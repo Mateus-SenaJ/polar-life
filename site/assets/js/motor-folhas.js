@@ -16,6 +16,25 @@ function contar(s,fr,total,verticais){                            /* nº de folh
   grupos.forEach(function(n){if(n>0)f+=Math.ceil(n/g.n)});
   return{folhas:f,porFolha:g.n,naoCabe:false}
 }
-window.PLFOLHAS={PAPEIS:PAPEIS,PADRAO:PADRAO,papel:papel,grade:grade,melhor:melhor,contar:contar,
-  ler:function(){try{var o=JSON.parse(sessionStorage.getItem('pl-folhas')||'null');if(o&&PAPEIS[o.papel]||o&&o.papel==='custom')return Object.assign({},PADRAO,o)}catch(e){}return Object.assign({},PADRAO)}};
+function paginar(s,fr,fotos){                                     /* mesma conta da T-07, agora também para o PDF */
+  fotos=fotos||[];
+  var p=papel(s),grupos=s.separar?[fotos.filter(function(f){return f.v}),fotos.filter(function(f){return!f.v})]:[fotos],sheets=[],erro=false,g0=melhor(s,p,fr);
+  if(g0.n===0)return{p:p,sheets:[],erro:true,g:g0};
+  grupos.forEach(function(g,gi){
+    if(!g.length)return;
+    var gr=melhor(s,p,fr),bw=gr.c*gr.fw+(gr.c-1)*s.gap,bh=gr.r*gr.fh+(gr.r-1)*s.gap,aw=p.w-2*s.margem,ah=p.h-2*s.margem;
+    var x0=s.align==='center'?s.margem+(aw-bw)/2:s.margem,y0=s.align==='center'?s.margem+(ah-bh)/2:s.margem;
+    for(var k=0;k<g.length;k+=gr.n){
+      var cells=g.slice(k,k+gr.n).map(function(f,i){var c=i%gr.c,r=Math.floor(i/gr.c);return{f:f,x:x0+c*(gr.fw+s.gap),y:y0+r*(gr.fh+s.gap),w:gr.fw,h:gr.fh,giro:gr.giro}});
+      sheets.push({cells:cells,grupo:s.separar?(gi===0?'Verticais':'Horizontais'):'',per:gr.n,parcial:cells.length<gr.n})
+    }
+  });
+  return{p:p,sheets:sheets,erro:false,g:g0}
+}
+window.PLFOLHAS={PAPEIS:PAPEIS,PADRAO:PADRAO,papel:papel,grade:grade,melhor:melhor,contar:contar,paginar:paginar,
+  ler:function(){                                   /* 30a: orientação da T-06 e, por cima, o que o editor salvou */
+    var d=Object.assign({},PADRAO);
+    try{if(sessionStorage.getItem('pl-orientacao')==='separar')d.separar=true}catch(e){}
+    try{var o=JSON.parse(sessionStorage.getItem('pl-folhas')||'null');if(o&&(PAPEIS[o.papel]||o.papel==='custom'))d=Object.assign(d,o)}catch(e){}
+    return d}};
 })();

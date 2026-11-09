@@ -23,13 +23,18 @@
     "testar:janela": "python3 scripts/testar-janela.py",
     "testar:valores": "python3 scripts/testar-valores.py",
     "fontes": "node scripts/baixar-fontes.mjs",
-    "testar:fontes": "node scripts/testar-fontes.mjs"
+    "vendor": "node scripts/copiar-vendor.mjs",
+    "testar:fontes": "node scripts/testar-fontes.mjs",
+    "testar:pdf": "node scripts/testar-pdf.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "fontkit": "^2.0.4",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
     "playwright": "^1.65.0",
     "subset-font": "^2.9.0"
   }

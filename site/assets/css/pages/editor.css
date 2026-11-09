@@ -274,10 +274,11 @@ strong{font-weight:500}
 
 /* estilos prontos da legenda (T-10) também nas folhas; só aparência, nada sobre a foto (T4) */
 figcaption[data-preset=contornada] .pol__cap{-webkit-text-stroke:.5px currentColor;paint-order:stroke fill}
-figcaption[data-preset=etiqueta] .pol__cap,figcaption[data-preset=bilhete] .pol__cap,figcaption[data-preset=carimbo] .pol__cap{display:inline-block;max-width:100%;padding:.05em .4em;border:1px solid currentColor;border-radius:2px}
-figcaption[data-preset=carimbo] .pol__cap{border-width:2px;transform:rotate(-3deg)}
+figcaption[data-preset=etiqueta],figcaption[data-preset=bilhete],figcaption[data-preset=carimbo]{line-height:0}
+figcaption[data-preset=etiqueta] .pol__cap,figcaption[data-preset=bilhete] .pol__cap,figcaption[data-preset=carimbo] .pol__cap{display:inline-block;max-width:100%;box-sizing:border-box;height:calc(1.2em + .52 * var(--mm));padding:.05em .4em;border:calc(.26 * var(--mm)) solid currentColor;border-radius:calc(.26 * var(--mm))}
+figcaption[data-preset=carimbo] .pol__cap{height:calc(1.2em + 1.06 * var(--mm));border-width:calc(.53 * var(--mm));transform:rotate(-3deg)}
 figcaption[data-preset=bilhete] .pol__cap{border-style:dashed}
-figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:0 .4em;border:1px solid currentColor;border-radius:2px}
+figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:0 .4em;border:calc(.26 * var(--mm)) solid currentColor;border-radius:calc(.26 * var(--mm))}
 .pol__top{display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .pol__top .pol__cap{overflow:visible}
 .aviso{position:relative;z-index:1;margin:8px auto 0;max-width:560px;padding:8px 12px;border-left:2px solid var(--black);background:var(--surface,#F8F9FA);font-size:12px;line-height:1.4}

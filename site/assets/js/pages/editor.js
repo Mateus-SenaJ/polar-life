@@ -7,7 +7,7 @@ function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
 /* ---------- dados ---------- */
 var PAPEIS=PLFOLHAS.PAPEIS;
 var FR={w:88,h:107,jw:76,jh:76,lado:6,topo:6};                 /* Clássico 88 × 107 · janela 76 × 76 */
-var LEG=['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'];
+var LEG=PLTEXTO.LEG;
 var VERT={2:1,6:1,9:1,13:1,17:1,21:1};                          /* 6 verticais e 18 horizontais (T-05) */
 var LISTA=[],TXT={},META={},LG=null;
 try{var Qd=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
@@ -24,12 +24,10 @@ var NF=FOTOS.length;
 document.getElementById('scope-t').textContent='Alterando: Todas as fotos · '+NF;
 document.getElementById('apply-t').textContent='Aplicar ao lote · '+NF+(NF===1?' foto':' fotos');
 var DEF={papel:'A4',w:210,h:297,orient:'retrato',margem:10,gap:4,girar:true,align:'center',separar:false,guias:true,contorno:false,compr:'continua',cor:'preto',rodape:false,assin:true};
-var D=JSON.parse(JSON.stringify(DEF));
+var D=PLFOLHAS.ler();                                          /* T-06 (pl-orientacao) + o que o editor salvou (D-085) */
 var COR={preto:'#000000',azul:'#006194',laranja:'#FD761A'};
 
 /* ---------- estado inicial: escolha da T-06 e estados de revisão por hash ---------- */
-try{if(sessionStorage.getItem('pl-orientacao')==='separar')D.separar=true}catch(e){}
-try{var SAV=JSON.parse(sessionStorage.getItem('pl-folhas')||'null');if(SAV&&(PAPEIS[SAV.papel]||SAV.papel==='custom'))D=Object.assign(D,SAV)}catch(e){}   /* volta do Quadro: papel e espaço como estavam (D-085) */
 function salvaD(){try{sessionStorage.setItem('pl-folhas',JSON.stringify(D))}catch(e){}}
 var est=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 if(est==='parcial')D.separar=true;
@@ -41,62 +39,13 @@ if(est==='sem-linhas'){D.guias=false;D.contorno=false}
 function papel(s){return PLFOLHAS.papel(s)}
 function grade(s,p,giro){return PLFOLHAS.grade(s,p,giro,FR)}   /* motor compartilhado (motor-folhas.js) */
 function melhor(s,p){return PLFOLHAS.melhor(s,p,FR)}
-function paginar(s){
-  var p=papel(s),grupos=s.separar?[FOTOS.filter(function(f){return f.v}),FOTOS.filter(function(f){return!f.v})]:[FOTOS],sheets=[],erro=false,g0=melhor(s,p);
-  if(g0.n===0)return{p:p,sheets:[],erro:true,g:g0};
-  grupos.forEach(function(g,gi){
-    if(!g.length)return;
-    var gr=melhor(s,p),bw=gr.c*gr.fw+(gr.c-1)*s.gap,bh=gr.r*gr.fh+(gr.r-1)*s.gap,aw=p.w-2*s.margem,ah=p.h-2*s.margem;
-    var x0=s.align==='center'?s.margem+(aw-bw)/2:s.margem,y0=s.align==='center'?s.margem+(ah-bh)/2:s.margem;
-    for(var k=0;k<g.length;k+=gr.n){
-      var cells=g.slice(k,k+gr.n).map(function(f,i){var c=i%gr.c,r=Math.floor(i/gr.c);return{f:f,x:x0+c*(gr.fw+s.gap),y:y0+r*(gr.fh+s.gap),w:gr.fw,h:gr.fh,giro:gr.giro}});
-      sheets.push({cells:cells,grupo:s.separar?(gi===0?'Verticais':'Horizontais'):'',per:gr.n,parcial:cells.length<gr.n})
-    }
-  });
-  return{p:p,sheets:sheets,erro:false,g:g0}
-}
 function aprov(R){var u=R.p.w-2*D.margem,v=R.p.h-2*D.margem,a=R.sheets.reduce(function(t,s){return t+s.cells.length},0)*FR.w*FR.h;return R.sheets.length?Math.round(a/(R.sheets.length*u*v)*100):0}
 
 /* ---------- desenho da folha ---------- */
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
 /* ---------- estilo da legenda nas folhas (T-10 → T-07) ---------- */
-function z2(n){return(n<10?"0":"")+n}
-var MESX=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"],SEMX=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
-var FMTD=[ /* 13 formatos de data (FN-07, DV-05), os mesmos da T-10 */
- function(d){return z2(d.getDate())+'.'+z2(d.getMonth()+1)+'.'+String(d.getFullYear()).slice(2)},
- function(d){return z2(d.getDate())+'/'+z2(d.getMonth()+1)+'/'+d.getFullYear()},
- function(d){return z2(d.getDate())+'-'+z2(d.getMonth()+1)+'-'+d.getFullYear()},
- function(d){return z2(d.getDate())+'/'+z2(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)},
- function(d){return d.getFullYear()+'-'+z2(d.getMonth()+1)+'-'+z2(d.getDate())},
- function(d){return z2(d.getMonth()+1)+'/'+d.getFullYear()},
- function(d){return z2(d.getMonth()+1)+'.'+String(d.getFullYear()).slice(2)},
- function(d){return d.getDate()+' de '+MESX[d.getMonth()]+' de '+d.getFullYear()},
- function(d){return d.getDate()+' '+MESX[d.getMonth()].slice(0,3)+' '+d.getFullYear()},
- function(d){return d.getDate()+' de '+MESX[d.getMonth()]},
- function(d){return MESX[d.getMonth()][0].toUpperCase()+MESX[d.getMonth()].slice(1)+' de '+d.getFullYear()},
- function(d){return MESX[d.getMonth()].slice(0,3)+'/'+String(d.getFullYear()).slice(2)},
- function(d){return SEMX[d.getDay()]+', '+d.getDate()+' de '+MESX[d.getMonth()]}
-];
-var COR_LG={preto:'#000',azul:'#006194',laranja:'#FD761A'};
-var FONT_LG={'Cormorant Garamond Itálico':["'Cormorant Garamond',serif",1,300],'Playfair Display Itálico':["'Playfair Display',serif",1,400],'Inter Light':["'Inter',sans-serif",0,300],'Inter Regular':["'Inter',sans-serif",0,400],'IBM Plex Mono':["'IBM Plex Mono',ui-monospace,monospace",0,400],'Courier Prime':["'Courier Prime',monospace",0,400],'Cutive Mono':["'Cutive Mono',monospace",0,400],'Special Elite':["'Special Elite',monospace",0,400],'EB Garamond':["'EB Garamond',serif",0,400],'Libre Baskerville':["'Libre Baskerville',serif",0,400],'Dancing Script':["'Dancing Script',cursive",0,400],'Satisfy':["'Satisfy',cursive",0,400],'Sacramento':["'Sacramento',cursive",0,400],'Allura':["'Allura',cursive",0,400],'Parisienne':["'Parisienne',cursive",0,400]};
-function famLG(n){var f=FONT_LG[n];return f?{f:f[0],i:f[1],w:f[2]}:{f:"'"+n+"',cursive",i:0,w:400}}
-function caixaLG(t,c){return c==='maiusc'?t.toUpperCase():c==='cap'?t.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase()}):t}
-function estLG(o,mm,px,extra){                               /* só a fonte e a cor; o corpo vem em pt reais (1 pt = 0,3528 mm) */
-  var fm=famLG(o.font);return'font-family:'+fm.f+';font-style:'+(fm.i?'italic':'normal')+';font-weight:'+fm.w+';color:'+(COR_LG[o.cor]||'#000')+';font-size:'+(o.pt*.3528*px)+'px'+(extra||'')
-}
-
-/* data e local de cada foto (T-13); sem edição vale o exemplo do DOC-04 §6 */
-var LOC0={uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'};
-function dadosFoto(f){
-  var m=f.m,iso=m?m.iso:'2026-07-14T08:00',cid=m?m.c:'Campos do Jordão',a=String(iso||'').match(/^(\d+)-(\d+)-(\d+)/);
-  return{d:a?new Date(+a[1],+a[2]-1,+a[3]):null,iso:a?a[0]:'',c:cid||''}
-}
-function localLG(l,cid){
-  var e=l.uf==='oculto'?'':l.uf==='sigla'?'SP':'São Paulo',pa=l.pais==='oculto'||l.ocBR?'':l.pais==='nome'?'Brasil':'BR';
-  var arr=l.ordem==='cidade'?[cid,e,pa]:[e,cid,pa],sep=l.sep===' '?' ':l.sep===', '?', ':' '+l.sep.trim()+' ';
-  return arr.filter(Boolean).join(sep)
-}
+var FMTD=PLTEXTO.FMTD, caixaLG=PLTEXTO.caixaLG, estLG=PLTEXTO.estLG, dadosFoto=PLTEXTO.dadosFoto, localLG=PLTEXTO.localLG, LOC0=PLTEXTO.LOC0;
 function polaroid(c,s,px,det){
   var L=c.x*px,T=c.y*px,W=c.w*px,H=c.h*px,ow=FR.w*px,oh=FR.h*px,ox=(W-ow)/2,oy=(H-oh)/2;
   var html='<figure class="pol'+(D.contorno&&!D.guias?' is-out':'')+'" data-n="'+c.f.n+'" style="left:'+L+'px;top:'+T+'px;width:'+W+'px;height:'+H+'px">';
@@ -158,7 +107,7 @@ function linhas(sh,p,px){                                          /* guias de c
 function desenhar(el,sh,p,px,det,idx,total){
   var h=sh.cells.map(function(c){return polaroid(c,sh,px,det)}).join('')+linhas(sh,p,px);
   if(det&&D.rodape&&px>1.2)h+='<div class="sheet__foot" style="bottom:'+Math.max(1,D.margem/2-1.2)*px+'px;font-size:'+2.2*px+'px">Viagem · Serra 2026 · Folha '+(idx+1)+' de '+total+'</div>';
-  el.style.width=p.w*px+'px';el.style.height=p.h*px+'px';el.innerHTML=h;
+  el.style.width=p.w*px+'px';el.style.height=p.h*px+'px';el.style.setProperty('--mm',px+'px');el.innerHTML=h;
   if(det)ajustarLeg(el,px)
 }
 /* «Ajustar para caber» (FN-07) e área segura (BR-13): mede a folha já desenhada */
@@ -186,7 +135,7 @@ function resumoTxt(){
   return R.g.n+' por folha · '+R.sheets.length+' folhas · aproveitamento '+aprov(R)+'%'
 }
 function render(){
-  R=paginar(D);
+  R=PLFOLHAS.paginar(D,FR,FOTOS);
   var N=R.sheets.length;if(cur>=N)cur=Math.max(0,N-1);
   var p=R.p,orient=D.orient==='paisagem'?'paisagem':'retrato';
   /* campos */

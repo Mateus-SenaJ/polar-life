@@ -38,11 +38,25 @@ function externos(origem, txt) {
     erros.push(`${rel(origem)}: recurso externo proibido (T6) → ${m[1]}`);
   }
 }
-for (const f of arquivos.filter(f => /\.(js|css)$/.test(f))) {        // JS e CSS também não chamam terceiros
+const VENDOR = join(SITE, 'assets', 'vendor');
+for (const f of arquivos.filter(f => /\.(js|css)$/.test(f) && !f.startsWith(VENDOR))) {  // vendor: URLs só em comentários internos, sem requisição (T6)
   const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   for (const m of s.matchAll(/(?:url\(\s*['"]?|['"])(https?:\/\/[^'")\s]+)/g))
     if (!/^http:\/\/www\.w3\.org\//.test(m[1])) erros.push(`${rel(f)}: recurso externo proibido (T6) → ${m[1]}`);
 }
+
+// 30a: um mesmo window.PLxxx não pode ser definido por dois arquivos (colisão de módulos)
+const plDono = new Map();
+for (const f of arquivos.filter(f => f.endsWith('.js') && f.startsWith(join(SITE, 'assets', 'js')))) {
+  const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of s.matchAll(/window\.(PL[A-Za-z0-9_]+)\s*=/g)) {
+    const nome = m[1];
+    if (!plDono.has(nome)) plDono.set(nome, new Set());
+    plDono.get(nome).add(rel(f));
+  }
+}
+for (const [nome, donos] of plDono)
+  if (donos.size > 1) erros.push(`window.${nome} definido em mais de um arquivo: ${[...donos].join(', ')}`);
 
 for (const h of htmls) {
   const s = readFileSync(h, 'utf8');
