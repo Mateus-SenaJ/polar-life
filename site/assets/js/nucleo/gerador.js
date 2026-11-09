@@ -44,19 +44,19 @@ function mat(sat,con,br,rgb,off){ /* mesma conta de filtros.js (T-11) */
 function por(id){return FILTROS.filter(function(f){return f.id===id})[0]||FILTROS[0]}
 function lerp(m,t){return m.map(function(v,i){return+(ID[i]+(v-ID[i])*t).toFixed(4)})}
 
-function nat(src){return VERT[src]?{w:976,h:1300}:{w:1300,h:976}}
-function efet(src,s){var a=nat(src);return s.rot%180?{w:a.h,h:a.w}:a}
+function nat(src,real){return real?{w:real.w,h:real.h}:VERT[src]?{w:976,h:1300}:{w:1300,h:976}}
+function efet(src,s,real){var a=nat(src,real);return s.rot%180?{w:a.h,h:a.w}:a}
 function janela(fr){return fr.ori==='h'?{jw:fr.jh,jh:fr.jw}:{jw:fr.jw,jh:fr.jh}}   /* MT-02/D-109: janela já girada */
 function jq(fr){var j=janela(fr);return j.jw/j.jh}
-function base(src,s,fr){var e=efet(src,s),a=1/e.w,b=1/(jq(fr)*e.h);return s.modo==='encaixar'?Math.min(a,b):Math.max(a,b)}
-function ppiFoto(src,s,fr){var j=janela(fr);return Math.round(1/(base(src,s,fr)*s.z/100)/j.jw*25.4)}
+function base(src,s,fr,real){var e=efet(src,s,real),a=1/e.w,b=1/(jq(fr)*e.h);return s.modo==='encaixar'?Math.min(a,b):Math.max(a,b)}
+function ppiFoto(src,s,fr,real){var j=janela(fr);return Math.round(1/(base(src,s,fr,real)*s.z/100)/j.jw*25.4)}
 
 function filtroParams(a){
   var f=1+(a.contraste>=0?a.contraste/100:a.contraste/125),bo=a.brilho/100*.3,tr=1+a.temp/100*.15,tb=1-a.temp/100*.15,ic=.5*(1-f)+bo;
   return{sat:1+a.saturacao/100,slopes:[f*tr,f,f*tb],ic:ic,amp:1+a.realces/100*.25,exp:1-a.sombras/100*.35}
 }
 function cena(sr,vin){ /* mesma cena de exemplo do quadro.js (T-08) */
-  var v=VERT[sr],o='<svg viewBox="0 0 '+(v?'300 400':'400 300')+'" preserveAspectRatio="none" aria-hidden="true"><rect width="'+(v?300:400)+'" height="'+(v?400:300)+'" fill="#fff"/>';
+  var v=VERT[sr],a=nat(sr),o='<svg xmlns="http://www.w3.org/2000/svg" width="'+a.w+'" height="'+a.h+'" viewBox="0 0 '+(v?'300 400':'400 300')+'" preserveAspectRatio="none" aria-hidden="true"><rect width="'+(v?300:400)+'" height="'+(v?400:300)+'" fill="#fff"/>';
   if(v){var sx=60+(sr*47)%180;
     o+='<rect width="300" height="270" fill="#006194" opacity=".14"/><circle cx="'+sx+'" cy="110" r="28" fill="#FD761A"/><path d="M0 270L60 170L110 230L170 130L230 245L300 180V400H0Z" fill="#006194" opacity=".55"/><path d="M0 320L80 240L150 300L220 230L300 310V400H0Z" fill="#000" opacity=".85"/><rect y="362" width="300" height="38" fill="#000"/>'}
   else{var sx2=70+(sr*53)%260;
@@ -65,24 +65,16 @@ function cena(sr,vin){ /* mesma cena de exemplo do quadro.js (T-08) */
   return o+'</svg>'
 }
 
-function svgFoto(f,fr,W,H){
-  var a=nat(f.src),k=base(f.src,f,fr)*f.z/100,bw=a.w*k*W,bh=a.h*k*W,cx=W*(.5+f.px),cy=H*(.5+f.py);
-  var adj=Object.assign({},ADJ0,f.adj||{}),flt=Object.assign({id:'original',int:100},f.flt||{}),fp=filtroParams(adj),fm=lerp(por(flt.id).m,(flt.int==null?100:flt.int)/100);
-  var filtro='<filter id="adj" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">'
-    +'<feColorMatrix type="saturate" values="'+fp.sat+'"/>'
-    +'<feComponentTransfer><feFuncR type="linear" slope="'+fp.slopes[0]+'" intercept="'+fp.ic+'"/><feFuncG type="linear" slope="'+fp.slopes[1]+'" intercept="'+fp.ic+'"/><feFuncB type="linear" slope="'+fp.slopes[2]+'" intercept="'+fp.ic+'"/></feComponentTransfer>'
-    +'<feComponentTransfer><feFuncR type="gamma" amplitude="'+fp.amp+'" exponent="'+fp.exp+'" offset="0"/><feFuncG type="gamma" amplitude="'+fp.amp+'" exponent="'+fp.exp+'" offset="0"/><feFuncB type="gamma" amplitude="'+fp.amp+'" exponent="'+fp.exp+'" offset="0"/></feComponentTransfer>'
-    +'<feColorMatrix type="matrix" values="'+fm.join(' ')+'"/>';
-  if((adj.nitidez||0)>0&&ppiFoto(f.src,f,fr)>=300){
-    var n=adj.nitidez/100*.5,kern='0 '+(-n)+' 0 '+(-n)+' '+(1+4*n)+' '+(-n)+' 0 '+(-n)+' 0';
-    filtro+='<feConvolveMatrix order="3" kernelMatrix="'+kern+'" divisor="1" edgeMode="duplicate"/>'
-  }
-  filtro+='</filter>';
-  var scene=cena(f.src,adj.vinheta||0).replace('<svg ','<svg x="'+(-bw/2)+'" y="'+(-bh/2)+'" width="'+bw+'" height="'+bh+'" ');
-  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
-    +'<defs><radialGradient id="vg" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="1"/></radialGradient>'+filtro+'</defs>'
-    +'<rect width="'+W+'" height="'+H+'" fill="#FFFFFF"/>'
-    +'<g transform="translate('+cx+' '+cy+') rotate('+(f.ang||0)+') scale('+(f.flip?-1:1)+' 1) rotate('+(f.rot||0)+')" filter="url(#adj)">'+scene+'</g></svg>'
+/* Canvas reproduz a cadeia SVG uma unica vez para cena e foto real (MT-02). */
+function aplicarAjustes(data,adj,flt){
+  var p=data.data,fp=filtroParams(adj),m=lerp(por(flt.id).m,(flt.int==null?100:flt.int)/100),i,r,g,b,l,nr,ng,nb;
+  for(i=0;i<p.length;i+=4){r=p[i]/255;g=p[i+1]/255;b=p[i+2]/255;l=.2126*r+.7152*g+.0722*b;r=l+(r-l)*fp.sat;g=l+(g-l)*fp.sat;b=l+(b-l)*fp.sat;r=Math.pow(Math.max(0,r*fp.slopes[0]+fp.ic),fp.exp)*fp.amp;g=Math.pow(Math.max(0,g*fp.slopes[1]+fp.ic),fp.exp)*fp.amp;b=Math.pow(Math.max(0,b*fp.slopes[2]+fp.ic),fp.exp)*fp.amp;nr=r*m[0]+g*m[1]+b*m[2]+m[4];ng=r*m[5]+g*m[6]+b*m[7]+m[9];nb=r*m[10]+g*m[11]+b*m[12]+m[14];p[i]=Math.max(0,Math.min(255,Math.round(nr*255)));p[i+1]=Math.max(0,Math.min(255,Math.round(ng*255)));p[i+2]=Math.max(0,Math.min(255,Math.round(nb*255)))}return data
+}
+function nitidez(data,valor){var s=data.data,o=new Uint8ClampedArray(s),w=data.width,h=data.height,n=valor/100*.5,x,y,c,i,a,b,d,e;for(y=0;y<h;y++)for(x=0;x<w;x++){i=(y*w+x)*4;for(c=0;c<3;c++){a=o[((y?y-1:0)*w+x)*4+c];b=o[(y*w+(x?x-1:0))*4+c];d=o[(y*w+(x<w-1?x+1:x))*4+c];e=o[((y<h-1?y+1:y)*w+x)*4+c];s[i+c]=Math.max(0,Math.min(255,o[i+c]*(1+4*n)-n*(a+b+d+e)))}}return data}
+function imagemCena(src){return new Promise(function(ok,no){var u=URL.createObjectURL(new Blob([cena(src,0)],{type:'image/svg+xml'})),im=new Image();im.onload=function(){URL.revokeObjectURL(u);ok(im)};im.onerror=function(){URL.revokeObjectURL(u);no(new Error('Cena indisponivel'))};im.src=u})}
+function rasterizar(f,fr,W,H,real,qualidade){
+  var adj=Object.assign({},ADJ0,f.adj||{}),flt=Object.assign({id:'original',int:100},f.flt||{}),a=nat(f.src,real),k=base(f.src,f,fr,real)*f.z/100,bw=a.w*k*W,bh=a.h*k*W,cx=W*(.5+f.px),cy=H*(.5+f.py),fonte=real?createImageBitmap(real.blob,{imageOrientation:'from-image'}):imagemCena(f.src);
+  return fonte.then(function(im){var cv=document.createElement('canvas');cv.width=W;cv.height=H;var g=cv.getContext('2d');g.fillStyle='#FFFFFF';g.fillRect(0,0,W,H);g.save();g.translate(cx,cy);g.rotate((f.ang||0)*Math.PI/180);g.scale(f.flip?-1:1,1);g.rotate((f.rot||0)*Math.PI/180);g.drawImage(im,-bw/2,-bh/2,bw,bh);if(adj.vinheta){/* MT-02: a vinheta acompanha o recorte, a rotação e a escala da foto. */g.save();g.scale(bw/2,bh/2);var gr=g.createRadialGradient(0,0,.675,0,0,1.5);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.45,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,'+(adj.vinheta/100*.55)+')');g.fillStyle=gr;g.fillRect(-1,-1,2,2);g.restore()}g.restore();var d=aplicarAjustes(g.getImageData(0,0,W,H),adj,flt);if((adj.nitidez||0)>0&&ppiFoto(f.src,f,fr,real)>=300)d=nitidez(d,adj.nitidez);g.putImageData(d,0,0);if(im.close)im.close();return new Promise(function(ok,no){cv.toBlob(function(b){if(!b){no({n:f.n,motivo:'Falha ao gerar a imagem'});return}b.arrayBuffer().then(function(ab){ok({n:f.n,bytes:new Uint8Array(ab),wpx:W,hpx:H})},no)},'image/jpeg',qualidade)})})
 }
 
 function projeto(){
@@ -351,25 +343,10 @@ function foto(proj,n,ppi,qualidade){
   if(!f)return Promise.reject({n:n,motivo:'Foto não encontrada'});
   var fr=proj.fr,j=janela(fr),W=Math.round(j.jw/25.4*ppi),H=Math.round(j.jh/25.4*ppi);
   if(W<1||H<1)return Promise.reject({n:n,motivo:'Formato inválido'});
-  var chave=[ppi,qualidade,W,H,JSON.stringify(f)].join('|');
-  if(cacheFoto[chave])return Promise.resolve(cacheFoto[chave]);
-  var svg=svgFoto(f,fr,W,H);
-  return new Promise(function(ok,no){
-    var url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'})),img=new Image();
-    img.onload=function(){
-      try{
-        var cv=document.createElement('canvas');cv.width=W;cv.height=H;
-        var g=cv.getContext('2d');g.fillStyle='#FFFFFF';g.fillRect(0,0,W,H);g.drawImage(img,0,0,W,H);
-        URL.revokeObjectURL(url);
-        cv.toBlob(function(b){
-          if(!b){no({n:n,motivo:'Falha ao gerar a imagem'});return}
-          b.arrayBuffer().then(function(ab){var r={n:n,bytes:new Uint8Array(ab),wpx:W,hpx:H};cacheFoto[chave]=r;ok(r)},function(){no({n:n,motivo:'Falha ao ler a imagem'})})
-        },'image/jpeg',qualidade)
-      }catch(e){URL.revokeObjectURL(url);no({n:n,motivo:'Falha ao desenhar a foto'})}
-    };
-    img.onerror=function(){URL.revokeObjectURL(url);no({n:n,motivo:'Falha ao desenhar a foto'})};
-    img.src=url
-  })
+  function gera(real){var chave=[ppi,qualidade,W,H,JSON.stringify(f),real?real.w+'x'+real.h:'cena'].join('|');if(cacheFoto[chave])return Promise.resolve(cacheFoto[chave]);return rasterizar(f,fr,W,H,real,qualidade).then(function(r){cacheFoto[chave]=r;return r})}
+  /* A foto local e decodificada uma por vez; o bitmap e fechado em rasterizar (DOC-08 §6). */
+  if(window.PLFOTOS&&window.PLFOTOS.ler)return window.PLFOTOS.ler(f.src).then(function(real){return gera(real)});
+  return gera(null)
 }
 
 /* ---------- PDF ---------- */
@@ -459,7 +436,7 @@ function fotosUsadas(paginas,a,b){
   for(var i=a;i<b;i++)walk(paginas[i].itens);
   return arr
 }
-function construirDoc(paginas,p,jpegs,a,b,avisos,sinal){
+function construirDoc(paginas,p,jpegs,a,b,avisos,sinal,escala){
   if(cancelado(sinal))return Promise.reject('abortado');
   return PDF.PDFDocument.create({updateMetadata:false}).then(function(doc){
     doc.registerFontkit(FK);
@@ -482,6 +459,7 @@ function construirDoc(paginas,p,jpegs,a,b,avisos,sinal){
         if(cancelado(sinal))return Promise.reject('abortado');
         var pg=paginas[i],page=doc.addPage([mm2pt(pg.w/1000),mm2pt(pg.h/1000)]),S=72/25.4/1000,H=mm2pt(pg.h/1000);
         page.pushOperators(PDF.pushGraphicsState(),PDF.concatTransformationMatrix(S,0,0,-S,0,H));
+        if(escala)page.pushOperators(PDF.concatTransformationMatrix(escala.fx||1,0,0,escala.fy||1,0,0)); /* DOC-08 §6: origem da pagina */
         ctx.page=page;ctx.pageIndex=i;desenharItens(ctx,pg.itens);
         page.pushOperators(PDF.popGraphicsState())
       }
@@ -489,11 +467,11 @@ function construirDoc(paginas,p,jpegs,a,b,avisos,sinal){
     })
   })
 }
-function construirVolumes(L,p,jpegs,lim,avisos,sinal){
+function construirVolumes(L,p,jpegs,lim,avisos,sinal,escala){
   var limB=lim>0?lim*1024*1024:0;
   function faixa(a,b){
     if(cancelado(sinal))return Promise.reject('abortado');
-    return construirDoc(L.paginas,p,jpegs,a,b,avisos,sinal).then(function(bytes){
+    return construirDoc(L.paginas,p,jpegs,a,b,avisos,sinal,escala).then(function(bytes){
       if(cancelado(sinal))return Promise.reject('abortado');
       if(limB&&bytes.length>limB&&b-a>1){var m=Math.floor((a+b)/2);return Promise.all([faixa(a,m),faixa(m,b)]).then(function(ps){return ps[0].concat(ps[1])})}
       return[{a:a,b:b,bytes:bytes}]
@@ -512,7 +490,7 @@ function preparar(p,avisos){
 }
 function pdf(proj,opcoes,cb){
   opcoes=opcoes||{};
-  var f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:326,q=f==='leve'?.72:.92,lim=opcoes.lim==null?150:opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal;
+  var f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:326,q=f==='leve'?.72:.92,lim=opcoes.lim==null?150:opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal,escala=opcoes.escala;
   var p=JSON.parse(JSON.stringify(proj));
   if(sem.length)p.fotos=p.fotos.filter(function(x){return sem.indexOf(x.n)<0});
   var falhasSet={},falhas=[],avisos=[];falhar.forEach(function(n){falhasSet[n]=1});
@@ -537,9 +515,9 @@ function pdf(proj,opcoes,cb){
       }
       return prox().then(function(){if(cb)cb({folha:idx+1,total:N,foto:ns.length});idx++;return folha()})
     }
-    return folha().then(function(){if(abortado())return Promise.reject('abortado');falhas.sort(function(a,b){return a-b});return construirVolumes(L,p,jpegs,lim,avisos,sinal)})
+    return folha().then(function(){if(abortado())return Promise.reject('abortado');falhas.sort(function(a,b){return a-b});return construirVolumes(L,p,jpegs,lim,avisos,sinal,escala)})
   }).then(function(arquivos){return{arquivos:arquivos,falhas:falhas,avisos:avisos}})
 }
 
-window.PLGERADOR={projeto:projeto,lista:lista,foto:foto,pdf:pdf,preparar:preparar,medir:medir,metricas:metricas};
+window.PLGERADOR={projeto:projeto,lista:lista,foto:foto,pdf:pdf,preparar:preparar,medir:medir,metricas:metricas,aplicarAjustes:aplicarAjustes};
 })();

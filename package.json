@@ -26,6 +26,7 @@
     "vendor": "node tools/copiar-vendor.mjs",
     "testar:fontes": "node tests/e2e/testar-fontes.mjs",
     "testar:pdf": "node tests/e2e/testar-pdf.mjs",
+    "testar:gerar-real": "node tests/e2e/testar-gerar-real.mjs",
     "testar:node": "node tests/unit/testar-quadro.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs"
   },
   "engines": {

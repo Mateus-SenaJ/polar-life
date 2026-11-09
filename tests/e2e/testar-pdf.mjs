@@ -170,6 +170,54 @@ try {
     });
   }
 
+  async function fidelidadeFoto(n) {
+    await page.evaluate(() => {
+      sessionStorage.removeItem('pl-quadro');
+      sessionStorage.removeItem('pl-fotos');
+      sessionStorage.removeItem('pl-folhas');
+    });
+    /* O Quadro só lê #foto-N ao abrir a página (etapa 28): trocar só o hash não recarrega, então passa por about:blank. */
+    await page.goto('about:blank');
+    await page.goto(srv.url + 'app/editor/quadro/#foto-' + n, { waitUntil: 'networkidle' });
+    await page.waitForFunction(() => document.querySelector('#clip .ph svg'));
+    for (const src of SCRIPTS) await page.addScriptTag({ url: srv.url + src });
+    const foto = await page.evaluate(async fotoN => {
+      const p = PLGERADOR.projeto();
+      const r = await PLGERADOR.foto(p, fotoN, 300, 0.9);
+      let s = '';
+      for (let i = 0; i < r.bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, r.bytes.subarray(i, i + 0x8000));
+      return { b64: btoa(s), w: r.wpx, h: r.hpx };
+    }, n);
+    /* Só a janela da foto: o cabeçalho fixo do editor e o esqueleto cobriam parte do #clip e entravam na comparação. */
+    await page.addStyleTag({ content: 'body *{visibility:hidden!important}#clip,#clip *{visibility:visible!important}' });
+    await page.locator('#clip').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const captura = (await page.locator('#clip').screenshot({ type: 'png' })).toString('base64');
+    const resultado = await page.evaluate(async ({ captura, foto }) => {
+      const carregar = src => new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = src; });
+      const quadro = await carregar('data:image/png;base64,' + captura);
+      const raster = await carregar('data:image/jpeg;base64,' + foto.b64);
+      const cv = document.createElement('canvas'), g = cv.getContext('2d');
+      cv.width = foto.w; cv.height = foto.h;
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(quadro, 0, 0, quadro.width, quadro.height, 0, 0, cv.width, cv.height);
+      const a = g.getImageData(0, 0, cv.width, cv.height).data;
+      g.clearRect(0, 0, cv.width, cv.height);
+      g.drawImage(raster, 0, 0, raster.width, raster.height, 0, 0, cv.width, cv.height);
+      const b = g.getImageData(0, 0, cv.width, cv.height).data;
+      const soma = [0, 0, 0], q = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], cont = [0, 0, 0, 0];
+      for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) {
+        const i = (y * cv.width + x) * 4, k = (y < cv.height / 2 ? 0 : 2) + (x < cv.width / 2 ? 0 : 1);
+        cont[k]++;
+        for (let c = 0; c < 3; c++) { const d = Math.abs(a[i + c] - b[i + c]); soma[c] += d; q[k][c] += d; }
+      }
+      return { media: soma.map(v => v / (cv.width * cv.height)), quadrantes: q.map((v, i) => v.map(x => x / cont[i])) };
+    }, { captura, foto });
+    /* carregarEditor() recarrega a página atual: volta ao editor para os próximos testes. */
+    await page.goto(srv.url + 'app/editor/', { waitUntil: 'networkidle' });
+    return resultado;
+  }
+
   const uniao = boxes => {
     const v = boxes.filter(Boolean);
     if (!v.length) return null;
@@ -317,6 +365,13 @@ try {
   await conferirFidelidade('contornada', { leg: leg({ preset: 'contornada' }), fr: null, folhas: {} });
   await conferirFidelidade('calendario', { leg: leg({ preset: 'calendario' }), fr: null, folhas: {} });
   await conferirFidelidade('inc 5 dx 1', { leg: leg({ dx: 1, inc: 5 }), fr: null, folhas: {} });
+  console.log('Fidelidade de raster MT-02:');
+  for (const n of [3, 12]) {
+    const r = await fidelidadeFoto(n);
+    const maxMedia = Math.max(...r.media), maxQuadrante = Math.max(...r.quadrantes.flat());
+    ok(maxMedia <= 6 && maxQuadrante <= 12,
+      'foto ' + n + ': média por canal ≤ 6 (' + r.media.map(x => x.toFixed(2)).join(', ') + ') e quadrante ≤ 12 (' + maxQuadrante.toFixed(2) + ')');
+  }
   const horiz = await conferirHorizontal();
   console.log('  desvio máximo MT-02: ' + desvioMax.toFixed(3) + ' mm');
 

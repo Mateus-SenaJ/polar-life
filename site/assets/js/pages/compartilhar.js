@@ -18,20 +18,11 @@ if(!A||!A.L||!A.L.length||A.k!==chave()){
   return
 }
 var L=A.L,ext=L[0].n.split('.').pop(),MIME={pdf:'application/pdf',png:'image/png',jpg:'image/jpeg',zip:'application/zip'};
-var PDF='%PDF-1.1\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF';
 var arquivos=[],modo='baixar',falhou=false;
 
 $('resumo').textContent=pl(L.length,'arquivo','arquivos')+' · '+fmt(L.reduce(function(a,x){return a+x.mb},0));
 $('arqs').innerHTML=L.slice(0,6).map(function(x){return'<li><span class="nm">'+x.n+'</span><span class="mono">'+fmt(x.mb)+'</span></li>'}).join('')+(L.length>6?'<li><span class="nm">e mais '+(L.length-6)+' arquivos</span><span></span></li>':'');
 
-function blobDe(cb){                                   /* arquivo de exemplo, pronto antes do clique */
-  if(ext==='pdf')return cb(new Blob([PDF],{type:MIME.pdf}));
-  if(ext==='zip')return cb(new Blob([new Uint8Array([80,75,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])],{type:MIME.zip}));
-  var c=document.createElement('canvas');c.width=600;c.height=750;var g=c.getContext('2d');
-  g.fillStyle='#fff';g.fillRect(0,0,600,750);g.strokeStyle='#000';g.lineWidth=2;g.strokeRect(1,1,598,748);
-  g.fillStyle='#000';g.font='24px sans-serif';g.fillText('Polar Life · arquivo de exemplo',40,380);
-  c.toBlob(cb,MIME[ext],.9)
-}
 function rotuloBaixar(){return ext==='pdf'?'Baixar PDF':ext==='zip'?'Baixar ZIP':L.length>1?'Baixar imagens':'Baixar imagem'}
 function destino(){return ext==='pdf'?'Abra o aplicativo de impressão ou de mensagens e escolha o PDF na pasta de downloads.':ext==='zip'?'Abra o aplicativo e escolha o arquivo ZIP na pasta de downloads.':'Abra o aplicativo e escolha a imagem na galeria.'}
 function pinta(){
@@ -62,11 +53,13 @@ $('ir').onclick=function(){
   }else baixa()
 };
 
-blobDe(function(b){
-  arquivos=L.map(function(x){return new File([b],x.n,{type:b.type})});
+function prepara(a){
+  arquivos=a.map(function(x){return new File([x.bytes],x.nome,{type:x.tipo||MIME[(x.nome||'').split('.').pop()]||'application/octet-stream'})});
   var ok=false;try{ok=!!(window.isSecureContext&&navigator.canShare&&navigator.canShare({files:arquivos}))}catch(e){}
   if(estado==='sem-suporte'||estado==='erro'||estado==='baixado')ok=false;
   falhou=estado==='erro';modo=ok?'compartilhar':'baixar';pinta();
   if(estado==='baixado')mostraBaixado()
-})
+}
+/* A tela de revisao preserva seus estados sem inventar um arquivo fora da geracao real. */
+if(window.PLFOTOS)PLFOTOS.lerArquivos(chave()).then(function(a){if(a.length)prepara(a);else if(estado)prepara([{nome:L[0].n,bytes:new Uint8Array(0),tipo:MIME[ext]}]);else{$('corpo').hidden=true;$('trava').hidden=false}},function(){$('corpo').hidden=true;$('trava').hidden=false});
 })();
