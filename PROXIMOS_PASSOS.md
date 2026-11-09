@@ -2,7 +2,14 @@
 
 **Estado:** etapas 1 a 29 prontas. Telas feitas: T-01 a T-14, T-18 a T-24, T-28 a T-31. Testes: `verificar`, `testar`, `testar:lote|formato|prevoo|exportar|gerar|imprimir|compartilhar|conexoes|estados|adicionar|processando|esqueleto|janela|valores` passam (os de Python, até a etapa 28) e `testar:fontes` (Node) passa.
 
-## Ordem sugerida
+## Ordem sugerida (revista na etapa 29)
+- **30 · Gerador real de PDF** (30a motor; 30b T-20/T-21/T-22 com arquivo real e fotos reais do aparelho no IndexedDB).
+- **31 · LED v4 canônico em todas as telas + anel em movimento (D-112)**: hoje cada tela recria pop-ups, barras e o estado desabilitado (com cinza, viola T2).
+- **32 · Imagens** PNG/JPEG de folhas e polaroids (300/600 PPI, DPI gravado) e ZIP.
+- **33 · Responsividade e movimento** (E13): 390, 834 e 1440 px em todas as telas; transições com `--ease`; `prefers-reduced-motion`.
+- **T-25 Entrar (2.0)**: referência do dono (captura de celular, 2026-11-09): foto de polaroids sobre a mesa no topo, faixa escura com sobretítulo laranja «NÃO DEIXE PARA DEPOIS», título Inter «Seu rolo de câmera está cheio de histórias.», texto, botão `led-btn--light` «Começar agora →» e abas Início · Editor · Referências na base. Segue o DOC-01 §12 (faixa escura). Foto de capa depende da licença (P31/J4).
+
+Itens herdados:
 1. ~~Ligar o que falta da T-31~~ **feito na etapa 24** (esqueleto na T-01 e no editor). A T-31 está fechada.
 2. **Gerador real de PDF e imagens** (DOC-08 §6). Hoje T-20, T-21 e T-22 usam arquivo de exemplo. pdf-lib + fontkit (DOC-08 §7), copiados para `site/assets/vendor/` (sem CDN, T6), com as fontes TTF da etapa 29.
 3. ~~**P-FONTES**~~ **feito na etapa 29**: fontes em `site/assets/fonts/` (WOFF2 para o site, TTF em `pdf/` para o gerador). Nanum Pen Script e Gaegu saíram do catálogo (sem acentos, D-111).

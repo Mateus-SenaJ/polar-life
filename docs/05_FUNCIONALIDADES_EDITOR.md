@@ -51,7 +51,7 @@ Dois interruptores independentes. **Invariante: `cutGuides && outline = falso`.*
 
 ## FN-03 · Formato da polaroid, moldura e medidas (abas MOLDURAS)
 
-- **Formatos de fábrica:** Clássico 88×107 (janela 76×76) · Mini quadrado 60×73 · Retro Pocket 60×80 · Instax Mini 54×86 · Instax Square 72×86 · Instax Wide 108×86 · Personalizado.
+- **Formatos de fábrica:** Clássico 88×107 (janela 76×76) · Mini quadrado 60×73 · Retro Pocket 66×99 (janela 60×79, D-113) · Instax Mini 54×86 · Instax Square 72×86 · Instax Wide 108×86 · Personalizado.
 - **Orientação da polaroid:** Vertical · Horizontal (atalho `R`).
 - **Medidas editáveis:** externa, janela, faixa superior, faixa inferior, cantos 0–6 mm, margem uniforme com cadeado, «Manter proporções do formato».
 - **Moldura é sempre branca**; não há seletor de cor. Moldura pertence à foto, não altera papel nem espaço.

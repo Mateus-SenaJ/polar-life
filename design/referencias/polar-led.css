@@ -1,0 +1,310 @@
+/* ==========================================================================
+   Polar Life · Sistema LED (v4, canônico)
+   Botões, caixas importantes, pop-ups e barras de carregamento.
+   Interface em 4 cores: branco, preto, azul, laranja.
+   Substitui a versão anterior deste arquivo.
+   ========================================================================== */
+
+:root {
+  --white: #FFFFFF;
+  --black: #000000;
+  --blue: #006194;
+  --orange: #FD761A;
+
+  /* Degradês do anel: laranja à esquerda, branco central, azul à direita */
+  --led-gradient-h: linear-gradient(90deg,  var(--orange) 0%, var(--white) 50%, var(--blue) 100%);
+  --led-gradient-d: linear-gradient(135deg, var(--orange) 0%, var(--white) 50%, var(--blue) 100%);
+
+  /* Espessuras do anel por nível */
+  --led-ring-1: 1px;
+  --led-ring-2: 1.5px;
+  --led-ring-3: 2.5px;
+
+  /* Halos (brilho externo, muito sutil) */
+  --led-halo-1: 0 0 0 0 transparent;
+  --led-halo-2: -4px 3px 10px rgb(253 118 26 / .14), 4px -2px 10px rgb(0 97 148 / .14);
+  --led-halo-3: -6px 4px 14px rgb(253 118 26 / .20), 6px -3px 14px rgb(0 97 148 / .20);
+
+  --r-box: 8px;
+  --btn-h: 56px;
+  --btn-r: 8px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   1. CAIXAS COM ANEL LED  (.led-box)
+   Nível 1: fio de 1 px, sem halo  → menus, popovers, toasts, tooltips
+   Nível 2: 1,5 px, halo leve      → caixas importantes (resumo de pré-voo,
+                                     decisão em lote, opção recomendada, login)
+   Nível 3: 2,5 px, halo completo  → pop-ups (diálogos) e botões
+   ========================================================================== */
+
+.led-box {
+  --ring: var(--led-ring-2);
+  --halo: var(--led-halo-2);
+  --core: var(--white);
+  --grad: var(--led-gradient-d);
+
+  box-sizing: border-box;
+  border: var(--ring) solid transparent;
+  border-radius: var(--r-box);
+  background-image: linear-gradient(var(--core), var(--core)), var(--grad);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: var(--halo);
+  color: var(--black);
+}
+.led-box--1 { --ring: var(--led-ring-1); --halo: var(--led-halo-1); }
+.led-box--2 { --ring: var(--led-ring-2); --halo: var(--led-halo-2); }
+.led-box--3 { --ring: var(--led-ring-3); --halo: var(--led-halo-3); }
+.led-box--wide { --grad: var(--led-gradient-h); }      /* caixas muito largas e baixas */
+.led-box--dark { --core: var(--black); color: var(--white); } /* toast */
+
+/* Pop-up (diálogo): película branca atrás + caixa nível 3 */
+.led-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgb(255 255 255 / .80);
+  backdrop-filter: blur(2px);
+}
+.led-dialog {
+  position: fixed;
+  z-index: 901;
+  top: 50%;
+  left: 50%;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  transform: translate(-50%, -50%);
+  animation: led-dialog-in 200ms var(--ease);
+}
+.led-dialog__title { margin: 0 0 8px; font: 600 20px/1.3 var(--font); }
+.led-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--black);
+}
+@keyframes led-dialog-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.98); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Menus, popovers, tooltips (nível 1) */
+.led-pop, .led-menu {
+  --ring: var(--led-ring-1);
+  --halo: var(--led-halo-1);
+  box-sizing: border-box;
+  border: var(--ring) solid transparent;
+  border-radius: var(--r-box);
+  background-image: linear-gradient(var(--white), var(--white)), var(--led-gradient-d);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* ==========================================================================
+   2. BOTÃO LED
+   Markup:
+   <button class="led-btn">
+     <span class="smoke-layer" aria-hidden="true"></span>
+     <span class="btn-content">Gerar PDF</span>
+     <span class="led-btn__bar" aria-hidden="true"></span>
+   </button>
+   Variantes: (padrão) miolo preto · .led-btn--light miolo branco
+   ========================================================================== */
+
+.led-btn {
+  --core: var(--black);
+  --ink: var(--white);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: var(--btn-h);
+  padding: 0 28px;
+  border: var(--led-ring-3) solid transparent;
+  border-radius: var(--btn-r);
+  background-image: linear-gradient(var(--core), var(--core)), var(--led-gradient-h);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: var(--led-halo-3);
+  color: var(--ink);
+  font: 700 15px/1 var(--font);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 150ms var(--ease), box-shadow 200ms var(--ease);
+}
+.led-btn--light { --core: var(--white); --ink: var(--black); }
+.led-btn--sm { --btn-h: 44px; padding: 0 20px; }
+.led-btn--block { display: flex; width: 100%; }
+
+.led-btn .btn-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  transition: color 200ms var(--ease);
+}
+
+/* Névoa multicamada (hover, foco, selecionado). O anel externo é preservado. */
+.led-btn .smoke-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background-color: var(--orange);
+  background-image:
+    linear-gradient(rgb(255 255 255 / .30), rgb(255 255 255 / .30)),          /* véu de contraste */
+    radial-gradient(ellipse 60% 45% at 25% 35%, rgb(255 255 255 / .75) 0%, rgb(255 255 255 / 0) 60%),
+    radial-gradient(ellipse 50% 50% at 55% 50%, rgb(0 97 148 / .65)   0%, rgb(0 97 148 / 0) 65%),
+    radial-gradient(ellipse 45% 40% at 75% 60%, rgb(255 255 255 / .70) 0%, rgb(255 255 255 / 0) 55%),
+    radial-gradient(ellipse 55% 55% at 95% 75%, rgb(253 118 26 / .95) 0%, rgb(253 118 26 / 0) 70%);
+  background-size: 100% 100%, 200% 200%, 200% 200%, 200% 200%, 200% 200%;
+  background-blend-mode: normal, screen, screen, screen, screen;
+  transition: opacity 350ms var(--ease);
+}
+
+@media (hover: hover) {
+  .led-btn:hover:not(:disabled):not([aria-busy="true"]) .smoke-layer {
+    opacity: 1;
+    animation: smoke-move 6s ease-in-out infinite alternate;
+  }
+  .led-btn:hover:not(:disabled):not([aria-busy="true"]) .btn-content { color: var(--black); }
+}
+.led-btn:focus-visible:not(:disabled):not([aria-busy="true"]) .smoke-layer,
+.led-btn.is-hover:not(:disabled):not([aria-busy="true"]) .smoke-layer {
+  opacity: 1;
+  animation: smoke-move 6s ease-in-out infinite alternate;
+}
+.led-btn:focus-visible .btn-content,
+.led-btn.is-hover .btn-content { color: var(--black); }
+
+.led-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.led-btn:active:not(:disabled):not([aria-busy="true"]) { transform: scale(.98); }
+
+@keyframes smoke-move {
+  0%   { background-position: 0 0, 0% 30%,  0% 30%,  0% 30%,  0% 30%; }
+  50%  { background-position: 0 0, 70% 70%, 70% 70%, 70% 70%, 70% 70%; }
+  100% { background-position: 0 0, 100% 40%, 100% 40%, 100% 40%, 100% 40%; }
+}
+
+/* Carregando: sem névoa e sem halo; barra deslizante na base */
+.led-btn[aria-busy="true"] { cursor: progress; pointer-events: none; box-shadow: none; --core: var(--white); --ink: var(--black); }
+.led-btn__bar { display: none; }
+.led-btn[aria-busy="true"] .led-btn__bar {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  height: 3px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.led-btn__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  border-radius: inherit;
+  background: var(--led-gradient-h);
+  animation: led-slide 1.4s var(--ease) infinite;
+}
+
+/* Desabilitado: sem LED, sem névoa, contorno tracejado preto */
+.led-btn:disabled,
+.led-btn[aria-disabled="true"] {
+  --core: var(--white);
+  --ink: var(--black);
+  border: 1px dashed var(--black);
+  background-image: none;
+  background-color: var(--white);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.led-btn:disabled .smoke-layer, .led-btn[aria-disabled="true"] .smoke-layer { display: none; }
+
+/* ==========================================================================
+   3. BARRAS DE CARREGAMENTO
+   <div class="led-progress" role="progressbar" aria-label="Carregando">
+     <span class="led-progress__glow"></span>
+     <span class="led-progress__track"><span class="led-progress__fill"></span></span>
+   </div>
+   Determinada: adicionar .led-progress--determinate, style="--value:50",
+   aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"
+   ========================================================================== */
+
+.led-progress {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  clip-path: inset(-14px 0 -14px 0);
+}
+.led-progress__track {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid var(--black);
+  border-radius: 999px;
+  background: var(--white);
+  overflow: hidden;
+}
+.led-progress__fill,
+.led-progress__glow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--led-gradient-h);
+  animation: led-slide 1.4s var(--ease) infinite;
+}
+.led-progress__glow { z-index: 0; filter: blur(8px); opacity: .55; }
+
+@keyframes led-slide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(250%); }
+}
+
+.led-progress--determinate .led-progress__fill,
+.led-progress--determinate .led-progress__glow {
+  width: calc(var(--value, 0) * 1%);
+  animation: none;
+  transition: width 300ms var(--ease);
+}
+.led-progress--thin { height: 4px; }
+.led-progress--page { position: fixed; inset: 0 0 auto 0; z-index: 1000; height: 3px; clip-path: none; }
+.led-progress--page .led-progress__track { border: 0; border-radius: 0; background: transparent; }
+.led-progress--page .led-progress__glow { display: none; }
+.led-progress--page .led-progress__fill { border-radius: 0; }
+
+/* ==========================================================================
+   4. ACESSIBILIDADE
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .led-btn, .led-btn .smoke-layer, .led-btn .btn-content { transition: none; }
+  .led-btn .smoke-layer { animation: none !important; background-position: 50% 50%; }
+  .led-dialog { animation: none; }
+  .led-btn__bar::after, .led-progress__fill, .led-progress__glow { animation: none; width: 100%; transform: none; }
+}
+
+@media (forced-colors: active) {
+  .led-btn, .led-box, .led-pop, .led-menu { border: 2px solid ButtonText; background: ButtonFace; color: ButtonText; box-shadow: none; }
+  .led-btn .smoke-layer { display: none; }
+}

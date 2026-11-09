@@ -3,3 +3,10 @@ node_modules/
 *.log
 dist/
 .env
+.tarefas/
+scripts/saida/
+# fotos pessoais de teste nunca entram no repo (T5)
+*.jpg
+*.jpeg
+*.heic
+!site/**/*.jpg
