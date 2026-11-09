@@ -27,7 +27,7 @@ site/                 ← tudo o que é publicado (raiz do GitHub Pages)
     css/  fonts.css · tokens.css · led.css (compartilhados) · pages/<tela>.css
     js/motor-folhas.js  papel, grade e contagem de folhas (T-07 e pop-up de formato)
     js/pages/           comportamento de cada tela
-    fonts/              Inter 400 e 500 (autohospedadas)
+    fonts/              todas as fontes autohospedadas (WOFF2), pdf/ (TTF para o PDF) e LICENCAS.txt
     img/logos/          nomes oficiais do DOC-01 §13
 docs/                 ← especificação (DOC-00 a DOC-12). O DOC-12 é o orquestrador
 design/
@@ -39,6 +39,8 @@ STATUS.md             ← telas feitas, próximas etapas, pendências
 ```
 
 ## Rodar e verificar
+
+Os testes `testar:*` em Python usam Playwright para Python; os novos (`.mjs`) usam o Playwright do Node: `npm install` e `npx playwright install chromium` uma vez.
 
 ```bash
 npm run serve        # abre site/ em http://localhost:3000
@@ -57,6 +59,8 @@ npm run testar:processando # Chromium: T-04 falha de leitura (fotos 7 e 19), Ten
 npm run testar:conexoes # Chromium: T-23 Central de conexões e T-24 Verificação (estados, teste sem tocar em foto, celular)
 npm run testar:janela # Chromium: janela não quadrada (Pocket, Instax Mini e Wide) no Quadro e na T-07
 npm run testar:valores # Chromium: «Valores diferentes» nos campos da aba Ajustes (escopo, aplicar, desfazer, filtro, celular)
+npm run testar:fontes  # Chromium (Node): nenhuma página pede nada de fora; catálogo de fontes local e com acentos
+npm run fontes         # (com rede) baixa as fontes, gera o subconjunto pt-BR e as licenças
 ```
 
 Todos os links são **relativos**: o site funciona na raiz de um domínio ou em `usuario.github.io/repositorio/`.

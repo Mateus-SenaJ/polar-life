@@ -1,6 +1,6 @@
 {
   "name": "polar-life",
-  "version": "0.10.5",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "description": "Polar Life · editor web local-first de polaroids. Telas T-01 a T-14, T-18 a T-24, T-31 e T-28 a T-30.",
@@ -21,9 +21,16 @@
     "testar:processando": "python3 scripts/testar-processando.py",
     "testar:esqueleto": "python3 scripts/testar-esqueleto.py",
     "testar:janela": "python3 scripts/testar-janela.py",
-    "testar:valores": "python3 scripts/testar-valores.py"
+    "testar:valores": "python3 scripts/testar-valores.py",
+    "fontes": "node scripts/baixar-fontes.mjs",
+    "testar:fontes": "node scripts/testar-fontes.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "fontkit": "^2.0.4",
+    "playwright": "^1.65.0",
+    "subset-font": "^2.9.0"
   }
 }

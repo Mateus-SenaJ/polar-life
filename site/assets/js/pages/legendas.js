@@ -21,25 +21,22 @@ var FMT=[ /* 13 formatos do FN-07 (DV-05) */
  ['jul/26',function(d){return MES[d.getMonth()].slice(0,3)+'/'+String(d.getFullYear()).slice(2)}],
  ['terça, 14 de julho',function(d){return SEM[d.getDay()]+', '+d.getDate()+' de '+MES[d.getMonth()]}]
 ];
-/* Catálogo EXC-2 (DOC-02 §4): 26 fontes, 5 categorias. fb = fallback genérico da categoria. */
+/* Catálogo EXC-2 (DOC-02 §4): 24 fontes, 5 categorias (Nanum Pen Script e Gaegu saíram: sem acentos, D-111). fb = fallback genérico da categoria. */
 var CAT={man:'Manuscrita',cal:'Caligráfica',dat:'Datilografada',edi:'Editorial',lim:'Limpa'};
 var FB={man:'cursive',cal:'cursive',dat:'monospace',edi:'serif',lim:'sans-serif'};
 var FONTES=[
- ['Caveat','man'],['Reenie Beanie','man'],['Shadows Into Light','man'],['Kalam','man'],['Patrick Hand','man'],['Covered By Your Grace','man'],['Nanum Pen Script','man'],['Gaegu','man'],['Zeyada','man'],['Homemade Apple','man'],['Over the Rainbow','man'],['La Belle Aurore','man'],
+ ['Caveat','man'],['Reenie Beanie','man'],['Shadows Into Light','man'],['Kalam','man'],['Patrick Hand','man'],['Covered By Your Grace','man'],['Zeyada','man'],['Homemade Apple','man'],['Over the Rainbow','man'],['La Belle Aurore','man'],
  ['Dancing Script','cal'],['Satisfy','cal'],['Sacramento','cal'],['Allura','cal'],['Parisienne','cal'],
  ['Special Elite','dat'],['Courier Prime','dat'],['Cutive Mono','dat'],
  ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],
  ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400]
 ].map(function(f){return{n:f[0],c:f[1],fam:f[2]||f[0],it:!!f[3],w:f[4]||400,css:"'"+(f[2]||f[0])+"',"+FB[f[1]]}});
 function fonte(n){return FONTES.filter(function(f){return f.n===n})[0]||FONTES[0]}
-var PRONTO=['Caveat','Reenie Beanie','Shadows Into Light','Cormorant Garamond Itálico','Sacramento','Special Elite']; /* usadas sem rede: já carregadas pela página */
-var carregadas={'Caveat':1,'Inter Light':1,'Inter Regular':1,'Cormorant Garamond Itálico':1};
-function carregar(lista){ /* sob demanda, só depois de um clique (LG-04). [VALIDAR] T6: autohospedar (P-FONTES) */
-  var novas=lista.filter(function(f){return!carregadas[f.n]&&f.c!=='lim'});if(!novas.length)return;
-  novas.forEach(function(f){carregadas[f.n]=1});
-  var l=document.createElement('link');l.rel='stylesheet';
-  l.href='https://fonts.googleapis.com/css2?'+novas.map(function(f){return'family='+f.fam.replace(/ /g,'+')+(f.it?':ital@1':'')}).join('&')+'&display=swap';
-  document.head.appendChild(l)
+var carregadas={};
+function carregar(lista){ /* sob demanda (LG-04): as fontes são nossas (fonts.css, P-FONTES fechada); só pede as visíveis na lista */
+  if(!document.fonts||!document.fonts.load)return;
+  lista.forEach(function(f){if(carregadas[f.n])return;carregadas[f.n]=1;
+    document.fonts.load((f.it?'italic ':'')+f.w+" 16px '"+f.fam+"'").catch(function(){})})
 }
 var PRESETS={ /* 8 estilos prontos (DV-03); cada um muda o look, não o texto */
  simples:{t:'Simples',p:{}},

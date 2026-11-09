@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Verificação estática do site (sem dependências). Uso: node scripts/verificar.mjs
 // Erros (saída 1): link ou ativo quebrado, âncora ausente, CDN/terceiro não permitido, noindex ausente em /app,
-// peso tipográfico > 500 (T1), cor fora da paleta (T2). Avisos: Google Fonts ainda em uso (P-FONTES, T6).
+// peso tipográfico > 500 (T1), fonte não autohospedada (T6, TP-06). Avisos: cor fora da paleta (T2).
+// Recurso externo é procurado em HTML, CSS e JS (P-FONTES fechada na etapa 29: Google Fonts agora é erro).
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, resolve, relative, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,9 +35,13 @@ function conferir(origem, ref) {
 }
 function externos(origem, txt) {
   for (const m of txt.matchAll(/(?:src|href)=["'](https?:\/\/[^"']+)/g)) {
-    if (/fonts\.(googleapis|gstatic)\.com/.test(m[1])) avisos.push(`${rel(origem)}: Google Fonts ainda em uso (P-FONTES, T6)`);
-    else erros.push(`${rel(origem)}: recurso externo proibido (T6) → ${m[1]}`);
+    erros.push(`${rel(origem)}: recurso externo proibido (T6) → ${m[1]}`);
   }
+}
+for (const f of arquivos.filter(f => /\.(js|css)$/.test(f))) {        // JS e CSS também não chamam terceiros
+  const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of s.matchAll(/(?:url\(\s*['"]?|['"])(https?:\/\/[^'")\s]+)/g))
+    if (!/^http:\/\/www\.w3\.org\//.test(m[1])) erros.push(`${rel(f)}: recurso externo proibido (T6) → ${m[1]}`);
 }
 
 for (const h of htmls) {

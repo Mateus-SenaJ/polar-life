@@ -1,6 +1,6 @@
 # Status do projeto
 
-Atualizado na **etapa 28** («Valores diferentes» dentro dos campos da aba Ajustes). Antes: etapa 27 (orientação Vertical/Horizontal da polaroid), etapa 26 (medidas oficiais das janelas e atalhos de personalização da moldura), etapa 25 (janela não quadrada: Retro Pocket, Instax Mini e Wide). Antes: etapa 24 (esqueleto de carregamento na T-01 e no editor; fecha a T-31), etapa 23 (falha de leitura na T-04 no padrão da T-31). Antes: etapa 22 (arquivo inválido da T-03). Antes: etapa 21 (T-31 Estados vazios e erros, 404; E12; ligas soltas de conexões). Antes: etapa 20 (T-23 Central de conexões e T-24 Verificação; E7), etapa 19 (T-22 Compartilhar; fecha o E6), etapa 18 (T-21 Imprimir e calibração), etapa 17 (T-20 Gerando), etapa 16 (T-19 Exportar), etapa 15 (T-18 Pré-voo), etapa 14 (pendências da legenda nas folhas: metadados por foto, «Ajustar para caber» e área segura). Antes: etapa 13 (formato da data e posição da legenda). Antes: etapa 12 (estilo e fonte da legenda nas folhas). Antes: etapa 11 (pop-ups de confirmação, T-07 com o formato e a legenda do Quadro). A etapa 1 organizou o repositório e migrou as 7 telas existentes; a etapa 2 fez T-05 e T-06; a etapa 3 fez a T-07; a etapa 4 fez a T-08; a etapa 5 fez a T-10; a etapa 6 fez a T-11; a etapa 7 fez a T-12 (parcial); a etapa 8 fez a T-13; a etapa 9 fez a T-14 (parcial); a etapa 10 fechou a T-14 (lote dinâmico); a etapa 11 ligou a T-12 às Folhas (pop-up de formato) e guardou o estado entre os modos.
+Atualizado na **etapa 29** (fontes autohospedadas: P-FONTES fechada). Antes: etapa 28 («Valores diferentes» dentro dos campos da aba Ajustes), etapa 27 (orientação Vertical/Horizontal da polaroid), etapa 26 (medidas oficiais das janelas e atalhos de personalização da moldura), etapa 25 (janela não quadrada: Retro Pocket, Instax Mini e Wide). Antes: etapa 24 (esqueleto de carregamento na T-01 e no editor; fecha a T-31), etapa 23 (falha de leitura na T-04 no padrão da T-31). Antes: etapa 22 (arquivo inválido da T-03). Antes: etapa 21 (T-31 Estados vazios e erros, 404; E12; ligas soltas de conexões). Antes: etapa 20 (T-23 Central de conexões e T-24 Verificação; E7), etapa 19 (T-22 Compartilhar; fecha o E6), etapa 18 (T-21 Imprimir e calibração), etapa 17 (T-20 Gerando), etapa 16 (T-19 Exportar), etapa 15 (T-18 Pré-voo), etapa 14 (pendências da legenda nas folhas: metadados por foto, «Ajustar para caber» e área segura). Antes: etapa 13 (formato da data e posição da legenda). Antes: etapa 12 (estilo e fonte da legenda nas folhas). Antes: etapa 11 (pop-ups de confirmação, T-07 com o formato e a legenda do Quadro). A etapa 1 organizou o repositório e migrou as 7 telas existentes; a etapa 2 fez T-05 e T-06; a etapa 3 fez a T-07; a etapa 4 fez a T-08; a etapa 5 fez a T-10; a etapa 6 fez a T-11; a etapa 7 fez a T-12 (parcial); a etapa 8 fez a T-13; a etapa 9 fez a T-14 (parcial); a etapa 10 fechou a T-14 (lote dinâmico); a etapa 11 ligou a T-12 às Folhas (pop-up de formato) e guardou o estado entre os modos.
 
 ## Telas (DOC-04 §4)
 
@@ -34,6 +34,17 @@ Atualizado na **etapa 28** («Valores diferentes» dentro dos campos da aba Ajus
 | T-25 | Entrar (2.0) | — | E10 | ◻ |
 | T-26, T-27 | Direito de uso e conta (2.0) | — | — | ◻ |
 | T-31 | Estados vazios e erros | `/app/estados/` e `404.html` | E12 | ✔ feita (etapa 21), página de catálogo |
+
+## Etapa 29 · Fontes autohospedadas (P-FONTES · T6, TP-06, TP-08)
+
+- **O que mudou:** nenhuma página chama mais o Google Fonts. As fontes do sistema (Inter 300/400/500, Cormorant Garamond 300/400 e itálico 300/400, Caveat 400/500, IBM Plex Mono 400) e as do catálogo de legendas estão em `site/assets/fonts/` em **subconjunto latino + pt-BR** (WOFF2, 5 a 60 KB cada). `fonts.css` declara todas; o navegador só baixa a que algum texto usa, então o carregamento continua sob demanda (DOC-02 §4). `legendas.js` deixou de montar o `<link>` do Google e só pede, com `document.fonts.load`, as fontes visíveis no seletor.
+- **Para o PDF (TP-08, MT-07):** a mesma fonte também sai em **TTF** em `site/assets/fonts/pdf/`, pronta para o gerador embutir em subconjunto (etapa 30).
+- **Reprodutível:** `npm run fontes` (`scripts/baixar-fontes.mjs`, precisa de rede) baixa, gera o subconjunto, confere os acentos e junta as licenças em `site/assets/fonts/LICENCAS.txt` (OFL 1.1; Apache 2.0 para Homemade Apple, Satisfy e Special Elite).
+- **Teste de acentuação (DOC-02 §4):** **Nanum Pen Script e Gaegu falharam** (nenhum acento do pt-BR) e **saíram do catálogo**, que passa a ter **24 fontes** (D-111). Projeto que já usava uma delas cai no padrão Caveat. `[VALIDAR]` com o dono se quer substitutas manuscritas.
+- **Verificador:** recurso externo em HTML, **CSS e JS** agora é **erro** (antes o Google Fonts era só aviso e o JS não era lido).
+- **Teste:** `npm run testar:fontes` (Node + Playwright, Chromium): as 18 páginas sem nenhum pedido fora do site; as 30 combinações de família e peso carregam dos arquivos locais com `á ã ç é ê í ó õ ú`. `verificar` e `testar` passam.
+- **Ambiente:** os testes `testar:*` em Python não rodaram nesta máquina (sem Python). Os testes novos passam a ser em Node (`scripts/servidor.mjs` serve o `site/`); `npm install` e `npx playwright install chromium` antes do primeiro uso.
+- **Correção:** `verificar.mjs` resolvia `site/` como `C:\C:\…` no Windows; agora usa `fileURLToPath`.
 
 ## Etapa 28 · «Valores diferentes» dentro dos campos (T-11 · FN-00a)
 
@@ -506,12 +517,11 @@ Atualizado na **etapa 28** («Valores diferentes» dentro dos campos da aba Ajus
 
 | ID | Item | Origem |
 | --- | --- | --- |
-| P-FONTES | Cormorant Garamond (300, 400), Caveat 500 e IBM Plex Mono 400 ainda vêm do Google Fonts (violam T6). Baixar os `.woff2` para `site/assets/fonts/`, descomentar o bloco em `fonts.css` e remover o `<link>` das páginas. O verificador deixa de avisar | DS-14, TP-06 |
 | P28 | Favicon quadrado (512, 192, 180, 48, 32, 16) | DOC-12 §3.5 |
 | P29 / P30 | Logo monocromático e logos em SVG | DOC-12 §3.5 |
 | P31 | Foto de capa do hero (licença, J4) | DOC-12 §3.5 |
 | J1 a J10 | Dados do controlador e demais itens jurídicos da T-30 continuam `[COLCHETES]` | DOC-09 |
 
-## Próxima etapa (29)
+## Próxima etapa (30)
 
 Ver `PROXIMOS_PASSOS.md`.
