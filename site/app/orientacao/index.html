@@ -22,9 +22,9 @@
 <section class="card"><p class="bg-t">24 fotos · 6 folhas · 4 por folha</p></section>
 </div></main>
 
-<div class="scrim" id="scrim"></div>
-<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d">
-<h2 id="dlg-t">Como organizar as fotos verticais e horizontais?</h2>
+<div class="scrim led-scrim" id="scrim"></div>
+<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d">
+<h2 class="led-dialog__title" id="dlg-t">Como organizar as fotos verticais e horizontais?</h2>
 <p id="dlg-d">Há <strong>6 verticais</strong> e <strong>18 horizontais</strong> entre as 24 fotos.</p>
 <fieldset class="opts">
 <legend class="sr">Organização por orientação</legend>
@@ -32,12 +32,12 @@
 <label class="opt"><input type="radio" name="o" value="padrao"><span class="opt__b"><span class="opt__t">Todas no padrão</span><span class="opt__d">Todas as fotos seguem a orientação padrão do formato.</span></span></label>
 <label class="opt"><input type="radio" name="o" value="depois"><span class="opt__b"><span class="opt__t">Decidir depois</span><span class="opt__d">Você escolhe no editor, quando quiser.</span></span></label>
 </fieldset>
-<div class="dialog__act">
+<div class="dialog__act led-dialog__actions">
 <a class="btn2 btn2--lg" id="back" href="../resumo/">Voltar</a>
 <button type="button" class="led-btn led-btn--light" id="go"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Continuar</span></span></button>
 </div>
 </div>
-<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
 
 <script src="../../assets/js/pages/orientacao.js" defer></script>
 </body>

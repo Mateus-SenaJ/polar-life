@@ -27,8 +27,8 @@
 
 <section class="card" aria-labelledby="lbl">
 <div class="lblrow"><span id="lbl"></span><span class="pct" id="pct"></span></div>
-<div class="prog" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--v:0%">
-<span class="prog__glow"></span><span class="prog__track"><span class="prog__fill"></span></span>
+<div class="led-progress led-progress--determinate" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--value:0">
+<span class="led-progress__glow"></span><span class="led-progress__track"><span class="led-progress__fill"></span></span>
 </div>
 <div class="sr" id="live" role="status" aria-live="polite"></div>
 
@@ -53,7 +53,7 @@
 </div>
 </section>
 </div></main>
-<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
 
 <script src="../../assets/js/pages/processando.js" defer></script>
 </body>

@@ -39,7 +39,7 @@ function card(s){
   var st=STATES[s.state];
   var h='<article class="svc" aria-labelledby="n-'+s.id+'"><div class="svc__top"><span class="svc__ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[s.icon]+'</svg></span><h3 id="n-'+s.id+'">'+s.name+'</h3></div>';
   h+='<span class="stt">'+I[st.i]+st.t+'</span>';
-  if(st.bar)h+='<div class="bar" role="progressbar" aria-label="Verificando"><i></i></div>';
+  if(st.bar)h+='<div class="led-progress led-progress--thin" role="progressbar" aria-label="Verificando"><span class="led-progress__glow"></span><span class="led-progress__track"><span class="led-progress__fill"></span></span></div>';
   h+='<p>'+s.help+'</p><div class="svc__act">';
   st.a.forEach(function(a){
     h+='<button type="button" class="'+(a[1]==='link'?'link':'btn2')+'" data-act="'+a[2]+'" data-svc="'+s.id+'">'+a[0]+'</button>';

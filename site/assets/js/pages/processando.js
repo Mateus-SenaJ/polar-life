@@ -30,7 +30,7 @@ function drawFiles(){
     return '<li><span class="nm">'+f.n+'</span><span class="st">'+s+'</span></li>';
   }).join('');
 }
-function setProg(p){var el=$('prog');el.style.setProperty('--v',p+'%');el.setAttribute('aria-valuenow',p)}
+function setProg(p){var el=$('prog');el.style.setProperty('--value',p);el.setAttribute('aria-valuenow',p)}
 
 function paint(){
   var c=counts();

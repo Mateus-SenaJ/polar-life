@@ -59,7 +59,7 @@ function resumo(s,L){var p=L.reduce(function(m,l){return PIOR[l[1]]>PIOR[m]?l[1]
  if(p==='atencao')return'Funciona, com um aviso. Suas fotos não foram tocadas.';
  return s.t==='saida'?'Tudo pronto. Você pode compartilhar o arquivo.':'Tudo pronto. Você pode trazer fotos deste caminho.'}
 function testa(id,de){var s=porId(id),ps=PASSOS[s.t],L=[];cancelado=false;
- abre('Verificar: '+s.n,'<p class="resumo" role="status" id="rs">Verificando… Nenhuma foto é lida, baixada ou enviada.</p><div class="cbar" id="cb" aria-hidden="true"></div><ul class="lin" id="ln" aria-live="polite"></ul>','<button type="button" class="btn2" id="cancela">Cancelar</button>',de);
+ abre('Verificar: '+s.n,'<p class="resumo" role="status" id="rs">Verificando… Nenhuma foto é lida, baixada ou enviada.</p><div class="cbar led-progress led-progress--thin" id="cb" aria-hidden="true"><span class="led-progress__glow"></span><span class="led-progress__track"><span class="led-progress__fill"></span></span></div><ul class="lin" id="ln" aria-live="polite"></ul>','<button type="button" class="btn2" id="cancela">Cancelar</button>',de);
  $('cancela').onclick=fecha;$('cancela').focus();
  if(estado==='verificando')return;                       /* revisão: fica no meio do teste */
  (function passo(i){if(cancelado)return;

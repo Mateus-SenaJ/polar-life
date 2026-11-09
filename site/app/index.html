@@ -46,7 +46,7 @@
     <button type="button" class="more" id="more1" aria-label="Mais ações do projeto Viagem · Serra 2026" aria-haspopup="menu" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
   </div>
   <span class="chip">Salvo neste dispositivo</span>
-  <div class="menu" id="menu1" role="menu" hidden>
+  <div class="menu led-menu" id="menu1" role="menu" hidden>
     <button type="button" role="menuitem" data-act="abrir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Abrir</button>
     <button type="button" role="menuitem" data-act="backup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Salvar backup (.polarlife)</button>
     <button type="button" role="menuitem" data-act="excluir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Excluir projeto…</button>
@@ -71,16 +71,16 @@
 </ul>
 </main>
 
-<div class="scrim" id="scrim" hidden></div>
-<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
-<h2 id="dlg-t">Excluir este projeto?</h2>
+<div class="scrim led-scrim" id="scrim" hidden></div>
+<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
+<h2 class="led-dialog__title" id="dlg-t">Excluir este projeto?</h2>
 <p>Viagem · Serra 2026 e as 24 fotos deste projeto serão apagados deste aparelho. Antes, você pode salvar um backup (.polarlife).</p>
-<div class="dialog__act">
+<div class="dialog__act led-dialog__actions">
 <button type="button" class="btn2 btn2--lg" id="dlg-cancel">Cancelar</button>
 <button type="button" class="btn2 btn2--lg" id="dlg-del"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Excluir projeto</button>
 </div>
 </div>
-<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-undo" hidden>Desfazer</button></div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-undo" hidden>Desfazer</button></div>
 
 <script src="../assets/js/pages/home.js" defer></script>
 </body>

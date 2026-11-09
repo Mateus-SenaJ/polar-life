@@ -63,17 +63,17 @@
 <div class="cookie__act"><button type="button" class="btn2" id="cookie-ok">Entendi</button><a class="link3" href="#cookies" id="cookie-more">Ver detalhes</a></div>
 </div>
 
-<div class="scrim" id="scrim" hidden></div>
-<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
-<h2 id="dlg-t">Preferências de cookies</h2>
+<div class="scrim led-scrim" id="scrim" hidden></div>
+<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
+<h2 class="led-dialog__title" id="dlg-t">Preferências de cookies</h2>
 <div class="pref"><div><b id="l-nec">Necessários</b><span class="d">Sempre ativo</span></div><button type="button" class="sw" role="switch" aria-checked="true" aria-disabled="true" aria-labelledby="l-nec"></button></div>
 <div class="pref"><div><b id="l-ana">Análise</b><span class="d">Desligada por padrão</span></div><button type="button" class="sw" id="sw-ana" role="switch" aria-checked="false" aria-labelledby="l-ana"></button></div>
-<div class="dialog__act">
+<div class="dialog__act led-dialog__actions">
 <button type="button" class="btn2" id="dlg-cancel">Cancelar</button>
 <button type="button" class="led-btn" id="dlg-save"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Salvar preferências</span></button>
 </div>
 </div>
-<div class="toast" id="toast" role="status" aria-live="polite" hidden>Preferências salvas</div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden>Preferências salvas</div>
 
 <script src="../assets/js/pages/legal.js" defer></script>
 </body>

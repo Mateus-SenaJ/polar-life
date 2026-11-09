@@ -19,13 +19,10 @@
 .lin .ico{margin-top:2px;stroke-width:2}
 .lin li[data-e=falha]{border:2px solid var(--black)}
 .lin small{display:block;font-size:13px;color:rgb(0 0 0/.72)}
-.cbar{position:relative;height:4px;margin-top:16px;border-radius:999px;overflow:hidden;background:var(--white);border:1px solid var(--outline-subtle)}
-.cbar::after{content:"";position:absolute;top:0;bottom:0;width:40%;border-radius:999px;background:var(--led-gradient-h);animation:cslide 1.2s ease-in-out infinite}
+.cbar{margin-top:16px}
 .cbar[hidden]{display:none}
-@keyframes cslide{from{left:-40%}to{left:100%}}
 .pas{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:p}
 .pas li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5}
 .pas li::before{counter-increment:p;content:counter(p);flex:none;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--black);border-radius:50%;font-size:14px;font-weight:500}
 .resumo{margin:16px 0 0;font-size:16px;line-height:1.6}
 @media(max-width:600px){.cx__acoes .btn2,.dialog__act .btn2{flex:1 1 100%;min-height:48px}.act--top .led-btn{width:100%}}
-@media(prefers-reduced-motion:reduce){.cbar::after{animation:none;left:0;width:100%}}
