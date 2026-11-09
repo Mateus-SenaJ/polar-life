@@ -1,0 +1,29 @@
+{
+  "name": "polar-life",
+  "version": "0.10.5",
+  "private": true,
+  "type": "module",
+  "description": "Polar Life · editor web local-first de polaroids. Telas T-01 a T-14, T-18 a T-24, T-31 e T-28 a T-30.",
+  "scripts": {
+    "serve": "npx --yes serve site",
+    "verificar": "node scripts/verificar.mjs",
+    "testar": "node scripts/testar-quadro.mjs",
+    "testar:lote": "python3 scripts/testar-lote.py",
+    "testar:formato": "python3 scripts/testar-formato.py",
+    "testar:prevoo": "python3 scripts/testar-prevoo.py",
+    "testar:exportar": "python3 scripts/testar-exportar.py",
+    "testar:gerar": "python3 scripts/testar-gerar.py",
+    "testar:imprimir": "python3 scripts/testar-imprimir.py",
+    "testar:compartilhar": "python3 scripts/testar-compartilhar.py",
+    "testar:conexoes": "python3 scripts/testar-conexoes.py",
+    "testar:estados": "python3 scripts/testar-estados.py",
+    "testar:adicionar": "python3 scripts/testar-adicionar.py",
+    "testar:processando": "python3 scripts/testar-processando.py",
+    "testar:esqueleto": "python3 scripts/testar-esqueleto.py",
+    "testar:janela": "python3 scripts/testar-janela.py",
+    "testar:valores": "python3 scripts/testar-valores.py"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

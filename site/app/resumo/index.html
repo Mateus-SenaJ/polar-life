@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Resumo da importação</title>
+<meta name="description" content="Confira o que foi importado antes de organizar as folhas.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond e IBM Plex Mono ainda vêm do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/pages/resumo.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+<main class="wrap page"><div class="narrow">
+<div class="head">
+<h1>Resumo da importação</h1>
+<p>Confira o que chegou antes de organizar as folhas.</p>
+</div>
+
+<section class="card" aria-labelledby="sum-t">
+<h2 class="sr" id="sum-t">Resumo</h2>
+<dl class="stats" id="stats"></dl>
+<div class="msg msg--warn" id="q-note">
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+<p id="q-txt"></p>
+</div>
+<div class="msg msg--warn" id="nd-note" hidden>
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+<p id="nd-txt"></p>
+</div>
+
+<ul class="rows">
+<li class="row">
+<div><strong>Manter uma de cada</strong><p id="dup-d"></p></div>
+<button type="button" class="btn2" id="dup-b">Manter uma de cada</button>
+</li>
+<li class="row">
+<div><strong id="ord-l">Ordenar por data da foto</strong><p id="ord-d"></p></div>
+<button type="button" class="sw" id="ord" role="switch" aria-checked="false" aria-labelledby="ord-l"><span></span></button>
+</li>
+</ul>
+
+<div class="msg" id="lock"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Suas fotos continuam no seu aparelho.</p></div>
+
+<div class="act">
+<a class="btn2" id="back" href="../adicionar-fotos/">Voltar</a>
+<button type="button" class="led-btn led-btn--light" id="go"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span id="go-t">Continuar</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+</div>
+</section>
+</div></main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" class="undo" id="toast-undo" hidden>Desfazer</button></div>
+
+<script src="../../assets/js/pages/resumo.js" defer></script>
+</body>
+</html>

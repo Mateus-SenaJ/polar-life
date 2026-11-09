@@ -1,0 +1,31 @@
+/* T-23 Central de conexões e T-24 Verificação · estado sempre em ícone + texto (CN-05); um só LED na tela */
+.h2{margin:0;font-size:22px;font-weight:300;line-height:1.2}
+.sec{margin-top:32px}
+.act--top{margin-top:16px;padding-top:0;border-top:0;justify-content:flex-start}
+.act--top .led-btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
+.cards{display:grid;gap:12px;margin-top:12px}
+.cx{display:grid;gap:8px;padding:16px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card)}
+.cx__top{display:flex;align-items:center;gap:12px}
+.cx__top .ico{width:24px;height:24px}
+.cx__nome{font-size:16px;font-weight:500}
+.cx__ajuda{margin:0;font-size:14px;line-height:1.5}
+.sel{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:2px 10px;border:1px solid var(--outline-subtle);border-radius:999px;width:max-content}
+.sel .ico{width:16px;height:16px;stroke-width:2}
+.sel--erro{border:2px solid var(--black)}
+.cx__acoes{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.cx__acoes .btn2{text-decoration:none}
+.lin{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.lin li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--outline-subtle);border-radius:10px;font-size:14px;line-height:1.5}
+.lin .ico{margin-top:2px;stroke-width:2}
+.lin li[data-e=falha]{border:2px solid var(--black)}
+.lin small{display:block;font-size:13px;color:rgb(0 0 0/.72)}
+.cbar{position:relative;height:4px;margin-top:16px;border-radius:999px;overflow:hidden;background:var(--white);border:1px solid var(--outline-subtle)}
+.cbar::after{content:"";position:absolute;top:0;bottom:0;width:40%;border-radius:999px;background:var(--led-gradient-h);animation:cslide 1.2s ease-in-out infinite}
+.cbar[hidden]{display:none}
+@keyframes cslide{from{left:-40%}to{left:100%}}
+.pas{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:p}
+.pas li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5}
+.pas li::before{counter-increment:p;content:counter(p);flex:none;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--black);border-radius:50%;font-size:14px;font-weight:500}
+.resumo{margin:16px 0 0;font-size:16px;line-height:1.6}
+@media(max-width:600px){.cx__acoes .btn2,.dialog__act .btn2{flex:1 1 100%;min-height:48px}.act--top .led-btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.cbar::after{animation:none;left:0;width:100%}}

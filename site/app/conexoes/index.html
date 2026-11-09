@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Conexões</title>
+<meta name="description" content="De onde as fotos chegam e para onde o arquivo vai. Suas fotos continuam no seu aparelho.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): IBM Plex Mono ainda vem do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/pages/processando.css">
+<link rel="stylesheet" href="../../assets/css/pages/gerar.css">
+<link rel="stylesheet" href="../../assets/css/pages/conexoes.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+<main class="wrap page"><div class="narrow">
+<div class="head"><h1>Conexões</h1><p>Suas fotos continuam no seu aparelho. Você escolhe o que trazer.</p></div>
+<div class="act act--top"><a class="led-btn led-btn--light" id="aparelho" href="../adicionar-fotos/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Escolher do aparelho</span></span></a></div>
+<section aria-labelledby="t-tz"><h2 class="h2 sec" id="t-tz">Trazer fotos</h2><div class="cards" id="trazer"></div></section>
+<section aria-labelledby="t-lv"><h2 class="h2 sec" id="t-lv">Levar para as redes</h2><div class="cards" id="levar"></div></section>
+</div></main>
+<div class="scrim" id="scrim" hidden></div>
+<div class="dialog" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-t" tabindex="-1" hidden>
+<h2 id="dlg-t"></h2><div id="dlg-c"></div>
+<div class="dialog__act" id="dlg-a"></div>
+</div>
+<script src="../../assets/js/pages/conexoes.js" defer></script>
+</body>
+</html>

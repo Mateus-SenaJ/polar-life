@@ -1,0 +1,27 @@
+/* T-20 · Gerando · recuperação · concluído. Usa a base de processando.css. Sucesso sem verde (DS-06): borda preta 1 px + ✓ azul + «Concluído». */
+.det{margin:12px 0 0;font-size:14px;line-height:1.5;color:rgb(0 0 0/.72)}
+.act{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--outline-subtle)}
+.msg--warn{border-left:4px solid var(--orange)}
+.msg--warn .ico{color:var(--orange)}
+.msg--ok .ico{color:var(--blue)}
+.msg p{margin:0}.msg__body p{margin-top:4px}
+.msg--err .btn2{margin-top:12px}
+#trava{margin-top:24px}
+.files{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.files li{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--outline-subtle);border-radius:10px;font-size:14px}
+.files .nm{overflow-wrap:anywhere}
+.act--ok{justify-content:flex-end}
+.nada{margin:12px 0 0;font-size:11px;text-transform:none;letter-spacing:0;color:rgb(0 0 0/.65)}
+/* pop-ups (mesmo padrão do editor) */
+.scrim{position:fixed;inset:0;z-index:900;background:rgb(255 255 255/.8);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.dialog{position:fixed;z-index:901;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,100vw - 32px);max-height:calc(100vh - 48px);overflow:auto;padding:24px;border:2.5px solid transparent;border-radius:14px;background-image:linear-gradient(#fff,#fff),var(--led-gradient-d);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:var(--shadow-card)}
+.scrim[hidden],.dialog[hidden]{display:none}
+.dialog h2{margin:0;font-size:22px;font-weight:300;line-height:1.2}
+.dialog p{margin:12px 0 0;font-size:16px;line-height:1.6}
+.dialog__act{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--outline-subtle)}
+.fl{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.fl li{display:flex;flex-direction:row;gap:10px;align-items:flex-start;padding:10px 12px;border:2px solid var(--black);border-radius:10px;font-size:14px;line-height:1.5}
+.fl li:first-child{padding-top:10px}
+.fl .ico{margin-top:2px;color:var(--black);stroke-width:2}
+@media(max-width:600px){.page{padding-top:20px}.card{padding:16px}.act .btn2,.act .led-btn,.dialog__act .btn2,.dialog__act .led-btn{flex:1 1 100%;width:100%}.act,.dialog__act{flex-direction:column-reverse}.act--ok{flex-direction:column}.act--ok .led-btn{order:-1}}
+@media(prefers-reduced-motion:reduce){.prog__fill,.prog__glow{transition:none}.led-btn__bar::after{animation:none}}

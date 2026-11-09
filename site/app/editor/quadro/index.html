@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Viagem · Serra 2026 · Quadro</title>
+<meta name="description" content="Edite uma polaroid por vez: recorte, endireite e ajuste a foto.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Caveat e IBM Plex Mono ainda vêm do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/led.css">
+<link rel="stylesheet" href="../../../assets/css/esqueleto.css">
+<script src="../../../assets/js/esqueleto.js"></script>
+<link rel="stylesheet" href="../../../assets/css/pages/editor.css">
+<link rel="stylesheet" href="../../../assets/css/pages/quadro.css">
+<link rel="stylesheet" href="../../../assets/css/pages/legendas.css">
+<link rel="stylesheet" href="../../../assets/css/pages/molduras.css">
+<link rel="stylesheet" href="../../../assets/css/pages/metadados.css">
+<link rel="stylesheet" href="../../../assets/css/pages/lote.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-collage" viewBox="0 0 24 24"><rect x="3" y="5" width="11" height="9" rx="1.5"/><rect x="10" y="10" width="11" height="9" rx="1.5"/></symbol>
+<symbol id="i-memory" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 17h4"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></symbol>
+<symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 7.5L20 18M8.5 16.5L20 6"/></symbol>
+<symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></symbol>
+<symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M4 18l5-5 4 4 3-3 4 4"/></symbol>
+<symbol id="i-verified" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></symbol>
+<symbol id="i-cancel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+<symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></symbol>
+<symbol id="i-flip" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M8.5 7L3.5 18h5z"/><path d="M15.5 7l5 11h-5z"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.2-4.2"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6-5.6 6-11a6 6 0 0 0-12 0c0 5.400 6 11 6 11z"/><circle cx="12" cy="10" r="2"/></symbol>
+<symbol id="i-crop" viewBox="0 0 24 24"><path d="M7 3v13a1 1 0 0 0 1 1h13"/><path d="M3 7h13a1 1 0 0 1 1 1v13"/></symbol>
+<radialGradient id="vg" cx=".5" cy=".5" r=".75"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="1"/></radialGradient>
+<filter id="adj" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+<feColorMatrix id="f-sat" type="saturate" values="1"/>
+<feComponentTransfer id="f-lin"><feFuncR type="linear" slope="1" intercept="0"/><feFuncG type="linear" slope="1" intercept="0"/><feFuncB type="linear" slope="1" intercept="0"/></feComponentTransfer>
+<feComponentTransfer id="f-gam"><feFuncR type="gamma" amplitude="1" exponent="1" offset="0"/><feFuncG type="gamma" amplitude="1" exponent="1" offset="0"/><feFuncB type="gamma" amplitude="1" exponent="1" offset="0"/></feComponentTransfer>
+<feColorMatrix id="f-flt" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+</filter>
+</defs></svg>
+
+<header class="eh">
+<div class="eh__l">
+<a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<span class="eh__div" aria-hidden="true"></span>
+<span class="eh__studio mono">Polar Life Studio</span>
+<div class="eh__proj">
+<span class="eh__name">Viagem · Serra 2026</span>
+<span class="chip"><span class="dot" aria-hidden="true"></span><span class="mono">Salvo neste dispositivo</span></span>
+</div>
+</div>
+<div class="eh__r">
+<div class="hist" role="group" aria-label="Histórico">
+<button type="button" class="ib" id="undo" aria-label="Desfazer" title="Desfazer (Ctrl+Z)" disabled><svg class="ico sm"><use href="#i-undo"/></svg></button>
+<button type="button" class="ib" id="redo" aria-label="Refazer" title="Refazer (Ctrl+Y)" disabled><svg class="ico sm"><use href="#i-redo"/></svg></button>
+</div>
+<button type="button" class="btn2 eh__save" id="save"><svg class="ico sm" style="color:var(--blue)"><use href="#i-download"/></svg>Salvar .polarlife</button>
+<button type="button" class="led-btn led-btn--sm eh__led" id="go"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm" style="color:var(--orange)"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button>
+<span class="eh__div eh__div--r" aria-hidden="true"></span>
+<span class="avatar" aria-hidden="true"><svg class="ico sm"><use href="#i-person"/></svg></span>
+<button type="button" class="ib eh__more" aria-label="Mais opções"><svg class="ico"><use href="#i-more"/></svg></button>
+</div>
+</header>
+
+<nav class="modes" aria-label="Modos">
+<a class="modes__o" href="../">Folhas</a>
+<a class="modes__o is-on" href="./" aria-current="page">Quadro</a>
+<button type="button" class="modes__o" disabled>Colagem</button>
+</nav>
+
+<aside class="rail" aria-label="Navegação de mesa">
+<div>
+<p class="rail__t mono"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
+<ul class="rail__l">
+<li><a class="rail__i" href="../"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
+<li><a class="rail__i is-on" href="./" aria-current="page"><svg class="ico"><use href="#i-grid"/></svg><span>Quadro</span></a></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="mono">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="mono">Em breve</em></button></li>
+</ul>
+</div>
+<div class="rail__card">
+<p class="mono rail__row"><span>Guia de corte</span><span style="color:var(--blue)">0,1 mm</span></p>
+<p class="rail__row2"><svg class="ico sm"><use href="#i-cut"/></svg><span>Guias ligadas · linha contínua</span></p>
+</div>
+</aside>
+
+<main class="content" id="main">
+<div class="wrap">
+<div class="ctx">
+<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-photo"/></svg><span class="mono" id="ctx-foto">Modo Quadro · Foto 03 de 24</span></span>
+<div class="ctx__r">
+<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="mono" id="ctx-scale">Escala 100%</span></span>
+<button type="button" class="btn2 btn2--sm ctx__insp" id="insp-toggle" aria-controls="insp" aria-expanded="true"><svg class="ico sm"><use href="#i-panel"/></svg>Inspetor</button>
+</div>
+</div>
+
+<div class="grid">
+<section class="mesa-col" aria-label="Mesa">
+<div class="mesa" id="mesa">
+<div class="hud">
+<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="mono">Guias · 0,1 mm</span></span>
+<span class="pill pill--hud seal" id="seal" role="status" aria-live="polite"><svg class="ico sm"><use href="#i-verified"/></svg><span class="mono" id="seal-t">Boa · 326 PPI</span></span>
+</div>
+
+<div class="cbar" role="toolbar" aria-label="Recorte">
+<div class="seg" role="radiogroup" aria-label="Modo do recorte">
+<label class="seg__o"><input type="radio" name="modo-b" value="preencher" data-modo><span>Preencher</span></label>
+<label class="seg__o"><input type="radio" name="modo-b" value="encaixar" data-modo><span>Encaixar</span></label>
+</div>
+<button type="button" class="ib" data-act="girar" aria-label="Girar 90°" title="Girar 90°"><svg class="ico"><use href="#i-rotate"/></svg></button>
+<button type="button" class="ib" data-act="espelhar" aria-label="Espelhar" aria-pressed="false" title="Espelhar"><svg class="ico"><use href="#i-flip"/></svg></button>
+<button type="button" class="ib" data-act="inteira" aria-label="Mostrar a foto inteira" aria-pressed="false" title="Mostrar a foto inteira"><svg class="ico"><use href="#i-eye"/></svg></button>
+</div>
+
+<div class="stage stage--q" id="stage">
+<figure class="pq" id="pq">
+<div class="win" id="win" tabindex="0" role="group" aria-label="Foto. Arraste para posicionar. Setas movem 1 px, com Shift 10 px. Os sinais + e − mudam o zoom.">
+<div class="win__ghost" id="ghost" aria-hidden="true"></div>
+<div class="win__clip" id="clip"></div>
+<svg class="win__grid" id="gradeov" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+</div>
+<div class="pq__leg" id="pq-leg"><div class="pq__sp" aria-hidden="true"></div>
+<div class="pq__top" id="cap-top" aria-hidden="true"></div>
+<figcaption class="pq__band" id="cap-band"><span class="pq__cap" id="cap">Dia de rolê</span><span class="pq__meta" id="cap-meta"><time datetime="2026-07-14">14.07.26</time> • Campos do Jordão, SP</span></figcaption>
+<img class="pq__sig" src="../../../assets/img/logos/Logo_tipografia_lateral.png" alt="" width="93" height="32">
+</div>
+</figure>
+</div>
+
+<div class="acts acts--q">
+<button type="button" class="ib" id="fprev" aria-label="Foto anterior" title="Foto anterior ( [ )"><svg class="ico"><use href="#i-prev"/></svg></button>
+<button type="button" class="btn2" data-act="centralizar"><svg class="ico sm" style="color:var(--blue)"><use href="#i-crop"/></svg>Centralizar quadro</button>
+<span class="acts__cota mono"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span id="cota">Passe-partout inferior: 25 mm</span></span>
+<span class="nb mono" id="nb" hidden>Ajustada</span>
+<button type="button" class="ib" id="fnext" aria-label="Foto seguinte" title="Foto seguinte ( ] )"><svg class="ico"><use href="#i-next"/></svg></button>
+</div>
+
+<div class="qmsg" id="qmsg" hidden>
+<div class="msg msg--warn" id="qmsg-b"><svg class="ico" id="qmsg-i"><use href="#i-warn"/></svg>
+<div class="msg__body"><p id="qmsg-t"></p>
+<div class="qmsg__act"><button type="button" class="btn2 btn2--sm" data-act="reduzir">Reduzir recorte</button><a class="btn2 btn2--sm" href="../../adicionar-fotos/">Trocar foto</a></div></div></div>
+</div>
+</div>
+
+<div class="faixa faixa--q" id="faixa-w">
+<div class="faixa__l"><span class="mono faixa__t">Lote <span>24</span></span>
+<ol class="faixa__list" id="faixa" aria-label="Fotos do lote"></ol></div>
+<span class="mono faixa__r" id="faixa-r">Foto 03 / 24</span>
+</div>
+</section>
+
+<aside class="insp" id="insp" aria-label="Inspetor">
+<button type="button" class="grab" id="grab" aria-label="Tamanho do painel"><span aria-hidden="true"></span></button>
+<div class="insp__in">
+<h2 class="insp__h">Inspetor</h2>
+<div class="tabs" role="tablist" aria-label="Abas do inspetor">
+<button type="button" role="tab" class="tab mono" id="tab-papel" aria-selected="false" aria-controls="p-papel" tabindex="-1">Papel</button>
+<button type="button" role="tab" class="tab mono" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
+<button type="button" role="tab" class="tab mono is-on" id="tab-ajustes" aria-selected="true" aria-controls="p-ajustes">Ajustes</button>
+<button type="button" role="tab" class="tab mono" id="tab-legendas" aria-selected="false" aria-controls="p-legendas" tabindex="-1">Legendas</button>
+<button type="button" role="tab" class="tab mono" id="tab-molduras" aria-selected="false" aria-controls="p-molduras" tabindex="-1">Molduras</button>
+<button type="button" role="tab" class="tab mono" id="tab-metadados" aria-selected="false" aria-controls="p-metadados" tabindex="-1">Metadados</button>
+</div>
+
+<div class="scope" id="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: só esta foto · Foto 03</span><span class="tag mono" id="scope-tag" hidden>Lote</span></div>
+
+<div id="p-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" class="panel">
+
+<section class="mod" id="m-flt" aria-labelledby="mf">
+<h3 class="mod__h" id="mf">Filtro</h3>
+<div class="seg" role="radiogroup" aria-label="Mostrar filtros">
+<label class="seg__o"><input type="radio" name="fview" value="todos" checked><span>Todos · 12</span></label>
+<label class="seg__o"><input type="radio" name="fview" value="fav"><span>Favoritos</span></label></div>
+<ul class="flt" id="flt-grid" aria-label="Filtros com a foto atual"></ul>
+<p class="f__h fvazio" id="flt-vazio" hidden>Nenhum favorito ainda. Toque no coração de um filtro para guardá-lo aqui.</p>
+<p class="f__h" id="flt-sug" role="status"></p>
+<p class="f__h" id="flt-dif" role="status" hidden><svg class="ico sm" aria-hidden="true"><use href="#i-info"/></svg><span></span></p>
+<div data-sl="fint"></div>
+<div class="row2">
+<button type="button" class="btn2" data-flt="cmp" aria-pressed="false"><svg class="ico sm" style="color:var(--blue)"><use href="#i-flip"/></svg>Comparar</button>
+<button type="button" class="btn2" id="flt-orig" aria-pressed="false"><svg class="ico sm" style="color:var(--blue)"><use href="#i-eye"/></svg>Ver original</button></div>
+<p class="f__h">Comparar divide a foto: original à esquerda, com filtro à direita. Segure «Ver original» para ver a foto sem filtro nem ajustes.</p>
+</section>
+
+<section class="mod" aria-labelledby="m1">
+<h3 class="mod__h" id="m1">Recorte e posição</h3>
+<div class="f" data-k="modo"><div class="f__top"><span class="f__l" id="modo-l">Modo do recorte</span><button type="button" class="rst mono" data-reset="modo" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="seg" role="radiogroup" aria-labelledby="modo-l">
+<label class="seg__o"><input type="radio" name="modo" value="preencher" data-modo><span>Preencher</span></label>
+<label class="seg__o"><input type="radio" name="modo" value="encaixar" data-modo><span>Encaixar</span></label></div>
+<p class="f__h" id="modo-h"></p></div>
+<div data-sl="zoom"></div>
+<div data-sl="ang"></div>
+<div class="row2">
+<button type="button" class="btn2" data-act="girar"><svg class="ico sm" style="color:var(--blue)"><use href="#i-rotate"/></svg>Girar 90°</button>
+<button type="button" class="btn2" data-act="espelhar" aria-pressed="false"><svg class="ico sm" style="color:var(--blue)"><use href="#i-flip"/></svg>Espelhar</button>
+</div>
+<div class="f" data-k="grade"><div class="f__top"><span class="f__l" id="grade-l">Grade de composição</span></div>
+<div class="seg seg--3" role="radiogroup" aria-labelledby="grade-l">
+<label class="seg__o"><input type="radio" name="grade" value="nenhuma"><span>Nenhuma</span></label>
+<label class="seg__o"><input type="radio" name="grade" value="tercos"><span>Terços</span></label>
+<label class="seg__o"><input type="radio" name="grade" value="diagonais"><span>Diagonais</span></label></div>
+<p class="f__h">Aparece só na tela. Nunca é impressa.</p></div>
+<div class="sw-row" data-k="inteira"><div><span class="f__l" id="inteira-l">Mostrar a foto inteira</span><p class="f__h">Um traço fino marca a janela; o que fica fora será cortado.</p></div><button type="button" class="sw" data-act="inteira" role="switch" aria-checked="false" aria-labelledby="inteira-l"><span></span></button></div>
+<div class="row2">
+<button type="button" class="btn2" data-act="centralizar"><svg class="ico sm" style="color:var(--blue)"><use href="#i-crop"/></svg>Centralizar</button>
+<button type="button" class="btn2" data-act="rfoto"><svg class="ico sm" style="color:var(--blue)"><use href="#i-reset"/></svg>Resetar foto</button>
+</div>
+</section>
+
+<section class="mod" aria-labelledby="m2">
+<h3 class="mod__h" id="m2">Luz e cor</h3>
+<div data-sl="brilho"></div><div data-sl="contraste"></div><div data-sl="saturacao"></div><div data-sl="temp"></div>
+</section>
+
+<section class="mod" aria-labelledby="m3">
+<h3 class="mod__h" id="m3">Detalhe</h3>
+<div data-sl="realces"></div><div data-sl="sombras"></div><div data-sl="nitidez"></div><div data-sl="vinheta"></div>
+</section>
+
+<div class="prot">
+<label class="chk"><input type="checkbox" id="replicar"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong id="replicar-t">Replicar para as demais 23 fotos</strong><span class="f__h">Copia os ajustes de imagem desta foto. O recorte de cada foto não muda.</span></span></label>
+<label class="chk chk--2"><input type="checkbox" id="subst"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Substituir ajustes individuais</strong><span class="f__h" id="subst-h">Desmarcada, as fotos com ajuste próprio ficam como estão.</span></span></label>
+</div>
+
+<div class="pe">
+<button type="button" class="btn2 btn2--lg pe__b" id="rtudo">Resetar tudo</button>
+<button type="button" class="btn2 btn2--lg pe__b" id="apply" disabled><span id="apply-t">Aplicar às demais · 23 fotos</span></button>
+</div>
+</div>
+
+<div id="p-legendas" role="tabpanel" aria-labelledby="tab-legendas" class="panel" hidden></div>
+
+<div id="p-papel" role="tabpanel" aria-labelledby="tab-papel" class="panel" hidden>
+<div class="msg"><svg class="ico"><use href="#i-info"/></svg><div class="msg__body"><p>As definições de papel valem para o projeto todo. Ajuste-as no modo Folhas.</p><div class="qmsg__act"><a class="btn2 btn2--sm" href="../">Abrir modo Folhas</a></div></div></div>
+</div>
+
+<div id="p-molduras" role="tabpanel" aria-labelledby="tab-molduras" class="panel" hidden></div>
+
+<div id="p-metadados" role="tabpanel" aria-labelledby="tab-metadados" class="panel" hidden></div>
+
+<div id="p-outra" role="tabpanel" class="panel" hidden>
+<div class="msg"><svg class="ico"><use href="#i-info"/></svg><p>Esta aba ainda não está disponível.</p></div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+
+<div class="bar"><button type="button" class="led-btn led-btn--block" id="go2"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm" style="color:var(--orange)"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" class="undo" id="toast-undo" hidden>Desfazer</button></div>
+
+<div class="esq-sk esq-sk--ed" role="status" aria-label="Carregando o projeto">
+<div class="esq-sk__mesa"><i class="folha"></i><i class="leg"></i></div>
+<div class="esq-sk__insp"><i></i><i></i><i></i><i></i></div>
+</div>
+<script src="../../../assets/js/motor-folhas.js" defer></script>
+<script src="../../../assets/js/pages/quadro.js" defer></script>
+<script src="../../../assets/js/pages/legendas.js" defer></script>
+<script src="../../../assets/js/pages/filtros.js" defer></script>
+<script src="../../../assets/js/pages/molduras.js" defer></script>
+<script src="../../../assets/js/pages/metadados.js" defer></script>
+<script src="../../../assets/js/pages/lote.js" defer></script>
+</body>
+</html>

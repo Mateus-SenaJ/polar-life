@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polar Life — Biblioteca Canônica de Componentes do Editor (E1)</title>
+  
+  <!-- Fontes Oficiais do DESIGN.md -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=Special+Elite&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'polar-white': '#FFFFFF',
+            'polar-black': '#000000',
+            'polar-blue': '#006194',
+            'polar-orange': '#FD761A',
+            'surface': '#FFFFFF',
+            'surface-subtle': '#F8F9FA',
+            'surface-card': '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'monospace'],
+            caveat: ['Caveat', 'cursive'],
+            elite: ['"Special Elite"', 'monospace'],
+            serif: ['Georgia', 'serif'],
+          },
+          boxShadow: {
+            'subtle': '0 2px 10px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            'card': '0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02)',
+            'polaroid': '0 16px 36px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+            'floating': '0 4px 16px rgba(0, 0, 0, 0.06)',
+            'lifted': '0 12px 32px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)'
+          },
+          borderRadius: {
+            'card': '14px',
+            'button': '12px',
+            'sm-round': '8px',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --black: #000000;
+      --blue: #006194;
+      --orange: #FD761A;
+
+      --led-gradient-h: linear-gradient(90deg, var(--orange) 0%, var(--white) 50%, var(--blue) 100%);
+      --led-gradient-d: linear-gradient(135deg, var(--orange) 0%, var(--white) 50%, var(--blue) 100%);
+
+      --led-ring-1: 1px;
+      --led-ring-2: 1.5px;
+      --led-ring-3: 2.5px;
+
+      --led-halo-2: -4px 3px 10px rgba(253, 118, 26, 0.14), 4px -2px 10px rgba(0, 97, 148, 0.14);
+      --led-halo-3: -6px 4px 14px rgba(253, 118, 26, 0.20), 6px -3px 14px rgba(0, 97, 148, 0.20);
+
+      --ease: cubic-bezier(.2, .7, .2, 1);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      background-color: #F8F9FA;
+      color: var(--black);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       SISTEMA LED CANÔNICO (polar-led.css)
+       ========================================================================== */
+    .led-btn {
+      --core: var(--black);
+      --ink: var(--white);
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      height: 52px;
+      padding: 0 24px;
+      border: var(--led-ring-3) solid transparent;
+      border-radius: 12px;
+      background-image: linear-gradient(var(--core), var(--core)), var(--led-gradient-h);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: var(--led-halo-3);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 150ms var(--ease), box-shadow 200ms var(--ease);
+    }
+    .led-btn--light {
+      --core: var(--white);
+      --ink: var(--black);
+      box-shadow: var(--led-halo-2), 0 4px 14px rgba(0,0,0,0.04);
+    }
+    .led-btn--sm {
+      height: 42px;
+      padding: 0 18px;
+      font-size: 13px;
+    }
+    .led-btn .btn-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      transition: color 200ms var(--ease);
+    }
+    .led-btn .smoke-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      background-color: var(--orange);
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .30), rgba(255, 255, 255, .30)),
+        radial-gradient(ellipse 60% 45% at 25% 35%, rgba(255, 255, 255, .75) 0%, rgba(255, 255, 255, 0) 60%),
+        radial-gradient(ellipse 50% 50% at 55% 50%, rgba(0, 97, 148, .65) 0%, rgba(0, 97, 148, 0) 65%),
+        radial-gradient(ellipse 45% 40% at 75% 60%, rgba(255, 255, 255, .70) 0%, rgba(255, 255, 255, 0) 55%),
+        radial-gradient(ellipse 55% 55% at 95% 75%, rgba(253, 118, 26, .95) 0%, rgba(253, 118, 26, 0) 70%);
+      background-size: 100% 100%, 200% 200%, 200% 200%, 200% 200%, 200% 200%;
+      background-blend-mode: normal, screen, screen, screen, screen;
+      transition: opacity 350ms var(--ease);
+    }
+    .led-btn.force-hover .smoke-layer,
+    .led-btn:hover:not(:disabled):not([aria-busy="true"]) .smoke-layer {
+      opacity: 1;
+      animation: smoke-move 6s ease-in-out infinite alternate;
+    }
+    .led-btn.force-hover .btn-content,
+    .led-btn:hover:not(:disabled):not([aria-busy="true"]) .btn-content {
+      color: var(--black);
+    }
+    .led-btn:active:not(:disabled):not([aria-busy="true"]) { transform: scale(.98); }
+    .led-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+    @keyframes smoke-move {
+      0%   { background-position: 0 0, 0% 30%,  0% 30%,  0% 30%,  0% 30%; }
+      50%  { background-position: 0 0, 70% 70%, 70% 70%, 70% 70%, 70% 70%; }
+      100% { background-position: 0 0, 100% 40%, 100% 40%, 100% 40%, 100% 40%; }
+    }
+
+    .led-btn[aria-busy="true"] {
+      cursor: progress;
+      pointer-events: none;
+      box-shadow: none;
+      --core: var(--white);
+      --ink: var(--black);
+    }
+    .led-btn__bar { display: none; }
+    .led-btn[aria-busy="true"] .led-btn__bar {
+      display: block;
+      position: absolute;
+      z-index: 2;
+      left: 16px;
+      right: 16px;
+      bottom: 5px;
+      height: 3px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .led-btn__bar::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 45%;
+      border-radius: inherit;
+      background: var(--led-gradient-h);
+      animation: led-slide 1.4s var(--ease) infinite;
+    }
+
+    .led-btn:disabled,
+    .led-btn[aria-disabled="true"] {
+      --core: var(--white);
+      --ink: rgba(0,0,0,0.35);
+      border: 1px dashed rgba(0,0,0,0.2);
+      background-image: none;
+      background-color: var(--white);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .led-btn:disabled .smoke-layer { display: none; }
+
+    /* Caixa LED Decisão (Nível 2) */
+    .led-box-decision {
+      border: var(--led-ring-2) solid transparent;
+      border-radius: 14px;
+      background-image: linear-gradient(var(--white), var(--white)), var(--led-gradient-d);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: var(--led-halo-2);
+    }
+
+    /* Pop-up LED Nível 3 */
+    .led-dialog-frame {
+      border: var(--led-ring-3) solid transparent;
+      border-radius: 14px;
+      background-image: linear-gradient(var(--white), var(--white)), var(--led-gradient-d);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: var(--led-halo-3);
+    }
+
+    /* Barras de Carregamento LED */
+    .led-progress {
+      position: relative;
+      width: 100%;
+      height: 7px;
+      clip-path: inset(-10px 0 -10px 0);
+    }
+    .led-progress__track {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    .led-progress__fill,
+    .led-progress__glow {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 45%;
+      border-radius: 999px;
+      background: var(--led-gradient-h);
+      animation: led-slide 1.4s var(--ease) infinite;
+    }
+    .led-progress__glow { z-index: 0; filter: blur(6px); opacity: .55; }
+
+    @keyframes led-slide {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(250%); }
+    }
+    .led-progress--determinate .led-progress__fill,
+    .led-progress--determinate .led-progress__glow {
+      width: calc(var(--value, 0) * 1%);
+      animation: none;
+      transition: width 300ms var(--ease);
+    }
+
+    /* Botão Secundário Tátil Canônico */
+    .btn-tactile-secondary {
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 12px;
+      background-color: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      color: #000000;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      cursor: pointer;
+      transition: all 150ms var(--ease);
+    }
+    .btn-tactile-secondary:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+    }
+    .btn-tactile-secondary:active {
+      transform: scale(0.98);
+    }
+
+    /* Toggles Canônicos */
+    .toggle-blue {
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background-color: #006194;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+      transition: background-color 200ms ease;
+    }
+    .toggle-blue .toggle-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    .toggle-disabled {
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background-color: #FFFFFF;
+      border: 1px dashed rgba(0,0,0,0.25);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .toggle-disabled .toggle-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="p-6 md:p-10 lg:p-12">
+
+  <div class="max-w-[1440px] mx-auto flex flex-col gap-8">
+    
+    <!-- CABEÇALHO DA PRANCHA CANÔNICA E1 -->
+    <header class="w-full bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="flex items-center gap-5">
+        <div class="bg-surface-subtle p-3.5 rounded-2xl shadow-subtle border border-black/[0.03] flex items-center justify-center shrink-0">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNfT_Vm5yjy2W4YTJSnhslj8DJBofHE5SZfgs6rn6SIaEnS8IcqyUS7AzfVtEy4qNEQT3ZcDPae3c0ETnlBVladctZix5degaGRjRJRaFemFnV9ZUo7krgm2gmRqzKtKA9GwV5UMOTEIZooLj-Gh8tOCmrSGhsYFyf3h5A4muUfcqfxzLKENPH6QxLAChnhu8P75Mdruv5kEtp7IYrUkXM3ofEbvl-o310HyIm7JqewOWx5F7eVp9x" alt="Polar Life" class="h-10 w-auto object-contain"/>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-polar-orange"></span>
+            <span class="font-mono text-[11px] font-semibold text-black/60 uppercase tracking-widest">Etapa E1 · Guia Mestre &amp; DESIGN.md Canônico</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-black">Biblioteca de Componentes do Editor</h1>
+          <p class="text-xs md:text-sm text-black/60 mt-0.5">Estúdio fotográfico tátil branco · Regra Imutável das 4 Cores (#FFFFFF, #000000, #006194, #FD761A) · polar-led.css</p>
+        </div>
+      </div>
+      <div class="flex flex-col md:items-end font-mono text-[11px] text-black/70 bg-surface-subtle border border-black/[0.04] px-4 py-3 rounded-xl shadow-subtle">
+        <span class="text-black font-bold">Largura Canônica: 1440 px</span>
+        <span>Sombras Táteis Orgânicas · Zero Cinzas Crus</span>
+        <span class="text-polar-blue font-semibold">WCAG 2.2 AA · 100% Local-First</span>
+      </div>
+    </header>
+
+    <!-- GRID PRINCIPAL DE MÓDULOS -->
+    <main class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-8 w-full">
+      
+      <!-- 01 · BOTÕES E SISTEMA LED NÍVEL 3 (12 colunas) -->
+      <section class="xl:col-span-12 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">01</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Botões e Sistema LED Nível 3 (Estados Canônicos)</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Anel gradiente 2,5 px Laranja → Branco → Azul · polar-led.css</span>
+        </div>
+
+        <!-- Linha Superior: 4 Estados do Botão Primário LED -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- 1. Repouso -->
+          <div class="p-5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col justify-between gap-4">
+            <div>
+              <span class="font-mono text-[10px] uppercase font-bold text-black/60">01 · Repouso</span>
+              <div class="font-semibold text-sm text-black mt-0.5">Botão Principal LED</div>
+            </div>
+            <button class="led-btn w-full" type="button">
+              <span class="smoke-layer"></span>
+              <span class="btn-content">
+                <span>Revisar impressão</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </span>
+              <span class="led-btn__bar"></span>
+            </button>
+            <span class="font-mono text-[10px] text-black/60 text-center">Miolo preto · Texto branco Inter 700</span>
+          </div>
+
+          <!-- 2. Hover Simulado com Névoa -->
+          <div class="p-5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col justify-between gap-4">
+            <div>
+              <span class="font-mono text-[10px] uppercase font-bold text-black/60">02 · Hover / Foco</span>
+              <div class="font-semibold text-sm text-black mt-0.5">Névoa Líquida Ativa</div>
+            </div>
+            <button class="led-btn force-hover w-full" type="button">
+              <span class="smoke-layer" style="opacity: 1; animation: smoke-move 6s ease-in-out infinite alternate;"></span>
+              <span class="btn-content">
+                <span>Revisar impressão</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </span>
+              <span class="led-btn__bar"></span>
+            </button>
+            <span class="font-mono text-[10px] text-black/60 text-center">Movimento 6s · Texto preto alto contraste</span>
+          </div>
+
+          <!-- 3. Carregando (Busy) -->
+          <div class="p-5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col justify-between gap-4">
+            <div>
+              <span class="font-mono text-[10px] uppercase font-bold text-black/60">03 · Carregando</span>
+              <div class="font-semibold text-sm text-black mt-0.5">aria-busy="true"</div>
+            </div>
+            <button class="led-btn w-full" aria-busy="true" type="button">
+              <span class="smoke-layer"></span>
+              <span class="btn-content">
+                <span class="material-symbols-outlined text-[18px] animate-spin">refresh</span>
+                <span>Gerando PDF...</span>
+              </span>
+              <span class="led-btn__bar"></span>
+            </button>
+            <span class="font-mono text-[10px] text-black/60 text-center">Miolo branco · Barra deslizante na base</span>
+          </div>
+
+          <!-- 4. Desabilitado -->
+          <div class="p-5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col justify-between gap-4">
+            <div>
+              <span class="font-mono text-[10px] uppercase font-bold text-black/60">04 · Desabilitado</span>
+              <div class="font-semibold text-sm text-black mt-0.5">aria-disabled="true"</div>
+            </div>
+            <button class="led-btn w-full" disabled aria-disabled="true" type="button">
+              <span class="smoke-layer"></span>
+              <span class="btn-content">
+                <span>Revisar impressão</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </span>
+              <span class="led-btn__bar"></span>
+            </button>
+            <span class="font-mono text-[10px] text-black/60 text-center">Tracejado 1px · Sem anel LED</span>
+          </div>
+        </div>
+
+        <!-- Linha Inferior: Variantes e Auxiliares Táteis (Zero Cinzas Crus) -->
+        <div class="p-5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.03] flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[11px] font-bold text-black/70 uppercase">Variante Clara e Ações Secundárias / Terciárias Táteis</span>
+            <span class="font-mono text-[11px] text-polar-blue font-semibold">Raio 12px · Sombra Orgânica shadow-subtle</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 pt-1">
+            <!-- Principal Claro -->
+            <button class="led-btn led-btn--light" type="button">
+              <span class="smoke-layer"></span>
+              <span class="btn-content">
+                <span>Começar agora</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </span>
+              <span class="led-btn__bar"></span>
+            </button>
+
+            <!-- Secundário Tátil: Adicionar fotos -->
+            <button class="btn-tactile-secondary" type="button">
+              <span class="material-symbols-outlined text-[18px] text-polar-blue">add_photo_alternate</span>
+              <span>+ Adicionar fotos</span>
+            </button>
+
+            <!-- Secundário Tátil: Salvar Projeto -->
+            <button class="btn-tactile-secondary" type="button">
+              <span class="material-symbols-outlined text-[18px]">save</span>
+              <span>Salvar .polarlife</span>
+            </button>
+
+            <!-- Secundário Tátil: Ver Lote -->
+            <button class="btn-tactile-secondary" type="button">
+              <span class="material-symbols-outlined text-[18px]">photo_library</span>
+              <span>Ver Lote (24)</span>
+            </button>
+
+            <!-- Terciário -->
+            <button class="h-12 px-3 text-black font-semibold text-sm hover:text-polar-blue underline underline-offset-4 cursor-pointer transition-colors" type="button">
+              Ver detalhes
+            </button>
+
+            <!-- Destrutivo Não Vermelho (Canônico) -->
+            <button class="h-12 px-4 rounded-xl bg-white border border-black/10 text-black font-semibold text-sm shadow-subtle hover:bg-black hover:text-white flex items-center gap-2 transition-all cursor-pointer" type="button">
+              <span class="material-symbols-outlined text-[18px]">delete_outline</span>
+              <span>Excluir 2 fotos</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 · CAIXAS DE DECISÃO (NÍVEL 2) E POP-UPS (NÍVEL 3) (12 colunas) -->
+      <section class="xl:col-span-12 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">02</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Caixas de Decisão (Nível 2) &amp; Pop-ups LED (Nível 3)</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Anel LED 1,5 px e 2,5 px · Decisões de Alto Peso</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <!-- Caixa Nível 2: Resumo de Pré-voo -->
+          <div class="led-box-decision p-6 md:p-7 flex flex-col justify-between gap-5">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-subtle font-mono text-[11px] font-bold text-polar-blue shadow-subtle uppercase">
+                  Nível 2 · Resumo de Produção
+                </span>
+                <span class="material-symbols-outlined text-[20px] text-polar-orange">verified</span>
+              </div>
+              <h3 class="text-xl font-bold text-black">Tudo pronto para o papel?</h3>
+              <p class="text-sm text-black/70 leading-relaxed">Suas 24 fotografias estão organizadas em 6 folhas A4 com margem uniforme de 10 mm e alinhamento de guilhotina calibrado.</p>
+            </div>
+
+            <!-- Dados Táteis em Grade -->
+            <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center justify-between">
+              <div>
+                <span class="font-mono text-[10px] text-black/50 uppercase font-semibold">Total Folhas</span>
+                <div class="text-lg font-bold text-black">6 Folhas A4</div>
+              </div>
+              <div class="h-8 w-px bg-black/[0.06]"></div>
+              <div>
+                <span class="font-mono text-[10px] text-black/50 uppercase font-semibold">Disposição</span>
+                <div class="text-sm font-semibold text-black">4 clássicas / folha</div>
+              </div>
+              <div class="h-8 w-px bg-black/[0.06]"></div>
+              <div>
+                <span class="font-mono text-[10px] text-black/50 uppercase font-semibold">Aproveitamento</span>
+                <div class="text-sm font-bold text-polar-blue">78% de área útil</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button class="btn-tactile-secondary" type="button">Voltar e ajustar</button>
+              <button class="led-btn led-btn--sm" type="button">
+                <span class="smoke-layer"></span>
+                <span class="btn-content">
+                  <span>Gerar PDF (6 folhas)</span>
+                  <span class="material-symbols-outlined text-[16px]">download</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pop-up Simulado Nível 3 (Regra 4.4 de Exclusão Mútua) -->
+          <div class="led-dialog-frame p-6 md:p-7 flex flex-col justify-between gap-5 bg-white">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-polar-orange"></span>
+                <span class="font-mono text-[11px] font-bold text-polar-orange uppercase tracking-wider">Regra de Produção 4.4</span>
+              </div>
+              <h3 class="text-xl font-bold text-black">Ativar guias desliga o contorno?</h3>
+              <p class="text-sm text-black/70 leading-relaxed">
+                As <strong>guias de corte contínuas de 0,1 mm</strong> se estendem até a borda da folha para alinhamento da guilhotina. Para evitar conflitos na lâmina e bordas duplas, o <strong>contorno individual</strong> deve ser desligado automaticamente nesta etapa.
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-surface-subtle border border-black/[0.03] flex items-center gap-3">
+              <span class="material-symbols-outlined text-[18px] text-polar-blue">info</span>
+              <span class="text-xs text-black/70">Invariante garantido: <code>cutGuides &amp;&amp; outline = Falso</code></span>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-black/[0.06]">
+              <button class="btn-tactile-secondary" type="button">Manter contorno</button>
+              <button class="led-btn led-btn--sm" type="button">
+                <span class="smoke-layer"></span>
+                <span class="btn-content">
+                  <span class="material-symbols-outlined text-[16px]">check</span>
+                  <span>Ativar guias</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 · INPUTS, CONTROLES NUMÉRICOS E SELETORES (6 colunas) -->
+      <section class="xl:col-span-6 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">03</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Controles Numéricos &amp; Seletores</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Altura 44px · Ergonomia Tátil</span>
+        </div>
+
+        <!-- Campo Numérico Tátil com Unidade mm -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center justify-between gap-4">
+          <div>
+            <label class="text-xs font-bold text-black uppercase tracking-wider block">Margem da Folha</label>
+            <span class="text-xs text-black/60">Respiro perimetral do papel</span>
+          </div>
+          <div class="flex items-center bg-white p-1 rounded-xl shadow-subtle border border-black/[0.04] gap-1">
+            <button class="w-9 h-9 rounded-lg bg-surface-subtle hover:bg-black hover:text-white text-black font-bold text-lg flex items-center justify-center transition-all cursor-pointer" type="button">−</button>
+            <div class="flex items-center px-2">
+              <input type="text" value="10" readonly class="w-8 text-center font-mono font-bold text-sm bg-transparent border-none p-0 focus:outline-none"/>
+              <span class="font-mono text-xs font-semibold text-black/60">mm</span>
+            </div>
+            <button class="w-9 h-9 rounded-lg bg-surface-subtle hover:bg-black hover:text-white text-black font-bold text-lg flex items-center justify-center transition-all cursor-pointer" type="button">+</button>
+          </div>
+        </div>
+
+        <!-- Estado de Erro Canônico (Borda 2px e Ícone ✕, Sem Vermelho) -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <label class="text-xs font-bold text-black uppercase tracking-wider block">Espaço Entre Fotos</label>
+              <span class="text-xs text-black/60">Canaleta de corte duplo</span>
+            </div>
+            <div class="flex items-center bg-white p-1 rounded-xl shadow-subtle border-2 border-black gap-1">
+              <button class="w-9 h-9 rounded-lg bg-surface-subtle text-black/30 font-bold text-lg flex items-center justify-center" type="button" disabled>−</button>
+              <div class="flex items-center px-1">
+                <span class="material-symbols-outlined text-[16px] text-black mr-1">cancel</span>
+                <input type="text" value="-2" readonly class="w-7 text-center font-mono font-bold text-sm bg-transparent border-none p-0 focus:outline-none"/>
+                <span class="font-mono text-xs font-semibold text-black/60">mm</span>
+              </div>
+              <button class="w-9 h-9 rounded-lg bg-surface-subtle hover:bg-black hover:text-white text-black font-bold text-lg flex items-center justify-center transition-all cursor-pointer" type="button">+</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 pt-1 text-xs text-black font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+            <span>O valor não pode ser negativo. Limite físico mínimo: 0 mm.</span>
+          </div>
+        </div>
+
+        <!-- Select Formato do Papel -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-black uppercase tracking-wider">Formato do Papel</label>
+          <div class="relative">
+            <select class="w-full h-11 px-4 pr-10 rounded-xl bg-white shadow-subtle border border-black/[0.06] text-sm text-black font-medium focus:ring-2 focus:ring-polar-blue focus:outline-none cursor-pointer appearance-none">
+              <option>A4 (210 × 297 mm) — Recomendado (4 por folha)</option>
+              <option>A3 (297 × 420 mm) — Amplo (9 por folha)</option>
+              <option>A5 (148 × 210 mm) — Compacto (2 por folha)</option>
+              <option>10 × 15 cm — Foto única</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-3 text-[20px] text-black/50 pointer-events-none">expand_more</span>
+          </div>
+        </div>
+
+        <!-- Grupos Segmentados (2 e 3 opções) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- 2 Opções -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-black uppercase tracking-wider">Orientação da Folha</label>
+            <div class="p-1 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.03] flex items-center">
+              <button class="flex-1 py-2 rounded-lg bg-black text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm" type="button">
+                <span class="material-symbols-outlined text-[15px]">crop_portrait</span> Retrato
+              </button>
+              <button class="flex-1 py-2 rounded-lg text-black/70 hover:text-black text-xs font-medium flex items-center justify-center gap-1.5 transition-all" type="button">
+                <span class="material-symbols-outlined text-[15px]">crop_landscape</span> Paisagem
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Opções -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-black uppercase tracking-wider">Formato Polaroid</label>
+            <div class="p-1 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.03] flex items-center">
+              <button class="flex-1 py-2 rounded-lg text-black/70 hover:text-black text-xs font-medium" type="button">Pocket</button>
+              <button class="flex-1 py-2 rounded-lg bg-black text-white text-xs font-bold shadow-sm" type="button">Classic</button>
+              <button class="flex-1 py-2 rounded-lg text-black/70 hover:text-black text-xs font-medium" type="button">Square</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deslizador (Slider) de Zoom 100-300% -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-black uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-polar-blue">zoom_in</span>
+              Zoom do Enquadramento
+            </label>
+            <span class="px-2.5 py-0.5 rounded-full bg-white shadow-subtle font-mono text-xs font-bold text-polar-blue border border-black/[0.04]">165%</span>
+          </div>
+          <div class="relative flex items-center h-8">
+            <div class="w-full h-2 rounded-full bg-black/10 overflow-hidden">
+              <div class="h-full bg-polar-blue rounded-full" style="width: 65%;"></div>
+            </div>
+            <div class="absolute left-[65%] -translate-x-1/2 w-5 h-5 rounded-full bg-white shadow-card border-2 border-polar-blue cursor-grab"></div>
+          </div>
+          <div class="flex items-center justify-between font-mono text-[10px] text-black/50">
+            <span>100% (Ajustar)</span>
+            <span>165% (Manual)</span>
+            <span>300% (Máximo)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 · INTERRUPTORES, CHECKBOXES E REGRA 4.4 (6 colunas) -->
+      <section class="xl:col-span-6 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">04</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Interruptores, Checkboxes &amp; Regra 4.4</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Azul Técnico (#006194) nos Ativos</span>
+        </div>
+
+        <!-- Interruptor Ativo: Guias de Corte -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold text-black uppercase tracking-wider block">Guias de Corte Contínuas (0,1 mm)</span>
+            <span class="text-xs text-black/60">Linhas milimétricas até as bordas para guilhotina</span>
+          </div>
+          <button class="toggle-blue" aria-pressed="true" type="button">
+            <span class="toggle-thumb"></span>
+          </button>
+        </div>
+
+        <!-- Interruptor Desabilitado: Contorno (Regra 4.4 Invariante) -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <span class="text-xs font-bold text-black/60 uppercase tracking-wider block">Contorno da Polaroid</span>
+              <span class="text-xs text-black/40">Traço periférico na borda do passe-partout</span>
+            </div>
+            <button class="toggle-disabled" disabled aria-disabled="true" type="button">
+              <span class="toggle-thumb"></span>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 pt-1 text-xs text-polar-blue font-semibold">
+            <span class="material-symbols-outlined text-[15px]">info</span>
+            <span>Desative as guias de corte para usar contorno. (Invariante 4.4)</span>
+          </div>
+        </div>
+
+        <!-- Checkbox Ativo (Azul Técnico com ✓ Branco) -->
+        <label class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center gap-3.5 cursor-pointer">
+          <div class="w-5 h-5 rounded-md bg-polar-blue flex items-center justify-center text-white shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-black uppercase tracking-wider">Replicar Estilo para as Demais Fotos</span>
+            <span class="text-xs text-black/60">Começa desmarcado por padrão para proteger ajustes individuais.</span>
+          </div>
+        </label>
+
+        <!-- Checkbox Desmarcado -->
+        <label class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center gap-3.5 cursor-pointer">
+          <div class="w-5 h-5 rounded-md bg-white border border-black/30 shrink-0"></div>
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-black uppercase tracking-wider">Substituir Ajustes Individuais</span>
+            <span class="text-xs text-black/60">Exige marcação explícita ao sincronizar em lote.</span>
+          </div>
+        </label>
+
+        <!-- Diagrama Guilhotina Espaço 0 mm vs > 0 mm -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2.5">
+          <span class="font-mono text-[10px] font-bold text-black/70 uppercase">Comportamento Físico de Lâmina (Seção 4.5)</span>
+          <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="p-3 rounded-lg bg-white shadow-subtle border border-black/[0.03]">
+              <span class="font-mono text-xs font-bold text-black block">Espaço &gt; 0 mm</span>
+              <span class="text-[11px] text-black/60">Linhas duplas independentes</span>
+            </div>
+            <div class="p-3 rounded-lg bg-white shadow-subtle border border-polar-blue/30 ring-1 ring-polar-blue/20">
+              <span class="font-mono text-xs font-bold text-polar-blue block">Espaço = 0 mm</span>
+              <span class="text-[11px] text-black/60">Linha única compartilhada</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 · CHIPS DE ESCOPO E SELOS DE QUALIDADE PPI (12 colunas) -->
+      <section class="xl:col-span-12 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">05</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Chips de Escopo &amp; Selos de Qualidade PPI</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Diagnóstico Efetivo da Impressão Fotográfica</span>
+        </div>
+
+        <!-- Chips de Escopo Obrigatórios (Regra 9) -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <span class="font-mono text-[11px] font-bold text-polar-blue uppercase">Regra 9 Canônica · Escopo da Edição Sempre Visível</span>
+            <p class="text-xs text-black/70 mt-0.5">Identifica instantaneamente se o inspetor altera a foto ativa ou o projeto inteiro.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white shadow-subtle border border-polar-blue/30 text-polar-blue text-xs font-semibold">
+              <span class="w-2 h-2 rounded-full bg-polar-blue"></span>
+              <span>Alterando: <strong>Só esta foto (Foto 3)</strong></span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white shadow-subtle border border-black/10 text-black text-xs font-semibold">
+              <span class="w-2 h-2 rounded-full bg-polar-orange"></span>
+              <span>Alterando: <strong>Todas as fotos · 24</strong></span>
+              <span class="px-1.5 py-0.5 rounded bg-black text-white font-mono text-[9px] font-bold">LOTE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Selos de Resolução PPI Oficial -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 1. Boa -->
+          <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-bold text-black border border-black/[0.03]">
+                <span class="text-polar-blue font-bold">✓</span> Boa · 326 PPI
+              </span>
+              <span class="material-symbols-outlined text-[18px] text-polar-blue">verified</span>
+            </div>
+            <p class="text-xs text-black/60">Nitidez de galeria fine art. Densidade ótima para visualização a 20 cm.</p>
+          </div>
+
+          <!-- 2. Abaixo do Ideal -->
+          <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-bold text-black border border-black/[0.03]">
+                <span class="w-1.5 h-1.5 rounded-full bg-polar-orange"></span> ! Abaixo do ideal · 210 PPI
+              </span>
+              <span class="material-symbols-outlined text-[18px] text-polar-orange">warning</span>
+            </div>
+            <p class="text-xs text-black/60">Aceitável para álbum de família. Leve granulação perceptível de perto.</p>
+          </div>
+
+          <!-- 3. Com Ressalvas -->
+          <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-bold text-black border border-black/[0.03]">
+                <span class="w-1.5 h-1.5 rounded-full bg-polar-orange"></span> ▲ Com ressalvas · 140 PPI
+              </span>
+              <span class="material-symbols-outlined text-[18px] text-polar-orange">report_problem</span>
+            </div>
+            <p class="text-xs text-black/60">Exige confirmação antes da exportação final. Recomenda-se reduzir o zoom.</p>
+          </div>
+
+          <!-- 4. Ruim -->
+          <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-2.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black text-white text-xs font-bold shadow-subtle">
+                ✕ Ruim · 96 PPI
+              </span>
+              <span class="material-symbols-outlined text-[18px] text-black">cancel</span>
+            </div>
+            <p class="text-xs text-black/60">Resolução de tela web. Impressão física com pixelização severa.</p>
+          </div>
+        </div>
+
+        <!-- Selos Neutros de Sistema -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-wrap items-center gap-3">
+          <span class="font-mono text-xs font-bold text-black/70 uppercase mr-1">Selos Neutros:</span>
+          <span class="px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-semibold text-black border border-black/[0.03]">Automático</span>
+          <span class="px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-semibold text-black border border-black/[0.03]">Aproximado</span>
+          <span class="px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-semibold text-black border border-black/[0.03]">Ajustada</span>
+          <span class="px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-semibold text-black border border-black/[0.03]">Convertida HEIC</span>
+          <span class="px-3 py-1 rounded-full bg-white shadow-subtle text-xs font-semibold text-polar-blue border border-polar-blue/30 font-mono">ICC: sRGB IEC61966-2.1</span>
+        </div>
+      </section>
+
+      <!-- 06 · ABAS, SANFONAS E TIPOGRAFIA DE LEGENDAS (6 colunas) -->
+      <section class="xl:col-span-6 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">06</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Navegação &amp; Fontes de Legenda</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Aba Ativa em Azul Técnico</span>
+        </div>
+
+        <!-- Abas Monoespaçadas do Inspetor -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-bold text-black uppercase tracking-wider">Abas Técnicas em Caixa Alta</span>
+          <div class="flex border-b border-black/[0.08] overflow-x-auto no-scrollbar">
+            <button class="px-4 py-2.5 font-mono text-xs font-bold text-polar-blue border-b-2 border-polar-blue uppercase tracking-wider whitespace-nowrap" type="button">PAPEL</button>
+            <button class="px-4 py-2.5 font-mono text-xs font-medium text-black/60 hover:text-black uppercase tracking-wider whitespace-nowrap transition-colors" type="button">FOTOS</button>
+            <button class="px-4 py-2.5 font-mono text-xs font-medium text-black/60 hover:text-black uppercase tracking-wider whitespace-nowrap transition-colors" type="button">AJUSTES</button>
+            <button class="px-4 py-2.5 font-mono text-xs font-medium text-black/60 hover:text-black uppercase tracking-wider whitespace-nowrap transition-colors" type="button">LEGENDAS</button>
+            <button class="px-4 py-2.5 font-mono text-xs font-medium text-black/60 hover:text-black uppercase tracking-wider whitespace-nowrap transition-colors" type="button">MOLDURAS</button>
+          </div>
+        </div>
+
+        <!-- Sanfona Técnica (Accordion) -->
+        <div class="rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.03] overflow-hidden">
+          <button class="w-full p-4 flex items-center justify-between text-left cursor-pointer hover:bg-black/[0.02] transition-colors" type="button" onclick="document.getElementById('acc-content-1').classList.toggle('hidden')">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[20px] text-black">settings</span>
+              <span class="text-xs font-bold text-black uppercase tracking-wider">Parâmetros de Lâmina e Guilhotina</span>
+            </div>
+            <span class="material-symbols-outlined text-[18px] text-black/60">expand_more</span>
+          </button>
+          <div id="acc-content-1" class="p-4 pt-0 border-t border-black/[0.04] text-xs text-black/70 flex flex-col gap-2">
+            <div class="pt-2 flex justify-between font-mono text-[11px]">
+              <span>Extensão para margens:</span>
+              <strong class="text-black">5,00 mm</strong>
+            </div>
+            <div class="flex justify-between font-mono text-[11px]">
+              <span>Espessura da linha:</span>
+              <strong class="text-black">0,10 mm (Hairline)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Fontes Autênticas de Legenda Fotográfica -->
+        <div class="flex flex-col gap-3">
+          <span class="text-xs font-bold text-black uppercase tracking-wider">Amostras Tipográficas no Passe-Partout</span>
+          
+          <!-- Caveat -->
+          <div class="p-3.5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center justify-between">
+            <div>
+              <span class="font-mono text-[10px] text-black/50 uppercase font-semibold">Caveat (Manuscrita Afetiva)</span>
+              <div class="font-caveat text-xl text-black font-semibold mt-0.5">Dias de sol na serra</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-white shadow-subtle text-[10px] font-mono text-black/60">Passe-partout</span>
+          </div>
+
+          <!-- Inter -->
+          <div class="p-3.5 rounded-xl bg-surface-subtle shadow-subtle border border-polar-blue/30 ring-1 ring-polar-blue/20 flex items-center justify-between">
+            <div>
+              <span class="font-mono text-[10px] text-polar-blue uppercase font-bold">Inter (Contemporânea Neutra · Ativa)</span>
+              <div class="text-sm font-semibold text-black mt-0.5">Campos do Jordão · 2026</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-polar-blue text-white shadow-subtle text-[10px] font-mono font-bold">Padrão UI</span>
+          </div>
+
+          <!-- Special Elite -->
+          <div class="p-3.5 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex items-center justify-between">
+            <div>
+              <span class="font-mono text-[10px] text-black/50 uppercase font-semibold">Special Elite (Datilografia Vintage)</span>
+              <div class="font-elite text-xs text-black mt-0.5">14.07.2026 · RETRO EXP</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-white shadow-subtle text-[10px] font-mono text-black/60">Passe-partout</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 · FEEDBACK, ALERTAS, TOAST E PROGRESSO (6 colunas) -->
+      <section class="xl:col-span-6 bg-white rounded-2xl shadow-card border border-black/[0.04] p-6 md:p-8 flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-black/[0.04]">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-md bg-surface-subtle font-mono text-[11px] font-bold text-black border border-black/[0.03]">07</span>
+            <h2 class="text-lg md:text-xl font-bold text-black">Feedback, Alertas &amp; Barras LED</h2>
+          </div>
+          <span class="font-mono text-xs text-black/60">Nenhuma Informação Só Por Cor</span>
+        </div>
+
+        <!-- 1. Informação (Cadeado Azul) -->
+        <div class="p-4 rounded-xl bg-white shadow-subtle border border-black/[0.06] flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-surface-subtle flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px] text-polar-blue">lock</span>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-black uppercase tracking-wider block">Processamento 100% Local</span>
+            <p class="text-xs text-black/70 mt-0.5">Suas fotos não sobem para nenhum servidor externo. A montagem em PDF é realizada inteiramente no seu navegador.</p>
+          </div>
+        </div>
+
+        <!-- 2. Atenção (Barra Lateral Laranja 4px) -->
+        <div class="p-4 rounded-xl bg-white shadow-subtle border border-black/[0.06] flex items-start gap-3 relative overflow-hidden">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-polar-orange"></div>
+          <div class="w-8 h-8 rounded-lg bg-surface-subtle flex items-center justify-center shrink-0 ml-1">
+            <span class="material-symbols-outlined text-[18px] text-polar-orange">priority_high</span>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-black uppercase tracking-wider block">Atenção Necessária (Foto 12)</span>
+            <p class="text-xs text-black/70 mt-0.5">Resolução de 140 PPI na área útil da janela. Reduza o zoom ou selecione o formato Pocket para melhor nitidez.</p>
+          </div>
+        </div>
+
+        <!-- 3. Erro (Borda 2px e Ícone ✕) -->
+        <div class="p-4 rounded-xl bg-white shadow-subtle border-2 border-black flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-black uppercase tracking-wider block">A polaroid não cabe neste papel</span>
+            <p class="text-xs text-black/70 mt-0.5">O formato e espaçamento selecionados excedem a folha A5. Reduza a margem para 5 mm ou mude o papel para A4.</p>
+          </div>
+        </div>
+
+        <!-- Toast Notificador Preto Canônico -->
+        <div class="p-4 rounded-xl bg-black text-white shadow-lifted flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-[18px] text-polar-orange">info</span>
+            <span class="text-xs font-medium">6 folhas recalculadas → 5 folhas</span>
+          </div>
+          <button class="text-white hover:text-polar-blue text-xs font-bold underline underline-offset-4 cursor-pointer" type="button">Desfazer</button>
+        </div>
+
+        <!-- Barras de Carregamento LED -->
+        <div class="p-4 rounded-xl bg-surface-subtle shadow-subtle border border-black/[0.02] flex flex-col gap-3">
+          <span class="font-mono text-[10px] uppercase font-bold text-black/60">Barras de Carregamento LED Canônicas</span>
+          
+          <!-- Indeterminada -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between font-mono text-[10px] text-black/60">
+              <span>Indeterminada (Calculando corte)</span>
+              <span class="animate-pulse">Aguarde...</span>
+            </div>
+            <div class="led-progress">
+              <div class="led-progress__glow"></div>
+              <div class="led-progress__track"><div class="led-progress__fill"></div></div>
+            </div>
+          </div>
+
+          <!-- Determinada 75% -->
+          <div class="flex flex-col gap-1.5 pt-1">
+            <div class="flex items-center justify-between font-mono text-[10px] text-black/60">
+              <span>Determinada: 18 de 24 fotos</span>
+              <span class="font-bold text-polar-blue">75% Concluído</span>
+            </div>
+            <div class="led-progress led-progress--determinate" style="--value: 75;">
+              <div class="led-progress__glow"></div>
+              <div class="led-progress__track"><div class="led-progress__fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RODAPÉ TÉCNICO OFICIAL -->
+    <footer class="mt-4 pt-6 border-t border-black/[0.06] flex flex-col sm:flex-row items-center justify-between gap-3 text-black/60 font-mono text-[11px]">
+      <div>Polar Life Clean · Prancha Canônica da Etapa E1 · Conforme DESIGN.md e Guia Mestre</div>
+      <div>Projeto Viagem · Serra 2026 · 24 fotos · 6 folhas A4 · 4 Clássicas por folha</div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

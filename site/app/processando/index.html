@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Preparando suas fotos</title>
+<meta name="description" content="Suas fotos estão sendo preparadas neste aparelho.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond ainda vem do Google Fonts neste protótipo. Hospedar antes de produção. Inter já está embutida. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/pages/processando.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+
+<main class="wrap page"><div class="narrow">
+<div class="head">
+<h1>Preparando suas fotos</h1>
+<p>Cada foto é lida, convertida quando precisa e conferida aqui no seu aparelho.</p>
+</div>
+
+<section class="card" aria-labelledby="lbl">
+<div class="lblrow"><span id="lbl"></span><span class="pct" id="pct"></span></div>
+<div class="prog" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--v:0%">
+<span class="prog__glow"></span><span class="prog__track"><span class="prog__fill"></span></span>
+</div>
+<div class="sr" id="live" role="status" aria-live="polite"></div>
+
+<div class="msg" id="lock"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p></div>
+
+<div class="msg msg--ok" id="done" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><p id="done-t"></p></div>
+
+<div class="msg msg--err" id="errbox" tabindex="-1" hidden>
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+<div class="msg__body"><p><strong id="err-t"></strong></p><p id="err-d"></p><ul class="fail" id="fail"></ul></div>
+</div>
+
+<details id="det">
+<summary><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span id="det-t">Ver todos os arquivos</span></summary>
+<ul class="files" id="files"></ul>
+</details>
+
+<input type="file" id="swap" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" hidden>
+<div class="act">
+<a class="btn2" id="cancel" href="../adicionar-fotos/">Cancelar</a>
+<button type="button" class="led-btn led-btn--light" id="go" aria-busy="true" disabled><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content" id="go-t">Preparando…</span><span class="led-btn__bar" aria-hidden="true"></span></button>
+</div>
+</section>
+</div></main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+
+<script src="../../assets/js/pages/processando.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Gerando</title>
+<meta name="description" content="Seu arquivo está sendo gerado no seu aparelho.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): IBM Plex Mono ainda vem do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/led.css">
+<link rel="stylesheet" href="../../../assets/css/pages/processando.css">
+<link rel="stylesheet" href="../../../assets/css/pages/gerar.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+<main class="wrap page"><div class="narrow">
+<div class="head"><h1 id="h1">Gerando seu arquivo</h1><p id="sub">Tudo acontece aqui, no seu aparelho. Pode deixar esta aba aberta.</p></div>
+
+<div class="msg msg--err" id="trava" tabindex="-1" hidden>
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+<div class="msg__body"><strong>Escolha o formato antes de gerar.</strong><p>Esta tela vem depois da revisão e da escolha do formato.</p><a class="btn2" href="../exportar/">Ir para Exportar</a></div>
+</div>
+
+<section class="card" id="corpo" aria-labelledby="lbl">
+<div id="fase-gerando">
+<div class="lblrow"><span id="lbl"></span><span class="pct mono" id="pct"></span></div>
+<div class="prog" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--v:0%"><span class="prog__glow"></span><span class="prog__track"><span class="prog__fill"></span></span></div>
+<p class="det" id="det"></p>
+<div class="sr" id="live" role="status" aria-live="polite"></div>
+<div class="msg" id="lock"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Suas fotos continuam no seu aparelho. Nada sobe para um servidor.</p></div>
+<div class="msg msg--warn" id="nota" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><p id="nota-t"></p></div>
+<div class="act"><button type="button" class="btn2" id="cancel">Cancelar</button>
+<button type="button" class="led-btn led-btn--light" aria-busy="true" disabled><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Gerando…</span></span><span class="led-btn__bar" aria-hidden="true"></span></button></div>
+</div>
+
+<div id="fase-ok" hidden>
+<div class="msg msg--ok" id="ok-box" tabindex="-1"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><div class="msg__body"><strong>Concluído · <span id="ok-r"></span></strong><p id="ok-d"></p></div></div>
+<ul class="files" id="arqs"></ul>
+<div class="act act--ok">
+<button type="button" class="btn2" id="b-compart">Compartilhar</button>
+<button type="button" class="btn2" id="b-imprimir">Imprimir agora</button>
+<button type="button" class="btn2" id="b-novo">Baixar novamente</button>
+<button type="button" class="led-btn led-btn--light" id="b-baixar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span id="b-baixar-t">Baixar</span></span></button>
+</div>
+<p class="mono nada">O navegador guarda o arquivo na sua pasta de downloads.</p>
+</div>
+</section>
+</div></main>
+
+<div class="scrim" id="sc" hidden></div>
+<div class="dialog" id="dl-cancel" role="alertdialog" aria-modal="true" aria-labelledby="dc-t" aria-describedby="dc-d" hidden>
+<h2 id="dc-t">Parar a geração?</h2><p id="dc-d">O que já foi gerado será descartado. Suas fotos e o projeto não mudam.</p>
+<div class="dialog__act"><button type="button" class="btn2 btn2--lg" id="dc-sim">Parar e descartar</button><button type="button" class="led-btn led-btn--light" id="dc-nao"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Continuar gerando</span></span></button></div>
+</div>
+<div class="dialog" id="dl-falha" role="alertdialog" aria-modal="true" aria-labelledby="df-t" aria-describedby="df-d" hidden>
+<h2 id="df-t"></h2><p id="df-d">A geração está parada. Escolha o que fazer.</p>
+<ul class="fl" id="df-l"></ul>
+<div class="dialog__act dialog__act--4">
+<button type="button" class="btn2 btn2--lg" id="df-cancel">Cancelar</button>
+<button type="button" class="btn2 btn2--lg" id="df-sem">Gerar sem elas</button>
+<a class="btn2 btn2--lg" id="df-troca" href="../quadro/">Trocar foto</a>
+<button type="button" class="led-btn led-btn--light" id="df-tenta"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Tentar de novo</span></span></button>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+<script src="../../../assets/js/pages/gerar.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+/* T-21 · Imprimir agora e calibração · três passos numerados (número + texto, nunca só cor) */
+.h2{margin:0;font-size:22px;font-weight:300;line-height:1.2}
+.lead{margin:8px 0 0;font-size:14px;line-height:1.6}
+.card+.card{margin-top:16px}
+.dicas{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.dicas li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5}
+.dicas .ico{margin-top:2px;color:var(--blue);stroke-width:2}
+.info{margin:16px 0 0;font-size:11px;text-transform:none;letter-spacing:0}
+.passos{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:16px}
+.passo{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid var(--outline-subtle);border-radius:12px;background:#fff}
+.passo__n{flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1.5px solid var(--black);border-radius:50%;font-size:14px}
+.passo.feito .passo__n{background:var(--black);color:#fff}
+.passo__c{flex:1;min-width:0}
+.passo h3{margin:0;font-size:16px;font-weight:500}
+.passo p{margin:4px 0 0;font-size:14px;line-height:1.5}
+.passo .btn2,.passo .led-btn{margin-top:12px}
+.passo .msg{margin-top:12px}
+.medidas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.fld{display:grid;gap:6px;margin-top:12px}
+.medidas .fld{margin-top:0}
+.f__l{font-size:13px;font-weight:500}
+.inp{height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:10px;background:#fff;font:400 16px 'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;color:var(--black)}
+.inp[aria-invalid=true]{border:2px solid var(--black)}
+.erro{margin:8px 0 0;font-size:13px;font-weight:500}
+.erro::before{content:"✕ "}
+#cal-ok{margin:16px 0 0}
+.act--v{justify-content:flex-start;border-top:0;padding-top:0}
+@media(max-width:600px){.medidas{grid-template-columns:1fr}.passo{padding:12px}}

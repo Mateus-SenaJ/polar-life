@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "led-blue": "#006194", "primary-container": "#1b1b1b", "surface-container": "#eeeeee", "on-secondary-fixed-variant": "#004b73", "on-primary-fixed-variant": "#474747", "tertiary-container": "#341100", "on-error": "#ffffff", "on-secondary-container": "#00517d", "on-secondary-fixed": "#001d31", "outline-variant": "#cfc4c5", "on-primary-container": "#848484", "surface-dim": "#dadada", "secondary-fixed": "#cce5ff", "led-orange": "#FD761A", "tertiary": "#000000", "secondary": "#076396", "surface-bright": "#f9f9f9", "tertiary-fixed": "#ffdbca", "on-tertiary": "#ffffff", "secondary-container": "#82c5fd", "error": "#ba1a1a", "on-background": "#1b1b1b", "surface-subtle": "#F8F9FA", "inverse-on-surface": "#f1f1f1", "on-error-container": "#93000a", "primary-fixed": "#e2e2e2", "tertiary-fixed-dim": "#ffb690", "surface-variant": "#e2e2e2", "surface-container-high": "#e8e8e8", "background": "#f9f9f9", "on-secondary": "#ffffff", "inverse-primary": "#c6c6c6", "inverse-surface": "#303030", "error-container": "#ffdad6", "outline": "#7e7576", "on-tertiary-fixed": "#341100", "on-tertiary-fixed-variant": "#783200", "surface": "#f9f9f9", "primary": "#000000", "on-tertiary-container": "#d95f00", "surface-tint": "#5e5e5e", "on-surface": "#1b1b1b", "on-primary": "#ffffff", "on-primary-fixed": "#1b1b1b", "secondary-fixed-dim": "#93ccff", "surface-container-low": "#f3f3f3", "on-surface-variant": "#4c4546", "surface-container-lowest": "#ffffff", "surface-container-highest": "#e2e2e2", "outline-micro": "rgba(0, 0, 0, 0.04)", "primary-fixed-dim": "#c6c6c6" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-lg": "1.5rem", "gutter-mobile": "0.75rem", "space-xs": "0.25rem", "margin": "2rem", "gutter": "1rem", "space-sm": "0.5rem", "space-md": "1rem", "margin-mobile": "1rem", "space-xl": "2.5rem" }, "fontFamily": { "label-md": [ "Inter" ], "headline-md": [ "Inter" ], "display-xl-mobile": [ "Inter" ], "body-sm": [ "Inter" ], "display-xl": [ "Inter" ], "label-technical": [ "\"ui-monospace, SFMono-Regular, monospace\"" ], "headline-lg": [ "Inter" ], "body-lg": [ "Inter" ], "button": [ "Inter" ], "body-md": [ "Inter" ], "headline-lg-mobile": [ "Inter" ] }, "fontSize": { "label-md": [ "12px", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600" } ], "headline-md": [ "22px", { "lineHeight": "1.3", "fontWeight": "600" } ], "display-xl-mobile": [ "36px", { "lineHeight": "42px", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "1.4", "fontWeight": "400" } ], "display-xl": [ "56px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "label-technical": [ "11px", { "lineHeight": "1.4", "letterSpacing": "0.04em", "fontWeight": "600" } ], "headline-lg": [ "32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "body-lg": [ "16px", { "lineHeight": "1.5", "fontWeight": "400" } ], "button": [ "14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "700" } ], "body-md": [ "14px", { "lineHeight": "1.5", "fontWeight": "400" } ], "headline-lg-mobile": [ "26px", { "lineHeight": "32px", "fontWeight": "700" } ] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-secondary-fixed selection:text-on-secondary-fixed"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-6"><div class="flex items-center gap-6"><div class="flex items-center gap-3"><img alt="Logo_tipografia_lateral.png" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VL_QwbI8sjo7RK7Uw0OJmusXkEWa2SoTjuZ3gJxg5eUHyZh_nQN2pK0o5_li9IgU5lKIa8iL2E-1o_BOv_KqomXukO8IAOD-exDxWx34jE2gGACo_pzOC2hvXB57_6JYJgSI1ln141pvM0vCJzAem8nkq8m-0w0xdojvMfltQYhcnJt1ZRkg-dRoVp613as1CXIR1FUg1wV6ItKi1oI5tES-M-OWqJz8kTRAtU3kDubmTO2lyzXzIJhYY"/><span class="w-px h-5 bg-surface-container-highest"></span><span class="font-label-md text-label-md text-on-surface tracking-tight uppercase">Polar Life Studio</span></div><div class="hidden md:flex items-center gap-3 pl-2"><span class="font-headline-md text-body-md font-semibold text-primary">Viagem · Serra 2026</span><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-subtle shadow-[0_1px_3px_rgba(0,0,0,0.02)]"><span class="w-1.5 h-1.5 rounded-full bg-led-blue"></span><span class="font-label-technical text-label-technical text-on-surface-variant">Salvo neste dispositivo</span></div></div></div><div class="flex items-center gap-4"><div class="flex items-center gap-1 bg-surface-subtle p-1 rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.02)]"><button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest transition-colors" title="Desfazer (Ctrl+Z)" type="button"><span class="material-symbols-outlined text-[18px]">undo</span></button><button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest transition-colors" title="Refazer (Ctrl+Y)" type="button"><span class="material-symbols-outlined text-[18px]">redo</span></button></div><button class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-subtle font-button text-button shadow-[0_2px_10px_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.02)] transition-colors" type="button"><span class="material-symbols-outlined text-[18px] text-led-blue">download</span>Salvar .polarlife</button><button class="relative group inline-flex items-center justify-center p-[2px] rounded-xl overflow-hidden focus:outline-none transition-transform active:scale-[0.98]" type="button"><span class="absolute inset-0 bg-gradient-to-r from-led-orange via-white to-led-blue"></span><span class="relative flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-primary font-button text-button text-on-primary transition-all group-hover:bg-primary/95"><span class="material-symbols-outlined text-[18px] text-led-orange">print</span>Revisar impressão</span></button><div class="w-px h-6 bg-surface-container-highest mx-1"></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.1)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.03)] z-40 flex flex-col justify-between py-6 px-4"><div class="flex flex-col gap-6"><div class="px-3 flex items-center justify-between"><span class="font-label-technical text-label-technical text-on-surface-variant uppercase tracking-wider">Navegação de Mesa</span><span class="w-2 h-2 rounded-full bg-led-orange"></span></div><nav class="flex flex-col gap-1.5" data-active-classes="bg-surface-subtle text-primary font-bold shadow-[0_2px_8px_rgba(0,0,0,0.04)]"><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-subtle hover:text-on-surface transition-all" data-path="modo-folhas" href="#"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">layers</span>Modo Folhas</a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-subtle hover:text-on-surface transition-all" data-path="modo-quadro" href="#"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">grid_view</span>Modo Quadro</a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-subtle hover:text-on-surface transition-all" data-path="ferramentas-inspecao" href="#"><span class="material-symbols-outlined text-[20px] text-on-surface-variant">tune</span>Ferramentas</a></nav></div><div class="flex flex-col gap-3 px-2"><div class="p-3.5 rounded-xl bg-surface-subtle shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col gap-2"><div class="flex items-center justify-between"><span class="font-label-technical text-label-technical text-on-surface-variant">GUIA DE CORTE</span><span class="font-label-technical text-label-technical text-led-blue">0.1mm</span></div><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">content_cut</span><span class="font-body-sm text-body-sm text-on-surface">Alinhamento de Guilhotina Ativo</span></div></div><div class="flex items-center justify-between text-on-surface-variant font-label-technical text-label-technical px-1"><span>ETAPA E4 · MOTOR FOTO</span><span>V2.4</span></div></div></aside><div class="pl-64"><main class="w-full pt-16 min-h-screen bg-surface"><div class="flex flex-col w-full">
+<div class="w-full px-6 py-6 max-w-[1720px] mx-auto">
+<!-- Sub-header bar / Workspace context -->
+<div class="flex items-center justify-between mb-6 pb-4">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-led-orange"></span>
+<span class="font-label-technical text-label-technical text-primary tracking-widest uppercase">Etapa E4b · Inspetor de Legendas</span>
+</div>
+<span class="text-surface-container-highest">/</span>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-led-blue">photo_camera</span>
+<span class="font-label-technical text-label-technical text-primary">Modo Quadro · Foto 03 de 24</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-led-orange">zoom_in</span>
+<span class="font-label-technical text-label-technical text-primary">Preview 1:1 Passe-Partout</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm font-label-technical text-label-technical text-primary">
+<span>Escala 100% (88 x 107 mm)</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace Grid: Central Polaroid Table + Inspector Rail -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT & CENTER: Photo Light-Table Preview (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<!-- Stage Canvas Surface -->
+<div class="relative w-full rounded-2xl bg-surface-container-lowest p-8 lg:p-12 shadow-sm flex flex-col items-center justify-center overflow-hidden min-h-[720px]">
+<!-- Background Studio Calibration Grid (micro subtle ticks) -->
+<div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(circle, #000000 0.75px, transparent 0.75px); background-size: 24px 24px;"></div>
+<!-- Overhead Metrology HUD -->
+<div class="absolute top-6 left-6 right-6 flex items-center justify-between pointer-events-none">
+<div class="flex items-center gap-3 bg-surface-container-lowest/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-led-blue">aspect_ratio</span>
+<span class="font-label-technical text-label-technical text-primary">Cardstock 300g · Borda Quente</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-led-orange"></span>
+<span class="font-label-technical text-label-technical text-primary">326 PPI Calibrado</span>
+</div>
+</div>
+<!-- PHYSICAL POLAROID FRAME SIMULATION -->
+<div class="relative bg-surface-container-lowest p-5 pb-7 rounded-sm shadow-2xl transition-all duration-300 w-full max-w-[420px] flex flex-col items-center" id="polaroid-card">
+<!-- Top / Side Borders are tight, Bottom is Passe-Partout wide -->
+<div class="relative w-full aspect-square rounded-sm overflow-hidden bg-primary shadow-inner group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up artistic analog photography of lush misty Atlantic rainforest trail in Campos do Jordão, green pine trees bathed in morning golden sunbeams, rich photographic grain, crisp natural lighting, fine art square print." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHrPbpTU2H_BUbQ0AdIoNTWwkycvb-8G-Lwse8bOmJS7Ls_kVGyR29DQRu3B-xyJ79qos_w4KV7hkOkuE25biA5BbksLm9oFQFI8lvd2pT3lKxCEphEMEOfaFA6EsA_tAVn4Z6EV93PetyBWr2aRrZ17JVP5tR0Bspb7AIEuRmGC-uFNu_FemY2Z6h2BaCGQ07aj8xURnXneaVmjk0yiQzp6jgLV1_Nrf56iP1JrY"/>
+<!-- Guillotine cut mark overlay (0.1mm micro lines) -->
+<div class="absolute top-0 left-0 w-3 h-3 pointer-events-none">
+<div class="w-full h-[0.5px] bg-surface-container-lowest opacity-60"></div>
+<div class="h-full w-[0.5px] bg-surface-container-lowest opacity-60"></div>
+</div>
+<div class="absolute top-0 right-0 w-3 h-3 pointer-events-none flex flex-col items-end">
+<div class="w-full h-[0.5px] bg-surface-container-lowest opacity-60"></div>
+<div class="h-full w-[0.5px] bg-surface-container-lowest opacity-60"></div>
+</div>
+<!-- Live Badge overlay on photo -->
+<div class="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded bg-primary/80 backdrop-blur-sm text-on-primary font-label-technical text-label-technical">
+                #03 · 14.07.26
+              </div>
+</div>
+<!-- PASSE-PARTOUT BOTTOM AREA (Embossed / Inscribed Live Preview) -->
+<div class="w-full pt-6 pb-2 px-2 flex flex-col items-center justify-center text-center transition-all duration-200" id="passepartout-preview">
+<!-- Line 1: Inscribed Free Text -->
+<div class="font-headline-md text-headline-md text-primary tracking-tight transition-all duration-150" id="preview-text">
+                Dia de rolê
+              </div>
+<!-- Line 2: Date + Location Stamp -->
+<div class="flex items-center justify-center gap-2 mt-2 font-label-technical text-label-technical text-primary tracking-wider transition-all duration-150">
+<span id="preview-date">14.07.26</span>
+<span class="text-led-orange">•</span>
+<span id="preview-location">Campos do Jordão, SP</span>
+</div>
+</div>
+<!-- Paper Texture Edge Sheen (Skeuomorphic tactile gloss indicator) -->
+<div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-surface-container-highest/20 to-transparent pointer-events-none"></div>
+</div>
+<!-- Bottom Stage Ruler & Controls -->
+<div class="mt-10 flex items-center gap-6">
+<button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow text-primary font-button text-button transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">crop_free</span>
+<span>Centralizar Quadro</span>
+</button>
+<div class="h-4 w-px bg-surface-container-highest"></div>
+<div class="flex items-center gap-3 font-label-technical text-label-technical text-primary">
+<span class="material-symbols-outlined text-[16px] text-led-blue">straighten</span>
+<span>Passe-partout inferior: 24.5 mm</span>
+</div>
+</div>
+</div>
+<!-- Film Strip Mini Selector Bar -->
+<div class="w-full p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3 overflow-x-auto py-1">
+<span class="font-label-technical text-label-technical text-primary whitespace-nowrap pl-2">LOTE 24:</span>
+<div class="flex items-center gap-2">
+<button class="w-12 h-14 rounded bg-surface-subtle p-1 opacity-70 hover:opacity-100 transition-opacity flex flex-col items-center justify-between">
+<span class="w-full h-8 bg-primary rounded-xs"></span>
+<span class="font-label-technical text-[9px] text-primary">#01</span>
+</button>
+<button class="w-12 h-14 rounded bg-surface-subtle p-1 opacity-70 hover:opacity-100 transition-opacity flex flex-col items-center justify-between">
+<span class="w-full h-8 bg-primary rounded-xs"></span>
+<span class="font-label-technical text-[9px] text-primary">#02</span>
+</button>
+<!-- Selected Photo 03 with LED Ring -->
+<button class="relative w-14 h-16 rounded-lg bg-surface-container-lowest p-1 shadow-md flex flex-col items-center justify-between ring-2 ring-led-orange">
+<span class="w-full h-9 bg-primary rounded-xs"></span>
+<span class="font-label-technical text-[10px] font-bold text-led-orange">#03 ATIVA</span>
+</button>
+<button class="w-12 h-14 rounded bg-surface-subtle p-1 opacity-70 hover:opacity-100 transition-opacity flex flex-col items-center justify-between">
+<span class="w-full h-8 bg-primary rounded-xs"></span>
+<span class="font-label-technical text-[9px] text-primary">#04</span>
+</button>
+<button class="w-12 h-14 rounded bg-surface-subtle p-1 opacity-70 hover:opacity-100 transition-opacity flex flex-col items-center justify-between">
+<span class="w-full h-8 bg-primary rounded-xs"></span>
+<span class="font-label-technical text-[9px] text-primary">#05</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-2 pl-4">
+<span class="font-label-technical text-label-technical text-primary">Foto 03 / 24</span>
+</div>
+</div>
+</div>
+<!-- RIGHT: EXPANDED INSPECTOR PANEL (LEGENDAS) (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-5">
+<!-- Inspector Container -->
+<div class="w-full rounded-2xl bg-surface-container-lowest p-6 shadow-md flex flex-col gap-6">
+<!-- Inspector Header Tabs -->
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-3">
+<span class="font-headline-md text-headline-md text-primary">Inspetor</span>
+<span class="px-2.5 py-0.5 rounded-full bg-led-blue text-on-primary font-label-technical text-label-technical">PROCESSO E4</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-subtle p-1 rounded-xl">
+<button class="px-3 py-1.5 rounded-lg font-button text-button text-primary hover:bg-surface-container-lowest transition-all" type="button">Quadro</button>
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest text-primary font-button text-button shadow-sm" type="button">Legendas</button>
+<button class="px-3 py-1.5 rounded-lg font-button text-button text-primary hover:bg-surface-container-lowest transition-all" type="button">Corte</button>
+</div>
+</div>
+<!-- SCOPE CHIP -->
+<div class="w-full p-3 rounded-xl bg-surface-subtle flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-led-orange animate-pulse"></span>
+<span class="font-label-md text-label-md text-primary">Alterando: Somente esta foto · Foto 03</span>
+</div>
+<button class="font-label-technical text-label-technical text-led-blue hover:underline" type="button">
+              Modificar escopo
+            </button>
+</div>
+<!-- ESTILOS PRONTOS DE LEGENDA (Quick Presets Carousel) -->
+<div class="flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-technical text-label-technical text-primary uppercase tracking-wider">Estilos Prontos de Legenda</span>
+<span class="font-label-technical text-label-technical text-led-blue">7 presets</span>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+<button class="preset-chip active px-3.5 py-2 rounded-xl bg-primary text-on-primary font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Simples')" type="button">Simples</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Contornada')" type="button">Contornada</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Etiqueta')" type="button">Etiqueta</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Carimbo')" type="button">Carimbo</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Pin de local')" type="button">Pin de local</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Calendário')" type="button">Calendário</button>
+<button class="preset-chip px-3.5 py-2 rounded-xl bg-surface-subtle text-primary hover:bg-surface-container-highest font-button text-button whitespace-nowrap shadow-sm transition-transform active:scale-95" onclick="selectPreset('Manuscrito')" type="button">Manuscrito</button>
+</div>
+</div>
+<!-- MODULE 1: TEXTO LIVRE -->
+<div class="rounded-2xl bg-surface-subtle p-4 flex flex-col gap-4 shadow-sm">
+<!-- Header with Switch -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-led-orange">title</span>
+<span class="font-label-md text-label-md text-primary tracking-wide">1. TEXTO LIVRE</span>
+</div>
+<!-- Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="toggle-free-text" onchange="toggleSection('free-text')" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-led-blue"></div>
+</label>
+</div>
+<!-- Content Area -->
+<div class="flex flex-col gap-3.5 pt-1" id="content-free-text">
+<!-- Input Field + Character Counter -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-technical text-label-technical text-primary" for="input-legend">Inscrição personalizada</label>
+<span class="font-label-technical text-label-technical text-primary" id="char-counter">11 / 80 caracteres</span>
+</div>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-lowest text-primary font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-led-blue transition-all" id="input-legend" maxlength="80" oninput="handleTextInput(this.value)" type="text" value="Dia de rolê"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:text-led-orange" onclick="clearTextInput()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<!-- Seletor de Fontes -->
+<div class="flex flex-col gap-1.5">
+<span class="font-label-technical text-label-technical text-primary">Tipografia (Mídia Física)</span>
+<div class="grid grid-cols-3 gap-2">
+<button class="font-choice active flex flex-col items-center justify-center p-2 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow text-primary" onclick="setFontFamily('font-headline-md')" type="button">
+<span class="font-headline-md text-[14px]">Inter</span>
+<span class="font-label-technical text-[10px] text-primary">Editorial</span>
+</button>
+<button class="font-choice flex flex-col items-center justify-center p-2 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow text-primary" onclick="setFontFamily('font-serif italic')" type="button">
+<span class="font-serif italic text-[15px]">Caveat</span>
+<span class="font-label-technical text-[10px] text-primary">Manuscrita</span>
+</button>
+<button class="font-choice flex flex-col items-center justify-center p-2 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow text-primary" onclick="setFontFamily('font-label-technical')" type="button">
+<span class="font-label-technical text-[13px]">Elite</span>
+<span class="font-label-technical text-[10px] text-primary">Máquina</span>
+</button>
+</div>
+</div>
+<!-- Tamanho da Fonte + Ajustar para Caber -->
+<div class="flex items-center justify-between gap-3 pt-1">
+<div class="flex items-center gap-2">
+<span class="font-label-technical text-label-technical text-primary">Tamanho:</span>
+<div class="flex items-center bg-surface-container-lowest rounded-xl shadow-sm p-1">
+<button class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface-subtle text-primary font-bold" onclick="adjustFontSize(-1)" type="button">-</button>
+<span class="w-10 text-center font-label-technical text-label-technical text-primary" id="font-size-indicator">12 pt</span>
+<button class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface-subtle text-primary font-bold" onclick="adjustFontSize(1)" type="button">+</button>
+</div>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow font-label-technical text-label-technical text-primary transition-all" onclick="fitTextToFrame()" type="button">
+<span class="material-symbols-outlined text-[16px] text-led-blue">fit_screen</span>
+<span>Ajustar para caber</span>
+</button>
+</div>
+<!-- Alinhamento + Caixa do Texto -->
+<div class="grid grid-cols-2 gap-3 pt-1">
+<div class="flex flex-col gap-1.5">
+<span class="font-label-technical text-label-technical text-primary">Alinhamento</span>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-1 shadow-sm">
+<button class="align-btn flex-1 py-1.5 flex items-center justify-center rounded-lg hover:bg-surface-subtle text-primary" onclick="setTextAlignment('left')" type="button">
+<span class="material-symbols-outlined text-[18px]">format_align_left</span>
+</button>
+<button class="align-btn active flex-1 py-1.5 flex items-center justify-center rounded-lg bg-primary text-on-primary" onclick="setTextAlignment('center')" type="button">
+<span class="material-symbols-outlined text-[18px]">format_align_center</span>
+</button>
+<button class="align-btn flex-1 py-1.5 flex items-center justify-center rounded-lg hover:bg-surface-subtle text-primary" onclick="setTextAlignment('right')" type="button">
+<span class="material-symbols-outlined text-[18px]">format_align_right</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<span class="font-label-technical text-label-technical text-primary">Caixa</span>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-1 shadow-sm">
+<button class="case-btn active flex-1 py-1.5 rounded-lg bg-primary text-on-primary font-label-technical text-[10px]" onclick="setTextTransform('normal-case')" type="button">Aa</button>
+<button class="case-btn flex-1 py-1.5 rounded-lg hover:bg-surface-subtle text-primary font-label-technical text-[10px]" onclick="setTextTransform('uppercase')" type="button">AA</button>
+<button class="case-btn flex-1 py-1.5 rounded-lg hover:bg-surface-subtle text-primary font-label-technical text-[10px]" onclick="setTextTransform('capitalize')" type="button">A-z</button>
+</div>
+</div>
+</div>
+<!-- Cor da Inscrição (dentro do quadro) -->
+<div class="flex items-center justify-between pt-1">
+<span class="font-label-technical text-label-technical text-primary">Cor da inscrição:</span>
+<div class="flex items-center gap-2">
+<!-- Preto (ativo) -->
+<button class="color-btn relative w-7 h-7 rounded-full bg-primary ring-2 ring-primary ring-offset-2 flex items-center justify-center" onclick="setTextColor('#000000')" title="Preto" type="button">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</button>
+<!-- Branco -->
+<button class="color-btn w-7 h-7 rounded-full bg-surface-container-lowest shadow-sm flex items-center justify-center hover:scale-105 transition-transform" onclick="setTextColor('#ffffff')" title="Branco" type="button">
+</button>
+<!-- Azul -->
+<button class="color-btn w-7 h-7 rounded-full bg-led-blue shadow-sm flex items-center justify-center hover:scale-105 transition-transform" onclick="setTextColor('#006194')" title="Azul Calibrado" type="button">
+</button>
+<!-- Laranja -->
+<button class="color-btn w-7 h-7 rounded-full bg-led-orange shadow-sm flex items-center justify-center hover:scale-105 transition-transform" onclick="setTextColor('#FD761A')" title="Laranja LED" type="button">
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- MODULE 2: DATA DA CAPTURA -->
+<div class="rounded-2xl bg-surface-subtle p-4 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-led-blue">calendar_today</span>
+<span class="font-label-md text-label-md text-primary tracking-wide">2. DATA DA CAPTURA</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="toggle-date" onchange="toggleSection('date')" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-led-blue"></div>
+</label>
+</div>
+<div class="flex flex-col gap-3.5 pt-1" id="content-date">
+<!-- Origem EXIF -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-led-blue">database</span>
+<div class="flex flex-col">
+<span class="font-label-technical text-label-technical text-primary">Origem: Data da foto (EXIF)</span>
+<span class="font-label-technical text-[10px] text-primary">Lido do arquivo: 14/07/2026 10:42</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-subtle font-label-technical text-[10px] text-primary">Válido</span>
+</div>
+<!-- Formato Padronizado -->
+<div class="flex flex-col gap-1.5">
+<span class="font-label-technical text-label-technical text-primary">Formato de carimbo</span>
+<div class="grid grid-cols-2 gap-2">
+<button class="date-choice active p-2.5 rounded-xl bg-primary text-on-primary font-label-technical text-label-technical text-left shadow-sm" onclick="setDateFormat('14.07.26')" type="button">
+                    14.07.26
+                  </button>
+<button class="date-choice p-2.5 rounded-xl bg-surface-container-lowest text-primary font-label-technical text-label-technical text-left shadow-sm hover:bg-surface-container-highest" onclick="setDateFormat('14/07/2026')" type="button">
+                    14/07/2026
+                  </button>
+<button class="date-choice p-2.5 rounded-xl bg-surface-container-lowest text-primary font-label-technical text-label-technical text-left shadow-sm hover:bg-surface-container-highest truncate" onclick="setDateFormat('14 de julho de 2026')" type="button">
+                    14 de julho de 2026
+                  </button>
+<button class="date-choice p-2.5 rounded-xl bg-surface-container-lowest text-primary font-label-technical text-label-technical text-left shadow-sm hover:bg-surface-container-highest" onclick="setDateFormat('Julho 2026')" type="button">
+                    Julho 2026
+                  </button>
+</div>
+</div>
+<!-- Separador & Opção Sem Data -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<span class="font-label-technical text-label-technical text-primary">Separador:</span>
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-1 shadow-sm">
+<button class="sep-btn active px-2.5 py-1 rounded bg-primary text-on-primary font-label-technical text-label-technical" onclick="setDateSeparator('.')" type="button">.</button>
+<button class="sep-btn px-2.5 py-1 rounded hover:bg-surface-subtle text-primary font-label-technical text-label-technical" onclick="setDateSeparator('/')" type="button">/</button>
+<button class="sep-btn px-2.5 py-1 rounded hover:bg-surface-subtle text-primary font-label-technical text-label-technical" onclick="setDateSeparator('-')" type="button">-</button>
+</div>
+</div>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded bg-surface-container-lowest text-primary focus:ring-0" type="checkbox"/>
+<span class="font-label-technical text-label-technical text-primary">Ocultar se ausente</span>
+</label>
+</div>
+</div>
+</div>
+<!-- MODULE 3: LOCALIZAÇÃO -->
+<div class="rounded-2xl bg-surface-subtle p-4 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-led-orange">location_on</span>
+<span class="font-label-md text-label-md text-primary tracking-wide">3. LOCALIZAÇÃO</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="toggle-loc" onchange="toggleSection('loc')" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-led-blue"></div>
+</label>
+</div>
+<div class="flex flex-col gap-3.5 pt-1" id="content-loc">
+<!-- Origem Automática / Selo Neutro -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-led-blue">my_location</span>
+<span class="font-label-technical text-label-technical text-primary">GPS local no aparelho</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-subtle font-label-technical text-[10px] text-primary">Automático · Aproximado</span>
+</div>
+<!-- Componentes Ativos -->
+<div class="flex flex-col gap-2">
+<span class="font-label-technical text-label-technical text-primary">Componentes da Localização</span>
+<div class="grid grid-cols-3 gap-2">
+<!-- Cidade -->
+<div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-technical text-[10px] text-primary">CIDADE</span>
+<span class="w-2 h-2 rounded-full bg-led-blue"></span>
+</div>
+<span class="font-label-technical text-label-technical text-primary font-bold truncate">Campos do Jordão</span>
+</div>
+<!-- Estado -->
+<div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-technical text-[10px] text-primary">ESTADO</span>
+<span class="w-2 h-2 rounded-full bg-led-blue"></span>
+</div>
+<span class="font-label-technical text-label-technical text-primary font-bold">SP (Sigla)</span>
+</div>
+<!-- País -->
+<div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1 opacity-60">
+<div class="flex items-center justify-between">
+<span class="font-label-technical text-[10px] text-primary">PAÍS</span>
+<span class="w-2 h-2 rounded-full bg-surface-container-highest"></span>
+</div>
+<span class="font-label-technical text-label-technical text-primary">Oculto (BR)</span>
+</div>
+</div>
+</div>
+<!-- Ordem e Separador -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">format_list_bulleted</span>
+<span class="font-label-technical text-label-technical text-primary">Formato de saída:</span>
+</div>
+<span class="font-label-technical text-label-technical font-bold text-primary">"Cidade, Estado"</span>
+</div>
+<!-- Privacy Notice Box -->
+<div class="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-[20px] text-led-blue shrink-0">shield</span>
+<p class="font-body-sm text-body-sm text-primary leading-tight">
+<strong class="font-bold">Privacidade garantida:</strong> Cidade identificada, nunca coordenadas brutas. Processamento 100% no seu dispositivo.
+                </p>
+</div>
+</div>
+</div>
+<!-- POSIÇÃO DA LEGENDA & CONTROLE DE LOTE -->
+<div class="flex flex-col gap-4 pt-1">
+<!-- Posicionamento -->
+<div class="flex flex-col gap-2">
+<span class="font-label-technical text-label-technical text-primary uppercase tracking-wider">Posição no Quadro</span>
+<div class="grid grid-cols-3 gap-2">
+<button class="pos-btn active py-2.5 px-3 rounded-xl bg-primary text-on-primary font-button text-button shadow-sm flex items-center justify-center gap-2" onclick="setPosition('below')" type="button">
+<span class="material-symbols-outlined text-[16px]">vertical_align_bottom</span>
+<span>Abaixo</span>
+</button>
+<button class="pos-btn py-2.5 px-3 rounded-xl bg-surface-subtle text-primary font-button text-button shadow-sm hover:bg-surface-container-highest flex items-center justify-center gap-2" onclick="setPosition('above')" type="button">
+<span class="material-symbols-outlined text-[16px]">vertical_align_top</span>
+<span>Acima</span>
+</button>
+<button class="pos-btn py-2.5 px-3 rounded-xl bg-surface-subtle text-primary font-button text-button shadow-sm hover:bg-surface-container-highest flex items-center justify-center gap-2" onclick="setPosition('both')" type="button">
+<span class="material-symbols-outlined text-[16px]">unfold_more</span>
+<span>Ambas</span>
+</button>
+</div>
+</div>
+<!-- Caixa de Proteção de Lote -->
+<div class="p-3.5 rounded-xl bg-surface-subtle shadow-sm flex items-center justify-between">
+<label class="flex items-center gap-3 cursor-pointer" for="batch-replicate">
+<input class="w-5 h-5 rounded bg-surface-container-lowest text-primary focus:ring-0" id="batch-replicate" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Replicar estilo para as demais 23 fotos</span>
+<span class="font-label-technical text-[10px] text-primary">Mantém textos individuais, padroniza fonte e posição</span>
+</div>
+</label>
+</div>
+</div>
+<!-- FOOTER / CTA ACTIONS -->
+<div class="pt-3 flex items-center gap-3">
+<!-- Secondary: Copiar Estilo -->
+<button class="flex-1 py-3.5 px-4 rounded-xl bg-surface-container-lowest text-primary hover:bg-surface-subtle font-button text-button shadow-sm transition-all flex items-center justify-center gap-2" id="btn-copy-style" onclick="copyStyleFeedback()" type="button">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+<span>Copiar estilo</span>
+</button>
+<!-- Primary Action with Level 3 Chromatic Spectrum Halo -->
+<button class="relative group flex-1 inline-flex items-center justify-center p-[2.5px] rounded-xl overflow-hidden focus:outline-none transition-transform active:scale-[0.98]" type="button">
+<!-- Chromatic spectrum ring -->
+<span class="absolute inset-0 bg-gradient-to-r from-led-orange via-surface-container-lowest to-led-blue"></span>
+<!-- Button core -->
+<span class="relative w-full h-full flex items-center justify-center gap-2 px-6 py-3 rounded-[10px] bg-primary text-on-primary font-button text-button transition-all group-hover:bg-primary/95 shadow-xl">
+<span class="material-symbols-outlined text-[18px] text-led-orange">check</span>
+<span>Aplicar legendas</span>
+</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interactions state handling
+  let currentFontSize = 12;
+
+  function handleTextInput(val) {
+    const preview = document.getElementById('preview-text');
+    const counter = document.getElementById('char-counter');
+    if (preview) {
+      preview.textContent = val.trim() === '' ? ' ' : val;
+    }
+    if (counter) {
+      counter.textContent = `${val.length} / 80 caracteres`;
+    }
+  }
+
+  function clearTextInput() {
+    const input = document.getElementById('input-legend');
+    if (input) {
+      input.value = '';
+      handleTextInput('');
+    }
+  }
+
+  function adjustFontSize(delta) {
+    currentFontSize = Math.max(9, Math.min(22, currentFontSize + delta));
+    const indicator = document.getElementById('font-size-indicator');
+    const preview = document.getElementById('preview-text');
+    if (indicator) indicator.textContent = `${currentFontSize} pt`;
+    if (preview) preview.style.fontSize = `${currentFontSize * 1.5}px`;
+  }
+
+  function fitTextToFrame() {
+    currentFontSize = 14;
+    const indicator = document.getElementById('font-size-indicator');
+    const preview = document.getElementById('preview-text');
+    if (indicator) indicator.textContent = `${currentFontSize} pt`;
+    if (preview) preview.style.fontSize = `${currentFontSize * 1.5}px`;
+  }
+
+  function setFontFamily(cls) {
+    const preview = document.getElementById('preview-text');
+    if (preview) {
+      preview.className = `text-primary tracking-tight transition-all duration-150 ${cls}`;
+    }
+    document.querySelectorAll('.font-choice').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('bg-surface-container-lowest', 'text-primary');
+    });
+    event.currentTarget.classList.remove('bg-surface-container-lowest', 'text-primary');
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function setTextAlignment(align) {
+    const preview = document.getElementById('passepartout-preview');
+    if (preview) {
+      preview.style.alignItems = align === 'left' ? 'flex-start' : (align === 'right' ? 'flex-end' : 'center');
+      preview.style.textAlign = align;
+    }
+    document.querySelectorAll('.align-btn').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('text-primary');
+    });
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function setTextTransform(t) {
+    const preview = document.getElementById('preview-text');
+    if (preview) {
+      preview.classList.remove('uppercase', 'capitalize', 'normal-case');
+      preview.classList.add(t);
+    }
+    document.querySelectorAll('.case-btn').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('text-primary');
+    });
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function setTextColor(hex) {
+    const preview = document.getElementById('preview-text');
+    if (preview) preview.style.color = hex;
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('ring-2', 'ring-primary', 'ring-offset-2'));
+    event.currentTarget.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+  }
+
+  function setDateFormat(df) {
+    const dateLabel = document.getElementById('preview-date');
+    if (dateLabel) dateLabel.textContent = df;
+    document.querySelectorAll('.date-choice').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('bg-surface-container-lowest', 'text-primary');
+    });
+    event.currentTarget.classList.remove('bg-surface-container-lowest', 'text-primary');
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function setDateSeparator(sep) {
+    const dateLabel = document.getElementById('preview-date');
+    if (dateLabel) {
+      dateLabel.textContent = `14${sep}07${sep}26`;
+    }
+    document.querySelectorAll('.sep-btn').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('text-primary');
+    });
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function toggleSection(sectionKey) {
+    if (sectionKey === 'free-text') {
+      const el = document.getElementById('preview-text');
+      const box = document.getElementById('content-free-text');
+      const checked = document.getElementById('toggle-free-text').checked;
+      if (el) el.style.display = checked ? 'block' : 'none';
+      if (box) box.style.opacity = checked ? '1' : '0.4';
+    } else if (sectionKey === 'date') {
+      const el = document.getElementById('preview-date');
+      const box = document.getElementById('content-date');
+      const checked = document.getElementById('toggle-date').checked;
+      if (el) el.style.display = checked ? 'inline' : 'none';
+      if (box) box.style.opacity = checked ? '1' : '0.4';
+    } else if (sectionKey === 'loc') {
+      const el = document.getElementById('preview-location');
+      const box = document.getElementById('content-loc');
+      const checked = document.getElementById('toggle-loc').checked;
+      if (el) el.style.display = checked ? 'inline' : 'none';
+      if (box) box.style.opacity = checked ? '1' : '0.4';
+    }
+  }
+
+  function selectPreset(name) {
+    document.querySelectorAll('.preset-chip').forEach(c => {
+      c.classList.remove('bg-primary', 'text-on-primary');
+      c.classList.add('bg-surface-subtle', 'text-primary');
+    });
+    event.currentTarget.classList.remove('bg-surface-subtle', 'text-primary');
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+
+    if (name === 'Manuscrito') {
+      setFontFamily('font-serif italic');
+    } else if (name === 'Carimbo') {
+      setFontFamily('font-label-technical');
+      setTextTransform('uppercase');
+    } else {
+      setFontFamily('font-headline-md');
+    }
+  }
+
+  function setPosition(pos) {
+    document.querySelectorAll('.pos-btn').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('bg-surface-subtle', 'text-primary');
+    });
+    event.currentTarget.classList.remove('bg-surface-subtle', 'text-primary');
+    event.currentTarget.classList.add('bg-primary', 'text-on-primary');
+  }
+
+  function copyStyleFeedback() {
+    const btn = document.getElementById('btn-copy-style');
+    if (btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px] text-led-blue">check</span><span>Copiado!</span>`;
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+      }, 1800);
+    }
+  }
+</script></main></div></body></html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Compartilhar</title>
+<meta name="description" content="Envie o arquivo pelo menu do aparelho ou baixe e escolha o aplicativo. O Polar Life não recebe nada.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): IBM Plex Mono ainda vem do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/led.css">
+<link rel="stylesheet" href="../../../assets/css/pages/processando.css">
+<link rel="stylesheet" href="../../../assets/css/pages/gerar.css">
+<link rel="stylesheet" href="../../../assets/css/pages/compartilhar.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+<main class="wrap page"><div class="narrow">
+<div class="head"><h1 id="h1">Compartilhar</h1><p id="sub">Você escolhe para onde o arquivo vai. O Polar Life não recebe nada.</p></div>
+
+<div class="msg msg--err" id="trava" tabindex="-1" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><div class="msg__body"><strong>Falta gerar o arquivo.</strong><p>Gere o PDF ou as imagens antes de compartilhar.</p><a class="btn2" id="trava-a" href="../exportar/">Escolher o formato</a></div></div>
+
+<div id="corpo">
+<section class="card" aria-labelledby="arq-t">
+<h2 class="h2" id="arq-t">O que será enviado</h2>
+<p class="mono info" id="resumo"></p>
+<ul class="files" id="arqs"></ul>
+<div class="msg" id="aviso" role="status" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="msg__body"><strong id="aviso-t"></strong><p id="aviso-d"></p></div></div>
+<div class="msg msg--ok" id="baixado" tabindex="-1" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><div class="msg__body"><strong>Arquivo baixado.</strong><p id="baixado-d"></p></div></div>
+<div class="act"><button type="button" class="led-btn led-btn--light" id="ir" disabled aria-disabled="true"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico" id="i-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7h14v-7"/></svg><svg class="ico" id="i-baixa" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 19h14"/></svg><span id="ir-t">Preparando o arquivo…</span></span></button></div>
+</section>
+
+<section class="card" aria-labelledby="rotas-t">
+<h2 class="h2" id="rotas-t">Para onde o arquivo vai</h2>
+<ul class="rotas">
+<li><strong>Celular com menu de compartilhar</strong><span>Toque em «Compartilhar» e escolha Instagram, WhatsApp, Mensagens…</span></li>
+<li><strong>Computador ou navegador sem suporte</strong><span>Toque em «Baixar» e, no aplicativo, escolha o arquivo na galeria ou na pasta de downloads.</span></li>
+<li><strong>Instagram</strong><span>Não há integração direta: o caminho é o menu do aparelho ou o arquivo baixado.</span></li>
+</ul>
+</section>
+<div class="act act--v"><a class="btn2" id="voltar" href="../gerar/#estado-concluido">Voltar ao arquivo</a></div>
+</div>
+</div></main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+<script src="../../../assets/js/pages/compartilhar.js" defer></script>
+</body>
+</html>

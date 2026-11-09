@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Viagem · Serra 2026 · Folhas</title>
+<meta name="description" content="Organize as polaroids nas folhas de papel antes de imprimir.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond, Caveat e IBM Plex Mono ainda vêm do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/esqueleto.css">
+<script src="../../assets/js/esqueleto.js"></script>
+<link rel="stylesheet" href="../../assets/css/pages/editor.css">
+<link rel="stylesheet" href="../../assets/css/pages/prevoo.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-collage" viewBox="0 0 24 24"><rect x="3" y="5" width="11" height="9" rx="1.5"/><rect x="10" y="10" width="11" height="9" rx="1.5"/></symbol>
+<symbol id="i-memory" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 17h4"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></symbol>
+<symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 7.5L20 18M8.5 16.5L20 6"/></symbol>
+<symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></symbol>
+<symbol id="i-verified" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></symbol>
+<symbol id="i-mountain" viewBox="0 0 24 24"><path d="M2 19l7-11 4 6 3-4 6 9z"/></symbol>
+</defs></svg>
+
+<header class="eh">
+<div class="eh__l">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<span class="eh__div" aria-hidden="true"></span>
+<span class="eh__studio mono">Polar Life Studio</span>
+<div class="eh__proj">
+<span class="eh__name">Viagem · Serra 2026</span>
+<span class="chip"><span class="dot" aria-hidden="true"></span><span class="mono">Salvo neste dispositivo</span></span>
+</div>
+</div>
+<div class="eh__r">
+<div class="hist" role="group" aria-label="Histórico">
+<button type="button" class="ib" id="undo" aria-label="Desfazer" title="Desfazer (Ctrl+Z)" disabled><svg class="ico sm"><use href="#i-undo"/></svg></button>
+<button type="button" class="ib" id="redo" aria-label="Refazer" title="Refazer (Ctrl+Y)" disabled><svg class="ico sm"><use href="#i-redo"/></svg></button>
+</div>
+<button type="button" class="btn2 eh__save" id="save"><svg class="ico sm" style="color:var(--blue)"><use href="#i-download"/></svg>Salvar .polarlife</button>
+<button type="button" class="led-btn led-btn--sm eh__led" id="go"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm" style="color:var(--orange)"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button>
+<span class="eh__div eh__div--r" aria-hidden="true"></span>
+<span class="avatar" aria-hidden="true"><svg class="ico sm"><use href="#i-person"/></svg></span>
+<button type="button" class="ib eh__more" aria-label="Mais opções"><svg class="ico"><use href="#i-more"/></svg></button>
+</div>
+</header>
+
+<nav class="modes" aria-label="Modos">
+<a class="modes__o is-on" href="./" aria-current="page">Folhas</a>
+<a class="modes__o" id="modes-q" href="quadro/#foto-1">Quadro</a>
+<button type="button" class="modes__o" disabled>Colagem</button>
+</nav>
+
+<aside class="rail" aria-label="Navegação de mesa">
+<div>
+<p class="rail__t mono"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
+<ul class="rail__l">
+<li><a class="rail__i is-on" href="./" aria-current="page"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
+<li><a class="rail__i" id="rail-q" href="quadro/#foto-1"><svg class="ico"><use href="#i-grid"/></svg><span>Quadro</span></a></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="mono">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="mono">Em breve</em></button></li>
+</ul>
+</div>
+<div class="rail__card">
+<p class="mono rail__row"><span>Guia de corte</span><span id="rail-mm" style="color:var(--blue)">0,1 mm</span></p>
+<p class="rail__row2"><svg class="ico sm"><use href="#i-cut"/></svg><span id="rail-t">Guias ligadas · linha contínua</span></p>
+</div>
+</aside>
+
+<main class="content" id="main">
+<div class="wrap">
+<div class="ctx">
+<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-layers"/></svg><span class="mono" id="ctx-sheet">Modo Folhas · Folha 1 de 6</span></span>
+<div class="ctx__r">
+<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="mono" id="ctx-scale">Escala 50%</span></span>
+<button type="button" class="btn2 btn2--sm ctx__insp" id="insp-toggle" aria-controls="insp" aria-expanded="true"><svg class="ico sm"><use href="#i-panel"/></svg>Inspetor</button>
+</div>
+</div>
+
+<div class="grid">
+<section class="mesa-col" aria-label="Mesa">
+<div class="mesa" id="mesa">
+<div class="hud">
+<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="mono" id="hud-l">Guias · 0,1 mm</span></span>
+<span class="pill pill--hud"><span class="mono" id="hud-r">A4 · Retrato</span></span>
+</div>
+<div class="stage" id="stage"><div class="sheet" id="sheet" role="img" aria-label="Folha"></div></div>
+<div class="err" id="err" role="alert" hidden>
+<div class="msg msg--err"><svg class="ico"><use href="#i-x"/></svg><div class="msg__body"><strong>A polaroid não cabe neste papel</strong><p id="err-d">Escolha um papel maior ou reduza a margem da folha.</p></div></div>
+</div>
+<div class="acts">
+<button type="button" class="btn2" id="prev"><svg class="ico sm"><use href="#i-prev"/></svg>Folha anterior</button>
+<span class="acts__cota mono"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span id="cota">Margem 10 mm · Entre polaroids 4 mm</span></span>
+<button type="button" class="btn2" id="next">Folha seguinte<svg class="ico sm"><use href="#i-next"/></svg></button>
+</div>
+<p class="status mono" id="status" role="status" aria-live="polite">A4 retrato · 4 clássicas por folha · 6 folhas no total</p>
+<p class="aviso mono" id="aviso-leg" role="status" aria-live="polite" hidden></p>
+</div>
+
+<div class="faixa" id="faixa-w">
+<div class="faixa__l"><span class="mono faixa__t">Folhas <span id="faixa-n">6</span></span>
+<ol class="faixa__list" id="faixa" aria-label="Folhas do projeto"></ol></div>
+<span class="mono faixa__r" id="faixa-r">Folha 1 / 6</span>
+</div>
+</section>
+
+<aside class="insp" id="insp" aria-label="Inspetor">
+<button type="button" class="grab" id="grab" aria-label="Tamanho do painel"><span aria-hidden="true"></span></button>
+<div class="insp__in">
+<h2 class="insp__h">Inspetor</h2>
+<div class="tabs" role="tablist" aria-label="Abas do inspetor">
+<button type="button" role="tab" class="tab mono is-on" id="tab-papel" aria-selected="true" aria-controls="p-papel">Papel</button>
+<button type="button" role="tab" class="tab mono" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
+<button type="button" role="tab" class="tab mono" id="tab-ajustes" aria-selected="false" aria-controls="p-outra" tabindex="-1">Ajustes</button>
+<button type="button" role="tab" class="tab mono" id="tab-legendas" aria-selected="false" aria-controls="p-outra" tabindex="-1">Legendas</button>
+<button type="button" role="tab" class="tab mono" id="tab-molduras" aria-selected="false" aria-controls="p-outra" tabindex="-1">Molduras</button>
+<button type="button" role="tab" class="tab mono" id="tab-metadados" aria-selected="false" aria-controls="p-outra" tabindex="-1">Metadados</button>
+</div>
+
+<div class="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: Todas as fotos · 24</span></div>
+
+<div id="p-papel" role="tabpanel" aria-labelledby="tab-papel" class="panel">
+
+<div class="result" id="result" aria-live="polite"><svg class="ico"><use href="#i-check"/></svg><p id="result-t">4 por folha · 6 folhas · aproveitamento 72%</p></div>
+
+<section class="mod" aria-labelledby="m1">
+<h3 class="mod__h" id="m1">Papel e orientação</h3>
+<div class="f" data-k="papel"><div class="f__top"><label class="f__l" for="papel">Papel</label><button type="button" class="rst mono" data-reset="papel" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="sel"><select id="papel"></select><svg class="ico sm" aria-hidden="true"><use href="#i-down"/></svg></div>
+<p class="f__h" id="papel-h"></p></div>
+<div class="f2" id="custom" hidden>
+<div class="f" data-k="w"><div class="f__top"><label class="f__l" for="w">Largura</label></div><div class="num"><button type="button" class="num__b" data-step="-10" aria-label="Diminuir largura">−</button><input id="w" inputmode="numeric" autocomplete="off" data-min="50" data-max="1000"><span class="num__u mono">mm</span><button type="button" class="num__b" data-step="10" aria-label="Aumentar largura">+</button></div><p class="f__h">De 50 a 1000 mm.</p></div>
+<div class="f" data-k="h"><div class="f__top"><label class="f__l" for="h">Altura</label></div><div class="num"><button type="button" class="num__b" data-step="-10" aria-label="Diminuir altura">−</button><input id="h" inputmode="numeric" autocomplete="off" data-min="50" data-max="1000"><span class="num__u mono">mm</span><button type="button" class="num__b" data-step="10" aria-label="Aumentar altura">+</button></div><p class="f__h">De 50 a 1000 mm.</p></div>
+</div>
+<div class="f" data-k="orient"><div class="f__top"><span class="f__l" id="orient-l">Orientação da folha</span><button type="button" class="rst mono" data-reset="orient" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="seg" role="radiogroup" aria-labelledby="orient-l">
+<label class="seg__o"><input type="radio" name="orient" value="retrato"><span>Retrato</span></label>
+<label class="seg__o"><input type="radio" name="orient" value="paisagem"><span>Paisagem</span></label></div></div>
+</section>
+
+<section class="mod" aria-labelledby="m2">
+<h3 class="mod__h" id="m2">Margem e espaço</h3>
+<div class="f" data-k="margem"><div class="f__top"><label class="f__l" for="margem">Margem da folha</label><button type="button" class="rst mono" data-reset="margem" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="num"><button type="button" class="num__b" data-step="-1" aria-label="Diminuir margem">−</button><input id="margem" inputmode="decimal" autocomplete="off" data-min="0" data-max="50"><span class="num__u mono">mm</span><button type="button" class="num__b" data-step="1" aria-label="Aumentar margem">+</button></div><p class="f__h" id="margem-h">De 0 a 50 mm.</p></div>
+<div class="f" data-k="gap"><div class="f__top"><label class="f__l" for="gap">Entre polaroids</label><button type="button" class="rst mono" data-reset="gap" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="num"><button type="button" class="num__b" data-step="-1" aria-label="Diminuir espaço">−</button><input id="gap" inputmode="decimal" autocomplete="off" data-min="0" data-max="30"><span class="num__u mono">mm</span><button type="button" class="num__b" data-step="1" aria-label="Aumentar espaço">+</button></div><p class="f__h" id="gap-h">De 0 a 30 mm. Com guias, use 2 mm ou mais.</p></div>
+<div class="sw-row" data-k="girar"><div><span class="f__l" id="girar-l">Girar para caber mais</span><p class="f__h" id="girar-h"></p></div><button type="button" class="sw" id="girar" role="switch" aria-checked="true" aria-labelledby="girar-l"><span></span></button></div>
+<div class="f" data-k="align"><div class="f__top"><span class="f__l" id="align-l">Alinhamento do bloco</span><button type="button" class="rst mono" data-reset="align" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="seg" role="radiogroup" aria-labelledby="align-l">
+<label class="seg__o"><input type="radio" name="align" value="center"><span>Centralizado</span></label>
+<label class="seg__o"><input type="radio" name="align" value="tl"><span>Topo-esquerda</span></label></div></div>
+<div class="sw-row" data-k="separar"><div><span class="f__l" id="separar-l">Separar por orientação</span><p class="f__h">Verticais e horizontais ficam em folhas próprias.</p></div><button type="button" class="sw" id="separar" role="switch" aria-checked="false" aria-labelledby="separar-l"><span></span></button></div>
+</section>
+
+<section class="mod" aria-labelledby="m3">
+<h3 class="mod__h" id="m3">Linhas de corte</h3>
+<div class="sw-row" data-k="guias"><div><span class="f__l" id="guias-l">Guias de corte</span><p class="f__h">Linhas de 0,1 mm até a borda da folha.</p></div><button type="button" class="sw" id="guias" role="switch" aria-checked="true" aria-labelledby="guias-l"><span></span></button></div>
+<div class="sw-row" data-k="contorno"><div><span class="f__l" id="contorno-l">Contorno da polaroid</span><p class="f__h" id="contorno-h"><svg class="ico sm"><use href="#i-info"/></svg><span>Desative as guias de corte para usar contorno.</span></p></div><button type="button" class="sw" id="contorno" role="switch" aria-checked="false" aria-labelledby="contorno-l" aria-describedby="contorno-h"><span></span></button></div>
+<div class="f" data-k="compr"><div class="f__top"><span class="f__l" id="compr-l">Comprimento das guias</span><button type="button" class="rst mono" data-reset="compr" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="seg" role="radiogroup" aria-labelledby="compr-l">
+<label class="seg__o"><input type="radio" name="compr" value="continua"><span>Linha contínua</span></label>
+<label class="seg__o"><input type="radio" name="compr" value="marcas"><span>Marcas de canto</span></label></div></div>
+<div class="f" data-k="cor"><div class="f__top"><span class="f__l" id="cor-l">Cor da guia</span><button type="button" class="rst mono" data-reset="cor" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
+<div class="seg seg--3" role="radiogroup" aria-labelledby="cor-l">
+<label class="seg__o"><input type="radio" name="cor" value="preto"><span>Preto</span></label>
+<label class="seg__o"><input type="radio" name="cor" value="azul"><span>Azul</span></label>
+<label class="seg__o"><input type="radio" name="cor" value="laranja"><span>Laranja</span></label></div></div>
+</section>
+
+<section class="mod" aria-labelledby="m4">
+<h3 class="mod__h" id="m4">Rodapé e assinatura</h3>
+<div class="sw-row" data-k="rodape"><div><span class="f__l" id="rodape-l">Rodapé da folha</span><p class="f__h">Nome do projeto e número da folha.</p></div><button type="button" class="sw" id="rodape" role="switch" aria-checked="false" aria-labelledby="rodape-l"><span></span></button></div>
+<div class="sw-row" data-k="assin"><div><span class="f__l" id="assin-l">Assinatura Polar Life</span><p class="f__h">Logo no canto inferior esquerdo de cada moldura.</p></div><button type="button" class="sw" id="assin" role="switch" aria-checked="true" aria-labelledby="assin-l"><span></span></button></div>
+</section>
+
+<div class="prot"><label class="chk"><input type="checkbox" id="subst"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Substituir ajustes individuais</strong><span class="f__h">Desmarcada, as fotos com ajuste próprio ficam como estão.</span></span></label></div>
+
+<div class="pe">
+<button type="button" class="btn2 btn2--lg pe__b" id="apply"><span id="apply-t">Aplicar ao lote · 24 fotos</span></button>
+</div>
+</div>
+
+<div id="p-outra" role="tabpanel" class="panel" hidden>
+<div class="msg"><svg class="ico"><use href="#i-info"/></svg><p>Esta aba ainda não está disponível.</p></div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+
+<div class="bar"><button type="button" class="led-btn led-btn--block" id="go2"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm" style="color:var(--orange)"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button></div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="dialog" id="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d" hidden>
+<h2 id="dlg-t">Ativar guias desliga o contorno?</h2>
+<p id="dlg-d">Guias de corte e contorno não ficam ligados juntos. Ao ativar as guias, o contorno da polaroid será desligado.</p>
+<div class="dialog__act">
+<button type="button" class="btn2 btn2--lg" id="dlg-no">Manter contorno</button>
+<button type="button" class="led-btn led-btn--light" id="dlg-yes"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Ativar guias</span></span></button>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" class="undo" id="toast-undo" hidden>Desfazer</button></div>
+
+<div class="esq-sk esq-sk--ed" role="status" aria-label="Carregando o projeto">
+<div class="esq-sk__mesa"><i class="folha"></i><i class="leg"></i></div>
+<div class="esq-sk__insp"><i></i><i></i><i></i><i></i></div>
+</div>
+<script src="../../assets/js/motor-folhas.js" defer></script>
+<script src="../../assets/js/pages/editor.js" defer></script>
+<script src="../../assets/js/pages/prevoo.js" defer></script>
+</body>
+</html>

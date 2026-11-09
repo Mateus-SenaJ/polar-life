@@ -1,0 +1,24 @@
+/* T-18 · Pré-voo · pop-up nível 3 (DS: caixa de decisão); severidade = ícone + texto, nunca só cor (BR-13) */
+.pv{width:min(640px,100vw - 32px)}
+.pv__top{display:flex;align-items:center;gap:12px}
+.pv__ico{width:28px;height:28px;flex:none;color:var(--blue)}
+.pv__grid{display:grid;grid-template-columns:repeat(3,1fr);margin:20px 0 0;padding:0;border:1px solid var(--outline-subtle);border-radius:12px;background:#F8F9FA}
+.pv__grid>div{padding:12px 14px;min-width:0}
+.pv__grid>div+div{border-left:1px solid rgb(0 0 0/.08)}
+.pv__grid dt{font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pv__grid dd{margin:4px 0 0;font-size:18px;font-weight:400;line-height:1.25;overflow-wrap:anywhere}
+.pv__g{margin-top:16px}
+.pv__h{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;font-weight:500}
+.pv__n{margin-left:auto;font-size:12px}
+.pv__l{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.pv__l li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--outline-subtle);border-radius:10px;font-size:14px;line-height:1.5;background:#fff}
+.pv__l li .ico{margin-top:2px;flex:none}
+.pv__g--bl .pv__l li{border:2px solid var(--black)}
+.pv__g--bl .ico{color:var(--black)}
+.pv__g--pe .ico{color:var(--orange)}
+.pv__g--in .ico{color:var(--blue)}
+.pv__ok{margin-top:16px;font-size:14px}
+.dialog.pv p.pv__why{margin:12px 0 0;font-size:12px;line-height:1.5;text-transform:none}
+.pv .dialog__act{position:sticky;bottom:-24px;margin-bottom:-24px;padding-bottom:24px;background:#fff}
+@media(max-width:480px){.pv{padding:20px}.pv__grid dt{font-size:10px;letter-spacing:0}.pv .dialog__act{bottom:-20px;margin-bottom:-20px;padding-bottom:20px}.pv__grid dd{font-size:15px}.pv .dialog__act .btn2,.pv .dialog__act .led-btn{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){.pv{animation:none}}

@@ -1,0 +1,42 @@
+.fmt{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fmt__b{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:8px 12px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font:500 14px 'Inter',system-ui,sans-serif;text-align:left;cursor:pointer}
+.fmt__b .mono{font-size:11px;font-weight:400}
+.fmt__b[aria-pressed=true]{border:2px solid var(--blue)}
+.fmt__b:disabled{opacity:.6;cursor:not-allowed;border-style:dashed}
+.fmt__b em{font-style:normal;font-size:11px}
+.fmt__b:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.pre{border:0;margin:12px 0 0;padding:0;min-width:0}
+.pre legend{padding:0 0 6px;font:500 14px 'Inter',system-ui,sans-serif}
+.pre legend .mono{font-size:11px;font-weight:400;margin-left:6px}
+.pre__g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pre__b{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:44px;padding:6px 4px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font:500 13px 'Inter',system-ui,sans-serif;cursor:pointer}
+.pre__b .mono{font-size:11px;font-weight:400}
+.pre__b .ico{display:none;position:absolute;top:3px;right:3px;width:14px;height:14px;stroke:var(--blue)}
+.pre__b[aria-pressed=true]{border:2px solid var(--blue)}
+.pre__b[aria-pressed=true] .ico{display:block}
+.pre__b:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (forced-colors:active){.pre__b[aria-pressed=true]{outline:2px solid Highlight}}
+.num__u{flex:none;padding:0 12px 0 6px;font-size:11px}
+.mo-chk{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:6px 0;font-size:14px;line-height:1.4;cursor:pointer}
+.mo-chk input{flex:none;width:20px;height:20px;margin:2px 0 0;accent-color:var(--blue)}
+.rg{position:absolute;pointer-events:none;color:var(--black);overflow:visible;font:400 11px 'IBM Plex Mono',ui-monospace,monospace}
+.rg--x{left:0;top:-22px}
+.rg--y{left:-40px;top:0}
+.pq:not(.has-rg) .rg{display:none}
+@media (forced-colors:active){.fmt__b[aria-pressed=true]{outline:2px solid Highlight}}
+
+/* pop-up Trocar formato: antes e depois */
+.antdep{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.antdep>div{display:grid;gap:4px;padding:12px;border:1px solid var(--outline-subtle);border-radius:12px}
+.antdep strong{font:500 16px 'Inter',system-ui,sans-serif}
+.antdep .mono{font-size:11px;letter-spacing:.04em}
+.antdep__k{text-transform:uppercase}
+@media (max-width:480px){.antdep{grid-template-columns:1fr}}
+
+/* orientação da polaroid (etapa 27): dois botões com ícone da moldura em pé e deitada; selecionado = borda azul 2 px + check */
+.pre__g--2{grid-template-columns:1fr 1fr}
+.pre__b--ori{min-height:88px;padding:8px 6px;text-align:center}
+.pre__b--ori .mono{text-align:center}
+.ori__i{display:block;box-sizing:border-box;border:1.5px solid var(--black);border-radius:2px;background:var(--white)}
+.ori__i--v{width:20px;height:25px;border-bottom-width:6px}
+.ori__i--h{width:25px;height:20px;border-left-width:6px}

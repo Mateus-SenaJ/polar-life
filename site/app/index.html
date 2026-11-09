@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Seus projetos</title>
+<meta name="description" content="Seus projetos de polaroids, salvos neste aparelho.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond ainda vem do Google Fonts neste protótipo. Hospedar antes de produção. Inter já está embutida. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/led.css">
+<link rel="stylesheet" href="../assets/css/esqueleto.css">
+<script src="../assets/js/esqueleto.js"></script>
+<link rel="stylesheet" href="../assets/css/pages/home.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="#projetos" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<a class="btn2" href="conexoes/" id="conexoes"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Conexões</a>
+<button type="button" class="btn2" id="backup"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Abrir backup</button>
+</div></header>
+
+<main class="wrap page">
+<div class="esq-sk esq-sk--home" role="status" aria-label="Carregando seus projetos">
+<div class="esq-sk__top"><i></i><i></i></div>
+<div class="esq-sk__card"><i></i><div class="esq-sk__lin"><i></i><i></i></div></div>
+<p class="esq-sk__msg"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p>
+</div>
+<div class="top" id="top">
+<h1>Seus projetos</h1>
+<button type="button" class="led-btn led-btn--light" id="novo1"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Novo projeto<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+</div>
+
+<section id="lista" aria-label="Projetos">
+<ul class="grid" style="list-style:none;padding:0">
+<li class="card" id="card1">
+  <div class="card__row">
+    <img class="avatar" src="../assets/img/logos/Logo_favicon_PolarLife.png" width="54" height="48" alt="">
+    <div class="card__txt">
+      <h2 class="card__name"><a href="editor/" id="open1">Viagem · Serra 2026</a></h2>
+      <p class="card__meta">24 fotos · 6 folhas A4 · Clássico 88 × 107 mm</p>
+    </div>
+    <button type="button" class="more" id="more1" aria-label="Mais ações do projeto Viagem · Serra 2026" aria-haspopup="menu" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+  </div>
+  <span class="chip">Salvo neste dispositivo</span>
+  <div class="menu" id="menu1" role="menu" hidden>
+    <button type="button" role="menuitem" data-act="abrir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Abrir</button>
+    <button type="button" role="menuitem" data-act="backup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Salvar backup (.polarlife)</button>
+    <button type="button" role="menuitem" data-act="excluir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Excluir projeto…</button>
+  </div>
+</li>
+</ul>
+</section>
+
+<section class="empty" id="vazio" aria-labelledby="t-vazio" hidden>
+<img class="logo-v" src="../assets/img/logos/logo_oficial_PolarLife.png" width="111" height="96" alt="Polar Life">
+<h1 id="t-vazio">Nenhum projeto ainda</h1>
+<p>Escolha algumas fotos e crie a sua primeira polaroid. Seus projetos ficam salvos neste aparelho.</p>
+<button type="button" class="led-btn led-btn--light" id="novo2"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Novo projeto<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+</section>
+
+<div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p></div>
+
+<ul class="legal">
+<li><a href="../legal/#privacidade">Privacidade</a></li>
+<li><a href="../legal/#termos">Termos</a></li>
+<li><a href="../legal/#cookies">Cookies</a></li>
+</ul>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
+<h2 id="dlg-t">Excluir este projeto?</h2>
+<p>Viagem · Serra 2026 e as 24 fotos deste projeto serão apagados deste aparelho. Antes, você pode salvar um backup (.polarlife).</p>
+<div class="dialog__act">
+<button type="button" class="btn2 btn2--lg" id="dlg-cancel">Cancelar</button>
+<button type="button" class="btn2 btn2--lg" id="dlg-del"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Excluir projeto</button>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-undo" hidden>Desfazer</button></div>
+
+<script src="../assets/js/pages/home.js" defer></script>
+</body>
+</html>

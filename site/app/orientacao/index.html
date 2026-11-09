@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Orientação das fotos</title>
+<meta name="description" content="Escolha como organizar fotos verticais e horizontais.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond e IBM Plex Mono ainda vêm do Google Fonts. Ver STATUS.md · P-FONTES. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/pages/orientacao.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+</div></header>
+<main class="wrap page" id="fundo" aria-hidden="true"><div class="narrow">
+<div class="head"><h1>Resumo da importação</h1><p>Confira o que chegou antes de organizar as folhas.</p></div>
+<section class="card"><p class="bg-t">24 fotos · 6 folhas · 4 por folha</p></section>
+</div></main>
+
+<div class="scrim" id="scrim"></div>
+<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" aria-describedby="dlg-d">
+<h2 id="dlg-t">Como organizar as fotos verticais e horizontais?</h2>
+<p id="dlg-d">Há <strong>6 verticais</strong> e <strong>18 horizontais</strong> entre as 24 fotos.</p>
+<fieldset class="opts">
+<legend class="sr">Organização por orientação</legend>
+<label class="opt"><input type="radio" name="o" value="separar" checked><span class="opt__b"><span class="opt__t">Separar por orientação <span class="tag mono">Recomendada</span></span><span class="opt__d">Horizontais e verticais ficam em grupos próprios.</span></span></label>
+<label class="opt"><input type="radio" name="o" value="padrao"><span class="opt__b"><span class="opt__t">Todas no padrão</span><span class="opt__d">Todas as fotos seguem a orientação padrão do formato.</span></span></label>
+<label class="opt"><input type="radio" name="o" value="depois"><span class="opt__b"><span class="opt__t">Decidir depois</span><span class="opt__d">Você escolhe no editor, quando quiser.</span></span></label>
+</fieldset>
+<div class="dialog__act">
+<a class="btn2 btn2--lg" id="back" href="../resumo/">Voltar</a>
+<button type="button" class="led-btn led-btn--light" id="go"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Continuar</span></span></button>
+</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+
+<script src="../../assets/js/pages/orientacao.js" defer></script>
+</body>
+</html>

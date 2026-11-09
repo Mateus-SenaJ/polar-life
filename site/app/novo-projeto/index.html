@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Novo projeto</title>
+<meta name="description" content="Escolha o formato da polaroid e o papel do seu novo projeto.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<!-- PENDENTE (T6, TP-06): Cormorant Garamond e IBM Plex Mono ainda vêm do Google Fonts neste protótipo. Hospedar antes de produção. Inter já está embutida. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/led.css">
+<link rel="stylesheet" href="../../assets/css/pages/novo-projeto.css">
+</head>
+<body>
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<a class="btn2" href="../">Cancelar</a>
+</div></header>
+
+<main class="wrap page">
+<div class="head">
+<h1>Novo projeto</h1>
+<p>Escolha o formato da polaroid e o papel. Você pode mudar tudo isso depois.</p>
+</div>
+
+<div class="shortcut">
+<p><strong>Quer fazer só uma polaroid?</strong> Escolha uma foto, escreva a legenda e baixe.</p>
+<button type="button" class="btn2" id="uma"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M5 15h14"/></svg>Fazer uma polaroid</button>
+</div>
+
+<div class="layout">
+<div class="stack">
+
+<section class="block" aria-labelledby="h-nome">
+<h2 id="h-nome">Nome do projeto</h2>
+<div class="fld fld--first">
+<label class="lbl" for="nome">Nome</label>
+<input class="txt" id="nome" type="text" autocomplete="off" placeholder="Ex.: Viagem · Serra 2026" aria-describedby="nome-h">
+<p class="help" id="nome-h">Se deixar em branco, usamos «Projeto sem nome».</p>
+</div>
+</section>
+
+<section class="block" role="group" aria-labelledby="h-fmt">
+<h2 id="h-fmt">Formato da polaroid</h2>
+<p class="lead">Escolha um formato pronto ou defina as medidas.</p>
+<div class="fmt-grid" id="fmt-grid" role="radiogroup" aria-labelledby="h-fmt"></div>
+
+<div class="custom" id="custom-frame" hidden>
+<div class="two" id="custom-frame-fields"></div>
+</div>
+
+<div class="fld">
+<span class="lbl" id="ori-l">Orientação da polaroid</span>
+<div class="seg" role="radiogroup" aria-labelledby="ori-l" id="seg-ori">
+<label><input type="radio" name="ori" value="portrait"><span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="1.5"/></svg>Vertical</span></label>
+<label><input type="radio" name="ori" value="landscape"><span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="10" rx="1.5"/></svg>Horizontal</span></label>
+</div>
+</div>
+</section>
+
+<section class="block" aria-labelledby="h-papel">
+<h2 id="h-papel">Papel</h2>
+<div class="fld fld--first">
+<label class="lbl" for="paper">Tamanho do papel</label>
+<div class="sel"><select id="paper"></select><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div>
+<p class="help">Margem de 10 mm e 4 mm entre as polaroids. Você ajusta depois.</p>
+</div>
+<div class="custom" id="custom-paper" hidden>
+<div class="two" id="custom-paper-fields"></div>
+</div>
+<div class="fld">
+<span class="lbl" id="pori-l">Orientação da folha</span>
+<div class="seg" role="radiogroup" aria-labelledby="pori-l" id="seg-pori">
+<label><input type="radio" name="pori" value="portrait"><span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="1.5"/></svg>Retrato</span></label>
+<label><input type="radio" name="pori" value="landscape"><span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="10" rx="1.5"/></svg>Paisagem</span></label>
+</div>
+</div>
+</section>
+
+</div>
+
+<aside class="aside" aria-label="Resultado">
+<div class="sum">
+<h2>Como fica a folha</h2>
+<div class="sheet" id="sheet" role="img" aria-label="Prévia da folha"></div>
+<div aria-live="polite" aria-atomic="true">
+<p class="count" id="count"></p>
+<p class="meta" id="meta"></p>
+<span class="pill mono" id="pill" hidden></span>
+</div>
+<div class="msg-err" id="msg-err" role="alert" hidden>
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+<div><p><strong id="err-t"></strong></p><p id="err-d"></p><button type="button" class="btn2" id="err-fix" hidden></button></div>
+</div>
+<button type="button" class="led-btn led-btn--light led-btn--block" id="continuar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+<p class="foot">O número de folhas aparece quando você adicionar as fotos.</p>
+</div>
+</aside>
+</div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+
+<script src="../../assets/js/pages/novo-projeto.js" defer></script>
+</body>
+</html>

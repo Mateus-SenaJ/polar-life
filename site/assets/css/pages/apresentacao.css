@@ -1,0 +1,59 @@
+/* T-28 · apresentacao · CSS específico da página (base + componentes). Tokens: tokens.css · LED: led.css */
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--white)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* ===== Página T-28 · Apresentação ===== */
+.wrap{width:100%;max-width:1280px;margin:0 auto;padding:0 24px}
+
+.site-header{height:72px;border-bottom:1px solid var(--outline-subtle);background:var(--white)}
+.site-header .wrap{height:100%;display:flex;align-items:center}
+.site-header a{display:inline-flex;align-items:center;min-height:44px}
+.logo-h{height:40px;width:auto}
+
+.hero{padding-top:80px;padding-bottom:80px}
+.hero__copy{max-width:640px}
+
+.eyebrow{display:flex;align-items:center;gap:12px;margin:0;font-size:12px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;line-height:1.5}
+.eyebrow::before{content:"";flex:none;width:24px;height:2px;background:var(--orange)}
+
+@media (max-width:420px){.eyebrow{letter-spacing:.16em}}
+.hero__title{margin:32px 0 0;font-size:clamp(44px,13.4vw,56px);line-height:1;font-weight:500;letter-spacing:-.04em}
+.hero__title .hl{font-family:var(--font-expressive);font-weight:500;letter-spacing:0;color:var(--blue)}
+
+.hero__lead{margin:32px 0 0;max-width:34ch;font-size:18px;line-height:1.6;font-weight:400}
+
+.hero__cta{margin:40px 0 0}
+.hero__cta .led-btn{width:100%}
+
+.hero__more{margin:48px 0 0}
+.link-more{display:inline-flex;align-items:center;gap:12px;min-height:44px;font-size:18px;font-weight:500;line-height:1.2;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+.ico{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* Composição de polaroids (desktop, LIVRE · DOC-01 §12.1). Fotos de exemplo [PENDENTE J4]. */
+.stack{display:none}
+.polaroid{position:absolute;margin:0;background:var(--white);padding:14px 14px 0;border-radius:2px}
+.polaroid__photo{aspect-ratio:1/1;border-radius:2px;background-color:var(--surface-subtle);background-image:radial-gradient(rgb(0 0 0/.4) .75px,transparent .75px);background-size:24px 24px;box-shadow:inset 0 0 0 1px var(--outline-micro)}
+.polaroid figcaption{height:84px;position:relative;padding-top:10px;font-family:var(--font-expressive);font-weight:500;font-size:26px;line-height:1.1;text-align:left}
+.polaroid .sign{position:absolute;left:0;bottom:10px;height:24px;width:auto}
+.p1{width:46%;top:0;left:0;transform:rotate(-5deg);box-shadow:var(--shadow-polaroid)}
+.p2{width:46%;top:26%;right:0;transform:rotate(4deg);box-shadow:var(--shadow-lifted);z-index:2}
+.p3{width:46%;top:52%;left:8%;transform:rotate(-2deg);box-shadow:var(--shadow-polaroid);z-index:3}
+
+@media (min-width:1024px){
+  .wrap{padding:0 32px}
+  .hero{display:grid;grid-template-columns:7fr 5fr;gap:32px;align-items:center;min-height:calc(100vh - 72px);min-height:calc(100svh - 72px);padding-top:64px;padding-bottom:64px}
+  .hero__title{font-size:clamp(72px,6.4vw,96px)}
+  .hero__cta .led-btn{width:auto;min-width:320px}
+  .stack{display:block;position:relative;aspect-ratio:5/7}
+}
+
+.site-footer{border-top:1px solid var(--outline-subtle);padding:48px 0}
+.site-footer .wrap{display:flex;flex-direction:column;gap:32px}
+.logo-v{height:96px;width:auto;align-self:flex-start}
+.legal{display:flex;gap:24px;margin:0;padding:0;list-style:none}
+.legal a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:500;text-underline-offset:4px}
+@media (min-width:768px){.site-footer .wrap{flex-direction:row;align-items:center;justify-content:space-between}}

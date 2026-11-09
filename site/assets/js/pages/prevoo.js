@@ -1,0 +1,117 @@
+/* T-18 · Pré-voo «Tudo pronto para o papel?» · DOC-03 BR-12 e BR-13 · DOC-01 (caixa de decisão) · DV-32
+   Pop-up nível 3 sobre a mesa do Modo Folhas. Três severidades, sempre com ícone + texto (nunca só cor):
+   Bloqueia (✕) · Pede confirmação (▲) · Informa (i). Lê o estado pelo gancho window.PLEDITOR (editor.js). */
+(function(){
+var $=function(i){return document.getElementById(i)};
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pl(n,s,p){return n+' '+(n===1?s:p)}
+function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
+var COORD=/-?\d{1,3}[.,]\d{3,}\s*[,;]\s*-?\d{1,3}[.,]\d{3,}/,ARQ=/^(IMG|DSC|DSCN|PXL|MVIMG)[_-]?\d+|\.(jpe?g|png|heic|webp)$/i;
+var MB_FOLHA=1.5;                                   /* [HIPÓTESE] ~1,5 MB por folha a 300 PPI; o estimador real vem com o PDF (T-19) */
+var NAO_IMPRIMIVEL=5;                               /* [HIPÓTESE] margem mínima em mm; depende da impressora */
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}
+  for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
+var disparo=null,confirmou=false,itens=null;
+
+function ppiDe(F,k){                                /* PPI por posição, gravado pelo Quadro; sem visita ao Quadro vale o exemplo (foto 12 = 140) */
+  try{var a=JSON.parse(sessionStorage.getItem('pl-ppi')||'null');if(Array.isArray(a)&&a.length===F.length&&typeof a[k]==='number')return a[k]}catch(e){}
+  return F[k].src===12?140:326}
+
+function analisar(){
+  var C=window.PLEDITOR.ctx(),R=C.R,D=C.D,F=C.FOTOS,LG=C.LG,bl=[],pe=[],inf=[];
+  var data=LG?LG.data.on:true,loc=LG?LG.loc.on:true;
+  /* ---- Bloqueia (BR-13) ---- */
+  if(D.guias&&D.contorno)bl.push('Guias e contorno estão ligados ao mesmo tempo. Desligue um deles na aba Papel.');
+  if(!F.length)bl.push('O projeto não tem fotos. Adicione ao menos uma foto.');
+  else if(R.erro)bl.push('A polaroid não cabe neste papel. Escolha um papel maior ou reduza as margens.');
+  else if(!R.sheets.length)bl.push('Nenhuma folha tem fotos.');
+  var fora=R.erro?0:C.foraTodas();
+  if(fora)bl.push('A legenda sai da área segura em '+pl(fora,'polaroid','polaroids')+' (inclui a zona da assinatura). Reduza o corpo, use «Ajustar para caber» ou mude a posição na aba Legendas.');
+  var coord=F.filter(function(f){return COORD.test(f.leg||'')});
+  if(coord.length)bl.push('O texto da '+(coord.length===1?'foto ':'s fotos ')+coord.map(function(f){return f.n}).join(', ')+' tem coordenadas. Troque por uma cidade.');
+  /* ---- Pede confirmação ---- */
+  var ru=[];F.forEach(function(f,k){var p=ppiDe(F,k);if(p<180)ru.push({n:f.n,p:p})});
+  if(ru.length)pe.push((ru.length===1?'Foto ':'Fotos ')+ru.slice(0,6).map(function(x){return x.n+' ('+x.p+' PPI)'}).join(', ')+(ru.length>6?' e mais '+(ru.length-6):'')+' com resolução baixa. Ela pode sair com pouca nitidez no papel.');
+  var arq=F.filter(function(f){return ARQ.test(String(f.leg||'').trim())});
+  if(arq.length)pe.push('O texto da '+(arq.length===1?'foto ':'s fotos ')+arq.map(function(f){return f.n}).join(', ')+' parece um nome de arquivo (como IMG_0234).');
+  var sd=data?F.filter(function(f){return f.m&&!f.m.iso}).length:0,sl=loc?F.filter(function(f){return f.m&&!f.m.c}).length:0;
+  if(sd)pe.push(pl(sd,'foto está','fotos estão')+' sem data, com a linha de data ligada.');
+  if(sl)pe.push(pl(sl,'foto está','fotos estão')+' sem local, com a linha de local ligada.');
+  var cal=false;try{cal=sessionStorage.getItem('pl-calibrou')==='1'||Object.keys(JSON.parse(localStorage.getItem('pl-calib')||'{}')).some(function(k){return k.split('|')[1]===window.PLFOLHAS.papel(D).n})}catch(e){}
+  if(!cal)pe.push('Sua impressora ainda não foi calibrada. Imprima a página de teste antes do lote.');
+  if(D.margem<NAO_IMPRIMIVEL)pe.push('A margem de '+nf(D.margem)+' mm pode ser menor que a área não imprimível da sua impressora.');
+  /* ---- Informa ---- */
+  var n=R.erro?0:R.sheets.length,ant=null;try{ant=+sessionStorage.getItem('pl-prevoo-folhas')||null}catch(e){}
+  inf.push('Tamanho estimado: cerca de '+nf(Math.max(1,n)*MB_FOLHA)+' MB em 1 arquivo.');
+  if(ant&&ant!==n&&n)inf.push(pl(ant,'folha','folhas')+' → '+pl(n,'folha','folhas')+' desde a última revisão.');
+  inf.push(D.assin?'A assinatura Polar Life está ligada.':'A assinatura Polar Life está desligada.');
+  return{bl:bl,pe:pe,inf:inf,n:n,por:R.erro?0:R.g.n,papel:window.PLFOLHAS.papel(D),aprov:R.erro?0:C.aprov(R),orient:D.orient}
+}
+
+function lista(cls,ico,rot,arr){
+  if(!arr.length)return'';
+  return'<section class="pv__g pv__g--'+cls+'" aria-label="'+rot+'"><h3 class="pv__h"><svg class="ico sm" aria-hidden="true"><use href="#'+ico+'"/></svg><span>'+rot+'</span><span class="mono pv__n">'+arr.length+'</span></h3><ul class="pv__l">'
+   +arr.map(function(t){return'<li><svg class="ico sm" aria-hidden="true"><use href="#'+ico+'"/></svg><span>'+esc(t)+'</span></li>'}).join('')+'</ul></section>'
+}
+function monta(){
+  if($('pv-dlg'))return;
+  var sc=document.createElement('div');sc.className='scrim';sc.id='pv-scrim';sc.hidden=true;
+  var d=document.createElement('div');d.className='dialog pv';d.id='pv-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
+  d.setAttribute('aria-labelledby','pv-t');d.setAttribute('aria-describedby','pv-d');d.hidden=true;
+  d.innerHTML='<div class="pv__top"><svg class="ico pv__ico" aria-hidden="true"><use href="#i-verified"/></svg><h2 id="pv-t">Tudo pronto para o papel?</h2></div><p id="pv-d"></p>'
+   +'<dl class="pv__grid"><div><dt class="mono">Total de folhas</dt><dd id="pv-f"></dd></div><div><dt class="mono">Disposição</dt><dd id="pv-p"></dd></div><div><dt class="mono">Aproveitamento</dt><dd id="pv-a"></dd></div></dl>'
+   +'<div id="pv-l"></div>'
+   +'<label class="chk pv__ok" id="pv-okl" hidden><input type="checkbox" id="pv-ok"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span>Revisei e quero continuar</span></label>'
+   +'<p class="pv__why mono" id="pv-w" hidden></p>'
+   +'<div class="dialog__act"><button type="button" class="btn2 btn2--lg" id="pv-v">Voltar e ajustar</button>'
+   +'<button type="button" class="led-btn led-btn--light" id="pv-g"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span id="pv-gt">Gerar PDF</span></span></button></div>';
+  document.body.appendChild(sc);document.body.appendChild(d);
+  $('pv-v').onclick=sc.onclick=function(){fecha()};
+  $('pv-ok').onchange=function(){confirmou=this.checked;estado()};
+  $('pv-g').onclick=function(){
+    if(this.disabled)return;
+    var C=window.PLEDITOR.ctx(),pp=window.PLFOLHAS.papel(C.D);
+    try{sessionStorage.setItem('pl-prevoo-folhas',String(itens.n));
+      sessionStorage.setItem('pl-prevoo',JSON.stringify({ok:true,k:chave(),n:itens.n,fotos:C.FOTOS.length,papel:pp.n,w:pp.w,h:pp.h,orient:C.D.orient,por:itens.por}))}catch(e){}
+    fecha(true);location.href='exportar/'                 /* T-19: escolher o formato; o rótulo «Gerar PDF» já vem marcado lá */
+  };
+  document.addEventListener('keydown',function(e){
+    if(d.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();fecha();return}
+    if(e.key!=='Tab')return;
+    var f=[].filter.call(d.querySelectorAll('button,input'),function(x){return!x.disabled&&x.offsetParent!==null||x===document.activeElement});
+    if(!f.length)return;var a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&(document.activeElement===a||!d.contains(document.activeElement))){e.preventDefault();z.focus()}
+    else if(!e.shiftKey&&(document.activeElement===z||!d.contains(document.activeElement))){e.preventDefault();a.focus()}
+  })
+}
+function estado(){
+  var b=itens.bl.length,c=itens.pe.length,g=$('pv-g'),w=$('pv-w');
+  $('pv-okl').hidden=!c||!!b;
+  var ok=!b&&(!c||confirmou);g.disabled=!ok;g.setAttribute('aria-disabled',String(!ok));
+  w.hidden=ok;
+  w.textContent=b?'Resolva '+pl(b,'item que bloqueia','itens que bloqueiam')+' para gerar o PDF.':!ok?'Marque «Revisei e quero continuar» para gerar o PDF.':''
+}
+function abrir(origem){
+  monta();disparo=origem||document.activeElement;confirmou=false;
+  itens=analisar();var n=itens.n,b=itens.bl.length,c=itens.pe.length;
+  $('pv-d').textContent=b?(b===1?'1 item impede de gerar o PDF.':b+' itens impedem de gerar o PDF.')+' Ajuste e revise de novo.'
+    :c?'Está quase. '+pl(c,'item pede','itens pedem')+' a sua confirmação antes de gerar.'
+    :'Nada impede a geração. Revise o resumo e gere o PDF.';
+  $('pv-f').textContent=b&&!n?'—':String(n);
+  $('pv-p').textContent=itens.por?pl(itens.por,'por folha','por folha')+' · '+itens.papel.n+' '+(itens.orient==='paisagem'?'paisagem':'retrato'):'—';
+  $('pv-a').textContent=itens.por?itens.aprov+'%':'—';
+  $('pv-l').innerHTML=lista('bl','i-x','Bloqueia',itens.bl)+lista('pe','i-warn','Pede confirmação',itens.pe)+lista('in','i-info','Informa',itens.inf);
+  $('pv-ok').checked=false;
+  $('pv-gt').textContent='Gerar PDF'+(n?' ('+pl(n,'folha','folhas')+')':'');
+  estado();
+  $('pv-scrim').hidden=$('pv-dlg').hidden=false;
+  (b?$('pv-v'):($('pv-ok').offsetParent?$('pv-ok'):$('pv-g'))).focus()
+}
+function fecha(semFoco){
+  $('pv-scrim').hidden=$('pv-dlg').hidden=true;
+  if(semFoco!==true&&disparo&&disparo.focus)disparo.focus()
+}
+window.PLPREVOO={abrir:abrir,analisar:function(){return analisar()}};
+if(location.hash==='#revisar')setTimeout(function(){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}abrir($('go'))},0)   /* abre uma vez; recarregar não reabre */
+})();

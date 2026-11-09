@@ -1,0 +1,69 @@
+/* T-10 · aba LEGENDAS · anatomia E4b/E1 (cartões #F8F9FA, seletor de fonte, estilos prontos) · DOC-12 DV-20 (ativo = preto + branco; objeto selecionado = anel azul) */
+
+/* legenda na polaroid: corpo em pt reais (1 pt = 0,3528 mm), deslocamento em mm, nada sobre a foto (T4) */
+.pq{--dx:0;--dy:0;--inc:0deg}
+.pq__top{position:absolute;left:calc(var(--k)*20px);right:calc(var(--k)*20px);top:0;height:calc(var(--k)*20px);display:flex;align-items:center;justify-content:center;gap:calc(var(--k)*8px);white-space:nowrap;pointer-events:none}
+.lg-txt,.lg-dt,.lg-lc{font-size:calc(var(--pw)/88*.3528*var(--pt,12));line-height:1.1;white-space:nowrap}
+.pq__band .pq__cap,.pq__top .lg-txt{font-size:inherit;display:block}
+.pq__band .pq__cap{line-height:1.1;overflow:visible;text-overflow:clip}
+.pq__meta{font-size:inherit}
+.pq__cap,.pq__meta,.pq__top{transform:translate(calc(var(--pw)/88*var(--dx)),calc(var(--pw)/88*var(--dy))) rotate(var(--inc));transform-origin:left center}
+.pq__meta{display:flex;align-items:baseline;flex-wrap:nowrap}
+.lg-dt,.lg-lc{font-weight:400;letter-spacing:.02em}
+.lg-sep{white-space:pre;font-size:calc(var(--pw)/88*.3528*8)}
+.lg-pin{width:1.2em;height:1.2em;vertical-align:-.2em;margin-right:.2em}
+.pq__top .lg-m{display:flex;align-items:baseline}
+
+/* estilos prontos: só aparência da inscrição, o texto não muda */
+.pq[data-preset=contornada] .lg-txt{-webkit-text-stroke:calc(var(--k)*.6px) currentColor;paint-order:stroke fill;color:#fff!important}
+.pq[data-preset=etiqueta] .lg-txt{display:inline-block;padding:.1em .5em;border:1px solid currentColor;border-radius:4px;font-size:calc(var(--pw)/88*.3528*var(--pt,12)*.9)}
+.pq[data-preset=carimbo] .lg-txt{display:inline-block;padding:.05em .4em;border:2px solid currentColor;border-radius:4px;transform:rotate(-3deg)}
+.pq[data-preset=bilhete] .lg-txt{display:inline-block;padding:.1em .5em;border:1px dashed currentColor}
+.pq[data-preset=calendario] .lg-dt{display:inline-block;padding:.1em .5em;border:1px solid currentColor;border-radius:4px}
+
+/* seletor de fonte (EXC-2) */
+.fsel{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 12px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-subtle);cursor:pointer;text-align:left;color:var(--black)}
+.fsel[aria-expanded=true]{box-shadow:inset 0 0 0 2px var(--blue)}
+.fsel:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.fsel__s{flex:1;min-width:0;font-size:22px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fsel__n{flex:none;max-width:40%;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fpick{display:flex;flex-direction:column;gap:12px;padding:12px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:14px}
+.fbusca{display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:12px}
+.fbusca:focus-within{outline:2px solid var(--blue)}
+.fbusca input{flex:1;min-width:0;height:100%;border:0;background:none;font:400 14px 'Inter',system-ui,sans-serif;outline:none}
+.fcats{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}
+.fcat{flex:none;min-height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:999px;background:var(--white);font-size:11px;cursor:pointer;color:var(--black)}
+.fcat[aria-selected=true]{background:var(--black);color:var(--white);border-color:var(--black)}
+.fcat:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto}
+.fitem{display:flex;align-items:center;gap:4px;border-radius:12px}
+.fitem.is-on{box-shadow:inset 0 0 0 2px var(--blue)}
+.fitem__b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;min-height:56px;padding:8px 12px;border:0;background:none;cursor:pointer;text-align:left;color:var(--black);border-radius:12px}
+.fitem__b:hover{background:var(--surface-subtle)}
+.fitem__b:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.fitem__s{font-size:22px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fitem__n{font-size:11px}
+.fitem .ib[aria-pressed=true] .ico{fill:var(--orange);color:var(--orange)}
+
+/* estilos prontos e formatos de data: ativo = preto + branco (DV-20) */
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fmts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preset{position:relative;display:block;cursor:pointer}
+.preset input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.preset span{display:flex;align-items:center;justify-content:center;min-height:44px;padding:4px 6px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font-size:12px;font-weight:500;line-height:1.2;text-align:center}
+.preset--s span{justify-content:flex-start;padding:4px 12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:400;font-size:12px}
+.preset input:checked+span{background:var(--black);color:var(--white);border-color:var(--black)}
+.preset input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+
+/* cor da inscrição: preto, azul, laranja, sempre com nome (T3) */
+.cores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cor{position:relative;display:block;cursor:pointer}
+.cor input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.cor__b{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 8px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font-size:12px;font-weight:500}
+.cor__b i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--outline-subtle)}
+.cor input:checked+.cor__b{box-shadow:inset 0 0 0 2px var(--blue)}
+.cor input:focus-visible+.cor__b{outline:2px solid var(--blue);outline-offset:2px}
+.lg-num input{width:100%}
+.seg:has(input[name=sep]) .seg__o span,.seg:has(input[name=ordem]) .seg__o span{font-size:12px}
+
+@media (max-width:767.98px){.presets{grid-template-columns:repeat(2,1fr)}.fsel__n{display:none}}

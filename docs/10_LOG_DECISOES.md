@@ -1,0 +1,183 @@
+---
+id: DOC-10
+titulo: Polar Life · Log de decisões, conflitos e pendências
+edicao: 2
+data: 2026-11-07
+status: vigente (histórico; nunca prevalece sobre DOC-01 a DOC-09)
+---
+
+# Log de decisões, conflitos e pendências
+
+> **TL;DR.** Aqui está o **porquê**. As decisões D-050 a D-064 e os conflitos C-35 a C-55 são desta edição e valem como **decisões do analista até veto do dono** (`[RECOMENDADO]`). O que veio das rodadas anteriores está resumido e atualizado. Itens `[NÃO RECUPERADO]` não tinham conteúdo nos anexos e não foram inventados.
+
+## 1. Convenções
+
+D-xxx decisão · C-xx conflito · F-xx funcionalidade · P-xx pendência com o dono · J-xx pendência jurídica · IDs de regra por documento (`DS`, `TP`, `BR`, `FL`, `FN`, `CL`, `CN`, `MT`, `LG`).
+
+## 2. Decisões vigentes (rodadas anteriores, condensadas)
+
+| ID | Decisão | Onde vive |
+| --- | --- | --- |
+| D-001 | Regras visuais saem do guia e ficam no design | DOC-01 |
+| D-002 | Sem integração por API com Instagram e Facebook | DOC-07 CN-03 |
+| D-004 | PDF grava «imprimir sem escala» como dica; aviso «Tamanho real (100%)» segue obrigatório | DOC-08 §6 |
+| **D-007b (rev.)** | Toggle e checkbox ligados em **azul #006194**, thumb e ✓ brancos. A versão «pretos» (guia 1.2) está **revogada** | DS-05 |
+| D-012 | SEO em duas levas (1.0 institucional; 1.1 galeria e modelos) | DOC-04 |
+| D-014 | Ordem de Drive/Dropbox/OneDrive por pesquisa de demanda | DOC-07 |
+| D-015 | Sem sangria; perfil «Casa / Gráfica» na 1.1 | DOC-08 |
+| D-017 | Moldura sempre branca | DS-10, BR-04 |
+| D-018 | Assinatura: logo horizontal, canto inferior esquerdo da faixa, ligada por padrão | BR-05 |
+| D-019 | Fonte canônica de design única; `DESIGN_v2.0.md` não existe | DOC-01 |
+| D-020 | LED nunca em controles | DS-04 |
+| D-021 | Borda do secundário = preto 8% | DS-02 |
+| D-022 | Cores de legenda e guia são conteúdo impresso | DS-13 |
+| D-023 | Toast: branco, texto preto, anel LED nível 1 | DOC-01 §5 |
+| D-024 a D-034 | Modelo de planos, direito de uso assinado, recuperação de conta, cobrança pelo provedor, entrada com Apple/Google, cartão como padrão do Pro, teste de 2 preços | DOC-03 |
+| D-026 a D-028 | 1.x sem limite comercial; limite de fotos avisado na importação; exportar exige conta na 2.0 | DOC-03 |
+| D-035 a D-049 | Portão «Direito de uso»; contagem de folhas; mês do grátis; uso razoável; migração; entrada e sessão; offline; botões Apple/Google (exceção); Pix; tela Conta; pagamento assíncrono | DOC-03 (só o que muda a tela) |
+| D-003, D-005, D-006, D-007a, D-008 a D-011, D-013, D-016 | `[NÃO RECUPERADO]` | — |
+
+## 3. Conflitos resolvidos nesta edição (C-35 a C-55)
+
+| ID | Conflito | Decisão | Doc |
+| --- | --- | --- | --- |
+| C-35 | Cabeçalho 56 px (guia) × 64 px (HTML E4b) | **64** | DOC-01 §4 |
+| C-36 | «Sem navegação lateral de 256 px» (C4) × trilho de 256 no HTML; coluna de fotos de 200 | **O HTML vence:** trilho 256 (recolhível a 72) com Folhas·Quadro·Colagem·Lembranças; coluna de fotos vira **faixa do lote** sob a mesa | DOC-01 |
+| C-37 | Pesos 600–700 no sistema × pedido de fontes leves | Máximo **500**; 300 só em ≥ 16 px | TP-02, TP-04 |
+| C-38 | Georgia (licença de embutir, C12/P3) | **Removida**; serifadas = Cormorant, Playfair, EB Garamond, Libre Baskerville | DOC-02 §4 |
+| C-39 | 4 fontes de legenda (HTML mostra 3) × pedido de várias opções | **Catálogo** de 26, 5 categorias, busca, favoritas, recentes | DOC-02 §4 |
+| C-40 | Caveat só em 1 palavra do hero × zonas expressivas pedidas | 5 zonas EXC-1 a EXC-5; hero vira frase com **1 palavra azul** | TP-03 |
+| C-41 | Toggle preto (prompts E0/E1 do guia) × azul (HTML, D-007b rev.) | **Azul**; prompts atualizados | DOC-11 |
+| C-42 | Botão LED 50–52/44 raio 12 móvel e 8 desktop × HTML 52/42 raio 12 | **52/42, raio 12**, área de toque 44, peso 500 | DOC-01 §3 |
+| C-43 | Sombra `lifted` existe no HTML e não no design | Adotada como 5º token | DOC-01 §2 |
+| C-44 | «Corte» para recortar a foto e para as guias do papel; aba «Corte» ambígua | **Recorte** (foto) e **Guias de corte** (papel); aba renomeada | Índice §4 |
+| C-45 | Rótulos internos e promessas no HTML («Regra 4.4», «Motor foto V2.4», «Cardstock 300g», «guilhotina calibrada») | Removidos da interface | DOC-01 §9 |
+| C-46 | HTML carrega Tailwind, Google Fonts e Material Symbols por CDN × promessa legal | **Autohospedar** em produção | TP-06, LG-04 |
+| C-47 | Cores `error` vermelhas no Tailwind do E4b × regra sem vermelho | Removidas | DS-01 |
+| C-48 | D-002 (Instagram sem API) × pedido de verificar conexões | **Central de conexões** com estados honestos; Instagram = «Indisponível por regra da plataforma» + caminho guiado | DOC-07 |
+| C-49 | «Apple» como origem de fotos × falta de API web de leitura | Entrada pelo **seletor do sistema** (Biblioteca de Fotos); «Entrar com Apple» só login; iCloud web `[VALIDAR]` | DOC-07 §2 |
+| C-50 | «Colagens e adesivos» na 2.0 × prioridade do pedido | **Modo Colagem, sugestões e lembranças na 1.1**; adesivos e colagem livre avançada na 2.0 | DOC-06 |
+| C-51 | Compartilhar com facilidade × F-25 (sem servidor, sem link) | Compartilhar **arquivo** (Web Share, download); sem link público | CL-06 |
+| C-52 | Lembranças × limite de folhas do Pro | Imagem para rede **não consome folha** | D-054 |
+| C-53 | Planos com detalhe de backend (webhooks, tokens, tentativas) | Movido para «O que o backend decide»; ficam só regras de tela | DOC-03 §8 |
+| C-54 | 7 arquivos com patches sobrepostos (guia 1.2 + 1.3 + 1.4 + 1.5) | **Edição 2** unificada, com IDs estáveis | DOC-00 |
+| C-55 | Fundos de colagem × 4 cores | Paleta + degradê LED suave; **texturas de papel `[PENDENTE]`** | CL-04 |
+
+**Conflitos anteriores ainda abertos:** C-24 e C-32 (ajustar `polar-led.css`: altura 52/42, divisor 8%, toast com núcleo branco) · C-34 resolvido por exceção (D-044) · C12 resolvido por C-38.
+
+## 4. Novas decisões (D-050 a D-087) `[RECOMENDADO]`
+
+| ID | Decisão | Motivo |
+| --- | --- | --- |
+| D-050 | Tipografia leve: Inter 300–500, Cormorant Garamond e IBM Plex Mono; proibido 600/700 | Pedido do dono |
+| D-051 | Os dois HTMLs são o **padrão de layout** do sistema | Pedido do dono |
+| D-052 | Georgia sai; editoriais livres entram | Fecha C12 |
+| D-053 | Modo Colagem, sugestões e lembranças entram na **1.1** | Valor central do produto; adesivos ficam na 2.0 |
+| D-054 | Lembranças e colagens em imagem não consomem folha; colagem em PDF consome | Limite protege impressão, não rede social |
+| D-055 | Central de conexões com teste que **não lê foto** | Verificação pedida, sem risco de privacidade |
+| D-056 | Catálogo de fontes de legenda gratuito para todos | Menos atrito |
+| D-057 | Vocabulário fixo: Recorte × Guias de corte; Folha × Colagem × Lembrança | Evitar ambiguidade |
+| D-058 | Botão 52/42, raio 12, peso 500 | Alinha ao HTML |
+| D-059 | Detalhe de backend de pagamento fora da documentação de produto | Pedido do dono |
+| D-060 | Autohospedar fontes, ícones e CSS compilado | LG-04 |
+| D-061 | Sugestões locais, determinísticas e sem IA em nuvem | Privacidade, previsibilidade |
+| D-062 | Fundos de colagem na paleta; texturas dependem do dono | Fidelidade às 4 cores |
+| D-063 | Importar ZIP (Takeout, backup de redes) entra como recomendação para 2.0 | Atende Instagram e Google sem API `[VALIDAR]` |
+| D-064 | Modelo de documento FIXO / GUIADO / LIVRE com IDs de regra | Guiar IAs sem engessar a criatividade |
+| D-065 | O Modo Quadro é uma rota própria (`/app/editor/quadro/#foto-N`), com estado por foto na sessão `[RECOMENDADO]` | Evita refatorar a T-07; clicar numa polaroid da folha abre o Quadro (FL-04) |
+| D-066 | Foto de exemplo com 976 px no lado menor: 326 PPI a 100% e 140 PPI a 233% `[HIPÓTESE]` | Reproduz «Boa · 326 PPI» e «Com ressalvas · 140 PPI» do DOC-04 §6 pela fórmula do BR-12 |
+| D-067 | Cota «Passe-partout inferior» calculada do formato (107 − 6 − 76 = 25 mm), não o 24,5 do HTML `[VALIDAR]` | Dados do Clássico 88 × 107 (FN-03) |
+| D-068 | Formato do projeto em `ST[0].fr`; polaroid desenhada em mm exatos (margem 6 mm) `[VALIDAR]` | FN-03; muda levemente o visual do Clássico da T-08 |
+| D-069 | Só formatos de janela quadrada ativos; os demais «Em breve» | O motor de recorte assume janela 1:1 (FN-04) |
+| D-070 | Medidas dos formatos não-Clássico, limites dos campos e cantos 0,4 mm `[RECOMENDADO]` | DOC-05 só dá as medidas externas |
+| D-071 | Réguas só com a aba Molduras aberta; unidade (mm, cm, pol) guardada na sessão | FN-03 «preferência global»; persistência real com Dexie |
+| D-072 | Metadados por foto em `ST[n].meta`; não contam como «Ajustada» e sobrevivem ao «Resetar recorte» | FN-08 |
+| D-073 | Legenda lê data e cidade da foto atual; campo vazio remove o item da legenda | FN-07 × FN-08 |
+| D-074 | Ajuste de horas vale para todas as fotos com data até a T-14 trazer a seleção `[VALIDAR]` | FN-08, FN-09 |
+| D-075 | Horas de exemplo 08:00 + 30 min por foto `[HIPÓTESE]`; lista de «Origem» `[RECOMENDADO]` | DOC-04 §6 só dá a data |
+| D-076 | Escopo em 4 níveis no chip («Modificar escopo»); a caixa «Replicar» fica sincronizada com ele | FN-00b, DV-22 |
+| D-077 | «Selecionadas» = marcadas + foto atual; folha = 4 fotos em ordem `[RECOMENDADO]` | FN-09, DOC-04 §6 |
+| D-078 | ~~Duplicar e Remover «Em breve» até o lote ficar dinâmico~~ **Substituída pela D-080 a D-082 (etapa 10)** | FN-09 |
+| D-079 | Ajuste de horas (FN-08) vale para as selecionadas; sem seleção, para todas com data. «Convertida» usa as fotos HEIC da T-04 | FN-08, FN-09 |
+| D-068 | «Replicar para as demais» copia só os ajustes de imagem; o recorte nunca replica; fotos com ajuste individual ficam protegidas até «Substituir» | FN-00b, FN-09 |
+| D-080 | Lote dinâmico: cada foto guarda a origem (`src`, 1 a 24) e a posição vira só ordem. Orientação, cena, legenda padrão e data/hora de exemplo seguem a origem `[RECOMENDADO]` | FN-09; sem isso a cópia mudaria de orientação ao deslocar posições |
+| D-081 | **Duplicar** coloca a cópia logo depois da original e herda ajustes, filtro, legenda e metadados; a foto aberta continua a mesma. Age nas marcadas na faixa; sem marcação, na foto aberta `[RECOMENDADO]` | FN-09 |
+| D-082 | **Remover** tira do projeto (o arquivo continua no aparelho, BR-01), nunca deixa o projeto sem fotos e se desfaz por Ctrl+Z e pelo toast. Pede confirmação em pop-up (nível 3): o LED fica em «Manter fotos»; «Remover N fotos» é secundário com lixeira, nunca LED nem vermelho. Esc mantém `[VALIDAR]` | FN-09, DS (destrutivo) |
+| D-083 | A lista de origens fica em `sessionStorage` (`pl-fotos`) para o Quadro e a T-07 mostrarem o mesmo número de fotos. Persistência real vem com Dexie `[RECOMENDADO]` | DOC-08 §7 |
+| D-084 | A T-07 usa o formato escolhido na aba Molduras (medidas externas, margens, janela quadrada) e a legenda própria de cada foto; lê do estado do Quadro em `sessionStorage` (`pl-quadro`) `[RECOMENDADO]` | FN-03 «moldura pertence à foto»; DOC-08 §3 |
+| D-085 | O estado do Quadro (`pl-quadro`) e as definições de papel e espaço da T-07 (`pl-folhas`) sobrevivem à ida e volta entre os modos; projeto novo (T-02) e a escolha da T-06 limpam o que for preciso `[RECOMENDADO]` | Evita perder ajustes ao trocar de modo; Dexie depois |
+| D-086 | Trocar formato abre pop-up com antes, depois e novo número de folhas, calculado com o papel e o espaço atuais; LED em «Trocar formato». Clicar no formato já ativo não faz nada | FN-03 |
+| D-088 | A T-07 aplica nas folhas o estilo da legenda do Quadro (fonte, cor, corpo, caixa, espaçamento, interruptores, estilo pronto), lido de `pl-quadro`; data e posição seguem fixas por ora `[RECOMENDADO]` | FN-07, FN-03 |
+| D-089 | As folhas seguem o formato da data e a posição (Abaixo, Acima, Ambas, deslocamento e inclinação) da legenda do Quadro `[RECOMENDADO]` | FN-07 |
+| D-090 | A T-07 usa data e cidade de cada foto (T-13), aplica «Ajustar para caber» medindo a folha e mostra aviso de área segura (não bloqueia; o bloqueio é do pré-voo) `[RECOMENDADO]` | FN-07, FN-08, BR-13 |
+| D-091 | O pré-voo (T-18) abre nas Folhas; o botão do Quadro leva até lá. Mede a legenda em todas as folhas desenhando-as fora da tela `[RECOMENDADO]` | BR-13, DV-32 |
+| D-092 | Limites do pré-voo: 180 PPI (confirmação), margem 5 mm, 1,5 MB por folha `[HIPÓTESE]`; «fonte indisponível» e «foto com falha» ficam para depois | BR-12, BR-13 |
+| D-093 | A T-19 Exportar só abre com pré-voo válido (chave do projeto em `pl-prevoo`); o LED do pré-voo leva a ela, com PDF alta qualidade já marcado `[RECOMENDADO]` | FL-07, T-18, T-19 |
+| D-094 | O estimador usa MB por foto e por folha como `[HIPÓTESE]` e divide em volumes de 150 MB (computador) ou 60 MB (celular), também para imagens e ZIP | DOC-08 §6 |
+| D-095 | A T-20 simula o progresso (650 ms por folha) até existir o gerador; a falha de foto só aparece em `#estado-falha` e «Gerar sem elas» repagina e reinicia `[RECOMENDADO]` | FL-07, DOC-08 §6 |
+| D-096 | O perfil de calibração fica no `localStorage` por «impressora|papel» (nome digitado), com faixa de 80 a 120 mm; a página de teste é real e a escala só é aplicada quando o gerador existir `[RECOMENDADO]` | DOC-08 §6, BR-13 |
+| D-087 | `motor-folhas.js` concentra papel, grade, melhor giro e contagem de folhas; a T-07 e o pop-up usam a mesma conta (DOC-08 §3) | Evita duas fórmulas |
+| D-097 | A T-22 prepara o arquivo antes do clique e só mostra «Compartilhar» quando `canShare({files})` confirma; cancelar não mostra nada e outro erro troca para «Baixar» `[RECOMENDADO]` | DOC-06 §8 |
+| D-098 | Até existir o gerador, a T-22 usa um arquivo de exemplo (PDF mínimo, PNG, JPEG ou ZIP vazio) com o mecanismo final de Web Share e download; a T-20 grava `pl-arquivos` para a T-22 ler `[HIPÓTESE]` | DOC-08 §6, DOC-06 §8 |
+| D-099 | O rótulo de baixar acompanha o tipo («Baixar PDF», «Baixar ZIP», «Baixar imagem(ns)»); o DOC-06 só prevê «Baixar imagem» `[RECOMENDADO]` | DOC-06 §8 |
+| D-100 | A T-23 vive em `/app/conexoes/` e a T-24 é a folha do «Testar conexão» (nível 3), não outra rota `[RECOMENDADO]` | DOC-07 §3 e §5 |
+| D-101 | Na 1.0 nenhum serviço fica «Conectado» (só com conta, 2.0); os cartões mostram «Pronto para usar», «Em breve» ou «Indisponível por regra da plataforma» `[RECOMENDADO]` | DOC-07 §3, CN-03 |
+| D-102 | iCloud Fotos (web) e Câmera entram como cartões próprios; iCloud usa o caminho guiado da Biblioteca de Fotos `[RECOMENDADO]` | DOC-07 §2 e §4 |
+| D-103 | A T-31 é uma página de catálogo (`/app/estados/`) mais a `404.html`; ligar cada estado dentro das telas fica para depois `[RECOMENDADO]` | DOC-04 §5, DOC-11 E12 |
+| D-105 | A falha de leitura passa a viver dentro da T-04 (não só no catálogo T-31): «Tentar de novo» e «Trocar foto» por foto; «Trocar foto» recusa o que não for JPEG, PNG, WebP ou HEIC `[RECOMENDADO]` | DOC-04 FL-02, FL-07, §5; DOC-11 E12 |
+| D-106 | O esqueleto de carregamento é um módulo único (`esqueleto.css`/`.js`) ligado antes da primeira pintura e desligado ~450 ms após o `DOMContentLoaded`; `#carregando` o mantém para revisão. Branco com borda e brilho azul, nunca cinza `[RECOMENDADO]` | DOC-04 §5, DOC-11 E12 |
+| D-107 | Janela da foto com proporção própria: `fr.jh` guarda a altura; zoom base, zoom mínimo, arraste e cobertura usam `FR.jw ÷ FR.jh`. Pocket (60 × 80, janela 48 × 60), Instax Mini (54 × 86, 46 × 62) e Instax Wide (108 × 86, 99 × 62) ficam ativos; as medidas da janela são `[RECOMENDADO]` (o DOC-05 só dá as externas). Projeto salvo sem `jh` abre com janela quadrada. Proporção aceita: 2,5 : 1 a 1 : 2,5 | DOC-05 FN-03, DOC-04 §6 |
+| D-108 | Medidas das janelas conferidas com a Fujifilm (Mini 46 × 62, Square 62 × 62, Wide 99 × 62); o Instax Square passa de 60 × 60 para 62 × 62 (margem 5 mm). Seção «Personalizar» na aba MOLDURAS com atalhos de proporção da janela, faixa inferior, margens e cantos; cada atalho só preenche campos já editáveis e respeita os limites de D-107 `[RECOMENDADO]`. Faixas superior/inferior de Mini, Square e Wide e a janela do Clássico (76 × 76 × 79 real) seguem `[VALIDAR]` | DOC-05 FN-03, DOC-01 DS-06 |
+| D-109 | Orientação da polaroid (Vertical/Horizontal, atalho `R`) pela opção A recomendada: gira a moldura inteira 90° no sentido horário, faixa grossa à esquerda e legenda girada junto. O modelo guarda as medidas sempre da moldura em pé (`fr.ori` = `v` ou `h`); `Q.FR` recebe a versão girada (`w`, `h`, `lado`, `ladoD`, `topo`, `jw`, `jh`) e a versão em pé (`cw`, `ch`, `cl`, `ct`, `cjw`, `cjh`). Projeto antigo abre em pé. Campos de Medidas seguem os da polaroid em pé; a cota vira «Passe-partout lateral». Entra no desfazer. `[RECOMENDADO]` até o dono confirmar. |
+| D-110 | «Valores diferentes» (FN-00a) dentro dos campos da aba AJUSTES: com escopo de várias fotos, o campo que difere em ao menos uma foto do escopo ganha a etiqueta «Valores diferentes» (ícone + texto, nunca só cor) no cabeçalho e a ajuda passa a dizer quantas fotos diferem e que «Aplicar às demais» iguala à foto aberta. Vale para os 8 ajustes e para a Intensidade do filtro; o Filtro (qual) tem linha própria abaixo da grade. Compara a foto aberta com as demais **do escopo** (Selecionadas, Esta folha ou Todas); em «Somente esta» não aparece. O campo segue mostrando o valor da foto aberta. Zoom, Endireitar e posição ficam sem etiqueta porque o escopo em lote não os propaga (só ajustes e filtro). `[RECOMENDADO]`; `[VALIDAR]` se o dono quer o texto «Valores diferentes» dentro do próprio campo no lugar do número. | FN-00a, FN-09, T3 |
+| D-104 | T-03 e T-01 apontam para `/app/conexoes/` («Verificar conexão» e «Conexões»); sem avatar de pessoa na 1.0 | DOC-07 §3 |
+
+## 5. Pendências com o dono
+
+| # | Pendência | Estado |
+| --- | --- | --- |
+| P1 | Roteiro v4 e PDFs: 25 modelos, limites de plano, telas S0–S31 | Aberta |
+| P2 | Valor `k` da assinatura e legibilidade em Mini/Instax Mini (teste de impressão) | Aberta |
+| P3 | Licenças: emoji, foto do hero e **cada fonte do catálogo** (Georgia fechada) | Reduzida |
+| P4 | Pesquisa de demanda para ordenar Drive, Dropbox e OneDrive | Aberta |
+| P5 | Dados jurídicos | Aberta |
+| P6 | Nome do projeto no nome do arquivo (padrão desligado) | Aberta |
+| P11 | Padronizar o azul entre os 3 arquivos de logo | Aberta |
+| P12 | Ajustar `polar-led.css` (C-24, C-32, C-42) | Aberta |
+| P13 | Provedor de pagamento; nota fiscal e reembolso | Aberta |
+| P16 | Login Apple/Google: escopos, domínios; registrar a exceção das 4 cores no DOC-01 | Aberta |
+| P17 | Preços da variante B, amostra e duração | Aberta |
+| P18 | Revisão jurídica (Termos, cancelamento, arrependimento, uso razoável) e contador | Aberta |
+| P19 | Confirmar hipóteses: 24 h, 30 dias, 100 folhas, sessão de 30 dias, offline de 7 dias | Aberta |
+| **P20** | Confirmar D-053 (colagem na 1.1) e D-054 | Nova |
+| **P21** | Biblioteca de adesivos (2.0) | Nova |
+| **P22** | Texturas de papel nos fundos de colagem (CL-04) | Nova |
+| **P23** | Instagram e Apple: confirmar regras e ZIP de dados | Nova |
+| **P24** | Verificação do app Google (console, prazo, limite por sessão) | Nova |
+| **P25** | Tamanhos de pixel das redes (revisar a cada release) | Nova |
+
+## 6. Benchmark e fatos verificados (07/11/2026, segundo os documentos de origem)
+
+| Referência | Observação | Onde adotamos |
+| --- | --- | --- |
+| Canva | Margem, sangria e marcas separadas | Guias também no preview (FN-02) |
+| Printique | Qualidade no tamanho final, ~300 PPI | PPI efetivo (BR-12) |
+| Acrobat | «Tamanho real» × «Ajustar à página» | Aviso obrigatório e dica no PDF |
+| Google Photos Picker | Endereço de mídia 60 min; download sem localização; escopo `photospicker.mediaitems.readonly` | DOC-07 |
+| Dropbox Chooser | Link direto expira em 4 h | DOC-07 |
+| Instagram | Acesso a fotos pessoais por API encerrado em dez/2024 | CN-03 |
+| MDN Web Share | HTTPS, ação do usuário, indisponível em Workers, `canShare` | DOC-06 §8 |
+| Pix Automático | Autorização do pagador; mudar valor exige nova autorização | Backend (DOC-03 §8) |
+| Botões de login | Google exige o «G» oficial e peso visual equivalente | CN-07 |
+
+Limitações: faixas de PPI são do Polar Life; comportamento de «sem escala» em cada visualizador `[VALIDAR]`; desempenho são **metas**; fatos de Apple e Instagram acima de web API `[VALIDAR]`.
+
+## 7. Changelog
+
+| Edição | Mudança |
+| --- | --- |
+| 2 | Pacote unificado (12 arquivos); layout dos HTMLs como padrão; tipografia leve com 5 zonas; catálogo de fontes; Modo Colagem, sugestões e lembranças; Central de conexões com verificação; backend de pagamentos removido; 21 conflitos e 15 decisões |
+| 1.5 | Portão «Direito de uso», migração, pagamento assíncrono |
+| 1.4 | Planos e conta |
+| 1.3 | Auditoria contra o design; C-15 a C-34 |
+| 1.2 | Guia mestre, fluxo de impressão, assinatura, moldura branca |

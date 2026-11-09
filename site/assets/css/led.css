@@ -1,0 +1,27 @@
+/* ===== LED · polar-led.css v4 com os 6 ajustes de produção (DOC-01 §11.7) ===== */
+.led-btn{--core:var(--black);--ink:var(--white);position:relative;display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 28px;border:var(--led-ring-3) solid transparent;border-radius:12px;background-image:linear-gradient(var(--core),var(--core)),var(--led-gradient-h);background-origin:border-box;background-clip:padding-box,border-box;box-shadow:-6px 4px 14px rgb(253 118 26/.20),6px -3px 14px rgb(0 97 148/.20);color:var(--ink);font:500 15px/1 'Inter',system-ui,sans-serif;letter-spacing:.01em;text-decoration:none;white-space:nowrap;cursor:pointer;overflow:hidden;transition:transform 150ms var(--ease),box-shadow 200ms var(--ease)}
+.led-btn--light{--core:var(--white);--ink:var(--black);box-shadow:var(--led-halo-2),0 4px 14px rgb(0 0 0/.04)}
+.led-btn--block{display:flex;width:100%}
+.led-btn .btn-content{position:relative;z-index:2;display:flex;align-items:center;gap:12px;color:var(--ink);transition:color 200ms var(--ease)}
+.led-btn .smoke-layer{position:absolute;inset:0;z-index:1;opacity:0;pointer-events:none;background-color:var(--orange);background-image:linear-gradient(rgb(255 255 255/.30),rgb(255 255 255/.30)),radial-gradient(ellipse 60% 45% at 25% 35%,rgb(255 255 255/.75) 0%,rgb(255 255 255/0) 60%),radial-gradient(ellipse 50% 50% at 55% 50%,rgb(0 97 148/.65) 0%,rgb(0 97 148/0) 65%),radial-gradient(ellipse 45% 40% at 75% 60%,rgb(255 255 255/.70) 0%,rgb(255 255 255/0) 55%),radial-gradient(ellipse 55% 55% at 95% 75%,rgb(253 118 26/.95) 0%,rgb(253 118 26/0) 70%);background-size:100% 100%,200% 200%,200% 200%,200% 200%,200% 200%;background-blend-mode:normal,screen,screen,screen,screen;transition:opacity 350ms var(--ease)}
+@media (hover:hover){
+  .led-btn:hover .smoke-layer{opacity:1;animation:smoke-move 6s ease-in-out infinite alternate}
+  .led-btn:hover .btn-content{--ink:var(--black)}
+}
+.led-btn:focus-visible .smoke-layer{opacity:1;animation:smoke-move 6s ease-in-out infinite alternate}
+.led-btn:focus-visible .btn-content{color:var(--black)}
+.led-btn:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.led-btn:active{transform:scale(.98)}
+@keyframes smoke-move{
+  0%{background-position:0 0,0% 30%,0% 30%,0% 30%,0% 30%}
+  50%{background-position:0 0,70% 70%,70% 70%,70% 70%,70% 70%}
+  100%{background-position:0 0,100% 40%,100% 40%,100% 40%,100% 40%}
+}
+@media (prefers-reduced-motion:reduce){
+  .led-btn,.led-btn .btn-content,.led-btn .smoke-layer{transition:none}
+  .led-btn:hover .smoke-layer,.led-btn:focus-visible .smoke-layer{animation:none;background-position:0 0,50% 50%,50% 50%,50% 50%,50% 50%}
+}
+@media (forced-colors:active){
+  .led-btn{border:2px solid ButtonText;background-image:none;box-shadow:none}
+  .led-btn .smoke-layer{display:none}
+}
