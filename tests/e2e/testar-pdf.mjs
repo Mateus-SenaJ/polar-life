@@ -7,7 +7,7 @@ import { createServer } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { servir } from './servidor.mjs';
+import { servir } from '../helpers/servidor.mjs';
 
 const falhas = [];
 const ok = (c, m) => { if (c) console.log('  ✔ ' + m); else { falhas.push(m); console.log('  ✘ ' + m); } };
@@ -16,7 +16,7 @@ const perto = (a, b, e = 0.01) => Math.abs(a - b) < e;
 const A4 = [210 * 72 / 25.4, 297 * 72 / 25.4];
 
 const srv = await servir();
-const pdfjsDir = fileURLToPath(new URL('../node_modules/pdfjs-dist/build/', import.meta.url));
+const pdfjsDir = fileURLToPath(new URL('../../node_modules/pdfjs-dist/build/', import.meta.url));
 const srvPdfjs = createServer(async (req, res) => {
   try {
     const p = join(pdfjsDir, decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -33,7 +33,7 @@ const errosPg = [];
 page.on('pageerror', e => errosPg.push(String(e)));
 try {
   await page.goto(srv.url + 'app/editor/', { waitUntil: 'networkidle' });
-  for (const src of ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/legenda-texto.js', 'assets/js/gerador.js'])
+  for (const src of ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/nucleo/legenda-texto.js', 'assets/js/nucleo/gerador.js'])
     await page.addScriptTag({ url: srv.url + src });
   ok(await page.evaluate(() => !!(window.PDFLib && window.fontkit && window.PLTEXTO && window.PLGERADOR)), 'bibliotecas e módulos carregados');
   ok(errosPg.length === 0, 'editor carrega sem erro de página' + (errosPg.length ? ': ' + errosPg[0] : ''));
@@ -83,7 +83,7 @@ try {
     return nomes;
   };
 
-  const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/legenda-texto.js', 'assets/js/gerador.js'];
+  const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/nucleo/legenda-texto.js', 'assets/js/nucleo/gerador.js'];
   async function carregarEditor({ leg = null, fr = null, folhas = null, txt = null, orientacao = null } = {}) {
     await page.evaluate(({ leg, fr, folhas, txt, orientacao }) => {
       const f = fr || { w: 88, h: 107, jh: 76, lado: 6, topo: 6, rad: 0.4, ori: 'v' };
@@ -321,7 +321,7 @@ try {
   console.log('  desvio máximo MT-02: ' + desvioMax.toFixed(3) + ' mm');
 
   console.log('Renderização da página 1:');
-  await mkdir(new URL('../scripts/saida/', import.meta.url), { recursive: true });
+  await mkdir(new URL('../saida/', import.meta.url), { recursive: true });
   const renderPdf = (b64, amostras = []) => page.evaluate(async ({ pdfjsUrl, b64, amostras }) => {
     const pdfjs = await import(pdfjsUrl + 'pdf.min.mjs');
     const worker = await (await fetch(pdfjsUrl + 'pdf.worker.min.mjs')).text();
@@ -351,9 +351,9 @@ try {
   }, { pdfjsUrl, b64, amostras });
 
   const render1 = await renderPdf(r1.arquivos[0].b64);
-  const saida = fileURLToPath(new URL('../scripts/saida/pdf-pagina-1.png', import.meta.url));
+  const saida = fileURLToPath(new URL('../saida/pdf-pagina-1.png', import.meta.url));
   await writeFile(saida, Buffer.from(render1.png, 'base64'));
-  ok(render1.png.length > 1000 && render1.naoBrancos > 1000, 'página 1 renderizada com conteúdo em scripts/saida/pdf-pagina-1.png (' + render1.naoBrancos + ' px não brancos)');
+  ok(render1.png.length > 1000 && render1.naoBrancos > 1000, 'página 1 renderizada com conteúdo em tests/saida/pdf-pagina-1.png (' + render1.naoBrancos + ' px não brancos)');
   ok(render1.texto.includes('Dias de sol'), 'texto extraído contém «Dias de sol»');
   ok(render1.texto.includes('14.07.26'), 'texto extraído contém «14.07.26»');
   ok(render1.texto.includes('Campos do Jordão, SP'), 'texto extraído contém «Campos do Jordão, SP»');
@@ -370,9 +370,9 @@ try {
     { x: (fbox.x + fbox.w / 2) * pxmm - 3, y: (horiz.page.h - (fbox.y + fbox.h * 0.08)) * pxmm - 3, w: 6, h: 6 }
   ] : [];
   const renderH = await renderPdf(rh.arquivos[0].b64, amostras);
-  const saidaH = fileURLToPath(new URL('../scripts/saida/pdf-horizontal-p1.png', import.meta.url));
+  const saidaH = fileURLToPath(new URL('../saida/pdf-horizontal-p1.png', import.meta.url));
   await writeFile(saidaH, Buffer.from(renderH.png, 'base64'));
-  ok(renderH.png.length > 1000 && renderH.naoBrancos > 1000, 'página 1 horizontal em scripts/saida/pdf-horizontal-p1.png (' + renderH.naoBrancos + ' px não brancos)');
+  ok(renderH.png.length > 1000 && renderH.naoBrancos > 1000, 'página 1 horizontal em tests/saida/pdf-horizontal-p1.png (' + renderH.naoBrancos + ' px não brancos)');
   const lum = c => (c.r + c.g + c.b) / 3;
   ok(renderH.cores.length === 2 && lum(renderH.cores[1]) < 70 && lum(renderH.cores[0]) > 150,
     'foto horizontal de pé: faixa preta embaixo da janela (topo ' + Math.round(lum(renderH.cores[0])) + ', fundo ' + Math.round(lum(renderH.cores[1])) + ')');
@@ -397,18 +397,18 @@ try {
   const ra = await gerar({ f: 'pdf' });
   ok(ra.ok && ra.avisos.length === 0, 'PDF com legenda acima gerado sem avisos');
   const renderA = await renderPdf(ra.arquivos[0].b64);
-  const saidaA = fileURLToPath(new URL('../scripts/saida/pdf-acima-p1.png', import.meta.url));
+  const saidaA = fileURLToPath(new URL('../saida/pdf-acima-p1.png', import.meta.url));
   await writeFile(saidaA, Buffer.from(renderA.png, 'base64'));
-  ok(renderA.png.length > 1000 && renderA.naoBrancos > 1000, 'página 1 com legenda acima em scripts/saida/pdf-acima-p1.png (' + renderA.naoBrancos + ' px não brancos)');
+  ok(renderA.png.length > 1000 && renderA.naoBrancos > 1000, 'página 1 com legenda acima em tests/saida/pdf-acima-p1.png (' + renderA.naoBrancos + ' px não brancos)');
 
   console.log('Renderização com legenda bilhete:');
   await carregarEditor({ leg: leg({ preset: 'bilhete' }), fr: null, folhas: {} });
   const rb = await gerar({ f: 'pdf' });
   ok(rb.ok && rb.avisos.length === 0, 'PDF com legenda bilhete gerado sem avisos');
   const renderB = await renderPdf(rb.arquivos[0].b64);
-  const saidaB = fileURLToPath(new URL('../scripts/saida/pdf-estilos-p1.png', import.meta.url));
+  const saidaB = fileURLToPath(new URL('../saida/pdf-estilos-p1.png', import.meta.url));
   await writeFile(saidaB, Buffer.from(renderB.png, 'base64'));
-  ok(renderB.png.length > 1000 && renderB.naoBrancos > 1000, 'página 1 com legenda bilhete em scripts/saida/pdf-estilos-p1.png (' + renderB.naoBrancos + ' px não brancos)');
+  ok(renderB.png.length > 1000 && renderB.naoBrancos > 1000, 'página 1 com legenda bilhete em tests/saida/pdf-estilos-p1.png (' + renderB.naoBrancos + ' px não brancos)');
   console.log('Orientação da T-06 (pl-orientacao):');
   await carregarEditor({ orientacao: 'separar' });
   const rsep = await page.evaluate(async () => {

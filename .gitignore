@@ -4,7 +4,7 @@ node_modules/
 dist/
 .env
 .tarefas/
-scripts/saida/
+tests/saida/
 # fotos pessoais de teste nunca entram no repo (T5)
 *.jpg
 *.jpeg

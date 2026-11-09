@@ -20,13 +20,18 @@ A especificação está em `docs/` (o `docs/12_ORQUESTRADOR_AGENTES-2.md` §1.3 
 - Comentários curtos citando a regra (ex.: `DOC-08 §6`, `MT-02`, `BR-13`).
 - Unidades internas em mm (o DOC-08 MT-01 pede µm inteiros na display list: converta com `Math.round(mm*1000)`).
 - Links sempre relativos (o site roda em `usuario.github.io/polar-life/`).
-- Scripts de teste e ferramentas em `scripts/*.mjs` (Node ≥ 20, ESM). **Não há Python nesta máquina**: testes novos em Node com `playwright` e `scripts/servidor.mjs`.
+- Scripts de teste e ferramentas em `tools/*.mjs` e `tests/**/*.mjs` (Node ≥ 20, ESM). **Não há Python nesta máquina**: testes novos em Node com `playwright` e `tests/helpers/servidor.mjs`.
+
+## Onde fica cada coisa
+- `site/assets/js/nucleo/` domínio sem DOM de tela (`PLFOLHAS`, `PLTEXTO`, `PLGERADOR`) · `js/ui/` componentes compartilhados · `js/editor/` módulos do inspetor e do pré-voo · `js/pages/` um script por rota.
+- `site/assets/css/base/` (fontes, tokens, LED) · `css/ui/` · `css/editor/` · `css/pages/` (um por tela).
+- `tools/` manutenção · `tests/unit/`, `tests/e2e/` (Node), `tests/e2e-py/` (legado) · saídas em `tests/saida/` (fora do git).
+- Um nome `window.PLxxx` por arquivo (o `verificar` acusa colisão). Arquivo novo vai na camada certa; não crie pasta nova sem motivo.
 
 ## Verificação obrigatória antes de entregar
 ```
-node scripts/verificar.mjs     # tem de terminar com "✔ Sem erros"
-node scripts/testar-quadro.mjs
-node scripts/testar-fontes.mjs
+npm run verificar      # tem de terminar com "✔ Sem erros"
+npm run testar:node    # motor do Quadro, fontes e PDF
 ```
 Mais o teste específico da tarefa. Não faça `git commit` nem `git push`: o orquestrador revisa e faz o commit.
 Não apague arquivos fora do escopo da tarefa. Não mexa em `docs/` (só o orquestrador atualiza STATUS e o log de decisões).
@@ -34,5 +39,5 @@ Não apague arquivos fora do escopo da tarefa. Não mexa em `docs/` (só o orque
 ## Fotos reais de teste (privacidade, T5)
 As fotos pessoais do dono ficam em `%USERPROFILE%\Desktop\fotos para o polarlife\` (69 JPEGs de ~12 MP).
 Testes podem **ler** essa pasta (variável `PL_FOTOS`, padrão esse caminho), mas **nunca** copiar, recortar, redimensionar
-ou salvar essas fotos (nem derivados) dentro do repositório. Saídas de teste vão para `scripts/saida/` (ignorada no git).
+ou salvar essas fotos (nem derivados) dentro do repositório. Saídas de teste vão para `tests/saida/` (ignorada no git).
 Se a pasta não existir, o teste pula as conferências com foto real e avisa.

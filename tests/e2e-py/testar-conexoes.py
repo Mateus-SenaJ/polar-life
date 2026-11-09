@@ -1,7 +1,7 @@
-# T-23 Central de conexões e T-24 Verificação. Uso: python3 scripts/testar-conexoes.py
+# T-23 Central de conexões e T-24 Verificação. Uso: python3 tests/e2e-py/testar-conexoes.py
 import subprocess, sys, time, os
 from playwright.sync_api import sync_playwright
-RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "site")
+RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "site")
 PORTA = 8807; BASE = f"http://localhost:{PORTA}"
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA)], cwd=RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 falhas, erros = [], []

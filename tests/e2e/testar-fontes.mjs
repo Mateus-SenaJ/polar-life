@@ -5,7 +5,7 @@
 import { chromium } from 'playwright';
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { servir, SITE } from './servidor.mjs';
+import { servir, SITE } from '../helpers/servidor.mjs';
 
 const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.push(m); console.log('  ✘ ' + m); };
 const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });

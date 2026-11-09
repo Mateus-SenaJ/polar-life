@@ -1,7 +1,7 @@
-# T-04: falha de leitura (fotos 7 e 19) no estilo T-31. Uso: python3 scripts/testar-processando.py
+# T-04: falha de leitura (fotos 7 e 19) no estilo T-31. Uso: python3 tests/e2e-py/testar-processando.py
 import subprocess, sys, time, os, tempfile
 from playwright.sync_api import sync_playwright
-RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "site")
+RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "site")
 PORTA = 8810; BASE = f"http://localhost:{PORTA}"
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA)], cwd=RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 falhas, erros = [], []

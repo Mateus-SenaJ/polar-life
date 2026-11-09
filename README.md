@@ -24,18 +24,32 @@ site/                 ← tudo o que é publicado (raiz do GitHub Pages)
     editor/compartilhar/ T-22 Compartilhar (Web Share ou «Baixar»)
       quadro/           T-08 Modo Quadro (aba Ajustes) + T-10 (Legendas) + T-11 (filtros) + T-12 (Molduras) + T-13 (Metadados) + T-14 (Lote e seleção) · #foto-N
   assets/
-    css/  fonts.css · tokens.css · led.css (compartilhados) · pages/<tela>.css
-    js/motor-folhas.js  papel, grade e contagem de folhas (T-07 e pop-up de formato)
-    js/pages/           comportamento de cada tela
-    fonts/              todas as fontes autohospedadas (WOFF2), pdf/ (TTF para o PDF) e LICENCAS.txt
+    css/base/           fonts.css · tokens.css · led.css (LED v4, DOC-01 §11) — valem em todas as telas
+    css/ui/             componentes compartilhados (esqueleto de carregamento)
+    css/editor/         módulos do inspetor e pop-ups do editor (legendas, lote, metadados, molduras, prevoo)
+    css/pages/          um arquivo por tela
+    js/nucleo/          domínio, sem DOM de tela: motor-folhas (PLFOLHAS), legenda-texto (PLTEXTO), gerador (PLGERADOR)
+    js/ui/              componentes compartilhados (esqueleto)
+    js/editor/          módulos do inspetor e do pré-voo (filtros, legendas, lote, metadados, molduras, prevoo)
+    js/pages/           um script por rota (home, editor, quadro, gerar, …)
+    vendor/             pdf-lib e fontkit locais (T6) + LICENCAS.txt
+    fonts/              fontes autohospedadas (WOFF2), pdf/ (TTF para o PDF) e LICENCAS.txt
     img/logos/          nomes oficiais do DOC-01 §13
 docs/                 ← especificação (DOC-00 a DOC-12). O DOC-12 é o orquestrador
+  historico/ETAPAS.md   histórico das etapas 1 a 28
 design/
-  referencias/          HTMLs canônicos E1 (componentes) e E4b (layout do editor)
+  referencias/          HTMLs canônicos E1 e E4b + polar-led.css (LED v4 canônico)
   prototipos-originais/ HTMLs de origem, intocados (auditoria)
-scripts/verificar.mjs ← checagem estática (links, ativos, T1, T2, T6)
-scripts/testar-*.{mjs,py} ← motor do Quadro e teste de navegador do lote
-STATUS.md             ← telas feitas, próximas etapas, pendências
+tools/                ← manutenção: verificar.mjs (checagem estática), baixar-fontes.mjs, copiar-vendor.mjs
+tests/
+  unit/                 sem navegador (motor do Quadro)
+  e2e/                  Playwright em Node (fontes, PDF, …)
+  e2e-py/               Playwright em Python (etapas 1 a 28)
+  helpers/servidor.mjs  servidor estático dos testes
+  saida/                capturas e PDFs gerados pelos testes (fora do git)
+AGENTS.md             ← regras para agentes de código (Travas, estilo, verificação, fotos de teste)
+STATUS.md             ← estado atual, última etapa e pendências
+PROXIMOS_PASSOS.md    ← o que vem a seguir
 ```
 
 ## Rodar e verificar

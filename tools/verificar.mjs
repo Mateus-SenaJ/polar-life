@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Verificação estática do site (sem dependências). Uso: node scripts/verificar.mjs
+// Verificação estática do site (sem dependências). Uso: node tools/verificar.mjs
 // Erros (saída 1): link ou ativo quebrado, âncora ausente, CDN/terceiro não permitido, noindex ausente em /app,
 // peso tipográfico > 500 (T1), fonte não autohospedada (T6, TP-06). Avisos: cor fora da paleta (T2).
 // Recurso externo é procurado em HTML, CSS e JS (P-FONTES fechada na etapa 29: Google Fonts agora é erro).

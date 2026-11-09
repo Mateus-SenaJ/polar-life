@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Teste do motor do Modo Quadro (T-08): PPI (BR-12), zoom mínimo ao endireitar, cobertura da janela (FN-04). Uso: node scripts/testar-quadro.mjs
+// Teste do motor do Modo Quadro (T-08): PPI (BR-12), zoom mínimo ao endireitar, cobertura da janela (FN-04). Uso: node tests/unit/testar-quadro.mjs
 import { readFileSync } from 'node:fs';
-const src = readFileSync(new URL('../site/assets/js/pages/quadro.js', import.meta.url), 'utf8');
+const src = readFileSync(new URL('../../site/assets/js/pages/quadro.js', import.meta.url), 'utf8');
 const motor = src.split('/*MOTOR*/')[1].split('/*FIM MOTOR*/')[0];
 const M = new Function(motor + '; return {FR,VERT,novo,nat,base,zmin,jq,cabe,acertar,ppi,nivel,zmaxPara,ajustou,mudou,setSrc:f=>{SRCMAP=f;}};')();
 let falhas = 0; const ok = (c, m) => { if (!c) { falhas++; console.log('FALHA', m); } };

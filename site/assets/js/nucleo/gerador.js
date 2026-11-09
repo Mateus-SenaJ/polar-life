@@ -3,7 +3,7 @@
 (function(){
 var FL=window.PLFOLHAS, LT=window.PLTEXTO, PDF=window.PDFLib, FK=window.fontkit;
 var BASE=(function(){
-  try{var u=new URL(document.currentScript.src);return u.origin+u.pathname.replace(/assets\/js\/gerador\.js$/,'')}catch(e){}
+  try{var u=new URL(document.currentScript.src);return u.origin+u.pathname.replace(/assets\/js\/nucleo\/gerador\.js$/,'')}catch(e){}
   return location.href.replace(/\/app\/.*$/,'/').replace(/[^/]*$/,'')
 })();
 var SIG='assets/img/logos/Logo_tipografia_lateral.png', SIGURL=BASE+SIG;

@@ -1,7 +1,7 @@
-# T-31 «Carregando»: esqueleto na T-01 e no editor (T-07, T-08). Uso: python3 scripts/testar-esqueleto.py
+# T-31 «Carregando»: esqueleto na T-01 e no editor (T-07, T-08). Uso: python3 tests/e2e-py/testar-esqueleto.py
 import subprocess, sys, time, os
 from playwright.sync_api import sync_playwright
-RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "site")
+RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "site")
 PORTA = 8811; BASE = f"http://localhost:{PORTA}"
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA)], cwd=RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 falhas, erros = [], []

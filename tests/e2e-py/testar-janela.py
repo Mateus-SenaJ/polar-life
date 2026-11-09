@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Teste em navegador: janela não quadrada (Retro Pocket, Instax Mini, Square e Wide) no Quadro e na T-07 (etapa 25) + atalhos de medida (etapa 26).
-Uso: python3 scripts/testar-janela.py"""
+Uso: python3 tests/e2e-py/testar-janela.py"""
 import subprocess, sys, time, pathlib
 from playwright.sync_api import sync_playwright
-RAIZ = pathlib.Path(__file__).resolve().parent.parent / "site"
+RAIZ = pathlib.Path(__file__).resolve().parents[2] / "site"
 PORTA = 8793; BASE = f"http://localhost:{PORTA}"
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA)], cwd=RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(1.2); falhas = []; erros = []

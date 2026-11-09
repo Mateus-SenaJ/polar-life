@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Teste em navegador (Chromium via Playwright) de «Valores diferentes» dentro dos campos (T-11 · DOC-05 FN-00a).
-Uso: python3 scripts/testar-valores.py   (requer: pip install playwright && playwright install chromium)"""
+Uso: python3 tests/e2e-py/testar-valores.py   (requer: pip install playwright && playwright install chromium)"""
 import subprocess, sys, time, pathlib
 from playwright.sync_api import sync_playwright
-RAIZ = pathlib.Path(__file__).resolve().parent.parent / "site"
+RAIZ = pathlib.Path(__file__).resolve().parents[2] / "site"
 PORTA = 8793; BASE = f"http://localhost:{PORTA}"
 srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA)], cwd=RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(1.2); falhas = []; erros = []
