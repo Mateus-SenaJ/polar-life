@@ -4,8 +4,9 @@
 // peso tipográfico > 500 (T1), cor fora da paleta (T2). Avisos: Google Fonts ainda em uso (P-FONTES, T6).
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, resolve, relative, extname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const SITE = resolve(new URL('../site', import.meta.url).pathname);
+const SITE = fileURLToPath(new URL('../site', import.meta.url));
 const erros = [], avisos = [];
 const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
 const arquivos = walk(SITE), htmls = arquivos.filter(f => f.endsWith('.html'));
