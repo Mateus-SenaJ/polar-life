@@ -29,7 +29,7 @@
 <section class="card" id="corpo" aria-labelledby="lbl">
 <div id="fase-gerando">
 <div class="lblrow"><span id="lbl"></span><span class="pct mono" id="pct"></span></div>
-<div class="prog" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--v:0%"><span class="prog__glow"></span><span class="prog__track"><span class="prog__fill"></span></span></div>
+<div class="led-progress led-progress--determinate prog" id="prog" role="progressbar" aria-labelledby="lbl" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--value:0"><span class="led-progress__glow prog__glow"></span><span class="led-progress__track prog__track"><span class="led-progress__fill prog__fill"></span></span></div>
 <p class="det" id="det"></p>
 <div class="sr" id="live" role="status" aria-live="polite"></div>
 <div class="msg" id="lock"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Suas fotos continuam no seu aparelho. Nada sobe para um servidor.</p></div>
@@ -52,12 +52,12 @@
 </section>
 </div></main>
 
-<div class="scrim" id="sc" hidden></div>
-<div class="dialog" id="dl-cancel" role="alertdialog" aria-modal="true" aria-labelledby="dc-t" aria-describedby="dc-d" hidden>
+<div class="led-scrim scrim" id="sc" hidden></div>
+<div class="led-dialog led-box led-box--3 dialog" id="dl-cancel" role="alertdialog" aria-modal="true" aria-labelledby="dc-t" aria-describedby="dc-d" hidden>
 <h2 id="dc-t">Parar a geração?</h2><p id="dc-d">O que já foi gerado será descartado. Suas fotos e o projeto não mudam.</p>
 <div class="dialog__act"><button type="button" class="btn2 btn2--lg" id="dc-sim">Parar e descartar</button><button type="button" class="led-btn led-btn--light" id="dc-nao"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Continuar gerando</span></span></button></div>
 </div>
-<div class="dialog" id="dl-falha" role="alertdialog" aria-modal="true" aria-labelledby="df-t" aria-describedby="df-d" hidden>
+<div class="led-dialog led-box led-box--3 dialog" id="dl-falha" role="alertdialog" aria-modal="true" aria-labelledby="df-t" aria-describedby="df-d" hidden>
 <h2 id="df-t"></h2><p id="df-d">A geração está parada. Escolha o que fazer.</p>
 <ul class="fl" id="df-l"></ul>
 <div class="dialog__act dialog__act--4">
@@ -68,6 +68,12 @@
 </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+<script src="../../../assets/js/nucleo/motor-folhas.js" defer></script>
+<script src="../../../assets/vendor/pdf-lib.min.js" defer></script>
+<script src="../../../assets/vendor/fontkit.umd.min.js" defer></script>
+<script src="../../../assets/js/nucleo/legenda-texto.js" defer></script>
+<script src="../../../assets/js/nucleo/fotos-locais.js" defer></script>
+<script src="../../../assets/js/nucleo/gerador.js" defer></script>
 <script src="../../../assets/js/pages/gerar.js" defer></script>
 </body>
 </html>

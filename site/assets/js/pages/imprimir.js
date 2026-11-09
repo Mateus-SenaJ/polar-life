@@ -6,6 +6,7 @@ var $=function(i){return document.getElementById(i)},tm;
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function pl(n,s,p){return n+' '+(n===1?s:p)}
 function pc(n){return (Math.round(n*1000)/10).toFixed(1).replace('.',',')+'%'}
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var estado=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 var P=null;try{P=JSON.parse(sessionStorage.getItem('pl-prevoo')||'null')}catch(e){}
 var papel=P&&P.ok?P.papel:'A4',W=P&&P.ok?P.w:210,H=P&&P.ok?P.h:297;
@@ -27,9 +28,13 @@ $('imprimir-t').textContent='Imprimir agora'+(P&&P.ok?' ('+pl(P.n,'folha','folha
 if(!(P&&P.ok)){$('imprimir').disabled=true;$('imprimir').setAttribute('aria-disabled','true')}
 var cal0=perfilDoPapel();
 if(cal0)mostraCalibrado(cal0.k.split('|')[0],cal0.v);else $('aviso-cal').hidden=false;
+function imprimirBytes(bytes){var u=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'})),f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.tabIndex=-1;f.style.cssText='position:fixed;left:-9999px;width:1px;height:1px;border:0';f.onload=function(){try{f.contentWindow.focus();f.contentWindow.print()}finally{setTimeout(function(){URL.revokeObjectURL(u);f.remove()},30000)}};f.src=u;document.body.appendChild(f)}
 $('imprimir').onclick=function(){
   if(this.disabled)return;
-  toast('A impressão das folhas usa o PDF do gerador, que ainda não está ligado. A página de teste já imprime de verdade.')
+  var prof=perfilDoPapel();
+  if(prof&&window.PLGERADOR){PLGERADOR.pdf(PLGERADOR.projeto(),{f:'pdf',escala:{fx:prof.v.fx,fy:prof.v.fy}}).then(function(r){imprimirBytes(r.arquivos[0].bytes)},function(){toast('Não foi possível preparar o PDF para imprimir.')});return}
+  if(!window.PLFOTOS){toast('Gere o PDF antes de imprimir.');return}
+  PLFOTOS.lerArquivos(chave()).then(function(a){var pdf=a.filter(function(x){return x.tipo==='application/pdf'})[0];if(pdf)imprimirBytes(pdf.bytes);else toast('Gere o PDF antes de imprimir.')},function(){toast('Gere o PDF antes de imprimir.')})
 };
 
 /* ---- passo 1: página de teste (régua de 100 mm no tamanho real) ---- */
@@ -45,6 +50,7 @@ function paginaTeste(){
    +'<div class="v">'+t.replace(/<i class="th"[^>]*><\/i>/g,'')+'</div><div class="l" style="left:26mm;top:84mm">Traço vertical · 100 mm</div></div></body></html>'
 }
 function mostraBloqueio(){var b=$('bloq');b.hidden=false;$('p1').classList.remove('feito');b.focus()}
+function pdfTeste(){if(!window.PDFLib)return Promise.resolve(null);return fetch('../../../assets/fonts/pdf/ibm-plex-mono-400.ttf').then(function(r){return r.arrayBuffer()}).then(function(bytes){return PDFLib.PDFDocument.create({updateMetadata:false}).then(function(d){d.registerFontkit(window.fontkit);d.catalog.set(PDFLib.PDFName.of('ViewerPreferences'),d.context.obj({PrintScaling:PDFLib.PDFName.of('None')}));return d.embedFont(bytes,{subset:true}).then(function(font){var pg=d.addPage([W/25.4*72,H/25.4*72]),k=72/25.4,x=20*k,y=(H-80)*k,i;pg.drawLine({start:{x:x,y:y},end:{x:x+100*k,y:y},thickness:.1*k});pg.drawLine({start:{x:x,y:y},end:{x:x,y:y-100*k},thickness:.1*k});for(i=0;i<=10;i++){pg.drawLine({start:{x:x+i*10*k,y:y},end:{x:x+i*10*k,y:y+3*k},thickness:.1*k});pg.drawLine({start:{x:x,y:y-i*10*k},end:{x:x+3*k,y:y-i*10*k},thickness:.1*k})}pg.drawText('100 mm',{x:x+40*k,y:y+5*k,size:9,font:font});return d.save()})})})}
 function imprimeTeste(){
   $('bloq').hidden=true;
   try{
@@ -52,8 +58,7 @@ function imprimeTeste(){
     var f=document.createElement('iframe');f.id='quadro-teste';f.setAttribute('aria-hidden','true');f.tabIndex=-1;f.style.cssText='position:fixed;left:-9999px;top:0;width:0;height:0;border:0';
     document.body.appendChild(f);
     var d=f.contentDocument;if(!d||!f.contentWindow)throw new Error('sem janela');
-    d.open();d.write(paginaTeste());d.close();
-    setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print();$('p1').classList.add('feito');$('mx').focus()}catch(e){mostraBloqueio()}},150)
+    pdfTeste().then(function(bytes){if(bytes){var u=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));f.onload=function(){f.contentWindow.focus();f.contentWindow.print();setTimeout(function(){URL.revokeObjectURL(u)},30000)};f.src=u}else{d.open();d.write(paginaTeste());d.close();setTimeout(function(){f.contentWindow.focus();f.contentWindow.print()},150)}$('p1').classList.add('feito');$('mx').focus()},mostraBloqueio)
   }catch(e){mostraBloqueio()}
 }
 $('teste').onclick=imprimeTeste;

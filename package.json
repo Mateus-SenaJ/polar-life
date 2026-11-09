@@ -27,7 +27,9 @@
     "testar:fontes": "node tests/e2e/testar-fontes.mjs",
     "testar:pdf": "node tests/e2e/testar-pdf.mjs",
     "testar:led": "node tests/e2e/testar-led.mjs",
-    "testar:node": "node tests/unit/testar-quadro.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs"
+    "testar:gerar-real": "node tests/e2e/testar-gerar-real.mjs",
+    "testar:node": "node tests/unit/testar-quadro.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs && node tests/e2e/testar-led.mjs && node tests/e2e/testar-csp.mjs && node tests/e2e/testar-gerar-real.mjs",
+    "testar:csp": "node tests/e2e/testar-csp.mjs"
   },
   "engines": {
     "node": ">=20"

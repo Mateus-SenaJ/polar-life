@@ -1,7 +1,7 @@
 /* T-03 · adicionar-fotos · comportamento da página */
 (function(){
 var $=function(i){return document.getElementById(i)};
-var tm,opener,picked=[];
+var tm,opener,picked=[],salvando=Promise.resolve();
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
 
 /* ===== Selos de estado: ícone + texto, nunca só cor (CN-05, DS-06) ===== */
@@ -64,6 +64,8 @@ function receive(list){
   var all=[].slice.call(list||[]);if(!all.length)return;
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
   picked=picked.concat(ok);
+  /* Arquivos escolhidos seguem direto para o IndexedDB deste aparelho (DOC-08 §5, T5). */
+  if(window.PLFOTOS)salvando=salvando.then(function(){return Promise.all(ok.map(function(f,i){return PLFOTOS.salvar(picked.length-ok.length+i+1,f)}))}).catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
   render(bad);
 }
 function render(bad){
@@ -82,13 +84,13 @@ function render(bad){
     t.innerHTML='Continuar com '+plural(picked.length,'foto','fotos')+'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     $('btn-camera').innerHTML='<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Escolher mais fotos';
     $('btn-camera').dataset.mode='more';
-    if(!$('btn-clear')){var c=document.createElement('button');c.type='button';c.className='link';c.id='btn-clear';c.textContent='Limpar escolha';$('drop').appendChild(c);c.onclick=function(){picked=[];$('btn-clear').remove();$('btn-camera').innerHTML='<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Usar a câmera';delete $('btn-camera').dataset.mode;render(0);$('btn-device').focus()}}
+    if(!$('btn-clear')){var c=document.createElement('button');c.type='button';c.className='link';c.id='btn-clear';c.textContent='Limpar escolha';$('drop').appendChild(c);c.onclick=function(){picked=[];if(window.PLFOTOS)salvando=PLFOTOS.limpar();$('btn-clear').remove();$('btn-camera').innerHTML='<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Usar a câmera';delete $('btn-camera').dataset.mode;render(0);$('btn-device').focus()}}
   }else{
     t.innerHTML='Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
   }
 }
 $('btn-device').addEventListener('click',function(){
-  if(picked.length){location.href='../processando/';return}
+  if(picked.length){salvando.then(function(){location.href='../processando/'});return}
   $('f-device').click();
 });
 $('btn-camera').addEventListener('click',function(){

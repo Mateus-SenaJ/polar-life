@@ -1,6 +1,6 @@
 # Status do projeto
 
-Atualizado na **etapa 30a** (motor real do gerador de PDF). Antes: etapa 29 (fontes autohospedadas: P-FONTES fechada), etapa 28 («Valores diferentes» dentro dos campos da aba Ajustes), etapa 27 (orientação Vertical/Horizontal da polaroid), etapa 26 (medidas oficiais das janelas e atalhos de personalização da moldura), etapa 25 (janela não quadrada: Retro Pocket, Instax Mini e Wide). Antes: etapa 24 (esqueleto de carregamento na T-01 e no editor; fecha a T-31), etapa 23 (falha de leitura na T-04 no padrão da T-31). Antes: etapa 22 (arquivo inválido da T-03). Antes: etapa 21 (T-31 Estados vazios e erros, 404; E12; ligas soltas de conexões). Antes: etapa 20 (T-23 Central de conexões e T-24 Verificação; E7), etapa 19 (T-22 Compartilhar; fecha o E6), etapa 18 (T-21 Imprimir e calibração), etapa 17 (T-20 Gerando), etapa 16 (T-19 Exportar), etapa 15 (T-18 Pré-voo), etapa 14 (pendências da legenda nas folhas: metadados por foto, «Ajustar para caber» e área segura). Antes: etapa 13 (formato da data e posição da legenda). Antes: etapa 12 (estilo e fonte da legenda nas folhas). Antes: etapa 11 (pop-ups de confirmação, T-07 com o formato e a legenda do Quadro). A etapa 1 organizou o repositório e migrou as 7 telas existentes; a etapa 2 fez T-05 e T-06; a etapa 3 fez a T-07; a etapa 4 fez a T-08; a etapa 5 fez a T-10; a etapa 6 fez a T-11; a etapa 7 fez a T-12 (parcial); a etapa 8 fez a T-13; a etapa 9 fez a T-14 (parcial); a etapa 10 fechou a T-14 (lote dinâmico); a etapa 11 ligou a T-12 às Folhas (pop-up de formato) e guardou o estado entre os modos.
+Atualizado na **etapa 31** (LED v4 com anel em movimento) e **30b** (PDF real nas telas, fotos reais). Antes: etapa 30a (motor real do gerador de PDF), etapa 29 (fontes autohospedadas: P-FONTES fechada), etapa 28 («Valores diferentes» dentro dos campos da aba Ajustes), etapa 27 (orientação Vertical/Horizontal da polaroid), etapa 26 (medidas oficiais das janelas e atalhos de personalização da moldura), etapa 25 (janela não quadrada: Retro Pocket, Instax Mini e Wide). Antes: etapa 24 (esqueleto de carregamento na T-01 e no editor; fecha a T-31), etapa 23 (falha de leitura na T-04 no padrão da T-31). Antes: etapa 22 (arquivo inválido da T-03). Antes: etapa 21 (T-31 Estados vazios e erros, 404; E12; ligas soltas de conexões). Antes: etapa 20 (T-23 Central de conexões e T-24 Verificação; E7), etapa 19 (T-22 Compartilhar; fecha o E6), etapa 18 (T-21 Imprimir e calibração), etapa 17 (T-20 Gerando), etapa 16 (T-19 Exportar), etapa 15 (T-18 Pré-voo), etapa 14 (pendências da legenda nas folhas: metadados por foto, «Ajustar para caber» e área segura). Antes: etapa 13 (formato da data e posição da legenda). Antes: etapa 12 (estilo e fonte da legenda nas folhas). Antes: etapa 11 (pop-ups de confirmação, T-07 com o formato e a legenda do Quadro). A etapa 1 organizou o repositório e migrou as 7 telas existentes; a etapa 2 fez T-05 e T-06; a etapa 3 fez a T-07; a etapa 4 fez a T-08; a etapa 5 fez a T-10; a etapa 6 fez a T-11; a etapa 7 fez a T-12 (parcial); a etapa 8 fez a T-13; a etapa 9 fez a T-14 (parcial); a etapa 10 fechou a T-14 (lote dinâmico); a etapa 11 ligou a T-12 às Folhas (pop-up de formato) e guardou o estado entre os modos.
 
 ## Telas (DOC-04 §4)
 
@@ -34,6 +34,22 @@ Atualizado na **etapa 30a** (motor real do gerador de PDF). Antes: etapa 29 (fon
 | T-25 | Entrar (2.0) | — | E10 | ◻ |
 | T-26, T-27 | Direito de uso e conta (2.0) | — | — | ◻ |
 | T-31 | Estados vazios e erros | `/app/estados/` e `404.html` | E12 | ✔ feita (etapa 21), página de catálogo |
+
+## Etapa 31 · LED v4 canônico em todas as telas + anel em movimento (D-112)
+
+- `css/base/led.css` = `design/referencias/polar-led.css` v4 inteiro + os 6 ajustes do DOC-01 §11.7. Saíram as cópias por página (desabilitado cinza, que violava T2; barra em vai-e-volta; ícone laranja fixo que sumia no hover).
+- Anel: `conic-gradient` girado por `@property --led-ang`, **8 s, velocidade constante** (a versão com 3 s no hover dava salto de ângulo); parado com `prefers-reduced-motion` ou sem suporte. Nível 1 não anima.
+- Pop-ups, toasts e barras usam as classes LED. Teste `testar:led` (18 páginas, 1440 e 390 px).
+
+## Etapa 30b · PDF real na T-20, T-21 e T-22 + fotos reais
+
+- `nucleo/fotos-locais.js` (`PLFOTOS`): fotos e arquivos gerados no IndexedDB do aparelho (T5). O gerador usa a foto real quando existe (orientação EXIF, uma por vez, bitmap fechado) e recodifica sem EXIF/GPS (MT-06).
+- T-20 com progresso, cancelamento, falhas e download reais (barra LED v4); T-21 imprime o PDF guardado em iframe e gera a página de teste em PDF; T-22 compartilha os arquivos reais.
+- Testes: fidelidade da foto com o Quadro (diferença média ≤ 3,6/255 nas fotos 3 e 12); `testar:gerar-real` com 24 fotos de 12 MP do dono → PDF em 6 a 9 s, sem EXIF/GPS.
+- **Ainda de exemplo:** data e local das legendas (ler o EXIF real é o passo 2 do DOC-08 §5); imagens PNG/JPEG (etapa 32).
+
+## Publicação
+- GitHub Pages: https://mateus-senaj.github.io/polar-life/ · **Vercel: https://polar-life.vercel.app** (`vercel.json`: CSP estrita, `noindex` em `/app/`, cache). O Vercel ainda não está ligado ao repositório (falta liberar o app do Vercel no GitHub); publicação pela CLI após cada etapa verificada.
 
 ## Etapa 30 · Reorganização das pastas (sem mudança de comportamento)
 
@@ -83,6 +99,6 @@ Histórico completo em [`docs/historico/ETAPAS.md`](docs/historico/ETAPAS.md).
 | P31 | Foto de capa do hero (licença, J4) | DOC-12 §3.5 |
 | J1 a J10 | Dados do controlador e demais itens jurídicos da T-30 continuam `[COLCHETES]` | DOC-09 |
 
-## Próxima etapa (30b)
+## Próxima etapa (34 · Retro Pocket e fontes em todas as linhas)
 
 Ver `PROXIMOS_PASSOS.md`.

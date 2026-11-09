@@ -86,7 +86,7 @@ try {
       }, alvoEl);
       if (!h) problemas.push('botão sem .smoke-layer/.btn-content');
       else {
-        if (h.opacidade !== '1') problemas.push(`névoa com opacidade ${h.opacidade} no hover`);
+        if (parseFloat(h.opacidade) < 0.99) problemas.push(`névoa com opacidade ${h.opacidade} no hover`);   // a transição de 350 ms pode estar no último quadro
         if (h.cor !== 'rgb(0, 0, 0)') problemas.push(`conteúdo ${h.cor} no hover`);
         for (const s of h.svgs) {
           const aceita = c => c === 'none' || c === 'rgba(0, 0, 0, 0)' || c === s.texto;
