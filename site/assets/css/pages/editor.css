@@ -95,7 +95,7 @@ strong{font-weight:500}
 .pol__ph{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--surface-subtle);overflow:hidden}
 .pol__ph svg{width:28%;height:28%;fill:none;stroke:var(--black);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .pol__ph svg path{vector-effect:non-scaling-stroke}
-.pol figcaption{position:absolute;margin:0}
+.pol figcaption{position:absolute;margin:0;text-rendering:geometricPrecision} /* MT-02: sem hinting (FreeType no Linux/Android arredonda o avanço das letras e desloca a legenda centralizada em relação ao PDF) */
 .pol__cap{display:block;font-family:var(--font-expressive);font-weight:500;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pol__meta{display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:400;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em}
 .pol__mline{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

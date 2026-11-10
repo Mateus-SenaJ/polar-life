@@ -1,26 +1,31 @@
 name: Publicar no GitHub Pages
 on:
-  push: { branches: [main] }
+  push: { branches: [main, "etapa-*", "ci/*"] }   # toda etapa é verificada no Linux antes do merge
+  pull_request:
   workflow_dispatch:
 permissions: { contents: read, pages: write, id-token: write }
-concurrency: { group: pages, cancel-in-progress: true }
+concurrency: { group: "pages-${{ github.ref }}", cancel-in-progress: true }
 jobs:
   verificar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run verificar
       - run: npx playwright install --with-deps chromium
       - run: npm run testar:node        # motor do Quadro, fontes locais (T6) e PDF (MT-02)
+      - if: failure()                   # capturas e PDFs dos testes para diagnóstico
+        uses: actions/upload-artifact@v4
+        with: { name: saida-testes, path: tests/saida, retention-days: 7 }
   publicar:
     needs: verificar
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'   # só a main vai ao ar
     runs-on: ubuntu-latest
     environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
