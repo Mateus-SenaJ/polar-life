@@ -24,7 +24,7 @@ function caminho(){ /* caminho da página atual relativo à raiz de /app/ */
 }
 function isenta(){return caminho().indexOf('entrar/')===0}
 function temSessao(){
-  return !!(window.PLCONTA&&PLCONTA.temSessao&&PLCONTA.temSessao())
+  return !!(window.PLCONTA&&PLCONTA.temSessao&&PLCONTA.temSessao()&&!(PLCONTA.cadastroPendente&&PLCONTA.cadastroPendente()))   /* sem «Seus dados», ainda não entrou */
 }
 function urlEntrar(voltar){
   var r=raiz();if(!r)return null;

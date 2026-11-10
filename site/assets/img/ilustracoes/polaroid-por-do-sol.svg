@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 112">
+  <defs>
+    <filter id="sol-sombra" x="-20%" y="-15%" width="140%" height="132%">
+      <feDropShadow dx="0" dy="1.6" stdDeviation="1.8" flood-color="#000000" flood-opacity=".1"/>
+    </filter>
+    <clipPath id="sol-janela"><rect x="8" y="8" width="76" height="76"/></clipPath>
+  </defs>
+  <!-- anima: sol-moldura pode balançar como polaroid apoiada (centro 48 56) -->
+  <g id="sol-moldura" filter="url(#sol-sombra)">
+    <rect x="2" y="2" width="88" height="107" rx="2" fill="#FFFFFF"/>
+    <g clip-path="url(#sol-janela)">
+      <g id="sol-cena" transform="translate(8 8)">
+        <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+        <!-- anima: sol-disco desce devagar até o horizonte, centro 38 46 -->
+        <g id="sol-disco"><circle cx="38" cy="46" r="18" fill="#FD761A"/></g>
+        <rect y="50" width="76" height="26" fill="#006194" fill-opacity=".55"/>
+        <rect y="49.5" width="76" height="1.5" fill="#000000" opacity=".55"/>
+        <path d="M6 42H28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+        <path d="M46 55H70" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+        <!-- anima: sol-reflexo cintila, centro 38 62 -->
+        <g id="sol-reflexo" fill="#FD761A" opacity=".85">
+          <rect x="27" y="54" width="22" height="2.4" rx="1.2"/>
+          <rect x="31" y="60" width="14" height="2.2" rx="1.1"/>
+          <rect x="34" y="66" width="8" height="2" rx="1"/>
+          <rect x="36" y="71" width="4" height="1.6" rx=".8"/>
+        </g>
+        <path d="M8 66H10L9.5 72H8.5Z" fill="#000000" opacity=".8"/>
+        <path d="M9 65V58M9 58L12 62H9Z" fill="#000000" opacity=".8"/>
+        <path d="M18 18q2-2 4 0M26 14q2-2 4 0" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -59,18 +59,17 @@
 
     <form id="f-email" class="cx-f" novalidate>
       <h2 class="cx-t">Entrar</h2>
-      <p class="cx-lead">Enquanto o Polar Life não tem servidor, a entrada funciona só neste navegador. Não há senha, e nada sai do seu aparelho.</p>
-      <div class="fld fld--first" id="g-email">
+            <div class="fld fld--first" id="g-email">
         <label class="lab" for="email">E-mail</label>
         <input class="txt" id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com">
         <p class="err" id="erro-email" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Digite um e-mail válido, como nome@exemplo.com.</span></p>
-        <p class="help" id="ajuda-email">Vamos gerar um código de 6 dígitos para você.</p>
+        <p class="help" id="ajuda-email">Sem senha: geramos um código de 6 dígitos. Nada sai do seu aparelho.</p>
       </div>
-      <button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Enviar código</span></button>
+      <button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar com e-mail</span></button>
       <p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>
     </form>
 
-    <button type="button" class="cx-trocar" id="b-via-codigo">Tenho um código de impressão</button>
+    <p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>
 
     <div class="cx-div" aria-hidden="true"><span>ou</span></div>
 

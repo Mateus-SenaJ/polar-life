@@ -212,6 +212,21 @@ function verificarCodigo(entrada){
   },function(){return Promise.reject({tipo:'indisponivel'})})}
 function tentativasCodigo(){return {n:TENTA.n,esperaMs:Math.max(0,TENTA.bloqueadoAte-agora())}}
 function sairCodigo(){apagar('pl-codigo-sessao')}
+/* Cadastro básico depois de entrar (provedor, e-mail ou código): nome + e-mail, só neste navegador (T5).
+   Com código de impressão, os dados ficam na sessão do código, que continua limitada ao pacote (D-124). */
+var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function completarCadastro(d){
+  var nome=String(d&&d.nome||'').replace(/\s+/g,' ').trim(),email=String(d&&d.email||'').trim().toLowerCase(),origem=d&&d.origem||'email';
+  if(nome.length<2||nome.length>60)return {erro:'nome'};
+  if(!EMAIL_RE.test(email))return {erro:'email'};
+  if(d.aceite!==true)return {erro:'aceite'};
+  var sc=sessaoCodigo();
+  if(origem==='codigo'){if(!sc)return {erro:'codigo'};sc.email=email;sc.nome=nome;sc.aceiteEm=agora();gravar('pl-codigo-sessao',sc);return {ok:true,codigo:true}}
+  var c=contaDe(email);c.nome=nome;c.provedor=origem;c.aceiteEm=agora();salvarConta(email,c);
+  gravar('pl-conta',{email:email,nome:nome,provedor:origem,entrouEm:agora()});return {ok:true}
+}
+function precisaCadastro(){var s=sessao();if(!s)return false;var c=contaDe(s.email);return !c.aceiteEm&&!CONTAS_PADRAO[s.email]}
+function cadastroPendente(){var sc=sessaoCodigo();if(sc)return !sc.email;return precisaCadastro()}   /* código conferido ou e-mail novo sem «Seus dados» */
 
 /* ---------- compra simulada (brief §3.6: sem campo de cartão; botões «Simular…») ---------- */
 function novoRecibo(c,desc,valor){var r={id:'R'+String(agora()).slice(-6),data:fmtDataCurta(agora()),desc:desc,valor:valor};c.recibos=c.recibos||[];c.recibos.unshift(r);return r}
@@ -313,7 +328,8 @@ function listarCodigos(){
 
 PLCONTA={
   modo:function(){return 'demo'},                             /* 'servidor' quando houver backend (DOC-12 §6) */
-  provedores:function(){return []},                          /* C-d: sem Apple/Google no modo demo (T7) */
+  provedores:function(){return [{id:'google',nome:'Google'},{id:'apple',nome:'Apple'},{id:'facebook',nome:'Facebook'}]}, /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
+  completarCadastro:completarCadastro,precisaCadastro:precisaCadastro,cadastroPendente:cadastroPendente,
   temLocalStorage:temLocalStorage,
   sessao:sessao,sessaoCodigo:sessaoCodigo,temSessao:temSessao,
   pedirCodigo:pedirCodigo,confirmarCodigo:confirmarCodigo,entrarComo:entrarComo,sair:sair,

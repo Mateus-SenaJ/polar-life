@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 180">
+  <defs>
+    <filter id="rolo-sombra" x="-10%" y="-15%" width="120%" height="135%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity=".12"/>
+    </filter>
+    <pattern id="rolo-furos" width="26" height="10" patternUnits="userSpaceOnUse">
+      <rect x="5" y="1" width="9" height="8" rx="2" fill="#F8F9FA"/>
+    </pattern>
+    <clipPath id="rolo-clip1"><rect x="34" y="42" width="126" height="96"/></clipPath>
+    <clipPath id="rolo-clip2"><rect x="172" y="42" width="126" height="96"/></clipPath>
+    <clipPath id="rolo-clip3"><rect x="310" y="42" width="126" height="96"/></clipPath>
+    <clipPath id="rolo-clip4"><rect x="448" y="42" width="126" height="96"/></clipPath>
+  </defs>
+
+  <!-- anima: rolo-tira anda para a esquerda, translateX 0 → -172 (um quadro) -->
+  <g id="rolo-tira" filter="url(#rolo-sombra)">
+    <rect x="10" y="20" width="580" height="140" rx="10" fill="#000000"/>
+    <rect x="22" y="25" width="556" height="10" fill="url(#rolo-furos)"/>
+    <rect x="22" y="145" width="556" height="10" fill="url(#rolo-furos)"/>
+
+    <!-- anima: rolo-q1 é um quadro fixo da tira, centro 97 90 -->
+    <g id="rolo-q1" clip-path="url(#rolo-clip1)">
+      <g transform="translate(34 42)">
+        <rect width="126" height="96" fill="#FFFFFF"/>
+        <rect width="126" height="96" fill="#006194" fill-opacity=".14"/>
+        <circle cx="98" cy="24" r="10" fill="#FD761A"/>
+        <rect y="54" width="126" height="24" fill="#006194" fill-opacity=".55"/>
+        <path d="M0 78Q28 74 56 78T126 77V96H0Z" fill="#FD761A" fill-opacity=".18"/>
+        <path d="M46 54V40" fill="none" stroke="#000000" stroke-width="1.2"/>
+        <path d="M47 41L56 51H47Z" fill="#FFFFFF"/>
+        <path d="M42 54H58L55 58H45Z" fill="#000000"/>
+        <path d="M8 16q3-3 6 0M18 12q3-3 6 0" fill="none" stroke="#000000" stroke-width=".8" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <!-- anima: rolo-q2 é um quadro fixo da tira, centro 235 90 -->
+    <g id="rolo-q2" clip-path="url(#rolo-clip2)">
+      <g transform="translate(172 42)">
+        <rect width="126" height="96" fill="#FFFFFF"/>
+        <rect width="126" height="96" fill="#006194" fill-opacity=".14"/>
+        <circle cx="104" cy="20" r="9" fill="#FD761A"/>
+        <path d="M0 82L26 40L44 60L66 28L92 64L108 44L126 78V96H0Z" fill="#006194" fill-opacity=".55"/>
+        <path d="M66 28L73 40L68 38L63 43L60 37Z" fill="#FFFFFF" opacity=".9"/>
+        <path d="M0 96V86L18 60L36 80L54 50L78 84L96 62L112 82L126 70V96Z" fill="#000000" fill-opacity=".85"/>
+        <rect y="88" width="126" height="8" fill="#000000"/>
+      </g>
+    </g>
+
+    <!-- anima: rolo-q3 é um quadro fixo da tira, centro 373 90 -->
+    <g id="rolo-q3" clip-path="url(#rolo-clip3)">
+      <g transform="translate(310 42)">
+        <rect width="126" height="96" fill="#FFFFFF"/>
+        <rect width="126" height="96" fill="#006194" fill-opacity=".14"/>
+        <circle cx="20" cy="18" r="8" fill="#FD761A"/>
+        <path d="M0 72V48H14V36H26V54H36V30H50V50H60V40H74V28H88V48H98V38H110V52H120V42H126V72Z" fill="#006194" fill-opacity=".55"/>
+        <g fill="#000000">
+          <rect x="2" y="56" width="20" height="22"/>
+          <rect x="27" y="48" width="18" height="30"/>
+          <rect x="50" y="60" width="16" height="18"/>
+          <rect x="70" y="50" width="22" height="28"/>
+          <rect x="97" y="58" width="20" height="20"/>
+        </g>
+        <g fill="#FFFFFF" opacity=".85">
+          <rect x="6" y="60" width="3" height="3.5"/><rect x="13" y="60" width="3" height="3.5"/>
+          <rect x="6" y="68" width="3" height="3.5"/><rect x="13" y="68" width="3" height="3.5"/>
+          <rect x="31" y="53" width="3" height="3.5"/><rect x="38" y="53" width="3" height="3.5"/>
+          <rect x="31" y="61" width="3" height="3.5"/><rect x="38" y="61" width="3" height="3.5"/>
+          <rect x="74" y="55" width="3" height="3.5"/><rect x="81" y="55" width="3" height="3.5"/>
+          <rect x="74" y="63" width="3" height="3.5"/><rect x="81" y="63" width="3" height="3.5"/>
+        </g>
+        <g fill="#FD761A" opacity=".9">
+          <rect x="6" y="74" width="3" height="3"/>
+          <rect x="38" y="70" width="3" height="3"/>
+          <rect x="81" y="72" width="3" height="3"/>
+          <rect x="104" y="63" width="3" height="3"/>
+        </g>
+        <rect y="86" width="126" height="10" fill="#000000"/>
+      </g>
+    </g>
+
+    <!-- anima: rolo-q4 é um quadro fixo da tira, centro 511 90 -->
+    <g id="rolo-q4" clip-path="url(#rolo-clip4)">
+      <g transform="translate(448 42)">
+        <rect width="126" height="96" fill="#FFFFFF"/>
+        <rect width="126" height="96" fill="#006194" fill-opacity=".14"/>
+        <circle cx="63" cy="58" r="24" fill="#FD761A"/>
+        <rect y="62" width="126" height="34" fill="#006194" fill-opacity=".55"/>
+        <rect y="61.5" width="126" height="1.5" fill="#000000" opacity=".55"/>
+        <g fill="#FD761A" opacity=".85">
+          <rect x="42" y="68" width="42" height="2.4" rx="1.2"/>
+          <rect x="50" y="76" width="26" height="2.2" rx="1.1"/>
+          <rect x="57" y="84" width="12" height="2" rx="1"/>
+        </g>
+        <path d="M20 50H46" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+        <path d="M88 72H112" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity=".35"/>
+        <path d="M30 22q3-3 6 0M40 18q3-3 6 0" fill="none" stroke="#000000" stroke-width=".8" stroke-linecap="round"/>
+      </g>
+    </g>
+  </g>
+</svg>

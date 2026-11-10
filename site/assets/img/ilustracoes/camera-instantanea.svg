@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 250">
+  <defs>
+    <filter id="cam-sombra-foto" x="-15%" y="-12%" width="130%" height="126%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <!-- anima: cam-corpo bascula de leve, centro 120 110 -->
+  <g id="cam-corpo">
+    <path d="M50 28H190A20 20 0 0 1 210 48V166A20 20 0 0 1 190 186H50A20 20 0 0 1 30 166V48A20 20 0 0 1 50 28Z" fill="#FFFFFF"/>
+    <path d="M50 28H190A20 20 0 0 1 210 48V82H30V48A20 20 0 0 1 50 28Z" fill="#000000"/>
+    <path d="M50 28H190A20 20 0 0 1 210 48V166A20 20 0 0 1 190 186H50A20 20 0 0 1 30 166V48A20 20 0 0 1 50 28Z" fill="none" stroke="#000000" stroke-width="2.5"/>
+    <!-- anima: cam-flash pisca, centro 68 57 -->
+    <g id="cam-flash">
+      <rect x="44" y="42" width="48" height="30" rx="6" fill="#F8F9FA"/>
+      <rect x="49" y="47" width="38" height="20" rx="3" fill="#FFFFFF"/>
+      <path d="M55 51H81M55 57H81M55 63H81" fill="none" stroke="#006194" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+    <g id="cam-visor">
+      <rect x="148" y="42" width="38" height="30" rx="6" fill="#F8F9FA"/>
+      <rect x="153" y="47" width="28" height="20" rx="3" fill="#006194" fill-opacity=".55"/>
+      <path d="M157 63L173 49" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".7"/>
+    </g>
+    <!-- anima: cam-botao afunda 1 px, centro 198 57 -->
+    <g id="cam-botao">
+      <circle cx="198" cy="57" r="8" fill="#FD761A"/>
+      <path d="M194 53a6 6 0 0 1 6-1" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+    </g>
+    <!-- anima: cam-lente gira o anel de foco, centro 70 118 -->
+    <g id="cam-lente">
+      <circle cx="70" cy="118" r="40" fill="#000000"/>
+      <circle cx="70" cy="118" r="33" fill="#F8F9FA"/>
+      <circle cx="70" cy="118" r="26" fill="#006194"/>
+      <circle cx="70" cy="118" r="13" fill="#000000"/>
+      <circle cx="61" cy="107" r="6" fill="#FFFFFF" opacity=".9"/>
+      <path d="M50 128A26 26 0 0 0 90 128" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".45"/>
+      <circle cx="80" cy="130" r="3.5" fill="#FD761A"/>
+    </g>
+    <g fill="#000000" opacity=".85">
+      <rect x="146" y="96" width="48" height="5" rx="2.5"/>
+      <rect x="146" y="105" width="48" height="5" rx="2.5"/>
+      <rect x="146" y="114" width="48" height="5" rx="2.5"/>
+      <rect x="146" y="123" width="48" height="5" rx="2.5"/>
+    </g>
+    <circle cx="170" cy="148" r="10" fill="#FD761A"/>
+    <circle cx="46" cy="177" r="3.5" fill="#FD761A"/>
+    <rect x="64" y="168" width="112" height="9" rx="4.5" fill="#000000"/>
+  </g>
+  <!-- anima: cam-foto sai pela fenda, translateY 0 → 82; topo fica sob cam-fenda -->
+  <g id="cam-foto" filter="url(#cam-sombra-foto)">
+    <rect x="88" y="170" width="64" height="78" rx="2" fill="#FFFFFF"/>
+    <g transform="translate(92.5 174.5) scale(.7237)">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="56" cy="20" r="8" fill="#FD761A"/>
+      <path d="M0 60L15 32L25 45L39 20L54 46L63 33L76 58V76H0Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M0 76V68L10 50L20 63L31 42L45 64L56 48L68 63L76 53V76Z" fill="#000000" fill-opacity=".85"/>
+      <rect y="68" width="76" height="8" fill="#000000"/>
+    </g>
+  </g>
+  <!-- anima: cam-fenda é a boca da saída, não se move -->
+  <g id="cam-fenda">
+    <rect x="76" y="166" width="88" height="10" rx="5" fill="#000000"/>
+    <path d="M82 168H158" fill="none" stroke="#F8F9FA" stroke-width="1.2" opacity=".35"/>
+  </g>
+</svg>

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500">
+  <defs>
+    <g id="bcol-cena-praia">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="56" cy="20" r="8" fill="#FD761A"/>
+      <path d="M0 40H76V62H0Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M0 62Q18 59 38 62T76 61V76H0Z" fill="#FD761A" fill-opacity=".18"/>
+      <path d="M47 39V30" fill="none" stroke="#000000" stroke-width="1"/>
+      <path d="M48 31L54 38H48Z" fill="#FFFFFF" opacity=".95"/>
+      <path d="M45 39H55L53 42H47Z" fill="#000000"/>
+      <path d="M20 62C20 55 19 50 21 43" fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M21 43C15 38 10 38 6 41C11 40 16 42 21 44Z" fill="#000000"/>
+      <path d="M21 43C21 36 24 32 29 30C26 35 25 39 23 44Z" fill="#000000"/>
+      <path d="M21 43C27 38 33 38 36 41C31 40 26 42 22 45Z" fill="#000000"/>
+    </g>
+    <g id="bcol-cena-montanha">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="58" cy="17" r="7" fill="#FD761A"/>
+      <path d="M0 60L15 32L25 45L39 20L54 46L63 33L76 58V76H0Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M39 20L44 28L40.5 26.5L37 30L35 26Z" fill="#FFFFFF" opacity=".9"/>
+      <path d="M0 76V68L10 50L20 63L31 42L45 64L56 48L68 63L76 53V76Z" fill="#000000" fill-opacity=".85"/>
+      <rect y="68" width="76" height="8" fill="#000000"/>
+    </g>
+    <g id="bcol-cena-sol">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="38" cy="46" r="18" fill="#FD761A"/>
+      <rect y="50" width="76" height="26" fill="#006194" fill-opacity=".55"/>
+      <rect y="49.5" width="76" height="1.5" fill="#000000" opacity=".55"/>
+      <g fill="#FD761A" opacity=".85">
+        <rect x="27" y="54" width="22" height="2.4" rx="1.2"/>
+        <rect x="31" y="60" width="14" height="2.2" rx="1.1"/>
+        <rect x="34" y="66" width="8" height="2" rx="1"/>
+        <rect x="36" y="71" width="4" height="1.6" rx=".8"/>
+      </g>
+    </g>
+    <g id="bcol-cena-festa">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".1"/>
+      <path d="M0 8Q19 18 38 11T76 13" fill="none" stroke="#000000" stroke-width="1"/>
+      <path d="M6 10.5L10 10.5L8 15.5Z" fill="#FD761A"/>
+      <path d="M15 12.8L19 12.8L17 17.8Z" fill="#FFFFFF"/>
+      <path d="M24 13.7L28 13.7L26 18.7Z" fill="#000000"/>
+      <path d="M33 13.2L37 13.2L35 18.2Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M42 12L46 12L44 17Z" fill="#FD761A"/>
+      <path d="M51 11.6L55 11.6L53 16.6Z" fill="#FFFFFF"/>
+      <path d="M60 11.9L64 11.9L62 16.9Z" fill="#000000"/>
+      <rect y="66" width="76" height="10" fill="#000000" opacity=".92"/>
+      <ellipse cx="38" cy="64" rx="21" ry="3" fill="#FFFFFF"/>
+      <rect x="21" y="51" width="34" height="12" rx="2" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+      <rect x="26" y="42" width="24" height="9" rx="2" fill="#FD761A"/>
+      <g stroke="#000000" stroke-width="1.4">
+        <path d="M32 42V35"/><path d="M38 42V34"/><path d="M44 42V35"/>
+      </g>
+      <g fill="#FD761A">
+        <path d="M32 34C30.4 32.4 30.4 30.8 32 29.6C33.6 30.8 33.6 32.4 32 34Z"/>
+        <path d="M38 33C36.2 31.2 36.2 29.2 38 27.8C39.8 29.2 39.8 31.2 38 33Z"/>
+        <path d="M44 34C42.4 32.4 42.4 30.8 44 29.6C45.6 30.8 45.6 32.4 44 34Z"/>
+      </g>
+    </g>
+    <g id="bcol-cena-viagem">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="10" cy="12" r="6" fill="#FD761A"/>
+      <path d="M4 62C16 54 30 58 40 48C50 38 56 28 68 20" fill="none" stroke="#006194" stroke-opacity=".55" stroke-width="1.4" stroke-dasharray="2 3" stroke-linecap="round"/>
+      <g fill="#FFFFFF" opacity=".92">
+        <circle cx="12" cy="28" r="5"/><circle cx="18" cy="26" r="6"/><circle cx="24" cy="29" r="4.5"/>
+        <rect x="12" y="28" width="12" height="4" rx="2"/>
+      </g>
+      <path d="M0 76V64C12 62 18 66 28 64C40 62 48 66 58 64C66 63 72 65 76 64V76Z" fill="#006194" fill-opacity=".14"/>
+      <path d="M64 58C60 53 60 49 64 47C68 49 68 53 64 58Z" fill="#FD761A"/>
+      <circle cx="64" cy="51" r="1.5" fill="#FFFFFF"/>
+      <path d="M18 44C28 36 52 32 64 36C70 38 70 42 64 44C54 48 32 48 22 47Z" fill="#000000"/>
+      <path d="M38 38L46 24L53 25L48 39Z" fill="#000000"/>
+      <path d="M36 45L38 56L45 55L45 46Z" fill="#000000"/>
+      <path d="M62 37L71 29L73 31L67 41Z" fill="#FD761A"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="500" fill="#000000"/>
+
+  <!-- anima: bcol-p1 entra e repousa, centro 70 85 -->
+  <g id="bcol-p1" transform="translate(430 45) rotate(-10 70 85)">
+    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
+    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bcol-cena-praia"/></g>
+  </g>
+
+  <!-- anima: bcol-p2 entra e repousa, centro 70 85 -->
+  <g id="bcol-p2" transform="translate(590 175) rotate(8 70 85)">
+    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
+    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bcol-cena-montanha"/></g>
+  </g>
+
+  <!-- anima: bcol-p3 entra e repousa, centro 70 85 -->
+  <g id="bcol-p3" transform="translate(760 40) rotate(-6 70 85)">
+    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
+    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bcol-cena-sol"/></g>
+  </g>
+
+  <!-- anima: bcol-p4 entra e repousa, centro 70 85 -->
+  <g id="bcol-p4" transform="translate(890 195) rotate(12 70 85)">
+    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
+    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bcol-cena-festa"/></g>
+  </g>
+
+  <!-- anima: bcol-p5 entra e repousa, centro 70 85 -->
+  <g id="bcol-p5" transform="translate(1040 70) rotate(14 70 85)">
+    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
+    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bcol-cena-viagem"/></g>
+  </g>
+
+  <!-- anima: bcol-fitas balançam, centro 502 33 -->
+  <g id="bcol-fitas" fill="#F8F9FA" opacity=".85">
+    <rect x="470" y="25" width="64" height="16" rx="2" transform="rotate(-35 502 33)"/>
+    <rect x="790" y="195" width="60" height="15" rx="2" transform="rotate(25 820 202)"/>
+    <rect x="1040" y="220" width="62" height="15" rx="2" transform="rotate(-40 1071 227)"/>
+  </g>
+
+  <g opacity=".9">
+    <path d="M700 430l0-18M691 421h18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="430" cy="420" r="10" fill="#FD761A"/>
+    <circle cx="1130" cy="410" r="16" fill="none" stroke="#006194" stroke-width="4" opacity=".85"/>
+  </g>
+</svg>

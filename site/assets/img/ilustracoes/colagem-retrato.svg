@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <defs>
+    <filter id="ret-sombra" x="-20%" y="-18%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#000000" flood-opacity=".12"/>
+    </filter>
+    <g id="ret-cena-montanha">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="58" cy="17" r="7" fill="#FD761A"/>
+      <path d="M0 60L15 32L25 45L39 20L54 46L63 33L76 58V76H0Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M39 20L44 28L40.5 26.5L37 30L35 26Z" fill="#FFFFFF" opacity=".9"/>
+      <path d="M15 32L19 39L16 37.5L13.5 40L11.5 37Z" fill="#FFFFFF" opacity=".8"/>
+      <path d="M0 76V68L10 50L20 63L31 42L45 64L56 48L68 63L76 53V76Z" fill="#000000" fill-opacity=".85"/>
+      <rect y="68" width="76" height="8" fill="#000000"/>
+      <path d="M60 64L63 56L66 64Z" fill="#000000"/>
+    </g>
+    <g id="ret-cena-praia">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+      <circle cx="56" cy="20" r="8" fill="#FD761A"/>
+      <path d="M0 40H76V62H0Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M0 62Q18 59 38 62T76 61V76H0Z" fill="#FD761A" fill-opacity=".18"/>
+      <path d="M47 39V30" fill="none" stroke="#000000" stroke-width="1"/>
+      <path d="M48 31L54 38H48Z" fill="#FFFFFF" opacity=".95"/>
+      <path d="M45 39H55L53 42H47Z" fill="#000000"/>
+      <path d="M20 62C20 55 19 50 21 43" fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M21 43C15 38 10 38 6 41C11 40 16 42 21 44Z" fill="#000000"/>
+      <path d="M21 43C21 36 24 32 29 30C26 35 25 39 23 44Z" fill="#000000"/>
+      <path d="M21 43C27 38 33 38 36 41C31 40 26 42 22 45Z" fill="#000000"/>
+    </g>
+    <g id="ret-cena-festa">
+      <rect width="76" height="76" fill="#006194" fill-opacity=".1"/>
+      <path d="M0 8Q19 18 38 11T76 13" fill="none" stroke="#000000" stroke-width="1"/>
+      <path d="M6 10.5L10 10.5L8 15.5Z" fill="#FD761A"/>
+      <path d="M15 12.8L19 12.8L17 17.8Z" fill="#FFFFFF"/>
+      <path d="M24 13.7L28 13.7L26 18.7Z" fill="#000000"/>
+      <path d="M33 13.2L37 13.2L35 18.2Z" fill="#006194" fill-opacity=".55"/>
+      <path d="M42 12L46 12L44 17Z" fill="#FD761A"/>
+      <path d="M51 11.6L55 11.6L53 16.6Z" fill="#FFFFFF"/>
+      <path d="M60 11.9L64 11.9L62 16.9Z" fill="#000000"/>
+      <rect y="66" width="76" height="10" fill="#000000" opacity=".92"/>
+      <ellipse cx="38" cy="64" rx="21" ry="3" fill="#FFFFFF"/>
+      <rect x="21" y="51" width="34" height="12" rx="2" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+      <rect x="26" y="42" width="24" height="9" rx="2" fill="#FD761A"/>
+      <g stroke="#000000" stroke-width="1.4">
+        <path d="M32 42V35"/><path d="M38 42V34"/><path d="M44 42V35"/>
+      </g>
+      <g fill="#FD761A">
+        <path d="M32 34C30.4 32.4 30.4 30.8 32 29.6C33.6 30.8 33.6 32.4 32 34Z"/>
+        <path d="M38 33C36.2 31.2 36.2 29.2 38 27.8C39.8 29.2 39.8 31.2 38 33Z"/>
+        <path d="M44 34C42.4 32.4 42.4 30.8 44 29.6C45.6 30.8 45.6 32.4 44 34Z"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="800" height="1000" fill="#FFFFFF"/>
+
+  <!-- anima: ret-p1 entra e repousa, centro 170 206 -->
+  <g id="ret-p1" transform="translate(230 94) rotate(-4 170 206)">
+    <g filter="url(#ret-sombra)">
+      <rect width="340" height="412" rx="6" fill="#FFFFFF"/>
+      <g transform="translate(23 23) scale(3.8684)"><use href="#ret-cena-montanha"/></g>
+    </g>
+  </g>
+
+  <!-- anima: ret-p2 entra e repousa, centro 150 182 -->
+  <g id="ret-p2" transform="translate(100 548) rotate(6 150 182.5)">
+    <g filter="url(#ret-sombra)">
+      <rect width="300" height="365" rx="5" fill="#FFFFFF"/>
+      <g transform="translate(20.5 20.5) scale(3.4079)"><use href="#ret-cena-praia"/></g>
+    </g>
+  </g>
+
+  <!-- anima: ret-p3 entra e repousa, centro 150 182 -->
+  <g id="ret-p3" transform="translate(420 558) rotate(-7 150 182.5)">
+    <g filter="url(#ret-sombra)">
+      <rect width="300" height="365" rx="5" fill="#FFFFFF"/>
+      <g transform="translate(20.5 20.5) scale(3.4079)"><use href="#ret-cena-festa"/></g>
+    </g>
+  </g>
+</svg>

@@ -1,10 +1,18 @@
 /* T-25 · Entrar (modo demonstração, D-116/D-123/D-124).
-   Duas vias: e-mail + código de 6 dígitos (mostrado na tela) e código de impressão PL-XXXX-XXXX.
+   Vias: provedores comuns (Google, Apple, Facebook — demonstração, sem acessar o provedor), e-mail + código de
+   6 dígitos (mostrado na tela) e, num link discreto, «Entrar com código» (e-mail + código de impressão PL-XXXX-XXXX).
+   Toda via nova termina em «Seus dados» (nome, e-mail, aceite) antes de entrar.
    Um único LED por etapa (T8); estados de revisão via #estado-… (checklist §8.5). */
 (function(){
 var $=function(i){return document.getElementById(i)};
 var C=window.PLCONTA,G=window.PLGUARDA;
 var voltar=lerVoltar(),EMAIL='',ETAPA='email',tmExp=null,tmNovo=null,tmTenta=null,tmToast=null,tmIr=null;
+var MARCA={
+ google:'<path d="M21.35 11.1H12v2.98h5.35c-.23 1.4-1.68 4.1-5.35 4.1a6.02 6.02 0 0 1 0-12.04c1.9 0 3.17.8 3.9 1.5l2.66-2.56A9.4 9.4 0 0 0 12 2.6a9.4 9.4 0 1 0 0 18.8c5.43 0 9.03-3.82 9.03-9.2 0-.62-.07-1.1-.18-1.1z"/>',
+ apple:'<path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.86-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.05 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.65-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/>',
+ facebook:'<path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.24-1.46 1.49-1.46h1.6V4.46a21 21 0 0 0-2.32-.12c-2.3 0-3.87 1.4-3.87 3.98v2.18H7.8v3h2.6V21z"/>'
+};
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]})}
 var RE_EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function lerVoltar(){
@@ -33,17 +41,18 @@ function renderEmail(manter){
   var cx=$('caixa');
   cx.innerHTML=
     '<h2 class="cx-t">Entrar</h2>'+
-    '<p class="cx-lead">Enquanto o Polar Life não tem servidor, a entrada funciona só neste navegador. Não há senha, e nada sai do seu aparelho.</p>'+
+    '<div class="cx-prov" role="group" aria-label="Entrar com uma conta">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span>Continuar com '+pv.nome+'</span></button>'}).join('')+'</div>'+
+    '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
     '<form id="f-email" class="cx-f" novalidate>'+
     '<div class="fld fld--first" id="g-email">'+
     '<label class="lab" for="email">E-mail</label>'+
     '<input class="txt" id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com" value="'+(manter||'')+'">'+
-    '<p class="help" id="ajuda-email">Vamos gerar um código de 6 dígitos para você.</p>'+
+    '<p class="help" id="ajuda-email">Sem senha: geramos um código de 6 dígitos. Nada sai do seu aparelho.</p>'+
     '</div>'+
-    '<button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Enviar código</span></button>'+
-    '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>'+
+    '<button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar com e-mail</span></button>'+
     '</form>'+
-    '<button type="button" class="cx-trocar" id="b-via-codigo">Tenho um código de impressão</button>'+
+    '<p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>'+
+    '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
     '<section class="cx-testes" aria-labelledby="t-testes">'+
     '<h3 class="cx-testes__t" id="t-testes">Contas de teste</h3>'+
@@ -56,6 +65,7 @@ function renderEmail(manter){
     '</ul></section>';
   $('f-email').addEventListener('submit',enviarCodigo);
   $('b-via-codigo').addEventListener('click',renderImpressao);
+  [].forEach.call(document.querySelectorAll('[data-prov]'),function(b){b.addEventListener('click',function(){var pv=b.getAttribute('data-prov');renderDados({origem:pv,nomeProv:b.textContent.replace('Continuar com ','')})})});
   var ls=[].slice.call(document.querySelectorAll('.cx-testes__lista .btn2'));
   for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',entrarContaTeste);
   var em=$('email');focar(em);
@@ -165,6 +175,7 @@ function confirmar(ev){
   var v=$('cod').value.replace(/\D/g,'');
   ledBusy($('b-confirmar'),true,'Conferindo…');
   C.confirmarCodigo(EMAIL,v).then(function(s){
+    if(C.precisaCadastro&&C.precisaCadastro()){renderDados({origem:'email',email:EMAIL});return}
     sucesso(nomePerfil(s.perfil))
   },function(erro){
     ledBusy($('b-confirmar'),false,'Confirmar código');
@@ -184,17 +195,22 @@ function renderImpressao(){
   limpaTimers();
   var cx=$('caixa');
   cx.innerHTML=
-    '<h2 class="cx-t">Entrar com o código</h2>'+
-    '<p class="cx-lead">Digite o código de impressão do seu pacote de folhas. A conferência acontece neste navegador; nada é enviado.</p>'+
+    '<h2 class="cx-t">Entrar com código</h2>'+
+    '<p class="cx-lead">Use o seu e-mail e o código de impressão do pacote de folhas. A conferência acontece neste navegador; nada é enviado.</p>'+
     '<form id="f-imp" class="cx-f" novalidate>'+
-    '<div class="fld fld--first" id="g-imp">'+
+    '<div class="fld fld--first" id="g-imp-email">'+
+    '<label class="lab" for="imp-email">E-mail</label>'+
+    '<input class="txt" id="imp-email" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com" value="'+esc(EMAIL)+'">'+
+    '<p class="help" id="ajuda-imp-email">Para lembrar de você neste aparelho.</p>'+
+    '</div>'+
+    '<div class="fld" id="g-imp">'+
     '<label class="lab" for="imp">Código de impressão</label>'+
     '<input class="txt cx-imp" id="imp" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="14" placeholder="PL-XXXX-XXXX">'+
     '<p class="help" id="ajuda-imp">Formato PL-XXXX-XXXX: 8 letras e números depois de PL.</p>'+
     '</div>'+
-    '<button type="submit" class="led-btn led-btn--block" id="b-imp"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Entrar com o código</span></button>'+
+    '<button type="submit" class="led-btn led-btn--block" id="b-imp"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Conferir código</span></button>'+
     '</form>'+
-    '<button type="button" class="cx-trocar" id="b-voltar-email">Voltar ao e-mail</button>';
+    '<button type="button" class="cx-trocar" id="b-voltar-email">Voltar às outras formas de entrar</button>';
   $('b-voltar-email').addEventListener('click',function(){renderEmail(EMAIL)});
   var imp=$('imp');
   imp.addEventListener('input',function(){ /* máscara PL-XXXX-XXXX */
@@ -208,8 +224,14 @@ function renderImpressao(){
     var c=imp.selectionStart,l=imp.value.length;
     imp.setSelectionRange(Math.min(c,l),Math.min(c,l));
   });
-  focar(imp);
+  focar($('imp-email').value?imp:$('imp-email'));
   $('f-imp').addEventListener('submit',verImpressao)
+}
+function erroImpEmail(){
+  var g=$('g-imp-email');g.className='fld fld--first fld--err';
+  var e=$('erro-imp-email');if(e)e.remove();
+  var d=document.createElement('div');d.innerHTML=er('Digite um e-mail válido, como nome@exemplo.com.');var p=d.firstChild;p.id='erro-imp-email';
+  g.insertBefore(p,$('ajuda-imp-email'));focar($('imp-email'))
 }
 function erroImp(msg){
   var g=$('g-imp');g.className='fld fld--err';
@@ -220,14 +242,15 @@ function erroImp(msg){
 }
 function verImpressao(ev){
   ev.preventDefault();
-  var v=$('imp').value;
+  var v=$('imp').value,em=$('imp-email').value.trim();
+  var e0=$('erro-imp-email');if(e0){e0.remove();$('g-imp-email').className='fld fld--first'}
+  if(!RE_EMAIL.test(em)){erroImpEmail();return}
+  EMAIL=em;
   ledBusy($('b-imp'),true,'Conferindo…');
   C.verificarCodigo(v).then(function(r){
-    toast('Você entrou com um código de impressão · Ambiente de teste');
-    clearTimeout(tmIr);
-    tmIr=setTimeout(irPara,900)
+    renderDados({origem:'codigo',email:em,pacote:r})            /* código ok → dados básicos → entra */
   },function(erro){
-    ledBusy($('b-imp'),false,'Entrar com o código');
+    ledBusy($('b-imp'),false,'Conferir código');
     var t=erro&&erro.tipo;
     if(t==='dv')erroImp('O dígito de conferência não bate. Confira o código digitado.'); /* não gasta tentativa (D-124) */
     else if(t==='formato')erroImp('Confira o formato: PL seguido de 8 letras e números.');
@@ -247,11 +270,59 @@ function bloquearImp(ms){ /* 5 tentativas → 30 s (D-124) */
   b.disabled=true;
   function t(){
     var r=fim-Date.now();
-    if(r<=0){b.disabled=false;led(b,'Entrar com o código');return}
+    if(r<=0){b.disabled=false;led(b,'Conferir código');return}
     led(b,'Espere '+mmss(r));
     tmTenta=setTimeout(t,1000)
   }
   t()
+}
+
+/* ---------- seus dados (cadastro básico, só neste navegador · T5) ---------- */
+function renderDados(ctx){
+  limpaTimers();ETAPA='dados';
+  var cx=$('caixa'),fixo=!!ctx.email,aviso='';
+  if(ctx.origem==='codigo'){
+    var pk=ctx.pacote||{};
+    aviso=cxInfo('<strong>Código conferido.</strong> '+esc(pk.pacote||'Pacote de folhas')+(pk.folhas?' · '+pk.folhas+' folhas':'')+(pk.fotos?' · até '+pk.fotos+' fotos':'')+'.')
+  }else if(ctx.origem!=='email'){                            /* T7: não fingir que o provedor foi acessado */
+    aviso=cxInfo('<strong>Demonstração.</strong> A entrada com '+esc(ctx.nomeProv||ctx.origem)+' ainda não acessa a sua conta. Preencha seus dados para continuar; eles ficam só neste navegador.')
+  }
+  cx.innerHTML=
+    '<h2 class="cx-t">Seus dados</h2>'+
+    '<p class="cx-lead">Falta pouco. Como devemos chamar você?</p>'+aviso+
+    '<form id="f-dados" class="cx-f" novalidate>'+
+    '<div class="fld fld--first" id="g-d-nome">'+
+    '<label class="lab" for="d-nome">Nome</label>'+
+    '<input class="txt" id="d-nome" type="text" autocomplete="name" maxlength="60" placeholder="Como você quer ser chamado">'+
+    '<p class="help" id="ajuda-d-nome">Aparece só para você, na sua conta.</p>'+
+    '</div>'+
+    '<div class="fld" id="g-d-email">'+
+    '<label class="lab" for="d-email">E-mail</label>'+
+    '<input class="txt" id="d-email" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com" value="'+esc(ctx.email||'')+'"'+(fixo?' readonly aria-readonly="true"':'')+'>'+
+    '<p class="help" id="ajuda-d-email">'+(fixo?'Confirmado na etapa anterior.':'Para lembrar de você neste aparelho.')+'</p>'+
+    '</div>'+
+    '<div class="fld cx-ac" id="g-d-aceite">'+
+    '<label class="cx-ac__l"><input type="checkbox" id="d-aceite"><span>Li e aceito os <a href="../../legal/#termos">Termos</a> e a <a href="../../legal/#privacidade">Privacidade</a>.</span></label>'+
+    '<p class="help" id="ajuda-d-aceite"></p>'+
+    '</div>'+
+    '<button type="submit" class="led-btn led-btn--block" id="b-dados"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Entrar no Polar Life</span></button>'+
+    '</form>'+
+    '<button type="button" class="cx-trocar" id="b-voltar-dados">Voltar</button>';
+  $('b-voltar-dados').addEventListener('click',function(){if(ctx.origem==='codigo'&&C.sairCodigo)C.sairCodigo();if(ctx.origem==='email'&&C.sair)C.sair();renderEmail(EMAIL)});
+  $('f-dados').addEventListener('submit',function(ev){
+    ev.preventDefault();
+    ['nome','email','aceite'].forEach(function(k){var e=$('erro-d-'+k);if(e)e.remove();$('g-d-'+k).classList.remove('fld--err')});
+    var r=C.completarCadastro({nome:$('d-nome').value,email:$('d-email').value,origem:ctx.origem,aceite:$('d-aceite').checked});
+    if(r.erro){
+      var msg={nome:'Digite seu nome (de 2 a 60 letras).',email:'Digite um e-mail válido, como nome@exemplo.com.',aceite:'Para entrar, aceite os Termos e a Privacidade.',codigo:'O código saiu da sessão. Confira o código de novo.'}[r.erro];
+      var alvo=r.erro==='codigo'?'aceite':r.erro,g=$('g-d-'+alvo);g.classList.add('fld--err');
+      var d=document.createElement('div');d.innerHTML=er(msg);var p=d.firstChild;p.id='erro-d-'+alvo;
+      g.insertBefore(p,$('ajuda-d-'+alvo));focar($(alvo==='aceite'?'d-aceite':'d-'+alvo));return
+    }
+    toast('Olá, '+$('d-nome').value.trim().split(' ')[0]+'! · Ambiente de teste');
+    clearTimeout(tmIr);tmIr=setTimeout(irPara,900)
+  });
+  focar(fixo?$('d-nome'):$('d-nome'))
 }
 
 /* ---------- contas de teste ---------- */
@@ -272,7 +343,7 @@ function renderEntrou(){
     if(sc.usadoEm)linha+=cxInfo('<strong>Seu código já foi usado.</strong> Para imprimir de novo, compre outro código ou crie uma conta.')
   }else if(s){
     var pl=C.plano()||{};
-    linha='<p class="cx-lead">Você já entrou como <strong>'+s.email+'</strong> ('+(pl.nome||'Grátis')+').</p>'
+    linha='<p class="cx-lead">Você já entrou como <strong>'+esc(s.nome||s.email)+'</strong> ('+(pl.nome||'Grátis')+').</p>'
   }
   cx.innerHTML=
     '<h2 class="cx-t">Entrar</h2>'+linha+
@@ -297,6 +368,7 @@ function semSuporte(){ /* §1.4: sem localStorage */
 }
 if(C&&G){
   if(!C.temLocalStorage())semSuporte();
+  else if(C.temSessao()&&C.cadastroPendente&&C.cadastroPendente()){var sc0=C.sessaoCodigo(),s0=C.sessao();renderDados(sc0?{origem:'codigo',email:''}:{origem:(s0&&s0.provedor)||'email',email:s0&&s0.email})}
   else if(C.temSessao())renderEntrou();
   else renderEmail('');
 }else{
