@@ -91,6 +91,8 @@ function projeto(){
     if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=24&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}
     l.forEach(function(sr){var e=novo(sr);if(sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(sr===12)e.z=233;lista.push(e)})
   }
+  var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
+  if(pocket){fr={w:66,h:99,jh:79,lado:3,topo:3,rad:.4,ori:'v'};if(!leg)leg=LT.legPocket(LT.LEG0)}
   var fotos=lista.map(function(e,k){
     var src=e.src;
     return{n:k+1,src:src,v:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:LT.LEG[(src-1)%4]),m:meta[k+1]||e.meta||null,
@@ -146,7 +148,8 @@ function estiloObj(o){
   var fm=LT.famLG(o.font),fam=String(fm.f).split("'")[1]||o.font;
   return{fam:fam,peso:fm.w,it:!!fm.i,pt:o.pt||9,cor:LT.COR_LG[o.cor]||'#000',esp:o.esp||0,contorno:false}
 }
-function metricas(f){var ft=fonteDe(f);if(ft&&ft.unitsPerEm)return{asc:ft.ascent/ft.unitsPerEm,desc:Math.abs(ft.descent)/ft.unitsPerEm};return{asc:.8,desc:.2}}
+function metricas(f){var ft=fonteDe(f);if(ft&&ft.unitsPerEm)return{asc:ft.ascent/ft.unitsPerEm,desc:Math.abs(ft.descent)/ft.unitsPerEm,cap:ft.capHeight!=null?Math.abs(ft.capHeight)/ft.unitsPerEm:.7};return{asc:.8,desc:.2,cap:.7}}
+function medirLeg(o){return metricas(estiloObj(o))}          /* D-113 · MT-02: métricas do PDF para PLTEXTO.linhas */
 function medir(txt,f){
   if(!txt)return 0;
   var size=tamUm(f.pt),ft=fonteDe(f),w;
@@ -173,31 +176,30 @@ function grupoRot(itens,cx,cy,graus){
 }
 
 function layoutLegenda(f,fr,leg,s){
-  var preset=leg?leg.preset:'simples',pos=leg?leg.pos||'abaixo':'abaixo',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],metaMax;
+  var preset=leg?leg.preset:'simples',pos=leg?leg.pos||'abaixo':'abaixo',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],legOu,sepEst,dataTxt,locTxt;
   /* MT-01/MT-02: tudo em µm dentro desta função; fr e constantes entram em mm. */
   var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2),GAP_ACIMA=mm(2);
   if(leg){
+    legOu=leg;
     capTxt=leg.txt.on?LT.caixaLG(f.leg,leg.txt.caixa):'';
     capEst=estiloObj(leg.txt);capEst.esp=leg.txt.esp||0;
     var dataEst=estiloObj(leg.data),locEst=estiloObj(leg.loc);dataEst.esp=.02;locEst.esp=.02;
-    var dataTxt=leg.data.on&&DF.d?LT.FMTD[leg.data.fmt||0](DF.d):'',locTxt=leg.loc.on&&DF.c?LT.localLG(leg.loc,DF.c):'';
-    var sepEst={fam:'IBM Plex Mono',peso:400,it:false,pt:Math.max(dataEst.pt,locEst.pt),cor:'#000000',esp:.02,contorno:false};
-    if(dataTxt)metaSegs.push({txt:dataTxt,est:dataEst,box:preset==='calendario'});
-    if(dataTxt&&locTxt)metaSegs.push({txt:' • ',est:sepEst,box:false});
-    if(locTxt)metaSegs.push({txt:locTxt,est:locEst,box:false});
-    metaMax=dataEst.pt>=locEst.pt?dataEst:locEst;
+    dataTxt=leg.data.on&&DF.d?LT.FMTD[leg.data.fmt||0](DF.d):'';locTxt=leg.loc.on&&DF.c?LT.localLG(leg.loc,DF.c):'';
+    sepEst={fam:'IBM Plex Mono',peso:400,it:false,pt:Math.max(dataEst.pt,locEst.pt),cor:'#000000',esp:.02,contorno:false};
+    var segD={k:'data',txt:dataTxt,est:dataEst,box:preset==='calendario'},segL={k:'loc',txt:locTxt,est:locEst,box:false};
+    metaSegs=((leg.ordem||'data-loc')==='loc-data'?[segL,segD]:[segD,segL]).filter(function(sg){return sg.txt})
   }else{
+    legOu={pos:'abaixo',meta:'junto',ordem:'data-loc',medida:'caixa',txt:{on:false},data:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,fmt:0,cor:'preto'},loc:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
     capTxt=f.leg||'';
     capEst={fam:'Caveat',peso:500,it:false,pt:5.2*72/25.4,cor:'#000000',esp:0,contorno:false};
     var metaEst={fam:'IBM Plex Mono',peso:400,it:false,pt:2.5*72/25.4,cor:'#000000',esp:.02,contorno:false};
-    var dTxt=DF.d?LT.FMTD[0](DF.d):'',lTxt=DF.c?LT.localLG(LT.LOC0,DF.c):'';
-    if(dTxt)metaSegs.push({txt:dTxt,est:metaEst,box:false});
-    if(dTxt&&lTxt)metaSegs.push({txt:' • ',est:metaEst,box:false});
-    if(lTxt)metaSegs.push({txt:lTxt,est:metaEst,box:false});
-    metaMax=metaEst;
+    dataTxt=DF.d?LT.FMTD[0](DF.d):'';locTxt=DF.c?LT.localLG(LT.LOC0,DF.c):'';
+    sepEst=metaEst;
+    metaSegs=[{k:'data',txt:dataTxt,est:metaEst,box:false},{k:'loc',txt:locTxt,est:metaEst,box:false}].filter(function(sg){return sg.txt})
   }
-  var metaWidth=0;
-  metaSegs.forEach(function(seg){var w=medir(seg.txt,seg.est);if(seg.box)w+=2*.4*tamUm(seg.est.pt)+520;seg.w=w;metaWidth+=w});
+  var junto=(legOu.meta||'junto')!=='linhas';                  /* D-113: juntas numa linha ou em linhas separadas */
+  metaSegs.forEach(function(seg){var w=medir(seg.txt,seg.est);if(seg.box)w+=2*.4*tamUm(seg.est.pt)+520;seg.w=w});
+  var metaWidth=junto?metaSegs.reduce(function(a,sg){return a+sg.w},0)+(metaSegs.length>1?medir(' • ',sepEst):0):metaSegs.reduce(function(a,sg){return Math.max(a,sg.w)},0);
   var capBox=preset==='etiqueta'||preset==='bilhete'||preset==='carimbo',capBorder=capBox?(preset==='carimbo'?530:260):0;
   var capSize,capPadX,capPadY,capTextW,capBoxW,capBoxH;
   function medirCap(){
@@ -213,7 +215,8 @@ function layoutLegenda(f,fr,leg,s){
     var capMaxW=Math.max(0,capAvail-2*(capBorder+capPadX));
     if(medir(capTxt,capEst)>capMaxW+.01){capTxt=cortar(capTxt,capEst,capMaxW);medirCap()}
   }
-  var metaSize=tamUm(metaMax.pt),metaLineH=1.2*metaSize;
+  /* D-113 · MT-02: PLTEXTO.linhas é o único cálculo da posição da data e do local (lin em mm, sai em µm) */
+  var LNS=LT.linhas(legOu,fr,medirLeg,{pos:pos,capTxt:!!capTxt&&pos==='abaixo',capBoxH:capBoxH/1000,temData:!!dataTxt,temLoc:!!locTxt});
   function capItems(top,x){
     var arr=[],clip={x:Math.round(L),w:Math.round(JW)};
     if(capTxt){
@@ -222,46 +225,52 @@ function layoutLegenda(f,fr,leg,s){
     }
     return arr
   }
-  function metaItems(top,x){
-    var arr=[],b=linhaBase(top,metaSize,metaMax,1.2),mx=x,maxRight=L+JW,clip={x:Math.round(L),w:Math.round(JW)};
-    metaSegs.forEach(function(seg){
+  function metaItems(ln,x){
+    var arr=[],b=Math.round(ln.base*1000),topU=Math.round(ln.top*1000),mx=x,maxRight=L+JW,clip={x:Math.round(L),w:Math.round(JW)};
+    var segs=ln.k==='meta'?metaSegs:metaSegs.filter(function(sg){return sg.k===ln.k});
+    segs.forEach(function(seg,i){
       if(mx>=maxRight)return;
       var avail=maxRight-mx,txt=seg.txt;
       if(seg.box){
         var size=tamUm(seg.est.pt),pad=2*.4*size+520,maxTxt=Math.max(0,avail-pad);
         if(medir(txt,seg.est)>maxTxt+.01)txt=cortar(txt,seg.est,maxTxt);
-        var tw=medir(txt,seg.est),bw=Math.min(avail,tw+pad),bh=1.2*size+520,m=metricas(seg.est);
-        var bTop=b-((1.2-(m.asc+m.desc))/2+m.asc)*size;       /* MT-02: borda inline compartilha o topo da caixa de linha */
+        var tw=medir(txt,seg.est),bw=Math.min(avail,tw+pad),bh=ln.lh*size+520,m=metricas(seg.est);
+        var bTop=b-((ln.lh-(m.asc+m.desc))/2+m.asc)*size;       /* MT-02: borda inline compartilha o topo da caixa de linha */
         arr.push(ret(mx,bTop,bw,bh,260,seg.est.cor,260,false));
-        arr.push(texto(txt,mx+260+.4*size,b,seg.est,false,top,1.2,clip));
+        arr.push(texto(txt,mx+260+.4*size,b,seg.est,false,topU,ln.lh,clip));
         mx+=bw
       }else{
         var w=medir(txt,seg.est);
         if(w>avail+.01){txt=cortar(txt,seg.est,avail);w=medir(txt,seg.est)}
-        arr.push(texto(txt,mx,b,seg.est,false,top,1.2,clip));
+        arr.push(texto(txt,mx,b,seg.est,false,topU,ln.lh,clip));
         mx+=w
+      }
+      if(junto&&ln.k==='meta'&&i<segs.length-1){                /* « • » só entre as duas partes da linha única */
+        var sw=medir(' • ',sepEst);
+        if(mx+sw<=maxRight){arr.push(texto(' • ',mx,b,sepEst,false,topU,ln.lh,clip));mx+=sw}
       }
     });
     return arr
   }
+  var fim=function(){var u=LNS[LNS.length-1];return u?Math.round((u.top+u.lh*u.corpo)*1000):0}; /* fim da última caixa de linha */
   var grupos=[];
   if(pos==='abaixo'){
-    var figTop=T+JH+GAP_FOTO,items=capItems(figTop,L),figH=capTxt?capBoxH:0;
-    var metaTop=figTop+(capTxt?capBoxH+GAP_META:GAP_META),mItems=metaItems(metaTop,L);
-    if(metaSegs.length)figH=metaTop+metaLineH-figTop;
+    var figTop=T+JH+GAP_FOTO,items=capItems(figTop,L),mItems=[];
+    LNS.forEach(function(ln){mItems=mItems.concat(metaItems(ln,L))});
     if(preset==='carimbo'&&capTxt)items=[grupoRot(items,L+capBoxW/2,figTop+capBoxH/2,-3)];
-    grupos.push({itens:items.concat(mItems),figTop:figTop,figH:figH})
+    grupos.push({itens:items.concat(mItems),figTop:figTop,figH:Math.max(capTxt?capBoxH:0,fim()-figTop)})
   }else if(pos==='acima'){
-    var gap2=capBoxW&&metaWidth?GAP_ACIMA:0,totalW=capBoxW+gap2+metaWidth,startX=Math.max(L,L+(JW-totalW)/2),capTop=(T-capBoxH)/2,items2=capItems(capTop,startX);
-    var metaX=startX+capBoxW+gap2,mItems2=metaItems((T-metaLineH)/2,metaX);
+    var gap2=capBoxW&&metaWidth?GAP_ACIMA:0,totalW=capBoxW+gap2+metaWidth,startX=Math.max(L,L+(JW-totalW)/2),capTop=(T-capBoxH)/2,items2=capItems(capTop,startX),mItems2=[];
+    LNS.forEach(function(ln){mItems2=mItems2.concat(metaItems(ln,startX+capBoxW+gap2))});
     if(preset==='carimbo'&&capTxt)items2=[grupoRot(items2,startX+capBoxW/2,capTop+capBoxH/2,-3)];
     grupos.push({itens:items2.concat(mItems2),figTop:0,figH:T})
   }else{
     var startX3=L+(JW-capBoxW)/2,capTop3=(T-capBoxH)/2,items3=capItems(capTop3,startX3);
     if(preset==='carimbo'&&capTxt)items3=[grupoRot(items3,startX3+capBoxW/2,capTop3+capBoxH/2,-3)];
     grupos.push({itens:items3,figTop:0,figH:T});
-    var figTop4=T+JH+GAP_FOTO,metaTop4=figTop4+GAP_META,mItems4=metaItems(metaTop4,L);
-    grupos.push({itens:mItems4,figTop:figTop4,figH:metaSegs.length?metaTop4+metaLineH-figTop4:0})
+    var figTop4=T+JH+GAP_FOTO,mItems4=[];
+    LNS.forEach(function(ln){mItems4=mItems4.concat(metaItems(ln,L))});
+    grupos.push({itens:mItems4,figTop:figTop4,figH:Math.max(0,fim()-figTop4)})
   }
   var out=[];
   grupos.forEach(function(g){
@@ -278,7 +287,8 @@ function itensPolaroid(c,proj){
      para a imagem ficar de pé no papel. O grupo aplica giro da grade/orientação. */
   itens.push({t:'foto',n:f.n,x:mm(fr.lado),y:mm(fr.topo),w:mm(fr.jw),h:mm(fr.jh),rot:fr.ori==='h'?-90:0});
   itens=itens.concat(layoutLegenda(f,fr,proj.leg,s));
-  if(s.assin){var w=3.9*2.9,h=w*96/279;itens.push({t:'img',x:mm(fr.lado),y:mm(fr.h-3-h),w:mm(w),h:mm(h),src:'assinatura'})}
+  if(s.assin){var w=3.9*2.9,h=w*96/279,dir=LT.assinaturaDir(proj.leg,fr); /* D-128: espelha no Pocket em duas linhas */
+    itens.push({t:'img',x:mm(dir?fr.w-fr.lado-w:fr.lado),y:mm(fr.h-3-h),w:mm(w),h:mm(h),src:'assinatura'})}
   return itens
 }
 function corLinha(c){return c==='azul'?'#006194':c==='laranja'?'#FD761A':'#000000'}

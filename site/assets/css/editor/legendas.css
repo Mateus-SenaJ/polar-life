@@ -3,20 +3,24 @@
 /* legenda na polaroid: corpo em pt reais (1 pt = 0,3528 mm), deslocamento em mm, nada sobre a foto (T4) */
 .pq{--dx:0;--dy:0;--inc:0deg}
 .pq__top{position:absolute;left:calc(var(--k)*20px);right:calc(var(--k)*20px);top:0;height:calc(var(--k)*20px);display:flex;align-items:center;justify-content:center;gap:calc(var(--k)*8px);white-space:nowrap;pointer-events:none}
-.lg-txt,.lg-dt,.lg-lc{font-size:calc(var(--pw)/88*.3528*var(--pt,12));line-height:1.1;white-space:nowrap}
+.lg-txt,.lg-dt,.lg-lc{font-size:calc(var(--pmm,calc(var(--pw)/88))*.3528*var(--pt,12));line-height:1.1;white-space:nowrap}
 .pq__band .pq__cap,.pq__top .lg-txt{font-size:inherit;display:block}
 .pq__band .pq__cap{line-height:1.1;overflow:visible;text-overflow:clip}
 .pq__meta{font-size:inherit}
-.pq__cap,.pq__meta,.pq__top{transform:translate(calc(var(--pw)/88*var(--dx)),calc(var(--pw)/88*var(--dy))) rotate(var(--inc));transform-origin:left center}
+.pq__cap,.pq__meta,.pq__top,.lg-xl{transform:translate(calc(var(--pmm,calc(var(--pw)/88))*var(--dx)),calc(var(--pmm,calc(var(--pw)/88))*var(--dy))) rotate(var(--inc));transform-origin:left center}
 .pq__meta{display:flex;align-items:baseline;flex-wrap:nowrap}
 .lg-dt,.lg-lc{font-weight:400;letter-spacing:.02em}
-.lg-sep{white-space:pre;font-size:calc(var(--pw)/88*.3528*8)}
+.lg-sep{white-space:pre;font-size:calc(var(--pmm,calc(var(--pw)/88))*.3528*8)}
 .lg-pin{width:1.2em;height:1.2em;vertical-align:-.2em;margin-right:.2em}
-.pq__top .lg-m{display:flex;align-items:baseline}
+.lg-m{display:flex;align-items:baseline}
+.lg-ms{display:flex;flex-direction:column}
+.lg-xl{position:absolute;left:0;pointer-events:none}
+.lg-l{display:block}
+.lg-l--x{position:absolute;left:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* estilos prontos: só aparência da inscrição, o texto não muda */
 .pq[data-preset=contornada] .lg-txt{-webkit-text-stroke:calc(var(--k)*.6px) currentColor;paint-order:stroke fill;color:#fff!important}
-.pq[data-preset=etiqueta] .lg-txt{display:inline-block;padding:.1em .5em;border:1px solid currentColor;border-radius:4px;font-size:calc(var(--pw)/88*.3528*var(--pt,12)*.9)}
+.pq[data-preset=etiqueta] .lg-txt{display:inline-block;padding:.1em .5em;border:1px solid currentColor;border-radius:4px;font-size:calc(var(--pmm,calc(var(--pw)/88))*.3528*var(--pt,12)*.9)}
 .pq[data-preset=carimbo] .lg-txt{display:inline-block;padding:.05em .4em;border:2px solid currentColor;border-radius:4px;transform:rotate(-3deg)}
 .pq[data-preset=bilhete] .lg-txt{display:inline-block;padding:.1em .5em;border:1px dashed currentColor}
 .pq[data-preset=calendario] .lg-dt{display:inline-block;padding:.1em .5em;border:1px solid currentColor;border-radius:4px}

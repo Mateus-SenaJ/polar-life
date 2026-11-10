@@ -5,8 +5,9 @@
 var Q=window.PLQ;if(!Q)return;
 var $=function(i){return document.getElementById(i)};
 /* [id, nome, largura, altura, ativo, margem lateral, faixa superior, altura da janela]
-   Janelas oficiais da Fujifilm: Mini 46×62, Square 62×62, Wide 99×62 (etapa 26, D-108). Faixa superior do Mini, Square e Wide e a janela do Pocket: [RECOMENDADO]/[VALIDAR] (medir filme real) */
-var FMT=[['classico','Clássico',88,107,1,6,6,76],['mini','Mini quadrado',60,73,1,6,6,48],['pocket','Retro Pocket',60,80,1,6,6,60],['imini','Instax Mini',54,86,1,4,5,62],['isq','Instax Square',72,86,1,5,5,62],['iwide','Instax Wide',108,86,1,4.5,5,62],['pers','Personalizado',88,107,1,6,6,76]];
+   Pocket 66×99 com janela 60×79 (etapa 34, D-113). Janelas oficiais da Fujifilm: Mini 46×62, Square 62×62, Wide 99×62 (etapa 26, D-108).
+   Faixa superior do Mini, Square e Wide: [RECOMENDADO] (medir filme real). */
+var FMT=[['classico','Clássico',88,107,1,6,6,76],['mini','Mini quadrado',60,73,1,6,6,48],['pocket','Retro Pocket',66,99,1,3,3,79],['imini','Instax Mini',54,86,1,4,5,62],['isq','Instax Square',72,86,1,5,5,62],['iwide','Instax Wide',108,86,1,4.5,5,62],['pers','Personalizado',88,107,1,6,6,76]];
 var UN={mm:{f:1,d:1,u:'mm'},cm:{f:10,d:2,u:'cm'},pol:{f:25.4,d:3,u:'pol'}};
 var un='mm',err=null,built=false;
 try{un=sessionStorage.getItem('pl-unidade')||'mm'}catch(e){}
@@ -153,7 +154,9 @@ function dialogoFmt(){
     +'<button type="button" class="led-btn led-btn--light" id="fmt-sim"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Trocar formato</span></span></button></div>';
   document.body.appendChild(sc);document.body.appendChild(d);
   $('fmt-nao').onclick=function(){fechaFmt()};sc.onclick=function(){fechaFmt()};
-  $('fmt-sim').onclick=function(){var g=fG,x=fX;fechaFmt(true);err=null;grava(g,'mo:fmt');Q.toast('Formato: '+x[1]+' · '+folhasDe(g)+' · Desfazer',true)};
+  $('fmt-sim').onclick=function(){var g=fG,x=fX;fechaFmt(true);err=null;
+    if(x[0]==='pocket'&&window.PLLEG)PLLEG.padraoPocket();   /* D-113: entra no Pocket com a legenda em duas linhas */
+    grava(g,'mo:fmt');Q.toast('Formato: '+x[1]+' · '+folhasDe(g)+' · Desfazer',true)};
   document.addEventListener('keydown',function(e){
     if(d.hidden)return;
     if(e.key==='Escape'){e.preventDefault();fechaFmt();return}
@@ -200,5 +203,13 @@ document.addEventListener('keydown',function(e){                  /* R gira a mo
   var d=$('fmt-dlg');if(d&&!d.hidden)return;if(document.querySelector('.dialog:not([hidden])'))return;
   e.preventDefault();girar(F().ori==='h'?'v':'h')});
 window.PLMOL={aplicar:aplicar,render:render,regua:regua,cota:cota,ligada:ligada};
-aplicar();render();Q.render()
+aplicar();
+/* projeto novo que veio de «Retro Pocket» (T-02 grava pl-fmt · D-113): aplica a moldura e o padrão de legenda de uma vez */
+var pf=null;try{pf=sessionStorage.getItem('pl-fmt')}catch(e){}
+if(pf==='pocket'){try{sessionStorage.removeItem('pl-fmt')}catch(e){}
+  var sp=Q.ST()[0];
+  if(!sp.fr||sp.fr.fmt!=='pocket'){
+    if(window.PLLEG)PLLEG.padraoPocket();
+    grava({fmt:'pocket',w:66,h:99,jh:79,lado:3,topo:3,rad:.4,man:false,lock:true,ori:'v'},'mo:fmt')}}
+render();Q.render()
 })();

@@ -40,9 +40,9 @@
 .rotulo{
   font-family:var(--font-rotulo);
   font-size:var(--rotulo-s);
-  font-weight:400;
+  font-weight:500;                 /* Cormorant tem altura-x baixa: 500 a 15 px lê como Inter ~11 px (brief visual v2, K-02) */
   letter-spacing:0;
   text-transform:none;
 }
-.rotulo--m{font-size:var(--rotulo-m)}
+.rotulo--m{font-size:var(--rotulo-m);font-weight:400}
 @media(max-width:480px){.rotulo:not(.rotulo--m){font-size:16px}}

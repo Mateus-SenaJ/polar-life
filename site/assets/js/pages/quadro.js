@@ -170,6 +170,7 @@ function dimensionar(){
   var st=$('stage'),w=st.clientWidth,h=st.clientHeight,rg=$('pq').classList.contains('has-rg')?40:0,pw=Math.max(120,Math.min(420,w-rg,(h-rg)*FR.w/FR.h));
   if(!(pw>0))pw=420;
   var pq=$('pq'),u=pw/FR.w,cwp=FR.cw*u;                                 /* u = px por mm; cwp = largura da moldura em pé (a legenda é desenhada nela) */
+  pq.style.setProperty('--pmm',u+'px');                                  /* D-113: legendas da tela em mm reais (linhas absolutas do Pocket) */
   pq.classList.toggle('is-h',FR.ori==='h');
   pq.style.setProperty('--pqw',pw+'px');pq.style.setProperty('--pw',cwp+'px');pq.style.setProperty('--k',cwp/420);
   pq.style.setProperty('--ar',FR.w+'/'+FR.h);pq.style.setProperty('--wa',FR.jw+'/'+FR.jh);pq.style.setProperty('--pl',(FR.lado*u)+'px');pq.style.setProperty('--pr',(FR.ladoD*u)+'px');pq.style.setProperty('--pt',(FR.topo*u)+'px');pq.style.setProperty('--rd',Math.max(0,FR.rad*u)+'px');

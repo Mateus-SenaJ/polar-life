@@ -7,7 +7,7 @@ var SVGNS='http://www.w3.org/2000/svg';
 var FORMATS=[
  {id:'classico',name:'Clássico',w:88,h:107},
  {id:'mini',name:'Mini quadrado',w:60,h:73},
- {id:'pocket',name:'Retro Pocket',w:60,h:80},
+ {id:'pocket',name:'Retro Pocket',w:66,h:99},
  {id:'imini',name:'Instax Mini',w:54,h:86},
  {id:'isquare',name:'Instax Square',w:72,h:86},
  {id:'iwide',name:'Instax Wide',w:108,h:86}
@@ -26,6 +26,7 @@ function fmtById(id){for(var i=0;i<FORMATS.length;i++)if(FORMATS[i].id===id)retu
 function paperById(id){for(var i=0;i<PAPERS.length;i++)if(PAPERS[i].id===id)return PAPERS[i]}
 function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
 function winOf(w,h){
+  if(w===66&&h===99)return [60,79];            /* Pocket: janela 60 × 79 (etapa 34, D-113) */
   if(w===88&&h===107)return [76,76];            /* Clássico: DOC-05 FN-03 */
   var side=w*0.068;return [w-2*side,h-side-h*0.234]; /* ilustrativo: janela dos demais [PENDENTE] */
 }
@@ -248,7 +249,8 @@ $('err-fix').addEventListener('click',function(){S.paper=this.dataset.paper;upda
 $('uma').addEventListener('click',function(){toast('Este atalho ainda não está disponível.')});
 $('continuar').addEventListener('click',function(){
   if(this.disabled)return;
-  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
+  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
+  if(S.fmt==='pocket'){try{sessionStorage.setItem('pl-fmt','pocket')}catch(e){}}   /* D-113: o Quadro aplica o padrão de legenda do Pocket */
   location.href='../adicionar-fotos/';
 });
 
