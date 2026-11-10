@@ -47,7 +47,7 @@ function aviso(t){return'<div class="aviso"><svg class="ico sm"><use href="#i-in
 var P={
   texto:function(){
     var o=EST.original,h='';
-    h+='<section class="mod">'+sw('original','Polaroid original',o,o?'Ligado · só a foto e a moldura. Desligue para editar os textos e stickers.':'Desligado · textos e stickers visíveis.')+'</section>';
+    h+='<section class="mod">'+sw('original','Sem legendas',o,o?'Ligado · só a foto e a moldura. Desligue para editar os textos e stickers.':'Desligado · textos e stickers visíveis.')+'</section>';
     h+='<div id="texto-resto" class="'+(o?'veu':'')+'"'+(o?' aria-disabled="true"':'')+'>';
     h+='<section class="mod"><h3 class="mod__h">Posição</h3>'+seg('al','Alinhamento',[['esq','Esquerda','i-al-e'],['centro','Centro','i-al-c'],['dir','Direita','i-al-d']],EST.al,' seg--ico')+'<p class="f__h">Sempre abaixo da foto, com as mesmas margens laterais da janela.</p></section>';
     h+='<section class="mod"><h3 class="mod__h">Estilo</h3><div class="chips" role="radiogroup" aria-label="Estilos prontos">'+['Simples','Contornada','Etiqueta','Carimbo','Pin de local','Calendário','Bilhete','Manuscrito'].map(function(s,i){return'<button type="button" class="chip-o" aria-pressed="'+(i===0)+'">'+s+'</button>'}).join('')+'</div></section>';
@@ -67,7 +67,7 @@ var P={
   },
   stickers:function(){
     var o=EST.original,h='',e=elSel();
-    if(o)h+=aviso('Desligue «Polaroid original» (painel Texto) para usar stickers e emojis.');
+    if(o)h+=aviso('Desligue «Sem legendas» (painel Texto) para usar stickers e emojis.');
     h+='<div class="'+(o?'veu':'')+'">';
     if(e){
       h+='<section class="mod"><h3 class="mod__h">Elemento selecionado · '+(e.t==='emoji'?e.v:nomeSt(e.v))+'</h3><div class="row2">'+num('w','Tamanho',e.w,'mm',1)+num('rot','Giro',e.rot,'°',15)+'</div>'

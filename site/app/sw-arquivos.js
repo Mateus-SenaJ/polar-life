@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='ced88b59cc17';
+self.PL_VERSAO='c8460a04f609';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",

@@ -1,5 +1,7 @@
 # Tarefa 53 · Editor v3 · arquitetura de informação, controles, «Polaroid original», texto só abaixo, stickers e emojis
 
+> **Nome final (dono, 2026-11-10):** o interruptor «Polaroid original» da D-135 se chama **«Sem legendas»** na interface; a chave de dados continua `leg.original`. Onde este documento diz «Polaroid original», leia «Sem legendas».
+
 Autor: Fable (arquiteto de software e design do projeto), 2026-11-10. Fase 1: especificação + protótipo navegável (`design/prototipos/editor-v3/`). Status: `[RECOMENDADO]` até o dono vetar; as propostas de mudança de regra (§7) ficam `[VALIDAR]` até virarem decisão no `docs/10_LOG_DECISOES.md`.
 
 Leitura obrigatória antes de implementar qualquer fase: `AGENTS.md` (T1–T8), `docs/10_LOG_DECISOES.md` D-107 a D-137 (sobretudo D-113, D-119, D-121, D-128, D-129, D-130, D-133, D-134, **D-135, D-136, D-137**), `.tarefas/37b-editor-celular.md`, `.tarefas/brief-visual-v2.md`, `.tarefas/52-catalogos.md` (em implementação paralela: o catálogo de formatos e as frases sugeridas entram aqui como dependência, não são refeitos), `design/referencias/E5-editor-layout.pdf`.

@@ -1,18 +1,18 @@
 ## ADDED Requirements
 
-### Requirement: Polaroid original
-O sistema SHALL oferecer, como primeiro controle do painel de texto, o interruptor «Polaroid original» (`leg.original`), que vale para o projeto todo. Ligado, legenda, data e local MUST deixar de aparecer na tela do Quadro, nas folhas e no PDF, sem apagar nenhum dado; a assinatura MUST seguir o plano.
+### Requirement: Sem legendas (Polaroid original)
+O sistema SHALL oferecer, como primeiro controle do painel de texto, o interruptor «Sem legendas» (`leg.original`), que vale para o projeto todo. Ligado, legenda, data e local MUST deixar de aparecer na tela do Quadro, nas folhas e no PDF, sem apagar nenhum dado; a assinatura MUST seguir o plano.
 
 #### Scenario: Ligar esconde todo texto na tela e no PDF
-- **WHEN** a pessoa liga «Polaroid original» num projeto com legenda «Dias de sol», data e local
+- **WHEN** a pessoa liga «Sem legendas» num projeto com legenda «Dias de sol», data e local
 - **THEN** nenhum `.lg-txt`, `.lg-dt` ou `.lg-lc` fica visível no Quadro e nas folhas, e o texto extraído do PDF não contém «Dias de sol» nem a data
 
 #### Scenario: Desligar devolve tudo
-- **WHEN** a pessoa desliga «Polaroid original»
+- **WHEN** a pessoa desliga «Sem legendas»
 - **THEN** legenda, data e local voltam exatamente como estavam e `ST[0].leg` é igual ao de antes de ligar (exceto `original`)
 
-#### Scenario: Pré-voo respeita a Polaroid original
-- **WHEN** «Polaroid original» está ligada e uma legenda estaria fora da área segura
+#### Scenario: Pré-voo respeita o Sem legendas
+- **WHEN** «Sem legendas» está ligada e uma legenda estaria fora da área segura
 - **THEN** o pré-voo não bloqueia por texto fora da área segura
 
 ### Requirement: Texto sempre abaixo da foto

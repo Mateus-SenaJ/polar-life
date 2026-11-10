@@ -1,7 +1,7 @@
 /* T-10 · Inspetor · aba LEGENDAS · DOC-05 FN-07 · DOC-02 §4 (EXC-2) · DOC-12 DV-03/04/05/18/21/23/28
    Estilo dos 3 tipos = projeto todo (ST[0].leg). Texto livre = por foto (ST[n].txt). Histórico vem do quadro.js.
    D-113: «linhas» do Pocket — posições da data e do local vêm de PLTEXTO.linhas (MT-02).
-   D-135: «Polaroid original» é o primeiro controle · D-136: o texto fica só abaixo, alinhado esq|centro|dir. */
+   D-135: «Sem legendas» (só a foto e a moldura) é o primeiro controle · D-136: o texto fica só abaixo, alinhado esq|centro|dir. */
 (function(){
 var Q=window.PLQ;if(!Q)return;
 var LT=window.PLTEXTO;if(!LT)return;
@@ -166,10 +166,10 @@ function sw(k,rot,on){return'<div class="sw-row"><div><span class="f__l" id="s-'
 function montar(){
   var l=L(),h='',dis=l.original?' aria-disabled="true"':'';   /* D-135: com a Polaroid original as outras seções ficam apagadas */
   /* 1 · Polaroid original (D-135): primeiro controle do painel */
-  h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Polaroid original</h3>'
-   +sw('original','Polaroid original',!!l.original)
+  h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Legendas</h3>'
+   +sw('original','Sem legendas',!!l.original)
    +'<p class="f__h" id="lg-orig-est">'+(l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis')+'</p>'
-   +(l.original?'<div class="msg msg--warn lg__aviso"><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>Desligue «Polaroid original» para editar.</p></div></div>':'')
+   +(l.original?'<div class="msg msg--warn lg__aviso"><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>Desligue «Sem legendas» para editar.</p></div></div>':'')
    +'</section>';
   h+='<div class="lg__rest'+(l.original?' is-off':'')+'" id="lg-rest">';
   /* 2 · Posição (D-136): o texto é sempre abaixo, alinhado entre as margens da foto */

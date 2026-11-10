@@ -4,7 +4,7 @@ O texto da polaroid é calculado em dois lugares que precisam concordar ao déci
 
 ## Goals / Non-Goals
 
-**Goals:** um único cálculo de x para todas as linhas; «Polaroid original» lida pela mesma chave em tela, folhas, pré-voo e PDF; migração idempotente; nenhuma regressão no Pocket (D-113) nem na assinatura (D-128).
+**Goals:** um único cálculo de x para todas as linhas; «Sem legendas» lida pela mesma chave em tela, folhas, pré-voo e PDF; migração idempotente; nenhuma regressão no Pocket (D-113) nem na assinatura (D-128).
 
 **Non-Goals:** casca nova do editor; stickers/emojis; mudar fontes, corpos ou a vertical das linhas.
 

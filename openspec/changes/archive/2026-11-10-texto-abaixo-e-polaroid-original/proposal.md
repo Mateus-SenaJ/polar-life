@@ -1,6 +1,6 @@
 ## Why
 
-O dono decidiu (D-135, D-136, 2026-11-10) que a edição começa com um interruptor «Polaroid original» (só a foto e a moldura) e que todo texto fica **abaixo** da foto, alinhado à Esquerda, ao Centro ou à Direita, nas mesmas margens laterais da foto. Hoje o motor ainda aceita as posições «acima» e «ambas», o deslocamento horizontal manual (`dx`) e a chave antiga `leg.limpa` (D-119). Esta mudança é a fundação do Editor v3 (docs/13_EDITOR_V3.md, Fases 0 e 1): muda dados e motor sem trocar a casca do editor.
+O dono decidiu (D-135, D-136, 2026-11-10) que a edição começa com um interruptor «Sem legendas» (só a foto e a moldura) e que todo texto fica **abaixo** da foto, alinhado à Esquerda, ao Centro ou à Direita, nas mesmas margens laterais da foto. Hoje o motor ainda aceita as posições «acima» e «ambas», o deslocamento horizontal manual (`dx`) e a chave antiga `leg.limpa` (D-119). Esta mudança é a fundação do Editor v3 (docs/13_EDITOR_V3.md, Fases 0 e 1): muda dados e motor sem trocar a casca do editor.
 
 ## What Changes
 
@@ -8,13 +8,13 @@ O dono decidiu (D-135, D-136, 2026-11-10) que a edição começa com um interrup
 - Novo campo `leg.al` = `'esq' | 'centro' | 'dir'`; nova função única `PLTEXTO.alinharX(al, L, JW, w)` usada pela tela e pelo gerador do PDF (MT-02).
 - **BREAKING (dados)**: removidos `leg.pos` («acima», «ambas») e `leg.dx`; o texto sempre sai na faixa inferior. `PLTEXTO.migrar(leg)` converte projetos antigos (idempotente) ao abrir e ao importar `.polarlife`.
 - `PLTEXTO.assinaturaPos(leg, fr)` substitui `assinaturaDir`: no modo automático a assinatura vai para o canto oposto ao texto (D-129 reduzida pela D-136).
-- Aba Legendas atual: «Polaroid original» como primeiro controle; seção Posição vira botões de seleção Esquerda · Centro · Direita; somem «Acima», «Ambas» e «Deslocar na horizontal».
-- Pré-voo não acusa área segura de texto com «Polaroid original» ligada.
+- Aba Legendas atual: «Sem legendas» como primeiro controle; seção Posição vira botões de seleção Esquerda · Centro · Direita; somem «Acima», «Ambas» e «Deslocar na horizontal».
+- Pré-voo não acusa área segura de texto com «Sem legendas» ligada.
 
 ## Capabilities
 
 ### New Capabilities
-- `legenda-polaroid`: texto da polaroid (legenda, data, local), sua posição, alinhamento, a «Polaroid original» e a posição da assinatura, iguais na tela e no PDF.
+- `legenda-polaroid`: texto da polaroid (legenda, data, local), sua posição, alinhamento, a «Sem legendas» e a posição da assinatura, iguais na tela e no PDF.
 
 ### Modified Capabilities
 (nenhuma — ainda não há specs registradas em openspec/specs/)

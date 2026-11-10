@@ -86,7 +86,7 @@ try {
       posicoes: [...p.querySelectorAll('input[name=pos],input[name=dx],#r-dx,#n-dx')].length
     };
   });
-  ok(painel.primeiro === 's-original' && painel.rotulo === 'Polaroid original', '«Polaroid original» é o primeiro interruptor do painel');
+  ok(painel.primeiro === 's-original' && painel.rotulo === 'Sem legendas', '«Sem legendas» é o primeiro interruptor do painel');
   ok(painel.estado === 'false' && painel.temEstado, 'o interruptor começa desligado e mostra o estado em texto');
   ok(painel.alinhamentos.join(',') === 'esq,centro,dir', 'a seção Posição tem Esquerda · Centro · Direita (' + painel.alinhamentos.join(', ') + ')');
   ok(!painel.acima && painel.posicoes === 0, 'sem «Acima», «Ambas» nem «Deslocar na horizontal»');

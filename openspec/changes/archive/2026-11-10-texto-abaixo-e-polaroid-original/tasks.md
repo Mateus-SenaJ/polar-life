@@ -11,7 +11,7 @@
 
 ## 3. Tela e controles
 
-- [x] 3.1 `site/assets/js/editor/legendas.js`: «Polaroid original» como primeiro controle (interruptor, textos da docs/13 §4.2; demais seções com `aria-disabled` e véu quando ligado); seção Posição vira botões de seleção Esquerda · Centro · Direita; remover Acima, Ambas e «Deslocar na horizontal»; aplicar `--al` na polaroid
+- [x] 3.1 `site/assets/js/editor/legendas.js`: «Sem legendas» como primeiro controle (interruptor, textos da docs/13 §4.2; demais seções com `aria-disabled` e véu quando ligado); seção Posição vira botões de seleção Esquerda · Centro · Direita; remover Acima, Ambas e «Deslocar na horizontal»; aplicar `--al` na polaroid
 - [x] 3.2 CSS (`site/assets/css/editor/legendas.css`, `site/assets/css/pages/quadro.css`, `site/assets/css/pages/editor.css`): `text-align: var(--al)` na faixa e nas linhas do Pocket
 - [x] 3.3 `site/assets/js/pages/editor.js` (folhas) e `site/assets/js/pages/quadro.js`: ler `leg.original`/`leg.al` e usar `assinaturaPos`; remover `leg.limpa`
 - [x] 3.4 `site/assets/js/editor/prevoo.js`: com `leg.original`, não acusar área segura do texto
