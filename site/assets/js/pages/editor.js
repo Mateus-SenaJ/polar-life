@@ -200,12 +200,16 @@ function render(){
   var rt=resumoTxt(),r=$('result');r.classList.toggle('is-err',R.erro);r.querySelector('use').setAttribute('href',R.erro?'#i-x':'#i-check');$('result-t').textContent=rt;
   var linhaT=D.guias?'Guias ligadas · '+(D.compr==='continua'?'linha contínua':'marcas de canto'):(D.contorno?'Contorno ligado':'Sem linhas de corte');
   $('rail-t').textContent=linhaT;$('rail-mm').textContent=D.guias?'0,1 mm':(D.contorno?'0,25 pt':'—');
-  $('hud-l').textContent=D.guias?'Guias · 0,1 mm':(D.contorno?'Contorno · 0,25 pt':'Sem linhas');
-  $('hud-r').textContent=p.n+' · '+(orient==='paisagem'?'Paisagem':'Retrato');
-  $('cota').textContent='Margem '+nf(D.margem)+' mm · Entre polaroids '+nf(D.gap)+' mm';
-  $('faixa-n').textContent=N;$('faixa-r').textContent=N?'Folha '+(cur+1)+' / '+N:'Sem folhas';
+  var hudLab=D.guias?'Guias':(D.contorno?'Contorno':'Sem linhas'),hudVal=D.guias?'0,1 mm':(D.contorno?'0,25 pt':'');
+  $('hud-lab').textContent=hudLab;$('hud-val').textContent=hudVal;$('hud-val').hidden=!hudVal;
+  $('hud-format').textContent=p.n;$('hud-orient').textContent=orient==='paisagem'?'Paisagem':'Retrato';
+  $('cota-margem').textContent=nf(D.margem)+' mm';$('cota-gap').textContent=nf(D.gap)+' mm';
   var g=R.sheets[cur];
-  $('ctx-sheet').textContent=N?'Modo Folhas · Folha '+(cur+1)+' de '+N+(g&&g.grupo?' · '+g.grupo:''):'Modo Folhas · Sem folhas';
+  $('faixa-n').textContent=N;$('faixa-label').hidden=!N;$('faixa-current').hidden=!N;$('faixa-total').hidden=!N;$('faixa-empty').hidden=!!N;
+  $('faixa-current').textContent=cur+1;$('faixa-total').textContent=N;
+  $('ctx-sheet-label').hidden=!N;$('ctx-sheet').hidden=!N;$('ctx-empty').hidden=!!N;
+  $('ctx-sheet').textContent=(cur+1)+' de '+N;
+  $('ctx-grupo').textContent=g&&g.grupo?g.grupo:'';$('ctx-grupo').hidden=!(g&&g.grupo);
   $('status').textContent=R.erro?'A polaroid não cabe neste papel':p.n+' '+orient+' · '+R.g.n+' clássicas por folha · '+N+' folhas no total';
   $('mesa').classList.toggle('is-err',R.erro);$('err').hidden=!R.erro;
   $('prev').disabled=cur<=0;$('next').disabled=cur>=N-1;
@@ -223,7 +227,7 @@ function desenharMesa(){
   desenhar(sh,R.sheets[cur],p,px,px>1,cur,R.sheets.length);
   sh.setAttribute('aria-label','Folha '+(cur+1)+' de '+R.sheets.length+', '+R.sheets[cur].cells.length+' polaroids');
   var av=$('aviso-leg');if(av){av.hidden=!FORA;av.textContent=FORA?'Atenção: a legenda sai da área segura em '+FORA+(FORA===1?' polaroid':' polaroids')+' desta folha. Ajuste o corpo ou a posição na aba Legendas do Quadro, ou ligue «Ajustar para caber».':''}
-  $('ctx-scale').textContent='Escala '+Math.round(px/(96/25.4)*100)+'%'
+  $('ctx-scale').textContent=Math.round(px/(96/25.4)*100)+'%'
 }
 function faixa(){
   var ol=$('faixa');ol.innerHTML='';

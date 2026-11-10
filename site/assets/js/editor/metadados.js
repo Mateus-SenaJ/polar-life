@@ -30,13 +30,13 @@ Q.meta=function(n){var m=M(n),p=pd(m.iso);return{iso:m.iso,data:p?new Date(p.y,p
 function grava(n,m,k){Q.ST()[n].meta=m;Q.commit(k)}
 function montar(){
   var p=$('p-metadados'),h='';
-  h+='<section class="mod" aria-labelledby="md-h1"><h3 class="mod__h" id="md-h1">Esta foto</h3><dl class="rd" id="md-rd"></dl><div class="rd__s" id="md-selos"></div></section>';
-  h+='<section class="mod" aria-labelledby="md-h2"><h3 class="mod__h" id="md-h2">Editar</h3>';
+  h+='<section class="mod" aria-labelledby="md-h1"><h3 class="mod__h rotulo rotulo--m" id="md-h1">Esta foto</h3><dl class="rd" id="md-rd"></dl><div class="rd__s" id="md-selos"></div></section>';
+  h+='<section class="mod" aria-labelledby="md-h2"><h3 class="mod__h rotulo rotulo--m" id="md-h2">Editar</h3>';
   h+='<div class="f" data-k="d"><div class="f__top"><label class="f__l" for="md-d">Data</label><button type="button" class="lk" data-clr="d">Sem data</button></div><div class="num num--l"><input id="md-d" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<div class="f"><div class="f__top"><label class="f__l" for="md-o">Origem</label></div><div class="num num--l"><select id="md-o">'+ORIG.map(function(o){return'<option>'+o+'</option>'}).join('')+'</select></div></div>';
   h+='<p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Vale só para esta foto. Se a cidade ficar vazia, a legenda de local some.</span></p></section>';
-  h+='<section class="mod" aria-labelledby="md-h3"><h3 class="mod__h" id="md-h3">Corrigir várias de uma vez</h3>';
+  h+='<section class="mod" aria-labelledby="md-h3"><h3 class="mod__h rotulo rotulo--m" id="md-h3">Corrigir várias de uma vez</h3>';
   h+='<div class="f" data-k="h"><div class="f__top"><label class="f__l" for="md-h">Somar ou subtrair horas às datas</label></div><div class="num"><input id="md-h" inputmode="numeric" autocomplete="off" value="0"><span class="num__u mono">h</span></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<p class="f__h" id="md-prev" role="status"></p>';
   h+='<button type="button" class="btn2" id="md-apl"></button>';
@@ -66,14 +66,14 @@ function render(){
   if(!built)montar();
   if(Q.cur()!==ult){ult=Q.cur();err=null}
   var n=Q.cur(),m=M(n),a=Q.nat(n),rd=$('md-rd'),sel='';
-  rd.innerHTML='<div><dt>Data</dt><dd>'+(m.iso?lido(m.iso):'Sem data')+'<span class="mono">'+(m.ds==='exif'?'Data da foto (EXIF)':m.ds==='manual'?'Digitada por você':'Sem data na foto')+(m.dh?' · corrigida '+(m.dh>0?'+':'−')+Math.abs(m.dh)+' h':'')+'</span></dd></div>'
+  rd.innerHTML='<div><dt>Data</dt><dd>'+(m.iso?lido(m.iso):'Sem data')+'<span class="rotulo">'+(m.ds==='exif'?'Data da foto (EXIF)':m.ds==='manual'?'Digitada por você':'Sem data na foto')+(m.dh?' · corrigida '+(m.dh>0?'+':'−')+Math.abs(m.dh)+' h':'')+'</span></dd></div>'
    +'<div><dt>Orientação</dt><dd>'+(Q.vert(n)?'Vertical':'Horizontal')+'</dd></div>'
    +'<div><dt>Dimensões</dt><dd>'+a.w+' × '+a.h+' px</dd></div>'
    +'<div><dt>Perfil de cor</dt><dd>sRGB</dd></div>'
    +'<div><dt>Origem</dt><dd>'+m.o+'</dd></div>'
    +'<div><dt>Local</dt><dd>'+(m.c||'Sem local')+'</dd></div>';
-  if(m.cs==='gps'&&m.c)sel+='<span class="pill mono">Aproximado</span>';
-  if(m.conv)sel+='<span class="pill mono">Convertida</span>';
+  if(m.cs==='gps'&&m.c)sel+='<span class="pill rotulo">Aproximado</span>';
+  if(m.conv)sel+='<span class="pill rotulo">Convertida</span>';
   $('md-selos').innerHTML=sel;
   var cmp=[['d',br(m.iso)],['c',m.c]];
   cmp.forEach(function(c){var box=$('p-metadados').querySelector('[data-k="'+c[0]+'"]'),inp=box.querySelector('input'),bad=err&&err.k===c[0];

@@ -15,7 +15,7 @@ mkdirSync(PDF, { recursive: true });
 // [família, peso, itálico]. Inter 400 e 500 do site já existem (.woff); aqui entram só no PDF.
 const LISTA = [
   ['Inter', 300], ['Inter', 400], ['Inter', 500],
-  ['Cormorant Garamond', 300], ['Cormorant Garamond', 400],
+  ['Cormorant Garamond', 300], ['Cormorant Garamond', 400], ['Cormorant Garamond', 500],   // 500: rótulos (D-114 revisto pelo brief visual v2, K-02)
   ['Cormorant Garamond', 300, 1], ['Cormorant Garamond', 400, 1],
   ['Caveat', 400], ['Caveat', 500],
   ['IBM Plex Mono', 400],

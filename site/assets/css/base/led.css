@@ -123,7 +123,7 @@
   background-image: linear-gradient(var(--core), var(--core)), var(--grad);
   background-origin: border-box;
   background-clip: padding-box, border-box;
-  box-shadow: var(--led-halo-3);
+  box-shadow: var(--led-halo-3-base);
   color: var(--ink);
   font: 500 15px/1 var(--font);
   letter-spacing: .01em;
@@ -146,54 +146,51 @@
   align-items: center;
   gap: 10px;
   color: var(--ink);
-  transition: color 200ms var(--ease);
 }
 .led-btn .btn-content svg { stroke: currentColor; }
 
-/* Névoa multicamada (hover, foco, selecionado). O anel externo é preservado. */
+/* Faixa de luz atravessando o miolo (D-115). O anel externo é preservado. */
 .led-btn .smoke-layer {
   position: absolute;
   inset: 0;
   z-index: 1;
   opacity: 0;
   pointer-events: none;
-  background-color: var(--orange);
-  background-image:
-    linear-gradient(rgb(255 255 255 / .30), rgb(255 255 255 / .30)),          /* véu de contraste */
-    radial-gradient(ellipse 60% 45% at 25% 35%, rgb(255 255 255 / .75) 0%, rgb(255 255 255 / 0) 60%),
-    radial-gradient(ellipse 50% 50% at 55% 50%, rgb(0 97 148 / .65)   0%, rgb(0 97 148 / 0) 65%),
-    radial-gradient(ellipse 45% 40% at 75% 60%, rgb(255 255 255 / .70) 0%, rgb(255 255 255 / 0) 55%),
-    radial-gradient(ellipse 55% 55% at 95% 75%, rgb(253 118 26 / .95) 0%, rgb(253 118 26 / 0) 70%);
-  background-size: 100% 100%, 200% 200%, 200% 200%, 200% 200%, 200% 200%;
-  background-blend-mode: normal, screen, screen, screen, screen;
-  transition: opacity 350ms var(--ease);
+  background-image: linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0) 35%, rgb(255 255 255 / .26) 50%, rgb(0 97 148 / .30) 58%, transparent 70%);
+  background-size: 220% 100%;
+  background-position: 100% center;
+}
+.led-btn--light .smoke-layer {
+  background-image: linear-gradient(105deg, transparent 0%, rgb(0 97 148 / 0) 35%, rgb(0 97 148 / .14) 50%, rgb(0 97 148 / .10) 58%, transparent 70%);
 }
 
 @media (hover: hover) {
-  .led-btn:hover:not(:disabled):not([aria-busy="true"]) .smoke-layer {
+  .led-btn:hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) .smoke-layer {
     opacity: 1;
-    animation: smoke-move 6s ease-in-out infinite alternate;
+    animation: led-shine 900ms var(--ease) 1 forwards;
   }
-  .led-btn:hover:not(:disabled):not([aria-busy="true"]) .btn-content { color: var(--black); }
 }
-.led-btn:focus-visible:not(:disabled):not([aria-busy="true"]) .smoke-layer,
-.led-btn.is-hover:not(:disabled):not([aria-busy="true"]) .smoke-layer {
+.led-btn:focus-visible:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) .smoke-layer,
+.led-btn.is-hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) .smoke-layer {
   opacity: 1;
-  animation: smoke-move 6s ease-in-out infinite alternate;
+  animation: led-shine 900ms var(--ease) 1 forwards;
 }
-.led-btn:focus-visible .btn-content,
-.led-btn.is-hover .btn-content { color: var(--black); }
+.led-btn:hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]),
+.led-btn:focus-visible:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]),
+.led-btn.is-hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) {
+  transform: translateY(-1px);
+  box-shadow: var(--led-halo-3);
+}
 
 .led-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
-.led-btn:active:not(:disabled):not([aria-busy="true"]) { transform: scale(.98); }
+.led-btn:active:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) { transform: scale(.98); }
 
-@keyframes smoke-move {
-  0%   { background-position: 0 0, 0% 30%,  0% 30%,  0% 30%,  0% 30%; }
-  50%  { background-position: 0 0, 70% 70%, 70% 70%, 70% 70%, 70% 70%; }
-  100% { background-position: 0 0, 100% 40%, 100% 40%, 100% 40%, 100% 40%; }
+@keyframes led-shine {
+  from { background-position: 100% center; }
+  to { background-position: 0% center; }
 }
 
-/* Carregando: sem névoa e sem halo; barra deslizante na base */
+/* Carregando: sem faixa e sem halo; barra deslizante na base */
 .led-btn[aria-busy="true"] { cursor: progress; pointer-events: none; box-shadow: none; --core: var(--white); --ink: var(--black); }
 .led-btn__bar { display: none; }
 .led-btn[aria-busy="true"] .led-btn__bar {
@@ -217,7 +214,7 @@
   animation: led-slide 1.4s var(--ease) infinite;
 }
 
-/* Desabilitado: sem LED, sem névoa, contorno tracejado preto */
+/* Desabilitado: sem LED, sem faixa, contorno tracejado preto */
 .led-btn:disabled,
 .led-btn[aria-disabled="true"] {
   --core: var(--white);
@@ -296,8 +293,7 @@
   .led-dialog {
     --grad: conic-gradient(from var(--led-ang, 0deg), var(--orange) 0%, var(--white) 25%, var(--blue) 50%, var(--white) 75%, var(--orange) 100%);
   }
-  /* Velocidade constante: trocar animation-duration no hover faz o anel saltar de ângulo (o navegador recalcula a posição).
-     O retorno de hover fica com a névoa do v4 (D-112, revisão do orquestrador). */
+  /* O anel mantém velocidade constante; a faixa de luz usa animação própria de 900 ms. */
   .led-btn { animation: led-spin 8s linear infinite; }
   .led-box--2, .led-box--3 { animation: led-spin 10s linear infinite; }
   .led-dialog { animation: led-dialog-in 200ms var(--ease), led-spin 10s linear infinite; }
@@ -314,8 +310,11 @@
 /* 5. ACESSIBILIDADE */
 
 @media (prefers-reduced-motion: reduce) {
-  .led-btn, .led-btn .smoke-layer, .led-btn .btn-content { transition: none; }
-  .led-btn .smoke-layer { animation: none !important; background-position: 50% 50%; }
+  .led-btn, .led-btn .smoke-layer { transition: none; }
+  .led-btn .smoke-layer { animation: none !important; opacity: 0 !important; background-image: none; }
+  .led-btn:hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]),
+  .led-btn:focus-visible:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]),
+  .led-btn.is-hover:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) { transform: none; }
   .led-dialog { animation: none !important; }
   .led-btn__bar::after, .led-progress__fill, .led-progress__glow { animation: none; width: 100%; transform: none; }
   .led-btn { animation: none !important; --grad: var(--led-gradient-h); }

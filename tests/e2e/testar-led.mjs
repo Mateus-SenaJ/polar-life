@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// P-LED (DOC-01 §11 · D-112): o LED v4 é o mesmo em todas as páginas — botão 52/42, peso 500,
-// raio 12, anel em movimento, névoa no hover, desabilitado tracejado preto, barra carregando,
+// P-LED (DOC-01 §11 · D-112 · D-115): o LED v4 é o mesmo em todas as páginas — botão 52/42, peso 500,
+// raio 12, anel em movimento, faixa de luz no hover, desabilitado tracejado preto, barra carregando,
 // pop-up nível 3 e barra de progresso. Também confere a paleta T2 dentro dos componentes LED.
 // Uso: npm run testar:led  (Chromium do Playwright)
 import { chromium } from 'playwright';
-import { readdirSync, statSync } from 'node:fs';
+import { copyFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +25,20 @@ const foraDaPaleta = c => {
 const srv = await servir();
 const nav = await chromium.launch();
 const saida = fileURLToPath(new URL('../saida/led/', import.meta.url));
+const saidaRotulos = fileURLToPath(new URL('../saida/rotulos/depois/', import.meta.url));
+const saidaHover = fileURLToPath(new URL('../saida/hover/', import.meta.url));
 await mkdir(saida, { recursive: true });
+await mkdir(saidaRotulos, { recursive: true });
+await mkdir(saidaHover, { recursive: true });
+
+/* Preserve as capturas-base existentes antes de substituir a série geral. */
+const antes = fileURLToPath(new URL('../saida/rotulos/antes/', import.meta.url));
+await mkdir(antes, { recursive: true });
+for (const nome of ['1440-app-editor.png', '390-app-editor.png', '1440-app-editor-quadro.png', '390-app-editor-quadro.png',
+  '1440-app.png', '390-app.png', '1440-inicio.png', '390-inicio.png']) {
+  const origem = join(saida, nome), destino = join(antes, nome);
+  if (!existsSync(destino) && existsSync(origem)) copyFileSync(origem, destino);
+}
 
 const retrato = async page => page.evaluate(() => {
   const vis = el => {
@@ -68,7 +81,7 @@ try {
       if (b.raio !== '12px') problemas.push(`botão ${b.i} com raio ${b.raio}`);
       if (b.animacao === 'none') problemas.push(`botão ${b.i} sem anel animado`);
     }
-    /* hover: névoa visível e conteúdo preto, ícone herdando a cor do texto */
+    /* hover: a faixa atravessa e o conteúdo mantém a cor do miolo */
     const alvo = page.locator('.led-btn:visible:not(:disabled):not([aria-busy="true"])').first();
     if (await alvo.count()) {
       await alvo.hover();
@@ -82,12 +95,17 @@ try {
           const cs = getComputedStyle(s);
           return { stroke: cs.stroke, fill: cs.fill, texto: cc.color };
         });
-        return { opacidade: sc.opacity, cor: cc.color, svgs };
+        return {
+          opacidade: sc.opacity, cor: cc.color, claro: el.classList.contains('led-btn--light'),
+          animacao: sc.animationName, iteracoes: sc.animationIterationCount, svgs
+        };
       }, alvoEl);
       if (!h) problemas.push('botão sem .smoke-layer/.btn-content');
       else {
-        if (parseFloat(h.opacidade) < 0.99) problemas.push(`névoa com opacidade ${h.opacidade} no hover`);   // a transição de 350 ms pode estar no último quadro
-        if (h.cor !== 'rgb(0, 0, 0)') problemas.push(`conteúdo ${h.cor} no hover`);
+        if (parseFloat(h.opacidade) < 0.99) problemas.push(`faixa com opacidade ${h.opacidade} no hover`);
+        const corEsperada = h.claro ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)';
+        if (h.cor !== corEsperada) problemas.push(`conteúdo ${h.cor} no hover; esperado ${corEsperada}`);
+        if (h.animacao !== 'led-shine' || h.iteracoes !== '1') problemas.push(`faixa com animação ${h.animacao} (${h.iteracoes})`);
         for (const s of h.svgs) {
           const aceita = c => c === 'none' || c === 'rgba(0, 0, 0, 0)' || c === s.texto;
           if (!aceita(s.stroke) || !aceita(s.fill)) problemas.push(`ícone com stroke ${s.stroke}/fill ${s.fill} no hover`);
@@ -146,12 +164,17 @@ try {
   const ctx = await nav.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
   const rm = await ctx.newPage();
   await rm.goto(srv.url + 'app/novo-projeto/', { waitUntil: 'networkidle' });
+  const alvoRm = rm.locator('.led-btn:visible:not(:disabled)').first();
+  if (await alvoRm.count()) await alvoRm.hover();
   const quieto = await rm.evaluate(() => {
     const bs = [...document.querySelectorAll('.led-btn')];
-    return bs.map(el => ({ btn: getComputedStyle(el).animationName, nevoa: getComputedStyle(el.querySelector('.smoke-layer')).animationName }));
+    return bs.map(el => {
+      const shine = el.querySelector('.smoke-layer'), btn = getComputedStyle(el), layer = getComputedStyle(shine);
+      return { btn: btn.animationName, shine: layer.animationName, opacidade: layer.opacity, elevacao: btn.transform };
+    });
   });
-  const mexendo = quieto.filter(x => x.btn !== 'none' || x.nevoa !== 'none');
-  mexendo.length ? ruim(`reduced-motion ainda anima: ${JSON.stringify(mexendo)}`) : ok('reduced-motion: anel e névoa parados');
+  const mexendo = quieto.filter(x => x.btn !== 'none' || x.shine !== 'none' || x.opacidade !== '0' || x.elevacao !== 'none');
+  mexendo.length ? ruim(`reduced-motion ainda anima ou eleva: ${JSON.stringify(mexendo)}`) : ok('reduced-motion: só o halo, sem faixa, anel ou elevação');
   await ctx.close();
 
   /* Capturas para revisão visual */
@@ -172,6 +195,36 @@ try {
   }
   await shot.close();
   ok(`${shots} capturas em tests/saida/led/`);
+
+  const rotulos = await nav.newPage();
+  for (const [nome, pg] of [['editor', 'app/editor/'], ['quadro', 'app/editor/quadro/'], ['t01', 'app/'], ['apresentacao', '']]) {
+    for (const [w, h] of [[1440, 900], [390, 844]]) {
+      await rotulos.setViewportSize({ width: w, height: h });
+      await rotulos.goto(srv.url + pg, { waitUntil: 'networkidle' });
+      await rotulos.evaluate(() => document.fonts.ready);
+      await rotulos.screenshot({ path: join(saidaRotulos, `${nome}-${w}.png`), fullPage: true });
+    }
+  }
+  await rotulos.close();
+  ok('8 capturas depois em tests/saida/rotulos/');
+
+  const hover = await nav.newPage({ viewport: { width: 1440, height: 900 } });
+  for (const [nome, pg, seletor] of [
+    ['escuro', 'app/editor/', '.led-btn:visible:not(.led-btn--light):not(:disabled):not([aria-busy="true"])'],
+    ['claro', '', '.led-btn--light:visible:not(:disabled):not([aria-busy="true"])']
+  ]) {
+    await hover.goto(srv.url + pg, { waitUntil: 'networkidle' });
+    await hover.evaluate(() => document.fonts.ready);
+    const alvoHover = hover.locator(seletor).first();
+    if (!(await alvoHover.count())) throw new Error(`Nenhum botão LED ${nome} visível para capturar`);
+    await alvoHover.hover();
+    for (let quadro = 1; quadro <= 4; quadro++) {
+      if (quadro > 1) await hover.waitForTimeout(300);
+      await hover.screenshot({ path: join(saidaHover, `${nome}-${quadro}.png`), fullPage: true });
+    }
+  }
+  await hover.close();
+  ok('8 quadros de hover em tests/saida/hover/');
 } finally {
   await nav.close();
   srv.fechar();

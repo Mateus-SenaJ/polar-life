@@ -48,10 +48,10 @@
 <div class="eh__l">
 <a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
 <span class="eh__div" aria-hidden="true"></span>
-<span class="eh__studio mono">Polar Life Studio</span>
+<span class="eh__studio rotulo">Polar Life Studio</span>
 <div class="eh__proj">
 <span class="eh__name">Viagem · Serra 2026</span>
-<span class="chip"><span class="dot" aria-hidden="true"></span><span class="mono">Salvo neste dispositivo</span></span>
+<span class="chip"><span class="dot" aria-hidden="true"></span><span class="rotulo">Salvo neste dispositivo</span></span>
 </div>
 </div>
 <div class="eh__r">
@@ -75,16 +75,16 @@
 
 <aside class="rail" aria-label="Navegação de mesa">
 <div>
-<p class="rail__t mono"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
+<p class="rail__t rotulo"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
 <ul class="rail__l">
 <li><a class="rail__i is-on" href="./" aria-current="page"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
 <li><a class="rail__i" id="rail-q" href="quadro/#foto-1"><svg class="ico"><use href="#i-grid"/></svg><span>Quadro</span></a></li>
-<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="mono">Em breve</em></button></li>
-<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="mono">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="rotulo">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="rotulo">Em breve</em></button></li>
 </ul>
 </div>
 <div class="rail__card">
-<p class="mono rail__row"><span>Guia de corte</span><span id="rail-mm" style="color:var(--blue)">0,1 mm</span></p>
+<p class="rail__row"><span class="rotulo">Guia de corte</span><span class="mono" id="rail-mm" style="color:var(--blue)">0,1 mm</span></p>
 <p class="rail__row2"><svg class="ico sm"><use href="#i-cut"/></svg><span id="rail-t">Guias ligadas · linha contínua</span></p>
 </div>
 </aside>
@@ -92,9 +92,9 @@
 <main class="content" id="main">
 <div class="wrap">
 <div class="ctx">
-<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-layers"/></svg><span class="mono" id="ctx-sheet">Modo Folhas · Folha 1 de 6</span></span>
+<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-layers"/></svg><span class="rotulo">Modo Folhas</span><span class="rotulo" id="ctx-sheet-label">Folha</span><span class="mono" id="ctx-sheet">1 de 6</span><span class="rotulo" id="ctx-empty" hidden>Sem folhas</span><span class="rotulo" id="ctx-grupo" hidden></span></span>
 <div class="ctx__r">
-<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="mono" id="ctx-scale">Escala 50%</span></span>
+<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Escala</span><span class="mono" id="ctx-scale">50%</span></span>
 <button type="button" class="btn2 btn2--sm ctx__insp" id="insp-toggle" aria-controls="insp" aria-expanded="true"><svg class="ico sm"><use href="#i-panel"/></svg>Inspetor</button>
 </div>
 </div>
@@ -103,8 +103,8 @@
 <section class="mesa-col" aria-label="Mesa">
 <div class="mesa" id="mesa">
 <div class="hud">
-<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="mono" id="hud-l">Guias · 0,1 mm</span></span>
-<span class="pill pill--hud"><span class="mono" id="hud-r">A4 · Retrato</span></span>
+<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="rotulo" id="hud-lab">Guias</span><span class="mono" id="hud-val">0,1 mm</span></span>
+<span class="pill pill--hud"><span class="mono" id="hud-format">A4</span><span class="rotulo" id="hud-orient">Retrato</span></span>
 </div>
 <div class="stage" id="stage"><div class="sheet" id="sheet" role="img" aria-label="Folha"></div></div>
 <div class="err" id="err" role="alert" hidden>
@@ -112,7 +112,7 @@
 </div>
 <div class="acts">
 <button type="button" class="btn2" id="prev"><svg class="ico sm"><use href="#i-prev"/></svg>Folha anterior</button>
-<span class="acts__cota mono"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span id="cota">Margem 10 mm · Entre polaroids 4 mm</span></span>
+<span class="acts__cota"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span class="rotulo">Margem</span><span class="mono" id="cota-margem">10 mm</span><span class="rotulo">Entre polaroids</span><span class="mono" id="cota-gap">4 mm</span></span>
 <button type="button" class="btn2" id="next">Folha seguinte<svg class="ico sm"><use href="#i-next"/></svg></button>
 </div>
 <p class="status mono" id="status" role="status" aria-live="polite">A4 retrato · 4 clássicas por folha · 6 folhas no total</p>
@@ -120,9 +120,9 @@
 </div>
 
 <div class="faixa" id="faixa-w">
-<div class="faixa__l"><span class="mono faixa__t">Folhas <span id="faixa-n">6</span></span>
+<div class="faixa__l"><span class="faixa__t"><span class="rotulo">Folhas</span><span class="mono" id="faixa-n">6</span></span>
 <ol class="faixa__list" id="faixa" aria-label="Folhas do projeto"></ol></div>
-<span class="mono faixa__r" id="faixa-r">Folha 1 / 6</span>
+<span class="faixa__r"><span class="rotulo" id="faixa-label">Folha</span> <span class="mono" id="faixa-current">1</span> / <span class="mono" id="faixa-total">6</span><span class="rotulo" id="faixa-empty" hidden>Sem folhas</span></span>
 </div>
 </section>
 
@@ -131,12 +131,12 @@
 <div class="insp__in">
 <h2 class="insp__h">Inspetor</h2>
 <div class="tabs" role="tablist" aria-label="Abas do inspetor">
-<button type="button" role="tab" class="tab mono is-on" id="tab-papel" aria-selected="true" aria-controls="p-papel">Papel</button>
-<button type="button" role="tab" class="tab mono" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
-<button type="button" role="tab" class="tab mono" id="tab-ajustes" aria-selected="false" aria-controls="p-outra" tabindex="-1">Ajustes</button>
-<button type="button" role="tab" class="tab mono" id="tab-legendas" aria-selected="false" aria-controls="p-outra" tabindex="-1">Legendas</button>
-<button type="button" role="tab" class="tab mono" id="tab-molduras" aria-selected="false" aria-controls="p-outra" tabindex="-1">Molduras</button>
-<button type="button" role="tab" class="tab mono" id="tab-metadados" aria-selected="false" aria-controls="p-outra" tabindex="-1">Metadados</button>
+<button type="button" role="tab" class="tab rotulo is-on" id="tab-papel" aria-selected="true" aria-controls="p-papel">Papel</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-ajustes" aria-selected="false" aria-controls="p-outra" tabindex="-1">Ajustes</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-legendas" aria-selected="false" aria-controls="p-outra" tabindex="-1">Legendas</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-molduras" aria-selected="false" aria-controls="p-outra" tabindex="-1">Molduras</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-metadados" aria-selected="false" aria-controls="p-outra" tabindex="-1">Metadados</button>
 </div>
 
 <div class="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: Todas as fotos · 24</span></div>
@@ -146,7 +146,7 @@
 <div class="result" id="result" aria-live="polite"><svg class="ico"><use href="#i-check"/></svg><p id="result-t">4 por folha · 6 folhas · aproveitamento 72%</p></div>
 
 <section class="mod" aria-labelledby="m1">
-<h3 class="mod__h" id="m1">Papel e orientação</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m1">Papel e orientação</h3>
 <div class="f" data-k="papel"><div class="f__top"><label class="f__l" for="papel">Papel</label><button type="button" class="rst mono" data-reset="papel" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
 <div class="sel"><select id="papel"></select><svg class="ico sm" aria-hidden="true"><use href="#i-down"/></svg></div>
 <p class="f__h" id="papel-h"></p></div>
@@ -161,7 +161,7 @@
 </section>
 
 <section class="mod" aria-labelledby="m2">
-<h3 class="mod__h" id="m2">Margem e espaço</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m2">Margem e espaço</h3>
 <div class="f" data-k="margem"><div class="f__top"><label class="f__l" for="margem">Margem da folha</label><button type="button" class="rst mono" data-reset="margem" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
 <div class="num"><button type="button" class="num__b" data-step="-1" aria-label="Diminuir margem">−</button><input id="margem" inputmode="decimal" autocomplete="off" data-min="0" data-max="50"><span class="num__u mono">mm</span><button type="button" class="num__b" data-step="1" aria-label="Aumentar margem">+</button></div><p class="f__h" id="margem-h">De 0 a 50 mm.</p></div>
 <div class="f" data-k="gap"><div class="f__top"><label class="f__l" for="gap">Entre polaroids</label><button type="button" class="rst mono" data-reset="gap" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
@@ -175,7 +175,7 @@
 </section>
 
 <section class="mod" aria-labelledby="m3">
-<h3 class="mod__h" id="m3">Linhas de corte</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m3">Linhas de corte</h3>
 <div class="sw-row" data-k="guias"><div><span class="f__l" id="guias-l">Guias de corte</span><p class="f__h">Linhas de 0,1 mm até a borda da folha.</p></div><button type="button" class="sw" id="guias" role="switch" aria-checked="true" aria-labelledby="guias-l"><span></span></button></div>
 <div class="sw-row" data-k="contorno"><div><span class="f__l" id="contorno-l">Contorno da polaroid</span><p class="f__h" id="contorno-h"><svg class="ico sm"><use href="#i-info"/></svg><span>Desative as guias de corte para usar contorno.</span></p></div><button type="button" class="sw" id="contorno" role="switch" aria-checked="false" aria-labelledby="contorno-l" aria-describedby="contorno-h"><span></span></button></div>
 <div class="f" data-k="compr"><div class="f__top"><span class="f__l" id="compr-l">Comprimento das guias</span><button type="button" class="rst mono" data-reset="compr" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
@@ -190,7 +190,7 @@
 </section>
 
 <section class="mod" aria-labelledby="m4">
-<h3 class="mod__h" id="m4">Rodapé e assinatura</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m4">Rodapé e assinatura</h3>
 <div class="sw-row" data-k="rodape"><div><span class="f__l" id="rodape-l">Rodapé da folha</span><p class="f__h">Nome do projeto e número da folha.</p></div><button type="button" class="sw" id="rodape" role="switch" aria-checked="false" aria-labelledby="rodape-l"><span></span></button></div>
 <div class="sw-row" data-k="assin"><div><span class="f__l" id="assin-l">Assinatura Polar Life</span><p class="f__h">Logo no canto inferior esquerdo de cada moldura.</p></div><button type="button" class="sw" id="assin" role="switch" aria-checked="true" aria-labelledby="assin-l"><span></span></button></div>
 </section>

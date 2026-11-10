@@ -218,7 +218,7 @@ function update(){
   }
   drawSheet(P,r,true);
   $('count').innerHTML='<span class="count__n">'+r.n+'</span> por folha';
-  if(r.rot&&r.gain>0){pill.textContent='Girada para caber mais: +'+r.gain+' por folha';pill.hidden=false}
+  if(r.rot&&r.gain>0){pill.innerHTML='<span class="rotulo">Girada para caber mais:</span> <span class="mono">+'+r.gain+'</span> <span class="rotulo">por folha</span>';pill.hidden=false}
   btn.disabled=false;
 }
 

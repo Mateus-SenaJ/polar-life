@@ -59,7 +59,7 @@ function monta(){
   var d=document.createElement('div');d.className='dialog pv led-dialog led-box led-box--3';d.id='pv-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
   d.setAttribute('aria-labelledby','pv-t');d.setAttribute('aria-describedby','pv-d');d.hidden=true;
   d.innerHTML='<div class="pv__top"><svg class="ico pv__ico" aria-hidden="true"><use href="#i-verified"/></svg><h2 class="led-dialog__title" id="pv-t">Tudo pronto para o papel?</h2></div><p id="pv-d"></p>'
-   +'<dl class="pv__grid"><div><dt class="mono">Total de folhas</dt><dd id="pv-f"></dd></div><div><dt class="mono">Disposição</dt><dd id="pv-p"></dd></div><div><dt class="mono">Aproveitamento</dt><dd id="pv-a"></dd></div></dl>'
+   +'<dl class="pv__grid"><div><dt class="rotulo">Total de folhas</dt><dd id="pv-f"></dd></div><div><dt class="rotulo">Disposição</dt><dd id="pv-p"></dd></div><div><dt class="rotulo">Aproveitamento</dt><dd id="pv-a"></dd></div></dl>'
    +'<div id="pv-l"></div>'
    +'<label class="chk pv__ok" id="pv-okl" hidden><input type="checkbox" id="pv-ok"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span>Revisei e quero continuar</span></label>'
    +'<p class="pv__why mono" id="pv-w" hidden></p>'

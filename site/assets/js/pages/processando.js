@@ -23,7 +23,7 @@ function plural(n,s,p){return n+' '+(n===1?s:p)}
 function drawFiles(){
   $('files').innerHTML=FILES.map(function(f,i){
     var s;
-    if(f.st==='ok')s=ICON.ok+'Pronta'+(f.heic?' <span class="tag mono">Convertida</span>':'');
+    if(f.st==='ok')s=ICON.ok+'Pronta'+(f.heic?' <span class="tag rotulo">Convertida</span>':'');
     else if(f.st==='fail')s=ICON.fail+'Não suportada';
     else if(f.st==='work')s=ICON.wait+(f.heic?'Convertendo…':'Lendo…');
     else s=ICON.wait+'Aguardando';

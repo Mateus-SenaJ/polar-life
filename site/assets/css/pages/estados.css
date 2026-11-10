@@ -1,6 +1,6 @@
 .est{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));margin:24px 0 64px;padding:0;list-style:none}
 .msg{background:var(--white);border:1px solid var(--outline-subtle);border-radius:14px;padding:24px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:12px}
-.msg__tipo{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.msg__tipo{display:block}
 .msg h2{font-weight:400;font-size:20px;margin:0}
 .msg p{margin:0;font-weight:400;line-height:1.5}
 .msg__ico{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;flex:none}
