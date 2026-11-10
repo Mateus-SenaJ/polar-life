@@ -58,7 +58,7 @@ function polaroid(c,s,px,det){
   var html='<figure class="pol'+(D.contorno&&!D.guias?' is-out':'')+'" data-n="'+c.f.n+'" style="left:'+L+'px;top:'+T+'px;width:'+W+'px;height:'+H+'px">';
   html+='<div class="pol__in" style="left:'+ox+'px;top:'+oy+'px;width:'+ow+'px;height:'+oh+'px'+(c.giro?';transform:rotate(90deg)':'')+'">';
   html+='<div class="pol__ph" style="left:'+FR.lado*px+'px;top:'+FR.topo*px+'px;width:'+FR.jw*px+'px;height:'+FR.jh*px+'px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19l7-11 4 6 3-4 6 9z"/></svg></div>';
-  if(det){
+  if(det&&(!LG||!LG.limpa)){
     var yb=(FR.topo+FR.jh)*px;
     var cap,meta,pos='abaixo',tr='',mls='';
     if(LG){
@@ -100,9 +100,9 @@ function polaroid(c,s,px,det){
       var metaOut=(pos==='ambas'||pos==='abaixo')&&!mls&&meta?meta.replace('class="pol__meta" style="','class="pol__meta" style="'+gap+';').replace('class="pol__meta">','class="pol__meta" style="'+gap+'">'):'';
       html+='<figcaption'+pre+' style="'+X+';top:'+(yb+2.2*px)+'px'+tr+'">'+(pos==='ambas'?'':cap)+metaOut+mls+'</figcaption>'
     }
-    if(D.assin){var dirSig=PLTEXTO.assinaturaDir(LG,FR);   /* D-128: Pocket em duas linhas → assinatura espelhada à direita */
-      html+='<img class="pol__sig" src="../../assets/img/logos/Logo_tipografia_lateral.png" alt="" style="'+(dirSig?'right':'left')+':'+FR.lado*px+'px;bottom:'+3*px+'px;width:'+3.9*2.9*px+'px">'}
   }
+  if(det&&D.assin){var dirSig=PLTEXTO.assinaturaDir(LG||PLTEXTO.LEG0,FR); /* D-119: assinatura segue o plano */
+    html+='<img class="pol__sig" src="../../assets/img/logos/Logo_tipografia_lateral.png" alt="" style="'+(dirSig?'right':'left')+':'+FR.lado*px+'px;bottom:'+3*px+'px;width:'+3.9*2.9*px+'px">'}
   return html+'</div></figure>'
 }
 function linhas(sh,p,px){                                          /* guias de corte · FN-02 · MT-04 */
@@ -207,8 +207,8 @@ function render(){
   /* chips e textos */
   var rt=resumoTxt(),r=$('result');r.classList.toggle('is-err',R.erro);r.querySelector('use').setAttribute('href',R.erro?'#i-x':'#i-check');$('result-t').textContent=rt;
   var linhaT=D.guias?'Guias ligadas · '+(D.compr==='continua'?'linha contínua':'marcas de canto'):(D.contorno?'Contorno ligado':'Sem linhas de corte');
-  $('rail-t').textContent=linhaT;$('rail-mm').textContent=D.guias?'0,1 mm':(D.contorno?'0,25 pt':'—');
-  var hudLab=D.guias?'Guias':(D.contorno?'Contorno':'Sem linhas'),hudVal=D.guias?'0,1 mm':(D.contorno?'0,25 pt':'');
+  $('rail-t').textContent=linhaT;$('rail-mm').textContent=D.guias?'0,15 mm':(D.contorno?'0,25 pt':'—');
+  var hudLab=D.guias?'Guias':(D.contorno?'Contorno':'Sem linhas'),hudVal=D.guias?'0,15 mm':(D.contorno?'0,25 pt':'');
   $('hud-lab').textContent=hudLab;$('hud-val').textContent=hudVal;$('hud-val').hidden=!hudVal;
   $('hud-format').textContent=p.n;$('hud-orient').textContent=orient==='paisagem'?'Paisagem':'Retrato';
   $('cota-margem').textContent=nf(D.margem)+' mm';$('cota-gap').textContent=nf(D.gap)+' mm';
@@ -332,7 +332,31 @@ document.addEventListener('keydown',function(e){
 
 /* abas do inspetor */
 var tabs=[].slice.call(document.querySelectorAll('.tab'));
-function aba(t){tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});var papel=t.id==='tab-papel';$('p-papel').hidden=!papel;$('p-outra').hidden=papel;$('p-outra').setAttribute('aria-labelledby',t.id)}
+var ESCOPO='todas';
+function alvo(){return ESCOPO==='folha'&&R.sheets[cur]?R.sheets[cur].cells.map(function(c){return c.f.n}):FOTOS.map(function(f){return f.n})}
+function quadro(){try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');if(Array.isArray(q)&&q.length===NF+1)return q}catch(e){}var q=[{leg:LG,fr:FR}];FOTOS.forEach(function(f){q.push({src:f.src,z:100,ang:0,px:0,py:0,rot:0,flip:false,modo:'preencher',adj:{brilho:0,contraste:0,saturacao:0,temp:0,realces:0,sombras:0,nitidez:0,vinheta:0},flt:{id:'original',int:100},txt:f.leg||null})});return q}
+function salvarQuadro(q){q[0]=q[0]||{};q[0].leg=LG;q[0].fr=FR;try{sessionStorage.setItem('pl-quadro',JSON.stringify(q))}catch(e){}}
+function escopo(){var n=alvo().length;$('scope-t').textContent='Alterando: '+(ESCOPO==='folha'?'Esta folha':'Todas as fotos')+' · '+n;var a=$('escopo-ajuda');if(a)a.textContent=ESCOPO==='folha'?'Somente as '+n+' fotos desta folha.':'Todas as '+n+' fotos do projeto.'}
+function painelExtra(id){
+  if(id==='tab-legendas'&&!LG)LG=JSON.parse(JSON.stringify(PLTEXTO.LEG0));
+  var h=window.PLCTRL.escopo(),ids=alvo(),q=quadro();
+  if(id==='tab-fotos')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Suas fotos · '+NF+'</h3><div class="foto-grid">'+FOTOS.map(function(f){return'<button type="button" class="foto-mini" data-abrir="'+f.n+'"><span aria-hidden="true">Foto '+f.n+'</span><small>Foto '+f.n+'</small></button>'}).join('')+'</div><a class="btn2" href="../adicionar-fotos/">Adicionar fotos</a><p class="f__h">Abra uma foto para recortar, duplicar ou remover.</p></section>';
+  if(id==='tab-ajustes'){var a=q[ids[0]]&&q[ids[0]].adj||{};h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Luz e cor</h3>'+window.PLCTRL.numero('ef-brilho','Brilho',a.brilho||0,-100,100,1,'')+window.PLCTRL.numero('ef-contraste','Contraste',a.contraste||0,-100,100,1,'')+'<div class="f"><label class="f__l" for="ef-filtro">Filtro</label><div class="sel"><select id="ef-filtro"><option value="original">Original</option><option value="pb">Preto e branco</option><option value="retro">Retrô</option><option value="cinema">Cinema</option></select></div></div><p class="f__h">As alterações respeitam ajustes individuais protegidos.</p></section>'}
+  if(id==='tab-legendas'){h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Legenda</h3><div class="sw-row"><div><span class="f__l">Polaroid sem textos</span><p class="f__h" id="limpa-estado">'+(LG.limpa?'Ligado · textos ocultos':'Desligado · textos visíveis')+'</p></div><button type="button" class="sw" id="ef-limpa" role="switch" aria-checked="'+!!LG.limpa+'" aria-label="Polaroid sem textos"><span></span></button></div><div class="f"><label class="f__l" for="ef-pos">Posição</label><div class="sel"><select id="ef-pos"><option value="abaixo">Abaixo</option><option value="acima">Acima</option><option value="ambas">Ambas</option></select></div></div></section>'}
+  if(id==='tab-molduras')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Formato e estilo das fotos</h3><div class="f"><label class="f__l" for="ef-formato">Moldura</label><div class="sel"><select id="ef-formato"><option value="classico">Polaroid Clássico · 88 × 107 mm</option><option value="mini">Mini quadrado · 60 × 73 mm</option><option value="pocket">Retro Pocket · 66 × 99 mm</option></select></div></div><p class="f__h">A medida da polaroid fica travada; a folha apenas reorganiza.</p></section>';
+  if(id==='tab-metadados')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Metadados</h3><p class="f__h">Data e cidade são usadas só na legenda. Coordenadas nunca aparecem.</p><a class="btn2" href="quadro/#foto-1">Editar data e cidade no Quadro</a></section>';
+  $('painel-extra').innerHTML=h;var se=$('escopo-folhas');se.value=ESCOPO;escopo();
+  se.onchange=function(){ESCOPO=this.value;painelExtra(id)};
+  var limpar=$('ef-limpa');if(limpar)limpar.onclick=function(){LG.limpa=!LG.limpa;salvarQuadro(quadro());render();painelExtra(id)};
+  var pos=$('ef-pos');if(pos){pos.value=LG.pos||'abaixo';pos.onchange=function(){LG.pos=this.value;salvarQuadro(quadro());render()}};
+  var fmt=$('ef-formato');if(fmt)fmt.value=FR.fmt||(POCKET?'pocket':'classico');if(fmt)fmt.onchange=function(){var m={classico:[88,107,6,6,76],mini:[60,73,6,6,48],pocket:[66,99,3,3,79]}[this.value]; /* mesmas medidas do FMT de molduras.js (D-113) */
+    FR={fmt:this.value,w:m[0],h:m[1],lado:m[2],topo:m[3],jw:m[0]-2*m[2],jh:m[4],rad:FR.rad!=null?FR.rad:.4,man:false,lock:true,ori:FR.ori||'v'};
+    if(this.value==='pocket')LG=PLTEXTO.legPocket(LG||PLTEXTO.LEG0);   /* D-113: legenda em duas linhas */salvarQuadro(quadro());render();toast('Formato aplicado a '+alvo().length+' fotos')};
+  [].forEach.call($('painel-extra').querySelectorAll('.num input'),function(i){i.onchange=function(){var v=Math.max(-100,Math.min(100,parseFloat(this.value.replace(',','.'))||0)),q=quadro();this.value=v,k=this.id==='ef-brilho'?'brilho':'contraste';alvo().forEach(function(n){q[n].adj[k]=v});salvarQuadro(q);toast(k==='brilho'?'Brilho aplicado a '+alvo().length+' fotos':'Contraste aplicado a '+alvo().length+' fotos')};});
+  [].forEach.call($('painel-extra').querySelectorAll('[data-step]'),function(b){b.onclick=function(){var i=this.parentNode.querySelector('input'),v=(parseFloat(i.value)||0)+parseFloat(this.getAttribute('data-step'));i.value=v;i.dispatchEvent(new Event('change'))}});
+  [].forEach.call($('painel-extra').querySelectorAll('[data-abrir]'),function(b){b.onclick=function(){location.href='quadro/#foto-'+b.getAttribute('data-abrir')}})
+}
+function aba(t){tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});var papel=t.id==='tab-papel';$('p-papel').hidden=!papel;$('p-outra').hidden=papel;$('p-outra').setAttribute('aria-labelledby',t.id);if(!papel)painelExtra(t.id)}
 tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
 
 /* tablet: inspetor deslizante · celular: painel inferior com 25%, 50% e 85% */

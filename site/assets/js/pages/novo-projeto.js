@@ -74,8 +74,8 @@ function errors(){
 
 /* ===== Formato: cartões ===== */
 function polHTML(w,h,max){
-  var k=max/Math.max(w,h),W=w*k,H=h*k,win=winOf(w,h),l=(w-win[0])/2,t=Math.min(l,(h-win[1])/2);
-  return '<span class="pol" style="width:'+W.toFixed(1)+'px;height:'+H.toFixed(1)+'px"><i style="left:'+(l*k).toFixed(1)+'px;top:'+(t*k).toFixed(1)+'px;width:'+(win[0]*k).toFixed(1)+'px;height:'+(win[1]*k).toFixed(1)+'px"></i></span>';
+  var k=max/Math.max(w,h),W=w*k,H=h*k,win=winOf(w,h),l=(w-win[0])/2,t=Math.min(l,(h-win[1])/2),faixa=Math.max(10,(h-win[1]-t)*k);
+  return '<span class="pol" style="width:'+W.toFixed(1)+'px;height:'+H.toFixed(1)+'px"><i style="left:'+(l*k).toFixed(1)+'px;top:'+(t*k).toFixed(1)+'px;width:'+(win[0]*k).toFixed(1)+'px;height:'+(win[1]*k).toFixed(1)+'px"></i><b class="pol__leg" style="left:'+(l*k).toFixed(1)+'px;bottom:'+Math.max(2,(t*k)/2).toFixed(1)+'px;width:'+(win[0]*k).toFixed(1)+'px;height:'+faixa.toFixed(1)+'px"></b></span>';
 }
 function buildCards(){
   var g=$('fmt-grid'),h='';
@@ -218,7 +218,9 @@ function update(){
   }
   drawSheet(P,r,true);
   $('count').innerHTML='<span class="count__n">'+r.n+'</span> por folha';
-  if(r.rot&&r.gain>0){pill.innerHTML='<span class="rotulo">Girada para caber mais:</span> <span class="mono">+'+r.gain+'</span> <span class="rotulo">por folha</span>';pill.hidden=false}
+  var pr=fit(P.w,P.h,S.fw,S.fh,S.margin,S.gap,false),pl=fit(P.h,P.w,S.fw,S.fh,S.margin,S.gap,false);
+  $('meta').innerHTML+='<br><span class="mono">Retrato: '+pr.n+' por folha · Paisagem: '+pl.n+' por folha</span>';
+  if(r.rot&&r.gain>0){pill.innerHTML='<span class="rotulo">Girada para caber mais:</span> <span class="mono">'+(r.n-r.gain)+' → '+r.n+' por folha</span>';pill.hidden=false}
   btn.disabled=false;
 }
 

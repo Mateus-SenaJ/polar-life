@@ -103,7 +103,7 @@ strong{font-weight:500}
 .pol__sig{position:absolute;height:auto}
 .sheet__foot{position:absolute;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.04em;white-space:nowrap}
 .guides{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.guides line{vector-effect:non-scaling-stroke;stroke-width:1px;shape-rendering:crispEdges}
+.guides line{vector-effect:non-scaling-stroke;stroke-width:1px;stroke-dasharray:4 3;stroke-opacity:.45;shape-rendering:crispEdges} /* D-121 */
 
 /* faixa de folhas */
 .faixa{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px;background:var(--white);border-radius:12px;box-shadow:var(--shadow-subtle)}
@@ -130,6 +130,10 @@ strong{font-weight:500}
 .tab.is-on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--blue)}
 .scope{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface-subtle);border-radius:12px;font-size:12px;font-weight:500;line-height:1.4}
 .panel{display:flex;flex-direction:column;gap:24px}
+.foto-grid{display:grid;grid-template-columns:repeat(4,minmax(44px,1fr));gap:8px}
+.foto-mini{min-height:60px;padding:6px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);font:400 11px 'IBM Plex Mono',monospace;cursor:pointer}
+.foto-mini span{display:block;height:30px;padding-top:8px;background:var(--surface-subtle);font:400 11px 'Inter',sans-serif}
+.foto-mini small{display:block;margin-top:3px;font:400 10px 'IBM Plex Mono',monospace}
 .result{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--black);border-radius:12px;font-size:14px;font-weight:500}
 .result .ico{color:var(--blue);stroke-width:2}
 .result p{margin:0}

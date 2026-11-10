@@ -60,7 +60,9 @@ function checar(v){
 /* ---------- desenho na polaroid ---------- */
 function pintar(){
   var l=L(),pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
+  top.hidden=!!l.limpa;band.hidden=!!l.limpa;
   [].slice.call(pq.querySelectorAll('.lg-xl')).forEach(function(n){n.parentNode.removeChild(n)}); /* sai antes: o .lg-lc do fluxo continua achável */
+  if(l.limpa)return; /* D-119: mantém os dados e só esconde a inscrição (inclusive as linhas do Pocket); assinatura segue o plano */
   if(!l.txt)return;
   var cor=function(k){return COR[l[k].cor]||'#000'};
   var M=Q.meta?Q.meta(Q.cur()):{data:DATA,cidade:LOCAL.cidade,iso:'2026-07-14T08:00'};
@@ -160,7 +162,7 @@ function montar(){
   var l=L(),h='';
   h+='<section class="mod" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
    +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>';
-  h+='<section class="mod" aria-labelledby="lm1"><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
+  h+='<section class="mod" aria-labelledby="lm1"><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('limpa','Polaroid sem textos',!!l.limpa)+'<p class="f__h">'+(l.limpa?'Ligado · textos ocultos':'Desligado · textos visíveis')+'</p>'+sw('txt.on','Mostrar texto livre',l.txt.on)
    +'<div class="f" id="f-texto"><div class="f__top"><label class="f__l" for="lg-in">Texto desta foto</label><span class="mono f__h" id="lg-cnt">0/80</span></div><div class="num lg-num"><input id="lg-in" maxlength="80" autocomplete="off" style="text-align:left;padding-left:12px"></div><p class="f__h" id="lg-h">Até 80 caracteres.</p><div id="lg-conf" hidden></div></div>'
    +seletor('txt')
    +sld('txt.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')

@@ -48,6 +48,8 @@ strong{font-weight:500}
 .fmt-art{display:flex;align-items:center;justify-content:center;width:100%;height:88px}
 .pol{position:relative;background:var(--white);border:1px solid var(--outline-subtle);box-shadow:0 6px 14px rgb(0 0 0/.08),0 1px 3px rgb(0 0 0/.04)}
 .pol i{position:absolute;background:var(--surface-subtle)}
+.pol__leg{position:absolute;display:block;border-top:1px solid rgb(0 0 0/.16);background:linear-gradient(to bottom,transparent 28%,rgb(0 0 0/.55) 28%,rgb(0 0 0/.55) 34%,transparent 34%,transparent 58%,rgb(0 0 0/.35) 58%,rgb(0 0 0/.35) 64%,transparent 64%)}
+.sheet svg{transition:transform 300ms var(--ease),opacity 300ms var(--ease)}
 .pol--custom{background:none;border:1px dashed rgb(0 0 0/.4);box-shadow:none;display:flex;align-items:center;justify-content:center;color:var(--black)}
 .fmt-name{font-size:14px;font-weight:500;line-height:1.3}
 .chk{position:absolute;top:8px;right:8px;z-index:1;display:none;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--blue);color:var(--white)}

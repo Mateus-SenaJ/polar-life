@@ -179,6 +179,7 @@ function layoutLegenda(f,fr,leg,s){
   var preset=leg?leg.preset:'simples',pos=leg?leg.pos||'abaixo':'abaixo',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],legOu,sepEst,dataTxt,locTxt;
   /* MT-01/MT-02: tudo em µm dentro desta função; fr e constantes entram em mm. */
   var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2),GAP_ACIMA=mm(2);
+  if(leg&&leg.limpa){return []} /* D-119: ocultar sem apagar também no arquivo */
   if(leg){
     legOu=leg;
     capTxt=leg.txt.on?LT.caixaLG(f.leg,leg.txt.caixa):'';
@@ -297,8 +298,8 @@ function linhas(sh,p,s){
   if(s.compr==='continua'){
     var xs={},ys={};
     sh.cells.forEach(function(c){var a=Math.round(c.x*100)/100,b=Math.round((c.x+c.w)*100)/100,d=Math.round(c.y*100)/100,e=Math.round((c.y+c.h)*100)/100;xs[a]=xs[a]||{l:0,r:0};xs[a].l=1;xs[b]=xs[b]||{l:0,r:0};xs[b].r=1;ys[d]=ys[d]||{t:0,b:0};ys[d].t=1;ys[e]=ys[e]||{t:0,b:0};ys[e].b=1});
-    Object.keys(xs).forEach(function(x){var v=+x,o=xs[x].l&&!xs[x].r?-.05:xs[x].r&&!xs[x].l?.05:0;arr.push(linha(mm(v+o),0,mm(v+o),H,cor,100))});
-    Object.keys(ys).forEach(function(y){var v=+y,o=ys[y].t&&!ys[y].b?-.05:ys[y].b&&!ys[y].t?.05:0;arr.push(linha(0,mm(v+o),W,mm(v+o),cor,100))})
+    Object.keys(xs).forEach(function(x){var v=+x,o=xs[x].l&&!xs[x].r?-.075:xs[x].r&&!xs[x].l?.075:0;arr.push(linha(mm(v+o),0,mm(v+o),H,cor,150))});
+    Object.keys(ys).forEach(function(y){var v=+y,o=ys[y].t&&!ys[y].b?-.075:ys[y].b&&!ys[y].t?.075:0;arr.push(linha(0,mm(v+o),W,mm(v+o),cor,150))})
   }else sh.cells.forEach(function(c){
     [[c.x,c.y,-1,-1],[c.x+c.w,c.y,1,-1],[c.x,c.y+c.h,-1,1],[c.x+c.w,c.y+c.h,1,1]].forEach(function(q){
       var ax=Math.min(5,q[2]<0?q[0]:p.w-q[0]),ay=Math.min(5,q[3]<0?q[1]:p.h-q[1]);
@@ -313,9 +314,9 @@ function linhas(sh,p,s){
           if(q[3]>0&&d.y>=c.y+c.h-.01)ay=Math.min(ay,d.y-(c.y+c.h))
         }
       });
-      var x=q[0]+.05*q[2],y=q[1]+.05*q[3];
-      if(q[2]<0)arr.push(linha(mm(x-ax),mm(y),mm(x),mm(y),cor,100));else arr.push(linha(mm(x),mm(y),mm(x+ax),mm(y),cor,100));
-      if(q[3]<0)arr.push(linha(mm(x),mm(y-ay),mm(x),mm(y),cor,100));else arr.push(linha(mm(x),mm(y),mm(x),mm(y+ay),cor,100))
+      var x=q[0]+.075*q[2],y=q[1]+.075*q[3];
+      if(q[2]<0)arr.push(linha(mm(x-ax),mm(y),mm(x),mm(y),cor,150));else arr.push(linha(mm(x),mm(y),mm(x+ax),mm(y),cor,150));
+      if(q[3]<0)arr.push(linha(mm(x),mm(y-ay),mm(x),mm(y),cor,150));else arr.push(linha(mm(x),mm(y),mm(x),mm(y+ay),cor,150))
     })
   });
   return arr
