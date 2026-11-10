@@ -40,7 +40,7 @@ try {
   ok(compartilhado.n === 1 && compartilhado.nome === 'Polar-Life.pdf' && compartilhado.tamanho > 1000, 'compartilhar recebe o arquivo real guardado');
   /* Fotos pessoais nunca entram no repositório: o navegador as lê diretamente da pasta local. */
   try {
-    const fotos = process.env.PL_FOTOS || join(process.env.USERPROFILE || '', 'Desktop', 'fotos para o polarlife');
+    const fotos = process.env.PL_FOTOS || fileURLToPath(new URL('../../.local/fotos-de-teste/', import.meta.url));   // pasta ignorada pelo git (T5)
     const xs = (await readdir(fotos)).filter(x => /\.jpe?g$/i.test(x)).slice(0, 24).map(x => join(fotos, x));
     if (xs.length < 24) throw new Error('menos de 24 JPEGs');
     await page.goto(srv.url + 'app/editor/gerar/');

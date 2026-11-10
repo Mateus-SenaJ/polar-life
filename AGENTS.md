@@ -37,7 +37,7 @@ Mais o teste específico da tarefa. Não faça `git commit` nem `git push`: o or
 Não apague arquivos fora do escopo da tarefa. Não mexa em `docs/` (só o orquestrador atualiza STATUS e o log de decisões).
 
 ## Fotos reais de teste (privacidade, T5)
-As fotos pessoais do dono ficam em `%USERPROFILE%\Desktop\fotos para o polarlife\` (69 JPEGs de ~12 MP).
-Testes podem **ler** essa pasta (variável `PL_FOTOS`, padrão esse caminho), mas **nunca** copiar, recortar, redimensionar
+As fotos pessoais do dono ficam em `.local/fotos-de-teste/` dentro do repositório (pasta **ignorada pelo git**; 69 JPEGs de ~12 MP).
+Testes podem **ler** essa pasta (variável `PL_FOTOS`, padrão `.local/fotos-de-teste/`), mas **nunca** copiar, recortar, redimensionar
 ou salvar essas fotos (nem derivados) dentro do repositório. Saídas de teste vão para `tests/saida/` (ignorada no git).
 Se a pasta não existir, o teste pula as conferências com foto real e avisa.

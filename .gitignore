@@ -14,3 +14,8 @@ tests/saida/
 # Vercel CLI (vínculo local do projeto) e segredos
 .vercel
 .env*
+
+# Pasta única do projeto (2026-11-10): arquivos pessoais e de trabalho ficam DENTRO do repositório, mas nunca sobem
+# .local: fotos pessoais de teste (T5), códigos de teste em texto, zip original · .trabalho: cópias de trabalho dos agentes e deploy
+.local/
+.trabalho/
