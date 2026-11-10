@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" type="image/png" href="../assets/img/logos/Logo_favicon_PolarLife.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icones/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/img/icones/favicon-16.png">
+<link rel="apple-touch-icon" href="../assets/img/icones/apple-touch-icon-180.png">
+<link rel="manifest" href="../app/manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-title" content="Polar Life">
+<link rel="stylesheet" href="../assets/css/ui/pwa.css">
 <title>Polar Life · Seus projetos</title>
 <meta name="description" content="Seus projetos de polaroids, salvos neste aparelho.">
 <meta name="color-scheme" content="light">
@@ -73,6 +79,11 @@
 
 <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p></div>
 
+<div class="note" id="aviso-espaco" role="status" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01"/></svg><p>O espaço deste aparelho para o Polar Life está acima de 80%. Salve um backup (.polarlife) e apague os projetos que você não usa mais.</p></div>
+<div class="pwa-barra" id="pwa-barra" hidden>
+<button type="button" class="btn2" id="pwa-instalar" hidden><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Instalar o Polar Life</button>
+<div class="pwa-dica" id="pwa-dica-ios" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg><p>No iPhone: Compartilhar → Adicionar à Tela de Início</p><button type="button" id="pwa-dica-fechar" aria-label="Fechar dica"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+</div>
 <ul class="legal">
 <li><a href="../legal/#privacidade">Privacidade</a></li>
 <li><a href="../legal/#termos">Termos</a></li>
@@ -92,5 +103,6 @@
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-undo" hidden>Desfazer</button></div>
 
 <script src="../assets/js/pages/home.js" defer></script>
+<script src="../assets/js/ui/pwa.js" defer></script>
 </body>
 </html>
