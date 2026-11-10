@@ -59,8 +59,8 @@ $('grid').addEventListener('click',function(e){
   else toast('Ainda não está disponível.');
 });
 
-/* ===== Importação do aparelho (DOC-08 §5: JPEG, PNG, WebP, HEIC/HEIF) ===== */
-var EXT=/\.(jpe?g|png|webp|heic|heif)$/i,MIME=/^image\/(jpeg|png|webp|heic|heif)$/i;
+/* D-132: a leitura detalhada é delegada a PLIMPORTAR; aqui só aceita a escolha. */
+var EXT=/\.(jpe?g|png|webp|avif|heic|heif|tif?f|dng|cr2|cr3|nef|arw|raf|orf|rw2|zip)$/i,MIME=/^image\/(jpeg|png|webp|avif|heic|heif|tiff)$/i;
 function accepted(f){return EXT.test(f.name)||MIME.test(f.type)}
 function plural(n,s,p){return n+' '+(n===1?s:p)}
 function limiteFotos(){ /* D-027: o teto de fotos vem do plano, nunca copiado em código de tela */
@@ -69,6 +69,11 @@ function limiteFotos(){ /* D-027: o teto de fotos vem do plano, nunca copiado em
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function receive(list){
+  if(window.PLIMPORTAR&&!(list&&list.__plExpandido)){ /* D-132: .zip e RAW viram fotos; cada arquivo com problema sai sozinho, com aviso */
+    PLIMPORTAR.expandir([].slice.call(list||[])).then(function(r){
+      if(r.erros.length)toast(r.erros.length===1?r.erros[0]:r.erros.length+' arquivos ficaram de fora. '+r.erros[0]);
+      var a=r.arquivos;a.__plExpandido=true;if(a.length)receive(a)});
+    return}
   var all=[].slice.call(list||[]);if(!all.length)return;
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
   var max=limiteFotos(),cabem=Math.max(0,max-JA.length-picked.length),extra=ok.length-cabem;
@@ -96,7 +101,7 @@ function render(bad,extra){
   }
   if(bad&&bad.length){
     var um=bad.length===1,nm=bad[0].replace(/[<>&"]/g,'');
-    h+='<div class="msg msg--err" role="alert"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><p><strong>'+(um?'Este arquivo não é uma foto':plural(bad.length,'arquivo não é uma foto','arquivos não são fotos'))+'.</strong> '+(um?'«'+nm+'» não pôde ser usado. ':'')+'Escolha JPEG, PNG, WebP ou HEIC.</p></div>';
+    h+='<div class="msg msg--err" role="alert"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><p><strong>'+(um?'Este arquivo não é uma foto':plural(bad.length,'arquivo não é uma foto','arquivos não são fotos'))+'.</strong> '+(um?'«'+nm+'» não pôde ser usado. ':'')+'Escolha uma foto, RAW com prévia JPEG ou uma pasta ZIP.</p></div>';
   }
   g.innerHTML=h;g.hidden=!h;
   var led=$('btn-device'),t=$('btn-device-t');

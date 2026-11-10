@@ -51,7 +51,8 @@ try {
     const realDl = page.waitForEvent('download'); await page.getByRole('button', { name: /^Baixar$/ }).click(); const real = await realDl;
     const realPath = join(fileURLToPath(saida), 'pdf-real.pdf'); await real.saveAs(realPath);
     const bytes = await (await import('node:fs/promises')).readFile(realPath), realDoc = await PDFDocument.load(bytes);
-    ok(realDoc.getPageCount() === 6 && !bytes.includes(Buffer.from('Exif\0\0')) && !bytes.includes(Buffer.from('GPS')), 'fotos reais: 6 folhas sem EXIF/GPS (' + ((Date.now() - inicio) / 1000).toFixed(1) + ' s)');
+    /* a localização só existe dentro do bloco EXIF; «GPS» solto aparece por acaso nos dados comprimidos de um PDF grande */
+    ok(realDoc.getPageCount() === 6 && !bytes.includes(Buffer.from('Exif\0\0')), 'fotos reais: 6 folhas sem bloco EXIF (' + ((Date.now() - inicio) / 1000).toFixed(1) + ' s, ' + (bytes.length / 1e6).toFixed(1) + ' MB)');
   } catch { console.log('– fotos reais ausentes ou indisponíveis: conferência opcional pulada'); }
 } finally { await nav.close(); srv.fechar(); }
 console.log(falhas.length ? `\n✘ gerar real: ${falhas.length} falha(s)` : '\n✔ gerar real: sem falhas');

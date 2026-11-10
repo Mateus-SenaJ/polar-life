@@ -22,18 +22,28 @@ try{var Qd=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
   }}catch(e){LISTA=[];TXT={};META={};LG=null}
 if(POCKET&&!LG)LG=PLTEXTO.legPocket(PLTEXTO.LEG0);              /* D-113: sem estado salvo, entra com o padrão do Pocket */
 if(!LISTA.length)try{var _l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(_l)&&_l.length>=1&&_l.length<=400&&_l.every(function(x){return x>=1&&x<=400&&x%1===0}))LISTA=_l}catch(e){}
-if(!LISTA.length)for(var i=1;i<=24;i++)LISTA.push(i);      /* origem de cada foto; o Quadro grava a lista ao duplicar e remover */
-var FOTOS=LISTA.map(function(sr,k){return{n:k+1,src:sr,v:!!VERT[sr],leg:TXT[k+1]!==undefined?TXT[k+1]:LEG[(sr-1)%4],m:META[k+1]||null}});
+if(!LISTA.length&&!PLTEXTO.ehReal())for(var i=1;i<=24;i++)LISTA.push(i);      /* sem lista: projeto de exemplo (DOC-04 §6); projeto real vazio fica vazio */
+var FOTOS=LISTA.map(function(sr,k){return{n:k+1,src:sr,v:!!VERT[sr],leg:TXT[k+1]!==undefined?TXT[k+1]:(PLTEXTO.ehReal()?'':LEG[(sr-1)%4]),m:META[k+1]||null}});
 /* 44: projeto real (pl-fotos) → sem legendas, datas ou orientação de exemplo; os dados vêm do IndexedDB
    (data original do EXIF e dimensões reais) e a cidade é a que a pessoa digitar (BR-06: nunca coordenada). */
 var REAL_ED=PLTEXTO.ehReal();
 if(REAL_ED){FOTOS.forEach(function(f){if(TXT[f.n]===undefined)f.leg='';f.v=false});
   if(window.PLFOTOS)Promise.all(FOTOS.map(function(f){return PLFOTOS.ler(f.src).catch(function(){return null})})).then(function(rs){
     rs.forEach(function(r,i){if(!r)return;var f=FOTOS[i],iso=r.meta&&r.meta.iso||'';
-      f.v=(r.h||0)>(r.w||0);
+      f.v=(r.h||0)>(r.w||0);if(r.w&&r.h)f.px={w:r.w,h:r.h};   /* pixels reais para a qualidade (BR-12) */
       if(!f.m)f.m={iso:iso,c:''};else if(!f.m.iso&&iso)f.m.iso=iso});
     if(typeof render==='function')render()
   })}
+/* BR-12 · D-130: PPI efetivo de uma foto nas folhas. Usa o valor do Quadro (pl-ppi) quando existe; senão calcula com
+   os pixels reais e o recorte salvo (zoom 100%, preencher, sem giro por padrão). Sem pixels reais, não arrisca: sem ponto. */
+var PPI_Q=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-ppi')||'null');return Array.isArray(a)&&a.length===FOTOS.length?a:null}catch(e){return null}})();
+var EST_Q=(function(){try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');return Array.isArray(q)&&q.length===FOTOS.length+1?q:null}catch(e){return null}})();
+function ppiDe(f){
+  if(PPI_Q&&typeof PPI_Q[f.n-1]==='number')return PPI_Q[f.n-1];
+  if(!f.px)return 0;
+  var e=EST_Q&&EST_Q[f.n]||{},z=e.z||100,rot=e.rot||0,w=rot%180?f.px.h:f.px.w,h=rot%180?f.px.w:f.px.h,jq=FR.jw/FR.jh;   /* jq como no Quadro: largura ÷ altura da janela */
+  var b=e.modo==='encaixar'?Math.min(1/w,1/(jq*h)):Math.max(1/w,1/(jq*h));
+  return Math.round(1/(b*z/100)/FR.jw*25.4)}
 var NF=FOTOS.length;
 document.getElementById('scope-t').textContent='Alterando: Todas as fotos · '+NF;
 document.getElementById('apply-t').textContent='Aplicar ao lote · '+NF+(NF===1?' foto':' fotos');
@@ -114,6 +124,7 @@ function polaroid(c,s,px,det){
   }
   if(det&&D.assin){var dirSig=PLTEXTO.assinaturaDir(LG||PLTEXTO.LEG0,FR); /* D-119: assinatura segue o plano */
     html+='<img class="pol__sig" src="../../assets/img/logos/Logo_tipografia_lateral.png" alt="" style="'+(dirSig?'right':'left')+':'+FR.lado*px+'px;bottom:'+3*px+'px;width:'+3.9*2.9*px+'px">'}
+  if(det&&window.PLQUALIDADE){var qp=ppiDe(c.f);if(qp)html+=PLQUALIDADE.ponto(qp,{decorativo:true}).outerHTML}   /* D-130: ponto na moldura (a folha é role=img) */
   return html+'</div></figure>'
 }
 function linhas(sh,p,px){                                          /* guias de corte · FN-02 · MT-04 */
@@ -191,6 +202,7 @@ function render(){
   R=PLFOLHAS.paginar(D,FR,FOTOS);
   var N=R.sheets.length;if(cur>=N)cur=Math.max(0,N-1);
   var p=R.p,orient=D.orient==='paisagem'?'paisagem':'retrato';
+  var outro=Object.assign({},D,{orient:D.orient==='paisagem'?'retrato':'paisagem'}),RO=PLFOLHAS.paginar(outro,FR,FOTOS),sug=$('sug-orient');if(sug){var eco=!R.erro&&!RO.erro&&RO.sheets.length<R.sheets.length;sug.hidden=!eco;if(eco){var no=outro.orient==='paisagem'?'Paisagem':'Retrato';$('sug-orient-t').textContent=no+': '+RO.g.n+' por folha · economiza '+(R.sheets.length-RO.sheets.length)+' folha'+(R.sheets.length-RO.sheets.length===1?'':'s');$('sug-orient-b').textContent='Usar '+no.toLowerCase();$('sug-orient-b').onclick=function(){D.orient=outro.orient;commit('orient')}}}
   /* campos */
   var sel=$('papel');if(!sel.options.length){[['A4','A4 (210 × 297 mm)'],['A3','A3 (297 × 420 mm)'],['A5','A5 (148 × 210 mm)'],['13x18','13 × 18 cm (130 × 180 mm)'],['10x15','10 × 15 cm (100 × 150 mm)'],['custom','Personalizado (50–1000 mm)']].forEach(function(o){var e=document.createElement('option');e.value=o[0];sel.appendChild(e)})}
   [].forEach.call(sel.options,function(o){
@@ -240,11 +252,12 @@ function render(){
 }
 function desenharMesa(){
   var st=$('stage'),sh=$('sheet'),p=R.p;
-  if(R.erro){sh.className='sheet is-empty';var px0=Math.min(st.clientWidth*.7/p.w,st.clientHeight/p.h);sh.style.width=p.w*px0+'px';sh.style.height=p.h*px0+'px';sh.innerHTML='';sh.setAttribute('aria-label','Folha vazia. A polaroid não cabe neste papel.');return}
+  if(R.erro||!R.sheets.length){sh.className='sheet is-empty';   /* sem folha: papel pequeno demais ou projeto ainda sem fotos */var px0=Math.min(st.clientWidth*.7/p.w,st.clientHeight/p.h);sh.style.width=p.w*px0+'px';sh.style.height=p.h*px0+'px';sh.innerHTML='';sh.setAttribute('aria-label','Folha vazia. A polaroid não cabe neste papel.');return}
   sh.className='sheet';
   var px=Math.min((st.clientWidth-8)/p.w,(st.clientHeight-8)/p.h);if(!(px>0))px=2;
   desenhar(sh,R.sheets[cur],p,px,px>1,cur,R.sheets.length);
-  sh.setAttribute('aria-label','Folha '+(cur+1)+' de '+R.sheets.length+', '+R.sheets[cur].cells.length+' polaroids');
+  var qps=R.sheets[cur].cells.map(function(c){return ppiDe(c.f)}).filter(Boolean);
+  sh.setAttribute('aria-label','Folha '+(cur+1)+' de '+R.sheets.length+', '+R.sheets[cur].cells.length+' polaroids'+(qps.length&&window.PLQUALIDADE?', '+PLQUALIDADE.resumo(qps):''));
   var av=$('aviso-leg');if(av){av.hidden=!FORA;av.textContent=FORA?'Atenção: a legenda sai da área segura em '+FORA+(FORA===1?' polaroid':' polaroids')+' desta folha. Ajuste o corpo ou a posição na aba Legendas do Quadro, ou ligue «Ajustar para caber».':''}
   $('ctx-scale').textContent=Math.round(px/(96/25.4)*100)+'%'
 }
@@ -265,6 +278,8 @@ function faixa(){
 function ir(i){if(i<0||i>=R.sheets.length)return;cur=i;render();var c=document.querySelector('.th[aria-current]');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',inline:'nearest'})}
 $('sheet').addEventListener('click',function(e){var p=e.target.closest&&e.target.closest('.pol');if(p&&p.getAttribute('data-n'))location.href='quadro/#foto-'+p.getAttribute('data-n')});
 $('prev').onclick=function(){ir(cur-1)};$('next').onclick=function(){ir(cur+1)};
+document.addEventListener('keydown',function(e){if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA')ir(cur+(e.key==='ArrowLeft'?-1:1))});
+var toqueX;$('stage').addEventListener('pointerdown',function(e){toqueX=e.clientX});$('stage').addEventListener('pointerup',function(e){if(toqueX!=null&&Math.abs(e.clientX-toqueX)>40)ir(cur+(e.clientX<toqueX?1:-1));toqueX=null});
 
 /* ---------- histórico (FN-00c) ---------- */
 function commit(k){
@@ -322,7 +337,7 @@ $('apply').onclick=function(){toast('Aplicado a '+NF+(NF===1?' foto':' fotos'))}
 $('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){window.PLPREVOO.abrir(this)};   /* T-18 · pré-voo */
 /* gancho para o pré-voo: mede a legenda em todas as folhas, desenhando-as fora da tela */
-window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,
+window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
   foraTodas:function(){var t=0,box=document.createElement('div');box.setAttribute('aria-hidden','true');box.style.cssText='position:absolute;left:-99999px;top:0;visibility:hidden';document.body.appendChild(box);
     R.sheets.forEach(function(sh,i){var el=document.createElement('div');el.className='sheet';el.style.position='relative';box.appendChild(el);desenhar(el,sh,R.p,4,true,i,R.sheets.length);t+=FORA});
     document.body.removeChild(box);return t}}}};

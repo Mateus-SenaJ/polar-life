@@ -7,7 +7,8 @@ var SRCMAP=function(n){return n};                                  /* posição 
 var ADJ0={brilho:0,contraste:0,saturacao:0,temp:0,realces:0,sombras:0,nitidez:0,vinheta:0};
 function copia(o){return JSON.parse(JSON.stringify(o))}
 function novo(){return{modo:'preencher',z:100,ang:0,px:0,py:0,rot:0,flip:false,adj:copia(ADJ0),txt:null,flt:{id:'original',int:100}}}
-function nat(n){return VERT[SRCMAP(n)]?{w:976,h:1300}:{w:1300,h:976}}      /* pixels da foto de exemplo [HIPÓTESE]: dá 326 PPI a 100% */
+var REAL_DIM={};   /* D-130 · BR-12: pixels reais de cada foto (src → {w,h}), lidos do IndexedDB */
+function nat(n){var r=REAL_DIM[SRCMAP(n)];if(r)return r;return VERT[SRCMAP(n)]?{w:976,h:1300}:{w:1300,h:976}}      /* sem foto real: pixels da foto de exemplo [HIPÓTESE], 326 PPI a 100% */
 function efet(n,s){var a=nat(n);return s.rot%180?{w:a.h,h:a.w}:a}
 function jq(){return FR.jw/FR.jh}                                   /* proporção da janela (largura ÷ altura); 1 = quadrada */
 function base(n,s){var e=efet(n,s),a=1/e.w,b=1/(jq()*e.h);return s.modo==='encaixar'?Math.min(a,b):Math.max(a,b)}   /* largura da janela por pixel, com zoom 100% (px e py são frações da largura e da altura da janela) */
@@ -33,7 +34,7 @@ function acertar(n,s){                                             /* zoom, âng
   return s
 }
 function ppi(n,s){return Math.round(1/(base(n,s)*s.z/100)/FR.jw*25.4)}   /* BR-12 */
-function nivel(p){return p>=240?'boa':p>=180?'abaixo':p>=120?'ressalvas':'ruim'}
+function nivel(p){return typeof window!=='undefined'&&window.PLQUALIDADE?PLQUALIDADE.nivel(p):p>=300?'excelente':p>=150?'boa':'borrada'}   /* D-130: fonte única em PLQUALIDADE */
 function zmaxPara(n,s,alvo){return Math.floor((1/base(n,s))/(alvo*FR.jw/25.4)*100)}
 function ajustou(s){return JSON.stringify(s.adj)!==JSON.stringify(ADJ0)||(s.flt&&s.flt.id!=='original')}
 function mudou(s){var c=JSON.parse(JSON.stringify(s));delete c.meta;delete c.src;return JSON.stringify(c)!==JSON.stringify(novo())}   /* metadados não contam como ajuste */
@@ -62,7 +63,7 @@ else{LISTA0.forEach(function(sr){var e=novo();e.src=sr;
 N=ST.length-1;
 SRCMAP=function(n){return ST[n]&&ST[n].src||n};
 /* Metadados da foto real ficam no aparelho; GPS só sinaliza existência (BR-06). */
-if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src)})).then(function(a){a.forEach(function(r,i){if(r){ST[i+1].meta=r.meta||{};if(r.w&&r.h)VERT[ST[i+1].src]=r.h>r.w?1:0}});if(window.PLLEG)PLLEG.render();guardarLista()});
+if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src)})).then(function(a){a.forEach(function(r,i){if(r){ST[i+1].meta=r.meta||{};if(r.w&&r.h){VERT[ST[i+1].src]=r.h>r.w?1:0;REAL_DIM[ST[i+1].src]={w:r.w,h:r.h}}}});if(window.PLLEG)PLLEG.render();render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
 function src(n){return SRCMAP(n)}
 function guardarLista(){try{sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(ST));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 var h0=(location.hash.match(/^#foto-(\d+)$/)||[])[1];cur=Math.min(cur,N);if(h0&&+h0>=1&&+h0<=N)cur=+h0;
@@ -121,7 +122,7 @@ var SL=[
  {id:'temp',t:'Temperatura',u:'',min:-100,max:100,step:1,dec:0,def:0,adj:1,h:function(){return'De −100 (azulado) a +100 (alaranjado).'}},
  {id:'realces',t:'Realces',u:'',min:-100,max:100,step:1,dec:0,def:0,adj:1,h:function(){return'De −100 a +100. Recupera céu estourado.'}},
  {id:'sombras',t:'Sombras',u:'',min:-100,max:100,step:1,dec:0,def:0,adj:1,h:function(){return'De −100 a +100. Abre áreas escuras.'}},
- {id:'nitidez',t:'Nitidez',u:'',min:0,max:100,step:1,dec:0,def:0,adj:1,h:function(s){var p=ppi(cur,s);return p>=300?'De 0 a 100. Aplicada só ao exportar (esta foto: '+p+' PPI).':'De 0 a 100. Só vale a partir de 300 PPI; esta foto tem '+p+' PPI.'}},
+ {id:'nitidez',t:'Nitidez',u:'',min:0,max:100,step:1,dec:0,def:0,adj:1,h:function(s){return nivel(ppi(cur,s))==='excelente'?'De 0 a 100. Aplicada só ao exportar.':'De 0 a 100. Melhora fotos com qualidade excelente.'}},
  {id:'vinheta',t:'Vinheta',u:'',min:0,max:100,step:1,dec:0,def:0,adj:1,h:function(){return'De 0 a 100. Escurece as bordas, sem cor.'}}
 ];
 SL.forEach(function(c){
@@ -182,22 +183,23 @@ function dimensionar(){
   if(window.PLMOL)PLMOL.regua();
   $('ctx-scale').textContent=Math.round(pw/(FR.w*96/25.4)*100)+'%'
 }
-var ROT={boa:'Boa',abaixo:'Abaixo do ideal',ressalvas:'Com ressalvas',ruim:'Ruim'},ICO={boa:'verified',abaixo:'alert',ressalvas:'warn',ruim:'cancel'};
+var ROT={excelente:'Excelente',boa:'Boa',borrada:'Pode sair borrada'},ICO={excelente:'verified',boa:'alert',borrada:'cancel'};
 function qualidade(){
   var s=S(),p=ppi(cur,s),nv=nivel(p),sl=$('seal');
-  sl.setAttribute('data-n',nv);sl.querySelector('use').setAttribute('href','#i-'+ICO[nv]);$('seal-level').textContent=ROT[nv];$('seal-ppi').textContent=p+' PPI';
-  var m=$('qmsg'),b=$('qmsg-b');m.hidden=nv==='boa';
-  if(nv!=='boa'){
-    b.className='msg '+(nv==='ruim'?'msg--err':'msg--warn');
-    $('qmsg-i').querySelector('use').setAttribute('href',nv==='ruim'?'#i-x':'#i-warn');
-    $('qmsg-t').textContent='Resolução de '+p+' PPI na janela. '+(nv==='abaixo'?'Revise o recorte antes de imprimir.':nv==='ressalvas'?'Reduza o zoom ou escolha um formato menor.':'Troque a foto ou escolha um formato menor.')
+  sl.setAttribute('data-n',nv);sl.querySelector('use').setAttribute('href','#i-'+ICO[nv]);$('seal-level').textContent=ROT[nv];
+  var m=$('qmsg'),b=$('qmsg-b');m.hidden=nv==='excelente';
+  if(nv!=='excelente'){
+    b.className='msg '+(nv==='borrada'?'msg--err':'msg--warn');
+    $('qmsg-i').querySelector('use').setAttribute('href',nv==='borrada'?'#i-x':'#i-warn');
+    $('qmsg-t').textContent=nv==='boa'?'Boa para este tamanho. Use uma foto maior ou diminua o zoom para melhorar.':'Pode sair borrada. Use uma foto maior ou diminua o zoom.'
   }
+  var mold=$('pq'),ant=mold&&mold.querySelector('.pl-qualidade');if(ant)ant.remove();if(mold&&window.PLQUALIDADE)mold.appendChild(PLQUALIDADE.ponto(p));
   return nv
 }
 function thumb(i){
   var b=$('faixa').children[i-1].firstChild,s=ST[i],t=b.querySelector('.tq');
   t.innerHTML='<div class="ph" style="'+estilo(i,s)+';filter:none">'+cena(i,0)+'</div>';
-  b.classList.toggle('th--alert',nivel(ppi(i,s))!=='boa');
+  b.classList.toggle('th--alert',nivel(ppi(i,s))!=='excelente');
   var nv=nivel(ppi(i,s));
   b.setAttribute('aria-label','Foto '+p2(i)+' de '+N+(mudou(s)?', ajustada':'')+(nv!=='boa'?', '+ROT[nv].toLowerCase():'')+(window.PLLOTE&&PLLOTE.sel(i)?', selecionada':''));
   if(i===cur)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')
@@ -297,7 +299,7 @@ var ACT={
   rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;commit('rfoto');toast('Recorte da foto restaurado',true)},
   reduzir:function(){
     var s=S(),mx=zmaxPara(cur,s,240),z=Math.max(zmin(s,cur),Math.min(s.z,mx));s.z=z;commit('reduzir');
-    toast('Zoom em '+S().z+'% · '+ppi(cur,S())+' PPI',true)
+    toast('Zoom em '+S().z+'% · '+ROT[nivel(ppi(cur,S()))],true)
   }
 };
 [].forEach.call(document.querySelectorAll('[data-act]'),function(b){b.onclick=function(){ACT[b.getAttribute('data-act')]()}});

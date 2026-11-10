@@ -1,0 +1,18 @@
+/* D-130 · ponto de qualidade. Única exceção à T2: o vermelho #D7263D, só neste indicador (o verificar confere).
+   Azul cheio = excelente · anel laranja = boa · vermelho com traço = pode sair borrada (T3: forma + texto). */
+.pl-qualidade{position:absolute;z-index:5;top:-14px;right:-14px;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;background:transparent;cursor:help;-webkit-tap-highlight-color:transparent}
+.pl-qualidade__p{position:relative;display:block;width:8px;height:8px;border-radius:50%;background:#006194;box-sizing:border-box}
+.pl-qualidade--boa .pl-qualidade__p{background:#FFFFFF;border:2px solid #FD761A}
+.pl-qualidade--borrada .pl-qualidade__p{background:#D7263D}
+.pl-qualidade--borrada .pl-qualidade__p::after{content:"";position:absolute;left:1px;top:3.5px;width:6px;height:1px;background:#FFFFFF;transform:rotate(-45deg)}
+.pl-qualidade__bal{position:absolute;right:8px;top:40px;display:none;width:200px;padding:8px 10px;background:#000000;color:#FFFFFF;border-radius:8px;font:400 12px/1.4 'Inter',system-ui,sans-serif;text-align:left;box-shadow:0 6px 18px rgb(0 0 0/.18)}
+.pl-qualidade__bal strong{font-weight:500}
+/* balão: cursor em cima, foco do teclado ou toque (o toque foca o botão) */
+.pl-qualidade:hover .pl-qualidade__bal,.pl-qualidade:focus .pl-qualidade__bal{display:block}
+.pl-qualidade:focus{outline:none}
+.pl-qualidade:focus-visible .pl-qualidade__p{outline:2px solid #006194;outline-offset:3px}
+/* nas folhas as polaroids são pequenas e vizinhas: alvo de 24 px (WCAG 2.2 · 2.5.8) e só desenho (a folha é role="img") */
+.pl-qualidade--folha{top:-6px;right:-6px;width:24px;height:24px}
+.pl-qualidade--folha .pl-qualidade__bal{top:22px;right:4px;width:180px}
+@media (forced-colors:active){.pl-qualidade__p{forced-color-adjust:none}}
+@media print{.pl-qualidade{display:none}}

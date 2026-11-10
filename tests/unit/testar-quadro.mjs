@@ -6,12 +6,12 @@ const motor = src.split('/*MOTOR*/')[1].split('/*FIM MOTOR*/')[0];
 const M = new Function(motor + '; return {FR,VERT,novo,nat,base,zmin,jq,cabe,acertar,ppi,nivel,zmaxPara,ajustou,mudou,setSrc:f=>{SRCMAP=f;}};')();
 let falhas = 0; const ok = (c, m) => { if (!c) { falhas++; console.log('FALHA', m); } };
 
-// DOC-04 §6: «Boa · 326 PPI», «Com ressalvas · 140 PPI»
-let s = M.novo(); ok(M.ppi(3, s) === 326 && M.nivel(326) === 'boa', 'padrão = 326 PPI Boa');
-s = M.novo(); s.z = 233; ok(M.ppi(12, s) === 140 && M.nivel(140) === 'ressalvas', 'foto 12 = 140 PPI Com ressalvas');
-s = M.novo(); s.z = 400; ok(M.ppi(3, s) === 82 && M.nivel(82) === 'ruim', 'zoom 400% = Ruim');
-s = M.novo(); s.z = 150; ok(M.nivel(M.ppi(3, s)) === 'abaixo', 'zoom 150% = Abaixo do ideal (' + M.ppi(3, s) + ')');
-[[239, 'abaixo'], [240, 'boa'], [180, 'abaixo'], [179, 'ressalvas'], [120, 'ressalvas'], [119, 'ruim']].forEach(([p, n]) => ok(M.nivel(p) === n, 'faixa ' + p));
+// D-130: a mesma fonte da classificação na tela e nos arquivos.
+let s = M.novo(); ok(M.ppi(3, s) === 326 && M.nivel(326) === 'excelente', 'padrão excelente');
+s = M.novo(); s.z = 233; ok(M.ppi(12, s) === 140 && M.nivel(140) === 'borrada', 'foto 12 pode sair borrada');
+s = M.novo(); s.z = 400; ok(M.ppi(3, s) === 82 && M.nivel(82) === 'borrada', 'zoom 400% pode sair borrada');
+s = M.novo(); s.z = 150; ok(M.nivel(M.ppi(3, s)) === 'boa', 'zoom 150% boa');
+[[149, 'borrada'], [150, 'boa'], [299, 'boa'], [300, 'excelente']].forEach(([p, n]) => ok(M.nivel(p) === n, 'faixa ' + p));
 // Reduzir recorte leva a ≥ 240 PPI
 s = M.novo(); s.z = 233; s.z = M.zmaxPara(12, s, 240); ok(M.ppi(12, s) >= 240, 'reduzir recorte ≥ 240 (zoom ' + s.z + ')');
 // Encaixar mostra a foto inteira: mais pixels na janela

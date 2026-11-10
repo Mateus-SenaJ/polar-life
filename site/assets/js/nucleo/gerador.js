@@ -89,7 +89,7 @@ function projeto(){
     q.slice(1).forEach(function(e,k){lista.push(e);if(typeof e.txt==='string')txt[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')meta[k+1]=e.meta});
   }else{
     var l=null;try{l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null')}catch(e){}
-    if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=400&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}
+    if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=400&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}   /* sem lista: projeto de exemplo (DOC-04 §6) */
     l.forEach(function(sr){var e=novo(sr);if(!real&&sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(!real&&sr===12)e.z=233;lista.push(e)})
   }
   var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
@@ -353,9 +353,12 @@ function foto(proj,n,ppi,qualidade){
   var f=null;
   for(var i=0;i<proj.fotos.length;i++)if(proj.fotos[i].n===n){f=proj.fotos[i];break}
   if(!f)return Promise.reject({n:n,motivo:'Foto não encontrada'});
-  var fr=proj.fr,j=janela(fr),W=Math.round(j.jw/25.4*ppi),H=Math.round(j.jh/25.4*ppi);
-  if(W<1||H<1)return Promise.reject({n:n,motivo:'Formato inválido'});
-  function gera(real){var chave=[ppi,qualidade,W,H,JSON.stringify(f),real?real.w+'x'+real.h:'cena'].join('|');if(cacheFoto[chave])return Promise.resolve(cacheFoto[chave]);return rasterizar(f,fr,W,H,real,qualidade).then(function(r){cacheFoto[chave]=r;return r})}
+  var fr=proj.fr,j=janela(fr);
+  function gera(real){
+    /* D-131: no Pro, cada foto sai na própria resolução (nunca abaixo de 326 PPI, nunca ampliada além do original) */
+    var alvo=ppi==='nativo'?(real?Math.max(326,ppiFoto(f.src,f,fr,real)):326):ppi,W=Math.round(j.jw/25.4*alvo),H=Math.round(j.jh/25.4*alvo);
+    if(W<1||H<1)return Promise.reject({n:n,motivo:'Formato inválido'});
+    var chave=[ppi,qualidade,W,H,JSON.stringify(f),real?real.w+'x'+real.h:'cena'].join('|');if(cacheFoto[chave])return Promise.resolve(cacheFoto[chave]);return rasterizar(f,fr,W,H,real,qualidade).then(function(r){cacheFoto[chave]=r;return r})}
   /* A foto local e decodificada uma por vez; o bitmap e fechado em rasterizar (DOC-08 §6). */
   if(window.PLFOTOS&&window.PLFOTOS.ler)return window.PLFOTOS.ler(f.src).then(function(real){return gera(real)});
   return gera(null)
@@ -504,7 +507,8 @@ function preparar(p,avisos){
 }
 function pdf(proj,opcoes,cb){
   opcoes=opcoes||{};
-  var f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:326,q=f==='leve'?.72:.92,lim=opcoes.lim==null?150:opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal,escala=opcoes.escala;
+  var plano=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null,pro=!!(plano&&plano.id==='pro');
+  var f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:(pro?'nativo':326),q=f==='leve'?.72:(pro?.95:.92),lim=opcoes.lim==null?(pro?0:150):opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal,escala=opcoes.escala;
   var p=JSON.parse(JSON.stringify(proj));
   if(sem.length)p.fotos=p.fotos.filter(function(x){return sem.indexOf(x.n)<0});
   var falhasSet={},falhas=[],avisos=[];falhar.forEach(function(n){falhasSet[n]=1});

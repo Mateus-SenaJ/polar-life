@@ -89,7 +89,10 @@ for (const c of arquivos.filter(f => extname(f) === '.css')) {
     if (+m[1] > 500 || /bold/.test(m[1])) erros.push(`${rel(c)}: font-weight ${m[1]} (T1: máx. 500)`);
   for (const m of s.matchAll(/#([0-9a-fA-F]{3,8})\b/g)) {
     let h = m[1].toLowerCase(); if (h.length === 3) h = [...h].map(x => x + x).join('');
-    if (h.length === 6 && !PALETA.has('#' + h)) avisos.push(`${rel(c)}: cor fora da paleta (T2) → #${h}`);
+    if (h.length === 6 && !PALETA.has('#' + h)) {
+      if (h === 'd7263d' && rel(c).split('\\').join('/') === 'assets/css/ui/qualidade.css') continue; /* D-130 */
+      avisos.push(`${rel(c)}: cor fora da paleta (T2) → #${h}`);
+    }
   }
 }
 const unicos = a => [...new Set(a)];

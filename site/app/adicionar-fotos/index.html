@@ -44,7 +44,7 @@
 <button type="button" class="led-btn led-btn--light" id="btn-device"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content" id="btn-device-t">Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
 <button type="button" class="btn2" id="btn-camera"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Usar a câmera</button>
 </div>
-<input type="file" id="f-device" multiple accept="image/*,.heic,.heif" hidden>
+<input type="file" id="f-device" multiple accept="image/*,.avif,.heic,.heif,.tif,.tiff,.dng,.cr2,.cr3,.nef,.arw,.raf,.orf,.rw2,.zip" hidden>
 <input type="file" id="f-camera" accept="image/*" capture="environment" hidden>
 </div>
 <div class="got" id="got" aria-live="polite" hidden></div>
@@ -74,6 +74,7 @@
 
 <script src="../../assets/js/nucleo/exif.js" defer></script>
 <script src="../../assets/js/nucleo/fotos-locais.js" defer></script>
+<script src="../../assets/js/nucleo/importar.js" defer></script>
 <script src="../../assets/js/nucleo/projetos.js" defer></script>
 <script src="../../assets/js/nucleo/sessao.js" defer></script>
 <script src="../../assets/js/pages/adicionar-fotos.js" defer></script>

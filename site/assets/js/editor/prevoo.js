@@ -30,8 +30,9 @@ function analisar(){
   var coord=F.filter(function(f){return COORD.test(f.leg||'')});
   if(coord.length)bl.push('O texto da '+(coord.length===1?'foto ':'s fotos ')+coord.map(function(f){return f.n}).join(', ')+' tem coordenadas. Troque por uma cidade.');
   /* ---- Pede confirmação ---- */
-  var ru=[];F.forEach(function(f,k){var p=ppiDe(F,k);if(p<180)ru.push({n:f.n,p:p})});
-  if(ru.length)pe.push((ru.length===1?'Foto ':'Fotos ')+ru.slice(0,6).map(function(x){return x.n+' ('+x.p+' PPI)'}).join(', ')+(ru.length>6?' e mais '+(ru.length-6):'')+' com resolução baixa. Ela pode sair com pouca nitidez no papel.');
+  /* D-130: mesmo cálculo das folhas (C.ppi) e mesmo limite do ponto de qualidade; o número só aqui, entre parênteses */
+  var ru=[];F.forEach(function(f,k){var p=C.ppi&&C.ppi(f);if(!p&&!(window.PLTEXTO&&PLTEXTO.ehReal()))p=ppiDe(F,k);if(p&&(window.PLQUALIDADE?PLQUALIDADE.nivel(p)==='borrada':p<150))ru.push({n:f.n,p:p})});
+  if(ru.length)pe.push((ru.length===1?'A foto ':'As fotos ')+ru.slice(0,6).map(function(x){return x.n+' ('+x.p+' PPI)'}).join(', ')+(ru.length>6?' e mais '+(ru.length-6):'')+(ru.length===1?' pode sair borrada':' podem sair borradas')+'. Diminua o zoom, escolha um formato menor ou use uma foto maior.');
   var arq=F.filter(function(f){return ARQ.test(String(f.leg||'').trim())});
   if(arq.length)pe.push('O texto da '+(arq.length===1?'foto ':'s fotos ')+arq.map(function(f){return f.n}).join(', ')+' parece um nome de arquivo (como IMG_0234).');
   var sd=data?F.filter(function(f){return f.m&&!f.m.iso}).length:0,sl=loc?F.filter(function(f){return f.m&&!f.m.c}).length:0;
