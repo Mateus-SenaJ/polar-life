@@ -6,7 +6,7 @@ var VERT={2:1,6:1,9:1,13:1,17:1,21:1};                             /* 6 verticai
 var SRCMAP=function(n){return n};                                  /* posição → foto de origem (muda com Duplicar e Remover) */
 var ADJ0={brilho:0,contraste:0,saturacao:0,temp:0,realces:0,sombras:0,nitidez:0,vinheta:0};
 function copia(o){return JSON.parse(JSON.stringify(o))}
-function novo(){return{modo:'preencher',z:100,ang:0,px:0,py:0,rot:0,flip:false,adj:copia(ADJ0),txt:null,flt:{id:'original',int:100}}}
+function novo(){return{modo:'preencher',z:100,ang:0,px:0,py:0,ex:0,ey:0,rot:0,flip:false,adj:copia(ADJ0),txt:null,flt:{id:'original',int:100}}}
 var REAL_DIM={};   /* D-130 · BR-12: pixels reais de cada foto (src → {w,h}), lidos do IndexedDB */
 function nat(n){var r=REAL_DIM[SRCMAP(n)];if(r)return r;return VERT[SRCMAP(n)]?{w:976,h:1300}:{w:1300,h:976}}      /* sem foto real: pixels da foto de exemplo [HIPÓTESE], 326 PPI a 100% */
 function efet(n,s){var a=nat(n);return s.rot%180?{w:a.h,h:a.w}:a}
@@ -37,7 +37,7 @@ function ppi(n,s){return Math.round(1/(base(n,s)*s.z/100)/FR.jw*25.4)}   /* BR-1
 function nivel(p){return typeof window!=='undefined'&&window.PLQUALIDADE?PLQUALIDADE.nivel(p):p>=300?'excelente':p>=150?'boa':'borrada'}   /* D-130: fonte única em PLQUALIDADE */
 function zmaxPara(n,s,alvo){return Math.floor((1/base(n,s))/(alvo*FR.jw/25.4)*100)}
 function ajustou(s){return JSON.stringify(s.adj)!==JSON.stringify(ADJ0)||(s.flt&&s.flt.id!=='original')}
-function mudou(s){var c=JSON.parse(JSON.stringify(s));delete c.meta;delete c.src;return JSON.stringify(c)!==JSON.stringify(novo())}   /* metadados não contam como ajuste */
+function mudou(s){var c=JSON.parse(JSON.stringify(s)),d=novo();delete c.meta;delete c.src;delete c.ex;delete c.ey;delete d.ex;delete d.ey;return JSON.stringify(c)!==JSON.stringify(d)}   /* metadados e elástico não contam como ajuste */
 /*FIM MOTOR*/
 
 var $=function(i){return document.getElementById(i)},tm;
@@ -65,7 +65,8 @@ SRCMAP=function(n){return ST[n]&&ST[n].src||n};
 /* Metadados da foto real ficam no aparelho; GPS só sinaliza existência (BR-06). */
 if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src)})).then(function(a){a.forEach(function(r,i){if(r){ST[i+1].meta=r.meta||{};if(r.w&&r.h){VERT[ST[i+1].src]=r.h>r.w?1:0;REAL_DIM[ST[i+1].src]={w:r.w,h:r.h}}}});if(window.PLLEG)PLLEG.render();render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
 function src(n){return SRCMAP(n)}
-function guardarLista(){try{sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(ST));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
+function guardarLista(){try{var s=ST.map(function(e,i){if(!i)return e;var o=copia(e);o.ex=0;o.ey=0;return o});   /* o elástico é do gesto: some quando a foto é guardada (MT-02) */
+  sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(s));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 var h0=(location.hash.match(/^#foto-(\d+)$/)||[])[1];cur=Math.min(cur,N);if(h0&&+h0>=1&&+h0<=N)cur=+h0;
 function S(){return ST[cur]}
 
@@ -91,13 +92,13 @@ function cena(n,vin){
 }
 function estilo(n,s){
   var a=nat(n),k=base(n,s)*s.z/100;
-  return 'width:'+a.w*k*100+'%;height:'+a.h*k*jq()*100+'%;left:'+(50+s.px*100)+'%;top:'+(50+s.py*100)+'%;transform:translate(-50%,-50%) rotate('+s.ang+'deg) scaleX('+(s.flip?-1:1)+') rotate('+s.rot+'deg)'
+  return 'width:'+a.w*k*100+'%;height:'+a.h*k*jq()*100+'%;left:'+(50+(s.px+(s.ex||0))*100)+'%;top:'+(50+(s.py+(s.ey||0))*100)+'%;transform:translate(-50%,-50%) rotate('+s.ang+'deg) scaleX('+(s.flip?-1:1)+') rotate('+s.rot+'deg)'
 }
 var keyMain='';
 function pintaMain(){
   var s=S(),key=cur+'|'+s.adj.vinheta;
   if(key!==keyMain){keyMain=key;var c=cena(cur,s.adj.vinheta);$('clip').innerHTML='<div class="ph">'+c+'</div>';$('ghost').innerHTML='<div class="ph">'+c+'</div>'}
-  var st=estilo(cur,s);[].forEach.call(document.querySelectorAll('#clip .ph,#ghost .ph'),function(e){e.setAttribute('style',st)});
+  var st=estilo(cur,s);[].forEach.call(document.querySelectorAll('#clip .ph,#ghost .ph,#cmp .ph'),function(e){e.setAttribute('style',st)});
   filtro(s.adj);if(window.PLFLT)PLFLT.aplicar(s)
 }
 
@@ -216,7 +217,7 @@ function faixa(){
 }
 function ir(n){
   if(n<1||n>N||n===cur)return;
-  var a=cur;cur=n;try{history.replaceState(null,'','#foto-'+n)}catch(e){}
+  var a=cur;cur=n;dbl=null;try{history.replaceState(null,'','#foto-'+n)}catch(e){}
   thumb(a);render();var c=document.querySelector('.th[aria-current]');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',inline:'nearest'})
 }
 
@@ -295,8 +296,8 @@ var ACT={
   girar:function(){var s=S();s.rot=(s.rot+90)%360;s.px=s.py=0;commit('girar')},
   espelhar:function(){var s=S();s.flip=!s.flip;commit('espelhar')},
   inteira:function(){UI.inteira=!UI.inteira;sincronizar()},
-  centralizar:function(){var s=S();s.px=s.py=0;commit('centralizar')},
-  rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;commit('rfoto');toast('Recorte da foto restaurado',true)},
+  centralizar:function(){var s=S();s.px=s.py=0;dbl=null;commit('centralizar')},
+  rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta;dbl=null;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;commit('rfoto');toast('Recorte da foto restaurado',true)},
   reduzir:function(){
     var s=S(),mx=zmaxPara(cur,s,240),z=Math.max(zmin(s,cur),Math.min(s.z,mx));s.z=z;commit('reduzir');
     toast('Zoom em '+S().z+'% · '+ROT[nivel(ppi(cur,S()))],true)
@@ -316,50 +317,144 @@ $('fprev').onclick=function(){ir(cur-1)};$('fnext').onclick=function(){ir(cur+1)
 $('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){location.href='../#revisar'};   /* o pré-voo (T-18) abre nas Folhas, onde a medida da folha existe */
 
-/* ---------- posicionar a foto: arrastar, pinça, roda e setas (FN-04, FN-12) ---------- */
-var win=$('win'),pts={},last=null,d0=0,z0=100;
+/* ---------- posicionar a foto: arrastar 1:1, pinça, roda e teclado (FN-04, FN-12) ---------- */
+var win=$('win'),pts={},gst=null,dbl=null,ultTap=0,ultX=0,ultY=0,rafE=null;
 function tam(){return win.getBoundingClientRect().width||380}
 function tamH(){return win.getBoundingClientRect().height||380}
+function parado(){try{return!!window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+function naJanela(e){var r=win.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]}   /* 0 a 1 em cada eixo */
+function dist(a,b){return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))}
+function meio(a,b){var r=win.getBoundingClientRect();return[((a.x+b.x)/2-r.left)/r.width,((a.y+b.y)/2-r.top)/r.height]}
+
+/* limite da posição: a janela continua coberta pela foto (FN-04 · nunca aparece fundo no modo Preencher) */
+function limX(n,s,py){
+  if(s.modo==='encaixar')return Math.abs(py)<=.5?0.5:0;
+  var lo=0,hi=1,m,i;if(cabe(n,s,0,py))return 1;
+  for(i=0;i<14;i++){m=(lo+hi)/2;if(cabe(n,s,m,py))lo=m;else hi=m}
+  return lo
+}
+function limY(n,s,px){
+  if(s.modo==='encaixar')return Math.abs(px)<=.5?0.5:0;
+  var lo=0,hi=1,m,i;if(cabe(n,s,px,0))return 1;
+  for(i=0;i<14;i++){m=(lo+hi)/2;if(cabe(n,s,px,m))lo=m;else hi=m}
+  return lo
+}
+function prender(n,s,px,py){                     /* posição mais próxima dentro da cobertura */
+  var i,lx,ly,lo=0,hi=1,m;
+  for(i=0;i<3;i++){lx=limX(n,s,py);if(Math.abs(px)>lx)px=px<0?-lx:lx;ly=limY(n,s,px);if(Math.abs(py)>ly)py=py<0?-ly:ly}
+  if(!cabe(n,s,px,py)){for(i=0;i<14;i++){m=(lo+hi)/2;if(cabe(n,s,px*m,py*m))lo=m;else hi=m}px*=lo;py*=lo}
+  return[px,py]
+}
+function ancorar(s,ax,ay,f){                    /* o ponto sob o ponteiro fica parado (roda, pinça, duplo clique) */
+  var W=tam(),H=tamH(),L=aEl(s,ax-.5-s.px,(ay-.5-s.py)*(H/W));
+  s.px=s.px+(1-f)*L[0];s.py=s.py+(1-f)*L[1]*(W/H)
+}
+function zoomPara(s,z,ax,ay){                   /* zoom final (absoluto) ancorado no ponto (ax,ay) */
+  var z0=s.z,z1=Math.max(zmin(s,cur),Math.min(400,Math.round(z)));
+  if(z1===z0)return;
+  ancorar(s,ax,ay,z1/z0);s.z=z1
+}
+function pintar(){pintaMain();qualidade()}      /* durante o gesto: a foto e o selo de qualidade (BR-12) */
+
+/* arrastar 1:1 com o mouse e com o dedo (Pointer Events + setPointerCapture) */
 win.addEventListener('pointerdown',function(e){
-  pts[e.pointerId]={x:e.clientX,y:e.clientY};try{win.setPointerCapture(e.pointerId)}catch(x){}
-  win.classList.add('is-drag');var k=Object.keys(pts);
-  if(k.length===2){var a=pts[k[0]],b=pts[k[1]];d0=Math.hypot(a.x-b.x,a.y-b.y);z0=S().z}
+  if(e.button!=null&&e.button>0)return;
+  var s=S();
+  pts[e.pointerId]={x:e.clientX,y:e.clientY};
+  var k=Object.keys(pts);
+  try{win.setPointerCapture(e.pointerId)}catch(x){}
+  try{win.focus()}catch(x){}
+  if(k.length===1){gst={tipo:'arrasto',id:e.pointerId,x:e.clientX,y:e.clientY,px:s.px,py:s.py};win.classList.add('is-drag')}
+  else if(k.length===2){var a=pts[k[0]],b=pts[k[1]];gst={tipo:'pinca',d0:dist(a,b),z0:s.z}}
+  e.preventDefault()
 });
 win.addEventListener('pointermove',function(e){
-  var p=pts[e.pointerId];if(!p)return;var k=Object.keys(pts),s=S();
-  if(k.length>=2){
-    pts[e.pointerId]={x:e.clientX,y:e.clientY};var a=pts[k[0]],b=pts[k[1]],d=Math.hypot(a.x-b.x,a.y-b.y);
-    if(d0>0){s.z=Math.round(z0*d/d0);acertar(cur,s);render()}
-  }else{
-    var dx=e.clientX-p.x,dy=e.clientY-p.y;pts[e.pointerId]={x:e.clientX,y:e.clientY};
-    s.px+=dx/tam();s.py+=dy/tamH();acertar(cur,s);render()
+  var p=pts[e.pointerId];if(!p||!gst)return;
+  var s=S(),k=Object.keys(pts);
+  if(gst.tipo==='pinca'&&k.length>=2){          /* pinça de dois dedos: zoom ancorado no ponto médio */
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    var a=pts[k[0]],b=pts[k[1]],d=dist(a,b),md=meio(a,b);
+    if(gst.d0>8&&d>8){dbl=null;zoomPara(s,gst.z0*d/gst.d0,md[0],md[1]);acertar(cur,s);pintar();sincronizar()}
+    return
   }
+  if(gst.tipo!=='arrasto')return;
+  var dx=e.clientX-gst.x,dy=e.clientY-gst.y;
+  if(!dx&&!dy)return;
+  ultTap=0;                                                /* arrastar cancela o duplo toque */
+  dbl=null;
+  var rawx=gst.px+dx/tam(),rawy=gst.py+dy/tamH(),pp=prender(cur,s,rawx,rawy);
+  s.px=pp[0];s.py=pp[1];
+  /* elástico na borda: a foto recua um pouco da beirada e volta ao soltar (FN-04) */
+  var rec=parado()?0:.28;
+  s.ex=Math.max(-.06,Math.min(.06,-(rawx-s.px)*rec));
+  s.ey=Math.max(-.06,Math.min(.06,-(rawy-s.py)*rec));
+  pintar()
 });
 function solta(e){
-  if(!pts[e.pointerId])return;delete pts[e.pointerId];
-  if(!Object.keys(pts).length){win.classList.remove('is-drag');commit('pos')}
+  if(!pts[e.pointerId])return;
+  var s=S(),id=e.pointerId,agora=Date.now();
+  delete pts[id];
+  if(gst&&gst.tipo==='arrasto'&&gst.id===id){
+    win.classList.remove('is-drag');
+    if(e.type==='pointerup'&&agora-ultTap<320&&Math.abs(e.clientX-ultX)<32&&Math.abs(e.clientY-ultY)<32){ultTap=0;gst=null;alternaZoom(e);return}   /* duplo clique/toque */
+    ultTap=agora;ultX=e.clientX;ultY=e.clientY;
+    voltarElastica(s);gst=null;return
+  }
+  if(gst&&gst.tipo==='pinca'){
+    var restam=Object.keys(pts);
+    if(restam.length===1){var q=pts[restam[0]];gst={tipo:'arrasto',id:restam[0],x:q.x,y:q.y,px:s.px,py:s.py}}   /* sobra um dedo: continua arrastando */
+    else gst=null;
+    commit('zoom');return
+  }
+  if(!Object.keys(pts).length){gst=null;win.classList.remove('is-drag')}
 }
 win.addEventListener('pointerup',solta);win.addEventListener('pointercancel',solta);
-win.addEventListener('wheel',function(e){e.preventDefault();var s=S();s.z+=e.deltaY<0?3:-3;commit('zoom')},{passive:false});
-function mover(dx,dy){var s=S();s.px+=dx/tam();s.py+=dy/tamH();commit('pos')}
-function zoomPor(d){S().z+=d;commit('zoom')}
+function voltarElastica(s){                     /* a mola volta ao lugar: uma entrada no histórico por gesto */
+  if(parado()||(!s.ex&&!s.ey)){s.ex=s.ey=0;pintar();commit('pos');return}
+  var x0=s.ex,y0=s.ey,t0=window.performance?performance.now():Date.now(),D=200;
+  if(rafE)cancelAnimationFrame(rafE);
+  (function passo(t){
+    var k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);
+    s.ex=x0*(1-e);s.ey=y0*(1-e);pintar();
+    if(k<1)rafE=requestAnimationFrame(passo);else{rafE=null;s.ex=s.ey=0;commit('pos')}
+  })(t0)
+}
+function alternaZoom(e){                         /* duplo clique/toque: 200% no ponto; de novo volta ao zoom anterior */
+  var s=S(),m=naJanela(e);
+  if(dbl&&dbl.n===cur){s.z=dbl.z;s.px=dbl.px;s.py=dbl.py;dbl=null}
+  else{dbl={n:cur,z:s.z,px:s.px,py:s.py};zoomPara(s,200,m[0],m[1])}
+  acertar(cur,s);commit('zoom')
+}
+/* roda: 10% por passo, ancorada no cursor; ctrlKey (pinça do trackpad): passo proporcional ao deltaY */
+win.addEventListener('wheel',function(e){
+  if(!e.deltaY)return;
+  e.preventDefault();
+  var s=S(),m=naJanela(e),f=e.ctrlKey?Math.pow(1.1,-e.deltaY/100):(e.deltaY<0?1.1:1/1.1);
+  dbl=null;zoomPara(s,s.z*f,m[0],m[1]);acertar(cur,s);commit('zoom')
+},{passive:false});
+function mover(dx,dy){                           /* dx e dy em mm (FN-12: 1 mm, Shift 5 mm) */
+  var s=S(),p=prender(cur,s,s.px+dx/FR.jw,s.py+dy/FR.jh);
+  dbl=null;s.px=p[0];s.py=p[1];s.ex=s.ey=0;commit('pos')
+}
+function zoomPor(f){var s=S();dbl=null;zoomPara(s,s.z*f,.5,.5);acertar(cur,s);commit('zoom')}
 document.addEventListener('keydown',function(e){
   var m=e.ctrlKey||e.metaKey,t=e.target,tag=t&&t.tagName;
   if(m&&!e.shiftKey&&e.key.toLowerCase()==='z'&&tag!=='INPUT'){e.preventDefault();desfazer();return}
   if(m&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))&&tag!=='INPUT'){e.preventDefault();refazer();return}
   if(m||e.altKey)return;
-  var livre=t===win||t===document.body;
+  var livre=t===win||t===document.body||!t;
   if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
   if(e.key==='['){ir(cur-1);return}
   if(e.key===']'){ir(cur+1);return}
   if(!livre)return;
-  var st=e.shiftKey?10:1;
+  var st=e.shiftKey?5:1;
   if(e.key==='ArrowLeft'){mover(-st,0);e.preventDefault()}
   else if(e.key==='ArrowRight'){mover(st,0);e.preventDefault()}
   else if(e.key==='ArrowUp'){mover(0,-st);e.preventDefault()}
   else if(e.key==='ArrowDown'){mover(0,st);e.preventDefault()}
-  else if(e.key==='+'||e.key==='='){zoomPor(1);e.preventDefault()}
-  else if(e.key==='-'||e.key==='_'){zoomPor(-1);e.preventDefault()}
+  else if(e.key==='+'||e.key==='='){zoomPor(1.1);e.preventDefault()}
+  else if(e.key==='-'||e.key==='_'){zoomPor(1/1.1);e.preventDefault()}
+  else if(e.key==='0'){ACT.centralizar();e.preventDefault()}
 });
 
 /* ---------- render ---------- */
