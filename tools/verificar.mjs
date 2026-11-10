@@ -6,6 +6,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname, resolve, relative, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const SITE = fileURLToPath(new URL('../site', import.meta.url));
 const erros = [], avisos = [];
@@ -95,6 +96,9 @@ for (const c of arquivos.filter(f => extname(f) === '.css')) {
     }
   }
 }
+// 36: a lista de arquivos do service worker precisa estar em dia (arquivo novo de /app/ sem entrar no cache)
+try { execFileSync(process.execPath, [fileURLToPath(new URL('./gerar-sw.mjs', import.meta.url)), '--checar'], { stdio: 'pipe' }); }
+catch (e) { erros.push('site/app/sw-arquivos.js desatualizado: rode npm run sw'); }
 /* 41 · T2 também nas ilustrações vetoriais: só a paleta (com opacidade), sem texto e sem recurso externo */
 for (const f of arquivos.filter(f => f.endsWith('.svg') && f.includes(join('img', 'ilustracoes')))) {
   const s = readFileSync(f, 'utf8');

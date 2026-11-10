@@ -27,7 +27,7 @@ await new Promise(r => srvPdfjs.listen(0, '127.0.0.1', r));
 const pdfjsUrl = `http://127.0.0.1:${srvPdfjs.address().port}/`;
 
 const nav = await chromium.launch();
-const page = await nav.newPage();
+const page = await (await nav.newContext({ serviceWorkers: 'block' })).newPage(); // sem SW: o teste intercepta a rede com page.route (o SW do editor serviria do cache)
 await page.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // sessão de teste: a guarda de /app/ exige conta (D-123)
 page.setDefaultTimeout(240000);
 const errosPg = [];

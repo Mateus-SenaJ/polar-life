@@ -1,0 +1,12 @@
+/* PWA · aviso de versão nova, instalar, dica do iPhone e aviso de espaço (DOC-08 §7). Só a paleta do DS (T2). */
+.pwa-aviso{position:fixed;z-index:960;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:16px;max-width:calc(100vw - 32px);padding:6px 6px 6px 16px;background:var(--white,#fff);font:500 14px 'Inter',system-ui,sans-serif;color:var(--black,#000)}
+.pwa-aviso button{height:44px;min-width:44px;padding:0 12px;border:0;background:none;color:inherit;font:500 14px 'Inter',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.pwa-aviso button:focus-visible{outline:2px solid var(--blue,#006194);outline-offset:2px}
+.pwa-barra{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:24px}
+.pwa-barra[hidden]{display:none!important}
+.pwa-dica{display:flex;align-items:center;gap:12px;padding:4px 4px 4px 16px;background:var(--white,#fff);border:1px solid var(--outline-subtle,#000);border-radius:14px;font-size:14px;line-height:1.5}
+.pwa-dica .ico{color:var(--blue,#006194)}
+.pwa-dica p{margin:0}
+.pwa-dica button{flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:12px;background:none;color:var(--black,#000);cursor:pointer}
+.pwa-dica button:hover{background:var(--surface-subtle,#F8F9FA)}
+.pwa-dica button:focus-visible{outline:2px solid var(--blue,#006194);outline-offset:2px}
