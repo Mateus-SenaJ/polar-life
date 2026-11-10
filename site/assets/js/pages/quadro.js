@@ -40,13 +40,14 @@ function mudou(s){var c=JSON.parse(JSON.stringify(s));delete c.meta;delete c.src
 /*FIM MOTOR*/
 
 var $=function(i){return document.getElementById(i)},tm;
+if(window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){document.title='Polar Life · '+p.nome+' · Quadro';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome}});
 function toast(m,undo){clearTimeout(tm);$('toast-t').textContent=m;$('toast-undo').hidden=!undo;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function nf(n,d){return (Math.round(n*(d?10:1))/(d?10:1)).toString().replace('.',',')}
 function p2(n){return(n<10?'0':'')+n}
 var LEG=['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'];
 var N=24,ST=[{}],cur=3,UI={grade:'nenhuma',inteira:false};
 function lerLista(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(a)&&a.length>=1&&a.length<=400&&a.every(function(x){return x>=1&&x<=400&&x%1===0}))return a}catch(e){}return null}
-var LISTA_REAL=lerLista(),DEMO=!LISTA_REAL;   /* 44: ajustes de exemplo só no projeto demo */
+var LISTA_REAL=lerLista(),DEMO=!(LISTA_REAL&&window.PLTEXTO&&PLTEXTO.ehReal());   /* 44: ajustes de exemplo só no projeto demo */
 var LISTA0=LISTA_REAL||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
 function lerQuadro(){                                              /* estado completo guardado ao sair para as Folhas (D-085) */
   try{var o=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
@@ -60,8 +61,10 @@ else{LISTA0.forEach(function(sr){var e=novo();e.src=sr;
   ST.push(e)})}
 N=ST.length-1;
 SRCMAP=function(n){return ST[n]&&ST[n].src||n};
+/* Metadados da foto real ficam no aparelho; GPS só sinaliza existência (BR-06). */
+if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src)})).then(function(a){a.forEach(function(r,i){if(r){ST[i+1].meta=r.meta||{};if(r.w&&r.h)VERT[ST[i+1].src]=r.h>r.w?1:0}});if(window.PLLEG)PLLEG.render();guardarLista()});
 function src(n){return SRCMAP(n)}
-function guardarLista(){try{sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(ST));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})))}catch(e){}}
+function guardarLista(){try{sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(ST));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 var h0=(location.hash.match(/^#foto-(\d+)$/)||[])[1];cur=Math.min(cur,N);if(h0&&+h0>=1&&+h0<=N)cur=+h0;
 function S(){return ST[cur]}
 
@@ -308,7 +311,7 @@ document.addEventListener('click',function(e){
 });
 $('rtudo').onclick=function(){if(!ajustou(S()))return;S().adj=copia(ADJ0);S().flt={id:'original',int:100};commit('rtudo');toast('Ajustes e filtro da foto zerados',true)};
 $('fprev').onclick=function(){ir(cur-1)};$('fnext').onclick=function(){ir(cur+1)};
-$('save').onclick=function(){toast('Próxima etapa: salvar o projeto em arquivo.')};
+$('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){location.href='../#revisar'};   /* o pré-voo (T-18) abre nas Folhas, onde a medida da folha existe */
 
 /* ---------- posicionar a foto: arrastar, pinça, roda e setas (FN-04, FN-12) ---------- */
@@ -363,7 +366,7 @@ function render(){
   var s=S(),nv;
   $('ctx-foto').textContent=p2(cur)+' de '+N;
   $('faixa-current').textContent=p2(cur);$('faixa-total').textContent=N;$('faixa-n').textContent=N;
-  $('cap').textContent=LEG[(src(cur)-1)%4];
+  $('cap').textContent=DEMO?LEG[(src(cur)-1)%4]:(s.txt||'');   /* 44: legenda de exemplo só no projeto demo */
   var cota=window.PLMOL?PLMOL.cota():'Passe-partout inferior: '+nf(FR.ch-FR.ct-FR.cjh)+' mm',separador=cota.indexOf(':');
   $('cota-label').textContent=cota.slice(0,separador+1);$('cota-value').textContent=cota.slice(separador+1).trim();
   $('nb').hidden=!mudou(s);

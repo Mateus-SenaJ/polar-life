@@ -253,7 +253,8 @@ $('continuar').addEventListener('click',function(){
   if(this.disabled)return;
   try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
   if(S.fmt==='pocket'){try{sessionStorage.setItem('pl-fmt','pocket')}catch(e){}}   /* D-113: o Quadro aplica o padrão de legenda do Pocket */
-  location.href='../adicionar-fotos/';
+  if(window.PLPROJETOS)PLPROJETOS.criar('Projeto de '+new Date().toLocaleDateString('pt-BR')).then(function(){location.href='../adicionar-fotos/'});
+  else location.href='../adicionar-fotos/';
 });
 
 /* Estados pelo endereço, para revisão: #personalizado, #nao-cabe */

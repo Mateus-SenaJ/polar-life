@@ -56,7 +56,7 @@ page.on('pageerror', e => errosPg.push(String(e)));
 
 const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/nucleo/legenda-texto.js', 'assets/js/nucleo/gerador.js'];
 
-const limpar = () => page.evaluate(() => ['pl-quadro', 'pl-fotos', 'pl-folhas', 'pl-orientacao', 'pl-fmt'].forEach(k => { try { sessionStorage.removeItem(k) } catch (e) { } }));
+const limpar = () => page.evaluate(() => { ['pl-quadro', 'pl-fotos', 'pl-folhas', 'pl-orientacao', 'pl-fmt'].forEach(k => { try { sessionStorage.removeItem(k) } catch (e) { } }); try { localStorage.removeItem('pl-projeto-atual') } catch (e) { } }); // volta ao projeto de exemplo (44: o T-02 cria projeto real)
 const guardarQuadro = (fr, leg, n, cidade) => page.evaluate(({ fr, leg, n, cidade }) => {
   const q = [{ fr }];
   if (leg) q[0].leg = leg;

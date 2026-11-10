@@ -81,6 +81,7 @@ function projeto(){
   var q=null;try{q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null')}catch(e){}
   if(!(Array.isArray(q)&&q.length>=2&&q.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0})))q=null;
   var lista=[],txt={},meta={},leg=null,fr={w:88,h:107,jh:76,lado:6,topo:6,rad:.4,ori:'v'};
+  var real=LT.ehReal();   /* 44: projeto real → nada de exemplo */
   if(q){
     var g=q[0]||{},f0=g.fr;
     if(f0&&f0.w>0&&f0.h>0&&f0.lado>0&&f0.w-2*f0.lado>0){fr={w:f0.w,h:f0.h,jh:f0.jh>0?f0.jh:f0.w-2*f0.lado,lado:f0.lado,topo:f0.topo==null?6:f0.topo,rad:f0.rad==null?.4:f0.rad,ori:f0.ori==='h'?'h':'v'}}
@@ -89,18 +90,18 @@ function projeto(){
   }else{
     var l=null;try{l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null')}catch(e){}
     if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=400&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}
-    l.forEach(function(sr){var e=novo(sr);if(sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(sr===12)e.z=233;lista.push(e)})
+    l.forEach(function(sr){var e=novo(sr);if(!real&&sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(!real&&sr===12)e.z=233;lista.push(e)})
   }
   var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
   if(pocket){fr={w:66,h:99,jh:79,lado:3,topo:3,rad:.4,ori:'v'};if(!leg)leg=LT.legPocket(LT.LEG0)}
   var fotos=lista.map(function(e,k){
     var src=e.src;
-    return{n:k+1,src:src,v:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:LT.LEG[(src-1)%4]),m:meta[k+1]||e.meta||null,
+    return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,
       modo:e.modo||'preencher',z:e.z==null?100:e.z,ang:e.ang||0,px:e.px||0,py:e.py||0,rot:e.rot||0,flip:!!e.flip,
       adj:Object.assign({},ADJ0,e.adj||{}),flt:Object.assign({id:'original',int:100},e.flt||{})}
   });
   fr.jw=fr.w-2*fr.lado;fr.jh=fr.jh>0?fr.jh:fr.jw;
-  return{s:FL.ler(),fr:fr,fotos:fotos,leg:leg}
+  return{s:FL.ler(),fr:fr,fotos:fotos,leg:leg,real:real}
 }
 
 function mul(A,B){return{a:A.a*B.a+A.c*B.b,b:A.b*B.a+A.d*B.b,c:A.a*B.c+A.c*B.d,d:A.b*B.c+A.d*B.d,e:A.a*B.e+A.c*B.f+A.e,f:A.b*B.e+A.d*B.f+A.f}}
@@ -496,6 +497,8 @@ function preparar(p,avisos){
   if(p.leg){var a=estiloObj(p.leg.txt);add(a.fam,a.peso,a.it);var b=estiloObj(p.leg.data);add(b.fam,b.peso,b.it);var c=estiloObj(p.leg.loc);add(c.fam,c.peso,c.it);add('IBM Plex Mono',400,false)}
   else{add('Caveat',500,false);add('IBM Plex Mono',400,false)}
   if(p.s.rodape)add('IBM Plex Mono',400,false);
+  if(p.real&&window.PLFOTOS)jobs.push(Promise.all(p.fotos.map(function(f){return PLFOTOS.ler(f.src).catch(function(){return null})})).then(function(rs){ /* 44 · MT-02: mesma orientação e data reais que a tela */
+    rs.forEach(function(r,i){if(!r)return;var f=p.fotos[i],iso=r.meta&&r.meta.iso||'';f.v=(r.h||0)>(r.w||0);if(!f.m)f.m={iso:iso,c:''};else if(!f.m.iso&&iso)f.m.iso=iso})}));
   if(p.s.assin)jobs.push(carregarBytes(SIGURL).catch(function(){registrarAviso(avisos,'AssinaturaIndisponivel',null,null);return null}));
   return Promise.all(jobs)
 }

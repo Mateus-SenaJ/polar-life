@@ -40,8 +40,12 @@ function estLG(o,mm,px,extra){                               /* só a fonte e a 
   var fm=famLG(o.font);return'font-family:'+fm.f+';font-style:'+(fm.i?'italic':'normal')+';font-weight:'+fm.w+';color:'+(COR_LG[o.cor]||'#000')+';font-size:'+(o.pt*.3528*px)+'px'+(extra||'')
 }
 var LOC0={uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'};
+/* 44: projeto real = fotos escolhidas (pl-fotos) num projeto salvo aberto. O exemplo também grava pl-fotos
+   ao passar pelo Quadro, por isso só a lista não basta. Fonte única para tela, Quadro e PDF (MT-02). */
+function ehReal(){try{return !!sessionStorage.getItem('pl-fotos')&&!!localStorage.getItem('pl-projeto-atual')}catch(e){return false}}
 function dadosFoto(f){
-  var m=f.m,iso=m?m.iso:'2026-07-14T08:00',cid=m?m.c:'Campos do Jordão',a=String(iso||'').match(/^(\d+)-(\d+)-(\d+)/);
+  var real=ehReal();
+  var m=f.m,iso=m?m.iso:(real?'':'2026-07-14T08:00'),cid=m?m.c:(real?'':'Campos do Jordão'),a=String(iso||'').match(/^(\d+)-(\d+)-(\d+)/);
   return{d:a?new Date(+a[1],+a[2]-1,+a[3]):null,iso:a?a[0]:'',c:cid||''}
 }
 function localLG(l,cid){
@@ -123,5 +127,5 @@ function linhas(leg,fr,medir,opts){
   }
   return L
 }
-window.PLTEXTO={LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,assinaturaDir:assinaturaDir,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,assinaturaDir:assinaturaDir,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

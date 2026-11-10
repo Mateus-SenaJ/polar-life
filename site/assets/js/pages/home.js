@@ -1,41 +1,18 @@
-/* T-01 · home · comportamento da página */
-(function(){
-var $=function(i){return document.getElementById(i)};
-var count=1,tm,opener;
-function render(){
-  var empty=count===0||location.hash==='#vazia';
-  $('lista').hidden=empty||count===0;$('top').hidden=empty;$('vazio').hidden=!empty;
-  document.title='Polar Life · '+(empty?'Nenhum projeto':'Seus projetos');
+/* T-01 · projetos locais, sem envio de fotos (T5). */
+(function(){var $=function(i){return document.getElementById(i)},selecionado='',tm;
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}function tempo(t){var m=Math.max(0,Math.round((Date.now()-t)/60000));return m<1?'agora':m===1?'há 1 min':'há '+m+' min'}function toast(s){clearTimeout(tm);$('toast-t').textContent=s;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
+function render(a){var vazio=!a.length;$('lista').hidden=vazio;$('top').hidden=vazio;$('vazio').hidden=!vazio;document.title='Polar Life · '+(vazio?'Nenhum projeto':'Seus projetos');if(vazio)return;var u=$('lista').querySelector('ul');u.innerHTML=a.map(function(p){return'<li class="card"><div class="card__row"><img class="avatar" data-capa="'+p.id+'" src="../assets/img/logos/Logo_favicon_PolarLife.png" width="54" height="48" alt=""><div class="card__txt"><h2 class="card__name"><a href="editor/" data-open="'+p.id+'">'+esc(p.nome)+'</a></h2><p class="card__meta">'+p.fotos+' '+(p.fotos===1?'foto':'fotos')+' · Salvo · '+tempo(p.atualizadoEm)+'</p></div><button type="button" class="more" data-more="'+p.id+'" aria-label="Mais ações: '+esc(p.nome)+'">•••</button></div><span class="chip rotulo">Salvo neste dispositivo</span><div class="menu led-menu" data-menu="'+p.id+'" role="menu" hidden><button type="button" data-act="abrir" data-id="'+p.id+'">Abrir</button><button type="button" data-act="renomear" data-id="'+p.id+'">Renomear</button><button type="button" data-act="duplicar" data-id="'+p.id+'">Duplicar</button><button type="button" data-act="backup" data-id="'+p.id+'">Salvar backup (.polarlife)</button><button type="button" data-act="excluir" data-id="'+p.id+'">Excluir projeto…</button></div></li>'}).join('')}
+function renomearNoCartao(b,id){ /* edição no próprio cartão (sem prompt do navegador): Enter salva, Esc cancela */
+  var card=b.closest('.card'),h=card.querySelector('.card__name'),a=h.querySelector('a'),antigo=a.textContent,inp=document.createElement('input'),feito=false;
+  b.closest('[data-menu]').hidden=true;inp.type='text';inp.className='card__ren';inp.value=antigo;inp.maxLength=80;inp.setAttribute('aria-label','Nome do projeto');
+  h.replaceChild(inp,a);inp.focus();inp.select();
+  function fim(salvar){if(feito)return;feito=true;var n=inp.value.trim();if(salvar&&n&&n!==antigo)PLPROJETOS.renomear(id,n).then(function(){atualizar();toast('Projeto renomeado')});else atualizar()}
+  inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();fim(true)}else if(ev.key==='Escape')fim(false)});
+  inp.addEventListener('blur',function(){fim(true)})
 }
-window.addEventListener('hashchange',function(){if(location.hash==='#vazia'&&count>0){}render()});render();
-
-function closeMenu(){var m=$('menu1');if(!m.hidden){m.hidden=true;$('more1').setAttribute('aria-expanded','false')}}
-$('more1').onclick=function(e){e.stopPropagation();var m=$('menu1');m.hidden=!m.hidden;this.setAttribute('aria-expanded',String(!m.hidden));if(!m.hidden)m.querySelector('button').focus()};
-document.addEventListener('click',function(e){if(!$('menu1').contains(e.target))closeMenu()});
-$('menu1').addEventListener('keydown',function(e){
-  var b=[].slice.call(this.querySelectorAll('button')),i=b.indexOf(document.activeElement);
-  if(e.key==='ArrowDown'){e.preventDefault();b[(i+1)%b.length].focus()}
-  if(e.key==='ArrowUp'){e.preventDefault();b[(i-1+b.length)%b.length].focus()}
-  if(e.key==='Escape'){closeMenu();$('more1').focus()}
-});
-function toast(msg,undo){
-  clearTimeout(tm);$('toast-t').textContent=msg;$('toast-undo').hidden=!undo;$('toast').hidden=false;
-  tm=setTimeout(function(){$('toast').hidden=true},5000)
-}
-$('menu1').addEventListener('click',function(e){
-  var b=e.target.closest('button');if(!b)return;closeMenu();
-  if(b.dataset.act==='excluir'){opener=$('more1');$('scrim').hidden=false;$('dialog').hidden=false;$('dlg-cancel').focus()}
-  if(b.dataset.act==='backup')toast('Backup salvo');
-});
-function closeDlg(){$('scrim').hidden=true;$('dialog').hidden=true;if(opener&&count>0)opener.focus()}
-$('dlg-cancel').onclick=closeDlg;$('scrim').onclick=closeDlg;
-$('novo1').onclick=$('novo2').onclick=function(){location.href='novo-projeto/'};
-$('dlg-del').onclick=function(){count=0;closeDlg();$('card1').hidden=true;location.hash='#vazia';render();toast('Projeto excluído',true)};
-$('toast-undo').onclick=function(){count=1;$('card1').hidden=false;history.replaceState(null,'','#projetos');render();toast('Projeto restaurado')};
-document.addEventListener('keydown',function(e){
-  if($('dialog').hidden)return;
-  if(e.key==='Escape')closeDlg();
-  if(e.key==='Tab'){var a=$('dlg-cancel'),z=$('dlg-del');
-    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
-});
+function capas(){[].forEach.call(document.querySelectorAll('[data-capa]'),function(img){PLPROJETOS.capa(img.getAttribute('data-capa')).then(function(b){if(!b)return;img.src=URL.createObjectURL(b);img.classList.add('avatar--foto')})})}
+function atualizar(){PLPROJETOS.listar().then(function(a){render(a);capas()})}function abrir(id){PLPROJETOS.abrir(id).then(function(){location.href='editor/'})}function baixar(o){var b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(o.projeto.nome||'projeto')+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)}
+$('lista').addEventListener('click',function(e){var b=e.target.closest('button,a');if(!b)return;if(b.dataset.more){var m=document.querySelector('[data-menu="'+b.dataset.more+'"]');m.hidden=!m.hidden;return}var id=b.dataset.id||b.dataset.open;if(!id)return;e.preventDefault(); /* o nome (data-open) também abre o projeto de verdade */if(b.dataset.act==='abrir'||b.dataset.open){abrir(id);return}if(b.dataset.act==='renomear'){renomearNoCartao(b,id);return}if(b.dataset.act==='duplicar'){PLPROJETOS.duplicar(id).then(atualizar);return}if(b.dataset.act==='backup'){PLPROJETOS.exportar(id).then(baixar);return}if(b.dataset.act==='excluir'){selecionado=id;$('scrim').hidden=false;$('dialog').hidden=false;$('dlg-cancel').focus()}});
+function fechar(){$('scrim').hidden=true;$('dialog').hidden=true}$('dlg-cancel').onclick=fechar;$('scrim').onclick=fechar;$('dlg-del').onclick=function(){PLPROJETOS.excluir(selecionado).then(function(){fechar();atualizar();toast('Projeto excluído')})};$('novo1').onclick=$('novo2').onclick=function(){location.href='novo-projeto/'};
+var input=document.createElement('input');input.type='file';input.accept='.polarlife,application/json';input.hidden=true;document.body.appendChild(input);$('backup').onclick=function(){input.click()};input.onchange=function(){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{PLPROJETOS.importar(JSON.parse(r.result)).then(function(){atualizar();toast('Backup aberto como novo projeto')})}catch(e){toast('Não foi possível abrir este backup.')}};r.readAsText(f)};atualizar();
 })();

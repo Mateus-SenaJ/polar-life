@@ -1,6 +1,7 @@
 /* T-07 · Editor · Modo Folhas · DOC-05 FN-01/FN-02 · DOC-08 §3 (paginação) · dados de exemplo: DOC-04 §6 */
 (function(){
 var $=function(i){return document.getElementById(i)},tm;
+if(window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){document.title='Polar Life · '+p.nome+' · Folhas';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome}});
 function toast(m,undo){clearTimeout(tm);$('toast-t').textContent=m;$('toast-undo').hidden=!undo;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
 
@@ -23,6 +24,16 @@ if(POCKET&&!LG)LG=PLTEXTO.legPocket(PLTEXTO.LEG0);              /* D-113: sem es
 if(!LISTA.length)try{var _l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(_l)&&_l.length>=1&&_l.length<=400&&_l.every(function(x){return x>=1&&x<=400&&x%1===0}))LISTA=_l}catch(e){}
 if(!LISTA.length)for(var i=1;i<=24;i++)LISTA.push(i);      /* origem de cada foto; o Quadro grava a lista ao duplicar e remover */
 var FOTOS=LISTA.map(function(sr,k){return{n:k+1,src:sr,v:!!VERT[sr],leg:TXT[k+1]!==undefined?TXT[k+1]:LEG[(sr-1)%4],m:META[k+1]||null}});
+/* 44: projeto real (pl-fotos) → sem legendas, datas ou orientação de exemplo; os dados vêm do IndexedDB
+   (data original do EXIF e dimensões reais) e a cidade é a que a pessoa digitar (BR-06: nunca coordenada). */
+var REAL_ED=PLTEXTO.ehReal();
+if(REAL_ED){FOTOS.forEach(function(f){if(TXT[f.n]===undefined)f.leg='';f.v=false});
+  if(window.PLFOTOS)Promise.all(FOTOS.map(function(f){return PLFOTOS.ler(f.src).catch(function(){return null})})).then(function(rs){
+    rs.forEach(function(r,i){if(!r)return;var f=FOTOS[i],iso=r.meta&&r.meta.iso||'';
+      f.v=(r.h||0)>(r.w||0);
+      if(!f.m)f.m={iso:iso,c:''};else if(!f.m.iso&&iso)f.m.iso=iso});
+    if(typeof render==='function')render()
+  })}
 var NF=FOTOS.length;
 document.getElementById('scope-t').textContent='Alterando: Todas as fotos · '+NF;
 document.getElementById('apply-t').textContent='Aplicar ao lote · '+NF+(NF===1?' foto':' fotos');
@@ -35,7 +46,7 @@ else if(PLN&&PLN.assinaturaDesligada){try{if(!JSON.parse(sessionStorage.getItem(
 var COR={preto:'#000000',azul:'#006194',laranja:'#FD761A'};
 
 /* ---------- estado inicial: escolha da T-06 e estados de revisão por hash ---------- */
-function salvaD(){try{sessionStorage.setItem('pl-folhas',JSON.stringify(D))}catch(e){}}
+function salvaD(){try{sessionStorage.setItem('pl-folhas',JSON.stringify(D));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 var est=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 if(est==='parcial')D.separar=true;
 if(est==='nao-cabe')D.papel='10x15';
@@ -308,7 +319,7 @@ $('guias').onclick=function(){
 };
 [].forEach.call(document.querySelectorAll('[data-reset]'),function(b){b.onclick=function(){var k=b.getAttribute('data-reset');D[k]=DEF[k];commit(k)}});
 $('apply').onclick=function(){toast('Aplicado a '+NF+(NF===1?' foto':' fotos'))};
-$('save').onclick=function(){toast('Próxima etapa: salvar o projeto em arquivo.')};
+$('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){window.PLPREVOO.abrir(this)};   /* T-18 · pré-voo */
 /* gancho para o pré-voo: mede a legenda em todas as folhas, desenhando-as fora da tela */
 window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,
@@ -335,7 +346,7 @@ var tabs=[].slice.call(document.querySelectorAll('.tab'));
 var ESCOPO='todas';
 function alvo(){return ESCOPO==='folha'&&R.sheets[cur]?R.sheets[cur].cells.map(function(c){return c.f.n}):FOTOS.map(function(f){return f.n})}
 function quadro(){try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');if(Array.isArray(q)&&q.length===NF+1)return q}catch(e){}var q=[{leg:LG,fr:FR}];FOTOS.forEach(function(f){q.push({src:f.src,z:100,ang:0,px:0,py:0,rot:0,flip:false,modo:'preencher',adj:{brilho:0,contraste:0,saturacao:0,temp:0,realces:0,sombras:0,nitidez:0,vinheta:0},flt:{id:'original',int:100},txt:f.leg||null})});return q}
-function salvarQuadro(q){q[0]=q[0]||{};q[0].leg=LG;q[0].fr=FR;try{sessionStorage.setItem('pl-quadro',JSON.stringify(q))}catch(e){}}
+function salvarQuadro(q){q[0]=q[0]||{};q[0].leg=LG;q[0].fr=FR;try{sessionStorage.setItem('pl-quadro',JSON.stringify(q));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 function escopo(){var n=alvo().length;$('scope-t').textContent='Alterando: '+(ESCOPO==='folha'?'Esta folha':'Todas as fotos')+' · '+n;var a=$('escopo-ajuda');if(a)a.textContent=ESCOPO==='folha'?'Somente as '+n+' fotos desta folha.':'Todas as '+n+' fotos do projeto.'}
 function painelExtra(id){
   if(id==='tab-legendas'&&!LG)LG=JSON.parse(JSON.stringify(PLTEXTO.LEG0));

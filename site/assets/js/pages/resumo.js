@@ -21,7 +21,7 @@ function medirReais(){
   if(!REAL||!window.PLFOTOS)return;
   Promise.all(REAL.map(function(id){return PLFOTOS.ler(id).catch(function(){return null})})).then(function(fs){
     var land=0,port=0;fs.forEach(function(r){if(!r)return;if((r.w||0)>=(r.h||0))land++;else port++});
-    D.land=land;D.port=port;paint();
+    D.land=land;D.port=port;D.nodate=fs.filter(function(r){return !r||!r.meta||!r.meta.iso}).length;paint();
   });
 }
 function paint(){

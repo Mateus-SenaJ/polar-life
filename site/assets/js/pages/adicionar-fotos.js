@@ -2,6 +2,9 @@
 (function(){
 var $=function(i){return document.getElementById(i)};
 var tm,opener,picked=[],salvando=Promise.resolve();
+/* 44: com um projeto aberto, as fotos já escolhidas ficam e as novas recebem ids depois do maior */
+var JA=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');return Array.isArray(a)&&window.PLPROJETOS&&PLPROJETOS.atual()?a:[]}catch(e){return []}})();
+var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
 
 /* ===== Selos de estado: ícone + texto, nunca só cor (CN-05, DS-06) ===== */
@@ -68,16 +71,17 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return
 function receive(list){
   var all=[].slice.call(list||[]);if(!all.length)return;
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
-  var max=limiteFotos(),cabem=Math.max(0,max-picked.length),extra=ok.length-cabem;
+  var max=limiteFotos(),cabem=Math.max(0,max-JA.length-picked.length),extra=ok.length-cabem;
   if(extra>0)ok=ok.slice(0,cabem); /* acima do plano: as primeiras entram, o resto avisa (DOC-03 §7) */
-  var fresh=picked.length===0&&ok.length>0; /* 44: primeira escolha desta seleção */
+  var fresh=picked.length===0&&ok.length>0&&!JA.length; /* 44: primeira escolha de um projeto vazio (num projeto aberto, acrescenta) */
   picked=picked.concat(ok);
   /* Arquivos escolhidos seguem direto para o IndexedDB deste aparelho (DOC-08 §5, T5).
      44: uma seleção nova limpa as fotos do envio anterior antes de gravar — senão fotos
      antigas por posição se misturam com as novas (bug «sempre aparecem 24 fotos»). */
   if(window.PLFOTOS)salvando=salvando
+    .then(function(){return window.PLPROJETOS&&!PLPROJETOS.atual()?PLPROJETOS.criar('Projeto de '+new Date().toLocaleDateString('pt-BR')):null})
     .then(function(){return fresh?PLFOTOS.limpar():null})
-    .then(function(){return Promise.all(ok.map(function(f,i){return PLFOTOS.salvar(picked.length-ok.length+i+1,f)}))})
+    .then(function(){return Promise.all(ok.map(function(f,i){var n=MAXJA+picked.length-ok.length+i+1;return PLFOTOS.salvar(n,f,window.PLPROJETOS?PLPROJETOS.atual():'')   /* uma leitura grava a foto aberta e a cópia do projeto */}))})
     .catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
   render(bad,extra);
 }
@@ -109,13 +113,22 @@ function render(bad,extra){
 /* 44: a lista real de fotos escolhidas (ids = posições gravadas no IndexedDB) vira a
    fonte da verdade; o estado de folhas/quadro antigo é descartado para não carregar 24. */
 function firmarSelecao(){
-  var ids=[];for(var i=1;i<=picked.length;i++)ids.push(i);
-  try{sessionStorage.setItem('pl-fotos',JSON.stringify(ids));
-    ['pl-quadro','pl-folhas','pl-prevoo','pl-exportar','pl-resumo'].forEach(function(k){sessionStorage.removeItem(k)});
+  var novos=[];for(var i=1;i<=picked.length;i++)novos.push(MAXJA+i);
+  try{
+    if(JA.length){ /* projeto aberto: as fotos novas entram no fim; quadro, folhas e ajustes ficam */
+      sessionStorage.setItem('pl-fotos',JSON.stringify(JA.concat(novos)));
+      var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
+      if(Array.isArray(q)&&q.length===JA.length+1){novos.forEach(function(sr){q.push({src:sr,modo:'preencher',z:100,ang:0,px:0,py:0,rot:0,flip:false,adj:{brilho:0,contraste:0,saturacao:0,temp:0,realces:0,sombras:0,nitidez:0,vinheta:0},txt:null,flt:{id:'original',int:100}})});sessionStorage.setItem('pl-quadro',JSON.stringify(q))}
+      else sessionStorage.removeItem('pl-quadro');
+      ['pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
+    }else{
+      sessionStorage.setItem('pl-fotos',JSON.stringify(novos));
+      ['pl-quadro','pl-folhas','pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
+    }
   }catch(e){}
 }
 $('btn-device').addEventListener('click',function(){
-  if(picked.length){firmarSelecao();salvando.then(function(){location.href='../processando/'});return}
+  if(picked.length){firmarSelecao();salvando.then(function(){return window.PLSESSAO?PLSESSAO.salvarJa():null}).catch(function(){}).then(function(){location.href='../processando/'});return}   /* 44: grava o projeto antes de sair */
   $('f-device').click();
 });
 $('btn-camera').addEventListener('click',function(){
