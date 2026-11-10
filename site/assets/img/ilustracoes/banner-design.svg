@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500">
   <defs>
+    <filter id="bdes-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity=".06" result="bdes-s1"/>
+      <feDropShadow in="bdes-s1" dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity=".08" result="bdes-s2"/>
+      <feDropShadow in="bdes-s2" dx="0" dy="20" stdDeviation="16" flood-color="#000000" flood-opacity=".1"/>
+    </filter>
     <g id="bdes-cena-sol">
       <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
       <circle cx="38" cy="46" r="18" fill="#FD761A"/>
@@ -7,78 +12,80 @@
       <rect y="49.5" width="76" height="1.5" fill="#000000" opacity=".55"/>
       <path d="M6 42H28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".55"/>
       <path d="M46 55H70" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".4"/>
-      <g fill="#FD761A" opacity=".85">
-        <rect x="27" y="54" width="22" height="2.4" rx="1.2"/>
-        <rect x="31" y="60" width="14" height="2.2" rx="1.1"/>
-        <rect x="34" y="66" width="8" height="2" rx="1"/>
-        <rect x="36" y="71" width="4" height="1.6" rx=".8"/>
-      </g>
+      <g fill="#FD761A" opacity=".85"><rect x="27" y="54" width="22" height="2.4" rx="1.2"/><rect x="31" y="60" width="14" height="2.2" rx="1.1"/><rect x="34" y="66" width="8" height="2" rx="1"/><rect x="36" y="71" width="4" height="1.6" rx=".8"/></g>
+      <path d="M8 66H10L9.5 72H8.5Z" fill="#000000" opacity=".8"/><path d="M9 65V58M9 58L12 62H9Z" fill="#000000" opacity=".8"/>
       <path d="M18 18q2-2 4 0M26 14q2-2 4 0" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"/>
     </g>
     <g id="bdes-cena-cidade">
       <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
       <circle cx="14" cy="15" r="6.5" fill="#FD761A"/>
       <path d="M0 60V38H9V30H16V42H22V26H30V40H36V33H43V24H52V38H58V31H65V42H70V35H76V60Z" fill="#006194" fill-opacity=".55"/>
-      <rect x="1" y="44" width="13" height="24" fill="#000000"/>
-      <rect x="17" y="38" width="12" height="30" fill="#000000"/>
-      <rect x="32" y="49" width="11" height="19" fill="#000000"/>
-      <rect x="46" y="41" width="14" height="27" fill="#000000"/>
-      <rect x="63" y="47" width="12" height="21" fill="#000000"/>
-      <g fill="#FFFFFF" opacity=".85">
-        <rect x="4" y="47" width="2.5" height="3"/><rect x="9" y="47" width="2.5" height="3"/>
-        <rect x="4" y="53" width="2.5" height="3"/><rect x="9" y="53" width="2.5" height="3"/>
-        <rect x="20" y="42" width="2.5" height="3"/><rect x="25" y="42" width="2.5" height="3"/>
-        <rect x="20" y="49" width="2.5" height="3"/><rect x="25" y="49" width="2.5" height="3"/>
-        <rect x="49" y="45" width="2.5" height="3"/><rect x="54" y="45" width="2.5" height="3"/>
-        <rect x="49" y="52" width="2.5" height="3"/><rect x="54" y="52" width="2.5" height="3"/>
-        <rect x="66" y="51" width="2.5" height="3"/><rect x="71" y="51" width="2.5" height="3"/>
-      </g>
-      <g fill="#FD761A" opacity=".9">
-        <rect x="4" y="59" width="2.6" height="3"/>
-        <rect x="20" y="57" width="2.6" height="3"/>
-        <rect x="49" y="59" width="2.6" height="3"/>
-        <rect x="66" y="58" width="2.6" height="3"/>
-      </g>
+      <g fill="#000000"><rect x="1" y="44" width="13" height="24"/><rect x="17" y="38" width="12" height="30"/><rect x="32" y="49" width="11" height="19"/><rect x="46" y="41" width="14" height="27"/><rect x="63" y="47" width="12" height="21"/></g>
+      <g fill="#FFFFFF" opacity=".85"><rect x="4" y="47" width="2.5" height="3"/><rect x="9" y="47" width="2.5" height="3"/><rect x="4" y="53" width="2.5" height="3"/><rect x="9" y="53" width="2.5" height="3"/><rect x="20" y="42" width="2.5" height="3"/><rect x="25" y="42" width="2.5" height="3"/><rect x="20" y="49" width="2.5" height="3"/><rect x="25" y="49" width="2.5" height="3"/><rect x="35" y="53" width="2.5" height="3"/><rect x="49" y="45" width="2.5" height="3"/><rect x="54" y="45" width="2.5" height="3"/><rect x="49" y="52" width="2.5" height="3"/><rect x="54" y="52" width="2.5" height="3"/><rect x="66" y="51" width="2.5" height="3"/><rect x="71" y="51" width="2.5" height="3"/></g>
+      <g fill="#FD761A" opacity=".9"><rect x="4" y="59" width="2.6" height="3"/><rect x="20" y="62" width="2.6" height="3"/><rect x="49" y="59" width="2.6" height="3"/><rect x="66" y="58" width="2.6" height="3"/></g>
+      <path d="M52 24V17" fill="none" stroke="#000000" stroke-width="1"/><circle cx="52" cy="16" r="1.4" fill="#FD761A"/>
       <rect y="66" width="76" height="10" fill="#000000"/>
+      <path d="M32 21q2-2 4 0M38 18q2-2 4 0" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"/>
     </g>
   </defs>
-
   <rect width="1200" height="500" fill="#000000"/>
-
-  <!-- anima: bdes-p1 recebe o foco, centro 110 134 -->
-  <g id="bdes-p1" transform="translate(450 115)">
-    <rect width="220" height="268" rx="4" fill="#FFFFFF"/>
-    <g transform="translate(15 15) scale(2.5)"><use href="#bdes-cena-sol"/></g>
-  </g>
-
-  <!-- anima: bdes-moldura tracejada aparece e some, centro 560 249 -->
-  <g id="bdes-moldura">
-    <rect x="430" y="95" width="260" height="308" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="7 7"/>
-    <g fill="#FFFFFF">
-      <rect x="424" y="89" width="12" height="12"/>
-      <rect x="678" y="89" width="12" height="12"/>
-      <rect x="424" y="397" width="12" height="12"/>
-      <rect x="678" y="397" width="12" height="12"/>
+  <!-- anima: bdes-p2 fica atrás, flutua devagar, centro 132 160.5 -->
+  <g id="bdes-p2" transform="translate(448 150) rotate(-13 132 160.5)">
+    <g filter="url(#bdes-papel)">
+      <rect width="264" height="321" rx="5" fill="#FFFFFF"/>
+      <rect x=".5" y=".5" width="263" height="320" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
+      <g transform="translate(18 18) scale(3)"><use href="#bdes-cena-cidade"/></g>
+      <rect x="18" y="18" width="228" height="228" fill="none" stroke="#000000" stroke-opacity=".06"/>
     </g>
   </g>
-
-  <!-- anima: bdes-p2 flutua, centro 70 85 -->
-  <g id="bdes-p2" transform="translate(720 210) rotate(10 70 85)">
-    <rect width="140" height="170" rx="3" fill="#FFFFFF"/>
-    <g transform="translate(9.5 9.5) scale(1.5921)"><use href="#bdes-cena-cidade"/></g>
+  <!-- anima: bdes-p1 recebe o foco, centro 162.8 197.95 -->
+  <g id="bdes-p1" transform="translate(560 62) rotate(-3 162.8 197.95)">
+    <g filter="url(#bdes-papel)">
+      <rect width="325.6" height="395.9" rx="5" fill="#FFFFFF"/>
+      <rect x=".5" y=".5" width="324.6" height="394.9" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
+      <g transform="translate(22.2 22.2) scale(3.7)"><use href="#bdes-cena-sol"/></g>
+      <rect x="22.2" y="22.2" width="281.2" height="281.2" fill="none" stroke="#000000" stroke-opacity=".06"/>
+      <g transform="scale(3.7)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+      <!-- anima: bdes-selecao aparece com as alças, centro 162.8 197.95 -->
+      <g id="bdes-selecao">
+        <rect x="-16" y="-16" width="357.6" height="427.9" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-dasharray="12 9"/>
+        <path d="M162.8 -16V-42" stroke="#FFFFFF" stroke-width="2.5"/>
+        <circle cx="162.8" cy="-51" r="9" fill="#000000" stroke="#FFFFFF" stroke-width="2.5"/>
+        <g fill="#FFFFFF" stroke="#000000" stroke-width="2">
+          <rect x="-24" y="-24" width="16" height="16"/><rect x="333.6" y="-24" width="16" height="16"/>
+          <rect x="-24" y="403.9" width="16" height="16"/><rect x="333.6" y="403.9" width="16" height="16"/>
+          <rect x="154.8" y="-24" width="16" height="16"/><rect x="154.8" y="403.9" width="16" height="16"/>
+          <rect x="-24" y="189.95" width="16" height="16"/><rect x="333.6" y="189.95" width="16" height="16"/>
+        </g>
+      </g>
+    </g>
   </g>
-
-  <!-- anima: bdes-cores pulsam em sequência, centro 1090 140 -->
+  <!-- anima: bdes-a1 entra em sequência, centro 118 30 -->
+  <g id="bdes-a1" transform="translate(930 112) rotate(3 118 30)">
+    <g filter="url(#bdes-papel)">
+      <rect width="236" height="60" rx="12" fill="#FFFFFF"/>
+      <rect x="-4" y="-4" width="244" height="68" rx="15" fill="none" stroke="#006194" stroke-width="2.5"/>
+      <g transform="translate(20 -120.4) scale(1.6)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".85" stroke-width="1.4" stroke-linecap="round"/></g>
+    </g>
+  </g>
+  <!-- anima: bdes-a2 entra em sequência, centro 118 30 -->
+  <g id="bdes-a2" transform="translate(944 206) rotate(3 118 30)">
+    <g filter="url(#bdes-papel)">
+      <rect width="236" height="60" rx="12" fill="#FFFFFF"/>
+      <rect x="24" y="24" width="150" height="6" rx="3" fill="#000000"/><rect x="24" y="36" width="92" height="6" rx="3" fill="#000000" fill-opacity=".45"/>
+    </g>
+  </g>
+  <!-- anima: bdes-a3 entra em sequência, centro 118 30 -->
+  <g id="bdes-a3" transform="translate(930 300) rotate(3 118 30)">
+    <g filter="url(#bdes-papel)">
+      <rect width="236" height="60" rx="12" fill="#FFFFFF"/>
+      <g transform="translate(20 -120.4) scale(1.6)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0" fill="none" stroke="#006194" stroke-opacity="1" stroke-width="1.6" stroke-linecap="round"/></g><circle cx="200" cy="30" r="7" fill="#FD761A"/>
+    </g>
+  </g>
+  <!-- anima: bdes-cores pulsam em sequência, centro 1024 418 -->
   <g id="bdes-cores">
-    <circle cx="1040" cy="140" r="18" fill="#FD761A"/>
-    <circle cx="1090" cy="140" r="18" fill="#006194" fill-opacity=".55"/>
-    <circle cx="1140" cy="140" r="18" fill="#FFFFFF"/>
-    <circle cx="1090" cy="140" r="18" fill="none" stroke="#000000" stroke-width="2"/>
-  </g>
-
-  <g opacity=".9">
-    <path d="M1000 380l0-18M991 371h18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="1120" cy="420" r="9" fill="#FD761A"/>
-    <circle cx="430" cy="440" r="16" fill="none" stroke="#006194" stroke-width="4" opacity=".85"/>
+    <circle cx="960" cy="418" r="16" fill="#FFFFFF"/><circle cx="1004" cy="418" r="16" fill="#006194"/><circle cx="1048" cy="418" r="16" fill="#FD761A"/>
+    <circle cx="1092" cy="418" r="16" fill="#000000" stroke="#FFFFFF" stroke-width="2.5"/>
+    <circle cx="1004" cy="418" r="21" fill="none" stroke="#FFFFFF" stroke-width="2"/>
   </g>
 </svg>

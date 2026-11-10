@@ -95,6 +95,18 @@ for (const c of arquivos.filter(f => extname(f) === '.css')) {
     }
   }
 }
+/* 41 · T2 também nas ilustrações vetoriais: só a paleta (com opacidade), sem texto e sem recurso externo */
+for (const f of arquivos.filter(f => f.endsWith('.svg') && f.includes(join('img', 'ilustracoes')))) {
+  const s = readFileSync(f, 'utf8');
+  for (const m of s.matchAll(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/g)) {
+    let h = m[1].toLowerCase(); if (h.length === 3) h = [...h].map(x => x + x).join('');
+    if (!PALETA.has('#' + h)) erros.push(`${rel(f)}: cor fora da paleta (T2) → #${h}`);
+  }
+  if (/\b(?:rgb|hsl)a?\(/.test(s)) erros.push(`${rel(f)}: cor em rgb()/hsl() — use a paleta em hex (T2)`);
+  if (/<text[\s>]/.test(s)) erros.push(`${rel(f)}: texto dentro da ilustração (o texto fica no HTML)`);
+  if (/href=["'](?!#)/.test(s)) erros.push(`${rel(f)}: referência externa na ilustração (T6)`);
+  if (s.length > 25 * 1024) erros.push(`${rel(f)}: ${(s.length / 1024).toFixed(1)} KB (máx. 25 KB)`);
+}
 const unicos = a => [...new Set(a)];
 console.log(`Páginas: ${htmls.length} · Arquivos: ${arquivos.length}`);
 unicos(avisos).forEach(a => console.log('AVISO ', a));
