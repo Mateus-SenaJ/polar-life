@@ -45,17 +45,18 @@ function nf(n,d){return (Math.round(n*(d?10:1))/(d?10:1)).toString().replace('.'
 function p2(n){return(n<10?'0':'')+n}
 var LEG=['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'];
 var N=24,ST=[{}],cur=3,UI={grade:'nenhuma',inteira:false};
-function lerLista(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(a)&&a.length>=1&&a.length<=400&&a.every(function(x){return x>=1&&x<=24&&x%1===0}))return a}catch(e){}return null}
-var LISTA0=lerLista()||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
+function lerLista(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(a)&&a.length>=1&&a.length<=400&&a.every(function(x){return x>=1&&x<=400&&x%1===0}))return a}catch(e){}return null}
+var LISTA_REAL=lerLista(),DEMO=!LISTA_REAL;   /* 44: ajustes de exemplo só no projeto demo */
+var LISTA0=LISTA_REAL||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
 function lerQuadro(){                                              /* estado completo guardado ao sair para as Folhas (D-085) */
   try{var o=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
-    if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=24&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'}))return o}catch(e){}
+    if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'}))return o}catch(e){}
   return null}
 var SALVO=lerQuadro();
 if(SALVO){ST=SALVO}
 else{LISTA0.forEach(function(sr){var e=novo();e.src=sr;
-  if(sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}   /* Foto 3 «Ajustada» (DOC-04 §6) */
-  if(sr===12)e.z=233;                                               /* Foto 12 «Com ressalvas · 140 PPI» */
+  if(DEMO&&sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}   /* Foto 3 «Ajustada» (DOC-04 §6) */
+  if(DEMO&&sr===12)e.z=233;                                               /* Foto 12 «Com ressalvas · 140 PPI» */
   ST.push(e)})}
 N=ST.length-1;
 SRCMAP=function(n){return ST[n]&&ST[n].src||n};

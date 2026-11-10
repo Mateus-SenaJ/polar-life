@@ -3,12 +3,21 @@
 var $=function(i){return document.getElementById(i)};
 var tm;function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
 
-/* Dados de exemplo (DOC-04 §6: 24 fotos). Nomes neutros. */
-var N=24,HEIC={5:1,7:1,12:1,13:1,18:1,22:1};
-var FILES=[];
-for(var k=1;k<=N;k++){FILES.push({n:'foto-'+(k<10?'0':'')+k+(HEIC[k]?'.heic':'.jpg'),heic:!!HEIC[k],st:'wait'})}
-/* Erros previstos (DOC-04 FL-02): memória e arquivo inválido */
-var FAIL={7:{why:'O aparelho ficou sem memória para converter esta foto. Feche outras abas e tente de novo.',retry:'ok'},19:{why:'O arquivo está danificado ou não é uma foto aceita.',retry:'fail'}};
+/* 44: a contagem vem das fotos realmente escolhidas (pl-fotos); sem seleção, cai no
+   exemplo de 24 fotos (DOC-04 §6) para quem abre a tela direto. */
+function listaReal(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');
+  if(Array.isArray(a)&&a.length>=1&&a.length<=400&&a.every(function(x){return x>=1&&x%1===0}))return a}catch(e){}return null}
+var REAL=listaReal();
+var N,HEIC,FAIL,FILES=[];
+if(REAL){ /* fotos de verdade: contagem real, sem erros/HEIC inventados */
+  N=REAL.length;HEIC={};FAIL={};
+  for(var k=1;k<=N;k++){FILES.push({n:'Foto '+k,heic:false,st:'wait'})}
+}else{ /* exemplo (DOC-04 §6: 24 fotos). Nomes neutros. */
+  N=24;HEIC={5:1,7:1,12:1,13:1,18:1,22:1};
+  for(var k=1;k<=N;k++){FILES.push({n:'foto-'+(k<10?'0':'')+k+(HEIC[k]?'.heic':'.jpg'),heic:!!HEIC[k],st:'wait'})}
+  /* Erros previstos (DOC-04 FL-02): memória e arquivo inválido */
+  FAIL={7:{why:'O aparelho ficou sem memória para converter esta foto. Feche outras abas e tente de novo.',retry:'ok'},19:{why:'O arquivo está danificado ou não é uma foto aceita.',retry:'fail'}};
+}
 
 var hash=location.hash,cur=-1,timer=null,finished=false;
 var ICON={

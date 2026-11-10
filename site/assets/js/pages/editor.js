@@ -13,14 +13,14 @@ var LEG=PLTEXTO.LEG;
 var VERT={2:1,6:1,9:1,13:1,17:1,21:1};                          /* 6 verticais e 18 horizontais (T-05) */
 var LISTA=[],TXT={},META={},LG=null;
 try{var Qd=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
-  if(Array.isArray(Qd)&&Qd.length>=2&&Qd.slice(1).every(function(e){return e&&e.src>=1&&e.src<=24&&e.src%1===0})){
+  if(Array.isArray(Qd)&&Qd.length>=2&&Qd.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0})){
     Qd.slice(1).forEach(function(e,k){LISTA.push(e.src);if(typeof e.txt==='string')TXT[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')META[k+1]=e.meta});
     if(Qd[0]&&Qd[0].leg&&Qd[0].leg.txt&&Qd[0].leg.data&&Qd[0].leg.loc)LG=Qd[0].leg;   /* estilo da legenda (T-10) vale nas folhas */
     var fr=Qd[0]&&Qd[0].fr;                              /* formato escolhido na aba Molduras (D-084) */
     if(fr&&fr.w>0&&fr.h>0&&fr.lado>0&&fr.w-2*fr.lado>0){FR.w=fr.w;FR.h=fr.h;FR.lado=fr.lado;FR.topo=fr.topo;FR.jw=fr.w-2*fr.lado;FR.jh=fr.jh>0?fr.jh:FR.jw;FR.rad=fr.rad}
   }}catch(e){LISTA=[];TXT={};META={};LG=null}
 if(POCKET&&!LG)LG=PLTEXTO.legPocket(PLTEXTO.LEG0);              /* D-113: sem estado salvo, entra com o padrão do Pocket */
-if(!LISTA.length)try{var _l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(_l)&&_l.length>=1&&_l.length<=400&&_l.every(function(x){return x>=1&&x<=24&&x%1===0}))LISTA=_l}catch(e){}
+if(!LISTA.length)try{var _l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(_l)&&_l.length>=1&&_l.length<=400&&_l.every(function(x){return x>=1&&x<=400&&x%1===0}))LISTA=_l}catch(e){}
 if(!LISTA.length)for(var i=1;i<=24;i++)LISTA.push(i);      /* origem de cada foto; o Quadro grava a lista ao duplicar e remover */
 var FOTOS=LISTA.map(function(sr,k){return{n:k+1,src:sr,v:!!VERT[sr],leg:TXT[k+1]!==undefined?TXT[k+1]:LEG[(sr-1)%4],m:META[k+1]||null}});
 var NF=FOTOS.length;

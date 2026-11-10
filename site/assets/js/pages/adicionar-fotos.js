@@ -70,9 +70,15 @@ function receive(list){
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
   var max=limiteFotos(),cabem=Math.max(0,max-picked.length),extra=ok.length-cabem;
   if(extra>0)ok=ok.slice(0,cabem); /* acima do plano: as primeiras entram, o resto avisa (DOC-03 §7) */
+  var fresh=picked.length===0&&ok.length>0; /* 44: primeira escolha desta seleção */
   picked=picked.concat(ok);
-  /* Arquivos escolhidos seguem direto para o IndexedDB deste aparelho (DOC-08 §5, T5). */
-  if(window.PLFOTOS)salvando=salvando.then(function(){return Promise.all(ok.map(function(f,i){return PLFOTOS.salvar(picked.length-ok.length+i+1,f)}))}).catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
+  /* Arquivos escolhidos seguem direto para o IndexedDB deste aparelho (DOC-08 §5, T5).
+     44: uma seleção nova limpa as fotos do envio anterior antes de gravar — senão fotos
+     antigas por posição se misturam com as novas (bug «sempre aparecem 24 fotos»). */
+  if(window.PLFOTOS)salvando=salvando
+    .then(function(){return fresh?PLFOTOS.limpar():null})
+    .then(function(){return Promise.all(ok.map(function(f,i){return PLFOTOS.salvar(picked.length-ok.length+i+1,f)}))})
+    .catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
   render(bad,extra);
 }
 function render(bad,extra){
@@ -100,8 +106,16 @@ function render(bad,extra){
     t.innerHTML='Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
   }
 }
+/* 44: a lista real de fotos escolhidas (ids = posições gravadas no IndexedDB) vira a
+   fonte da verdade; o estado de folhas/quadro antigo é descartado para não carregar 24. */
+function firmarSelecao(){
+  var ids=[];for(var i=1;i<=picked.length;i++)ids.push(i);
+  try{sessionStorage.setItem('pl-fotos',JSON.stringify(ids));
+    ['pl-quadro','pl-folhas','pl-prevoo','pl-exportar','pl-resumo'].forEach(function(k){sessionStorage.removeItem(k)});
+  }catch(e){}
+}
 $('btn-device').addEventListener('click',function(){
-  if(picked.length){salvando.then(function(){location.href='../processando/'});return}
+  if(picked.length){firmarSelecao();salvando.then(function(){location.href='../processando/'});return}
   $('f-device').click();
 });
 $('btn-camera').addEventListener('click',function(){

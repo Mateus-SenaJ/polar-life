@@ -79,7 +79,7 @@ function rasterizar(f,fr,W,H,real,qualidade){
 
 function projeto(){
   var q=null;try{q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null')}catch(e){}
-  if(!(Array.isArray(q)&&q.length>=2&&q.slice(1).every(function(e){return e&&e.src>=1&&e.src<=24&&e.src%1===0})))q=null;
+  if(!(Array.isArray(q)&&q.length>=2&&q.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0})))q=null;
   var lista=[],txt={},meta={},leg=null,fr={w:88,h:107,jh:76,lado:6,topo:6,rad:.4,ori:'v'};
   if(q){
     var g=q[0]||{},f0=g.fr;
@@ -88,7 +88,7 @@ function projeto(){
     q.slice(1).forEach(function(e,k){lista.push(e);if(typeof e.txt==='string')txt[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')meta[k+1]=e.meta});
   }else{
     var l=null;try{l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null')}catch(e){}
-    if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=24&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}
+    if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=400&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}
     l.forEach(function(sr){var e=novo(sr);if(sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(sr===12)e.z=233;lista.push(e)})
   }
   var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
