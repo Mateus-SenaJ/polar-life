@@ -9,8 +9,8 @@ function meta(file){return /^image\/jpe?g$/i.test(file.type||'')&&window.PLEXIF?
 function registro(file){return Promise.all([dimensoes(file),meta(file)]).then(function(r){return{blob:file,w:r[0].w,h:r[0].h,nome:file.name||'',meta:r[1]||{}}})}
 function salvar(src,file,pid){return registro(file).then(function(v){return abrirDB().then(function(db){return new Promise(function(ok,no){ /* 44: decodifica uma vez; com projeto, grava também a cópia (mesma transação) */
   var t=db.transaction(pid?['fotos','fotosProjeto']:['fotos'],'readwrite');t.objectStore('fotos').put(v,Number(src));if(pid)t.objectStore('fotosProjeto').put(v,String(pid)+':'+Number(src));
-  t.oncomplete=function(){db.close();ok({w:v.w,h:v.h,meta:v.meta})};t.onerror=function(){db.close();no(t.error)}})})})}
-function salvarProjeto(id,src,file){return registro(file).then(function(v){return tx('fotosProjeto','readwrite',function(s){s.put(v,String(id)+':'+Number(src))}).then(function(){return{w:v.w,h:v.h,meta:v.meta}})})}
+  t.oncomplete=function(){db.close();if(window.PLPWA)PLPWA.persistir();ok({w:v.w,h:v.h,meta:v.meta})};t.onerror=function(){db.close();no(t.error)}})})})}
+function salvarProjeto(id,src,file){return registro(file).then(function(v){return tx('fotosProjeto','readwrite',function(s){s.put(v,String(id)+':'+Number(src))}).then(function(){if(window.PLPWA)PLPWA.persistir();return{w:v.w,h:v.h,meta:v.meta}})})}
 function ler(src){return tx('fotos','readonly',function(s){return pedido(s.get(Number(src)))})}
 function todos(){return tx('fotos','readonly',function(s){return pedido(s.getAllKeys()).then(function(a){return a.map(Number)})})}
 function limpar(){return tx('fotos','readwrite',function(s){s.clear()})}function limparArquivos(){return tx('arquivos','readwrite',function(s){s.clear()})}
