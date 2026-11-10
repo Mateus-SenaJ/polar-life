@@ -10,3 +10,7 @@ tests/saida/
 *.jpeg
 *.heic
 !site/**/*.jpg
+
+# Vercel CLI (vínculo local do projeto) e segredos
+.vercel
+.env*
