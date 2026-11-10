@@ -1,0 +1,42 @@
+schema: spec-driven
+
+context: |
+  Language: pt-BR
+  All artifacts must be written in pt-BR.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Projeto: Polar Life — editor web local-first de polaroids para imprimir em casa.
+  Pilha: site estático em site/ (HTML, CSS, JS ES5 em IIFE expondo window.PLxxx; sem build, sem módulos),
+  publicado no GitHub Pages e no Vercel. PDF com pdf-lib + fontkit em site/assets/vendor/. Testes em Node 22
+  com Playwright (tests/unit, tests/e2e) e tests/helpers/servidor.mjs. Não há Python na máquina.
+  Regras do projeto: AGENTS.md (Travas T1–T8: tipografia peso ≤ 500; paleta #FFFFFF #000000 #006194 #FD761A
+  #F8F9FA, exceção #D7263D só no ponto de qualidade D-130; acessibilidade com ícone + texto e alvos ≥ 44 px;
+  nada sobre a foto; tudo no aparelho; nenhum recurso de terceiros; sem jargão ou promessa falsa; um único
+  botão LED principal por tela).
+  Decisões: docs/10_LOG_DECISOES.md (D-001…D-137). Arquitetura do editor v3: docs/13_EDITOR_V3.md.
+  Fonte única tela = PDF (MT-02): toda medida visual sai de PLTEXTO/PLFOLHAS/PLGERADOR, em µm inteiros (MT-01).
+  Projeto real × exemplo: PLTEXTO.ehReal(); fotos no IndexedDB com chave Number(src) (não mudar).
+  Fotos pessoais do dono só podem ser LIDAS por testes; nunca copiadas para o repositório.
+  Verificação obrigatória de toda mudança: `npm run verificar` (✔ Sem erros) e `npm run testar:node` (saída 0),
+  mais o teste específico. Commit só pelo orquestrador, depois do CI verde no Linux.
+
+rules:
+  proposal:
+    - Cite as decisões (D-xxx) e travas (Tx) que a mudança respeita ou altera; mudança de regra vira decisão nova.
+    - Diga o que fica FORA do escopo.
+  design:
+    - Descreva contratos de dados (nomes de campos, unidades em mm/µm) e onde cada cálculo vive (fonte única MT-02).
+  tasks:
+    - Tarefas pequenas e verificáveis, cada uma com o arquivo afetado e o teste que a comprova.
+    - A última tarefa é sempre rodar npm run verificar e npm run testar:node e registrar a saída real.
+  specs:
+    - Cada requisito com pelo menos um cenário testável (WHEN/THEN) que vira verificação Playwright ou Node.
+
+operations:
+  apply:
+    guidance:
+      - Escape normal em strings e regex (nunca barra dupla); não reintroduza dados de exemplo nem limite de 24 fotos.
+      - Não leia nada fora da pasta do projeto; não faça commit nem push.
+  archive:
+    guidance:
+      - Atualize docs/10_LOG_DECISOES.md quando a mudança criar ou revogar uma decisão.
