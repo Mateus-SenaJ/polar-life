@@ -33,10 +33,24 @@ function conferir(origem, ref) {
   if (hash && p.endsWith('.html') && !usaHash(p) && !new RegExp(`id=["']${hash}["']`).test(readFileSync(p, 'utf8')))
     erros.push(`${rel(origem)}: âncora inexistente → ${ref}`);
 }
+const SITECFG = JSON.parse(readFileSync(fileURLToPath(new URL('./site.json', import.meta.url)), 'utf8'));
 function externos(origem, txt) {
-  for (const m of txt.matchAll(/(?:src|href)=["'](https?:\/\/[^"']+)/g)) {
+  // o canonical é o endereço do próprio site (tools/site.json), não recurso de terceiro (T6)
+  const semCanonical = txt.replace(/<link rel="canonical" href="[^"]*">/g, '');
+  for (const m of semCanonical.matchAll(/(?:src|href)=["'](https?:\/\/[^"']+)/g)) {
     erros.push(`${rel(origem)}: recurso externo proibido (T6) → ${m[1]}`);
   }
+}
+function seo(h, s) {                                            // 35: SEO e semântica das páginas públicas
+  const r = rel(h).split('\\').join('/'), pub = SITECFG.paginas.find(p => p.arquivo === r);
+  if (r.startsWith('app/')) { if (/rel="canonical"|property="og:/.test(s)) erros.push(`${r}: página noindex não leva canonical nem Open Graph`); return; }
+  if (!pub) return;
+  const h1 = (s.match(/<h1[ >]/g) || []).length;
+  if (h1 !== 1) erros.push(`${r}: deve ter exatamente um <h1> (tem ${h1})`);
+  const can = (s.match(/<link rel="canonical" href="([^"]*)">/) || [])[1];
+  if (can !== SITECFG.url + pub.rota) erros.push(`${r}: canonical deve ser ${SITECFG.url + pub.rota} (está ${can || 'ausente'})`);
+  for (const p of ['og:title', 'og:description', 'og:url', 'og:image']) if (!s.includes(`property="${p}"`)) erros.push(`${r}: falta ${p}`);
+  if (!existsSync(join(SITE, SITECFG.og))) erros.push(`imagem de compartilhamento ausente: ${SITECFG.og} (npm run og)`);
 }
 const VENDOR = join(SITE, 'assets', 'vendor');
 for (const f of arquivos.filter(f => /\.(js|css)$/.test(f) && !f.startsWith(VENDOR))) {  // vendor: URLs só em comentários internos, sem requisição (T6)
@@ -62,6 +76,7 @@ for (const h of htmls) {
   const s = readFileSync(h, 'utf8');
   for (const m of s.matchAll(/(?:src|href)=["']([^"']+)["']/g)) conferir(h, m[1]);
   externos(h, s);
+  seo(h, s);
   if (rel(h).startsWith('app') && !/noindex/.test(s)) erros.push(`${rel(h)}: falta <meta name="robots" content="noindex"> (DOC-08 §7)`);
   const js = [...s.matchAll(/<script[^>]*src=["']([^"']+)["']/g)].map(m => resolve(dirname(h), m[1]));
   for (const j of js) if (existsSync(j))                       // navegação feita em JS vale a partir da página

@@ -6,7 +6,7 @@
   "description": "Polar Life · editor web local-first de polaroids. Telas T-01 a T-14, T-18 a T-24, T-31 e T-28 a T-30.",
   "scripts": {
     "serve": "npx --yes serve site",
-    "verificar": "node tools/verificar.mjs",
+    "verificar": "node tools/verificar.mjs && node tools/seo.mjs --checar",
     "testar": "node tests/unit/testar-quadro.mjs",
     "testar:lote": "python3 tests/e2e-py/testar-lote.py",
     "testar:formato": "python3 tests/e2e-py/testar-formato.py",
@@ -30,7 +30,10 @@
     "testar:gerar-real": "node tests/e2e/testar-gerar-real.mjs",
     "testar:node": "node tests/unit/testar-quadro.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs && node tests/e2e/testar-led.mjs && node tests/e2e/testar-csp.mjs && node tests/e2e/testar-gerar-real.mjs && node tests/e2e/testar-pocket.mjs",
     "testar:pocket": "node tests/e2e/testar-pocket.mjs",
-    "testar:csp": "node tests/e2e/testar-csp.mjs"
+    "testar:csp": "node tests/e2e/testar-csp.mjs",
+    "seo": "node tools/seo.mjs",
+    "og": "node tools/gerar-og.mjs",
+    "icones": "node tools/gerar-icones.mjs"
   },
   "engines": {
     "node": ">=20"
