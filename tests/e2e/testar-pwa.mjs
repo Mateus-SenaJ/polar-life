@@ -166,8 +166,9 @@ try {
     await PLFOTOS.salvar(1, new File([b], 'a.jpg', { type: 'image/jpeg' })); await PLFOTOS.salvar(2, new File([b], 'b.jpg', { type: 'image/jpeg' }));
   }, novaFoto.toString());
   ok(await arm.evaluate(() => window.__persist === 1), 'storage.persist() é pedido uma única vez, na primeira foto');
-  await arm.reload({ waitUntil: 'load' }); await arm.waitForTimeout(400);
+  await arm.reload({ waitUntil: 'load' });
   const av = arm.locator('#aviso-espaco');
+  await av.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}); // a estimativa é assíncrona: espera o aviso em vez de um tempo fixo (CI mais lento)
   ok(await av.isVisible() && /80%/.test(await av.textContent()) && (await av.locator('svg').count()) === 1, 'acima de 80%: aviso na T-01 com ícone e texto');
   ok(await arm.evaluate(async () => { const e = await PLPWA.espaco(); return e.cheio && Math.abs(e.fracao - 0.85) < 1e-9; }), 'PLPWA.espaco() calcula a fração usada');
 
