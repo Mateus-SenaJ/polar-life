@@ -16,7 +16,7 @@ try:
         pg.on("pageerror", lambda e: erros.append(str(e)))
         pg.goto(BASE + "/app/editor/quadro/#foto-3"); pg.wait_for_timeout(400)
         pg.click("#tab-molduras"); pg.wait_for_timeout(100)
-        for fid, w, h, jw, jh in [("pocket", 60, 80, 48, 60), ("imini", 54, 86, 46, 62), ("isq", 72, 86, 62, 62), ("iwide", 108, 86, 99, 62)]:
+        for fid, w, h, jw, jh in [("pocket", 66, 99, 60, 79), ("imini", 54, 86, 46, 62), ("isq", 72, 86, 62, 62), ("iwide", 108, 86, 99, 62)]:  # pocket 66 × 99 · janela 60 × 79 (etapa 34, D-113)
             ok(pg.is_enabled(f'[data-fmt="{fid}"]'), f"{fid}: botão ativo")
             pg.click(f'[data-fmt="{fid}"]'); pg.click("#fmt-sim"); pg.wait_for_timeout(150)
             fr = pg.evaluate("PLQ.ST()[0].fr")
