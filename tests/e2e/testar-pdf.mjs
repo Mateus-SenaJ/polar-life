@@ -242,7 +242,7 @@ try {
     if (!a || !b) return rotulo + ': caixa ausente';
     const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
     marca(Math.max(dx, dy));
-    return (dx > 0.05 || dy > 0.05) ? rotulo + ': Δx=' + dx.toFixed(3) + ' Δy=' + dy.toFixed(3) : null;
+    return (dx > 0.2 || dy > 0.2) ? rotulo + ': Δx=' + dx.toFixed(3) + ' Δy=' + dy.toFixed(3) : null;   // DOC-08 MT-02: texto ±0,2 mm (o rasterizador de cada sistema varia)
   };
 
   const conferirFidelidade = async (nome, opcoes) => {
