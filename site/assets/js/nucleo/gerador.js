@@ -85,7 +85,7 @@ function projeto(){
   if(q){
     var g=q[0]||{},f0=g.fr;
     if(f0&&f0.w>0&&f0.h>0&&f0.lado>0&&f0.w-2*f0.lado>0){fr={w:f0.w,h:f0.h,jh:f0.jh>0?f0.jh:f0.w-2*f0.lado,lado:f0.lado,topo:f0.topo==null?6:f0.topo,rad:f0.rad==null?.4:f0.rad,ori:f0.ori==='h'?'h':'v'}}
-    if(g.leg&&g.leg.txt&&g.leg.data&&g.leg.loc)leg=g.leg;
+    if(g.leg&&g.leg.txt&&g.leg.data&&g.leg.loc)leg=LT.migrar(g.leg);   /* D-135/D-136: projeto antigo abre com os dados novos */
     q.slice(1).forEach(function(e,k){lista.push(e);if(typeof e.txt==='string')txt[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')meta[k+1]=e.meta});
   }else{
     var l=null;try{l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null')}catch(e){}
@@ -177,10 +177,10 @@ function grupoRot(itens,cx,cy,graus){
 }
 
 function layoutLegenda(f,fr,leg,s){
-  var preset=leg?leg.preset:'simples',pos=leg?leg.pos||'abaixo':'abaixo',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],legOu,sepEst,dataTxt,locTxt;
+  var preset=leg?leg.preset:'simples',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],legOu,sepEst,dataTxt,locTxt;
   /* MT-01/MT-02: tudo em µm dentro desta função; fr e constantes entram em mm. */
-  var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2),GAP_ACIMA=mm(2);
-  if(leg&&leg.limpa){return []} /* D-119: ocultar sem apagar também no arquivo */
+  var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2);
+  if(leg&&leg.original){return []} /* D-135: só a foto e a moldura (sem apagar nada) */
   if(leg){
     legOu=leg;
     capTxt=leg.txt.on?LT.caixaLG(f.leg,leg.txt.caixa):'';
@@ -191,7 +191,7 @@ function layoutLegenda(f,fr,leg,s){
     var segD={k:'data',txt:dataTxt,est:dataEst,box:preset==='calendario'},segL={k:'loc',txt:locTxt,est:locEst,box:false};
     metaSegs=((leg.ordem||'data-loc')==='loc-data'?[segL,segD]:[segD,segL]).filter(function(sg){return sg.txt})
   }else{
-    legOu={pos:'abaixo',meta:'junto',ordem:'data-loc',medida:'caixa',txt:{on:false},data:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,fmt:0,cor:'preto'},loc:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
+    legOu={original:false,al:'esq',meta:'junto',ordem:'data-loc',medida:'caixa',txt:{on:false},data:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,fmt:0,cor:'preto'},loc:{on:true,font:'IBM Plex Mono',pt:2.5*72/25.4,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
     capTxt=f.leg||'';
     capEst={fam:'Caveat',peso:500,it:false,pt:5.2*72/25.4,cor:'#000000',esp:0,contorno:false};
     var metaEst={fam:'IBM Plex Mono',peso:400,it:false,pt:2.5*72/25.4,cor:'#000000',esp:.02,contorno:false};
@@ -201,7 +201,6 @@ function layoutLegenda(f,fr,leg,s){
   }
   var junto=(legOu.meta||'junto')!=='linhas';                  /* D-113: juntas numa linha ou em linhas separadas */
   metaSegs.forEach(function(seg){var w=medir(seg.txt,seg.est);if(seg.box)w+=2*.4*tamUm(seg.est.pt)+520;seg.w=w});
-  var metaWidth=junto?metaSegs.reduce(function(a,sg){return a+sg.w},0)+(metaSegs.length>1?medir(' • ',sepEst):0):metaSegs.reduce(function(a,sg){return Math.max(a,sg.w)},0);
   var capBox=preset==='etiqueta'||preset==='bilhete'||preset==='carimbo',capBorder=capBox?(preset==='carimbo'?530:260):0;
   var capSize,capPadX,capPadY,capTextW,capBoxW,capBoxH;
   function medirCap(){
@@ -209,7 +208,7 @@ function layoutLegenda(f,fr,leg,s){
     capTextW=capTxt?medir(capTxt,capEst):0;capBoxW=capTxt?capTextW+2*capPadX+2*capBorder:0;capBoxH=capTxt?1.1*capSize+2*capPadY+2*capBorder:0
   }
   medirCap();
-  var capAvail=pos==='acima'?JW-(metaWidth?metaWidth+GAP_ACIMA:0):JW;
+  var capAvail=JW;                                        /* D-136: o texto é sempre abaixo, na largura da janela */
   if(leg&&leg.txt.fit&&capTxt){
     while(capBoxW>capAvail&&capEst.pt>8){capEst.pt=Math.max(8,capEst.pt-.25);medirCap()}
   }
@@ -218,7 +217,17 @@ function layoutLegenda(f,fr,leg,s){
     if(medir(capTxt,capEst)>capMaxW+.01){capTxt=cortar(capTxt,capEst,capMaxW);medirCap()}
   }
   /* D-113 · MT-02: PLTEXTO.linhas é o único cálculo da posição da data e do local (lin em mm, sai em µm) */
-  var LNS=LT.linhas(legOu,fr,medirLeg,{pos:pos,capTxt:!!capTxt&&pos==='abaixo',capBoxH:capBoxH/1000,temData:!!dataTxt,temLoc:!!locTxt});
+  var LNS=LT.linhas(legOu,fr,medirLeg,{capTxt:!!capTxt,capBoxH:capBoxH/1000,temData:!!dataTxt,temLoc:!!locTxt});
+  /* D-136 · MT-02: o alinhamento (esq|centro|dir) sai sempre de PLTEXTO.alinharX — a mesma função da tela */
+  var al=legOu.al||'esq';
+  function ax(wmm){return mm(LT.alinharX(al,fr.lado,fr.jw,wmm))}
+  function segsDe(ln){return ln.k==='meta'?metaSegs:metaSegs.filter(function(sg){return sg.k===ln.k})}
+  function largMeta(ln){                                     /* soma dos segmentos da linha (o « • » entra na conta) */
+    var segs=segsDe(ln),w=0;
+    segs.forEach(function(sg){w+=sg.w});
+    if(junto&&ln.k==='meta'&&segs.length>1)w+=medir(' • ',sepEst);
+    return w
+  }
   function capItems(top,x){
     var arr=[],clip={x:Math.round(L),w:Math.round(JW)};
     if(capTxt){
@@ -229,7 +238,7 @@ function layoutLegenda(f,fr,leg,s){
   }
   function metaItems(ln,x){
     var arr=[],b=Math.round(ln.base*1000),topU=Math.round(ln.top*1000),mx=x,maxRight=L+JW,clip={x:Math.round(L),w:Math.round(JW)};
-    var segs=ln.k==='meta'?metaSegs:metaSegs.filter(function(sg){return sg.k===ln.k});
+    var segs=segsDe(ln);
     segs.forEach(function(seg,i){
       if(mx>=maxRight)return;
       var avail=maxRight-mx,txt=seg.txt;
@@ -243,7 +252,7 @@ function layoutLegenda(f,fr,leg,s){
         mx+=bw
       }else{
         var w=medir(txt,seg.est);
-        if(w>avail+.01){txt=cortar(txt,seg.est,avail);w=medir(txt,seg.est)}
+        if(w>avail+1){txt=cortar(txt,seg.est,avail+1);w=medir(txt,seg.est)}   /* +1 µm: o arredondamento do x em µm não corta o texto */
         arr.push(texto(txt,mx,b,seg.est,false,topU,ln.lh,clip));
         mx+=w
       }
@@ -256,29 +265,15 @@ function layoutLegenda(f,fr,leg,s){
   }
   var fim=function(){var u=LNS[LNS.length-1];return u?Math.round((u.top+u.lh*u.corpo)*1000):0}; /* fim da última caixa de linha */
   var grupos=[];
-  if(pos==='abaixo'){
-    var figTop=T+JH+GAP_FOTO,items=capItems(figTop,L),mItems=[];
-    LNS.forEach(function(ln){mItems=mItems.concat(metaItems(ln,L))});
-    if(preset==='carimbo'&&capTxt)items=[grupoRot(items,L+capBoxW/2,figTop+capBoxH/2,-3)];
-    grupos.push({itens:items.concat(mItems),figTop:figTop,figH:Math.max(capTxt?capBoxH:0,fim()-figTop)})
-  }else if(pos==='acima'){
-    var gap2=capBoxW&&metaWidth?GAP_ACIMA:0,totalW=capBoxW+gap2+metaWidth,startX=Math.max(L,L+(JW-totalW)/2),capTop=(T-capBoxH)/2,items2=capItems(capTop,startX),mItems2=[];
-    LNS.forEach(function(ln){mItems2=mItems2.concat(metaItems(ln,startX+capBoxW+gap2))});
-    if(preset==='carimbo'&&capTxt)items2=[grupoRot(items2,startX+capBoxW/2,capTop+capBoxH/2,-3)];
-    grupos.push({itens:items2.concat(mItems2),figTop:0,figH:T})
-  }else{
-    var startX3=L+(JW-capBoxW)/2,capTop3=(T-capBoxH)/2,items3=capItems(capTop3,startX3);
-    if(preset==='carimbo'&&capTxt)items3=[grupoRot(items3,startX3+capBoxW/2,capTop3+capBoxH/2,-3)];
-    grupos.push({itens:items3,figTop:0,figH:T});
-    var figTop4=T+JH+GAP_FOTO,mItems4=[];
-    LNS.forEach(function(ln){mItems4=mItems4.concat(metaItems(ln,L))});
-    grupos.push({itens:mItems4,figTop:figTop4,figH:Math.max(0,fim()-figTop4)})
-  }
+  var figTop=T+JH+GAP_FOTO,capX=ax(capBoxW/1000),items=capItems(figTop,capX),mItems=[];
+  LNS.forEach(function(ln){mItems=mItems.concat(metaItems(ln,ax(largMeta(ln)/1000)))});
+  if(preset==='carimbo'&&capTxt)items=[grupoRot(items,capX+capBoxW/2,figTop+capBoxH/2,-3)];
+  grupos.push({itens:items.concat(mItems),figTop:figTop,figH:Math.max(capTxt?capBoxH:0,fim()-figTop)});
   var out=[];
   grupos.forEach(function(g){
-    if(!leg||(!leg.dx&&!leg.dy&&!leg.inc)){out=out.concat(g.itens);return}
-    var ox=L,oy=g.figTop+g.figH/2,dx=(leg.dx||0)*1000,dy=(leg.dy||0)*1000,inc=(leg.inc||0)*Math.PI/180,ca=Math.cos(inc),sa=Math.sin(inc);
-    out.push({t:'grupo',m:[r6(ca),r6(sa),r6(-sa),r6(ca),Math.round(ox+dx-ca*ox+sa*oy),Math.round(oy+dy-sa*ox-ca*oy)],itens:g.itens})
+    if(!leg||(!leg.dy&&!leg.inc)){out=out.concat(g.itens);return}
+    var ox=L,oy=g.figTop+g.figH/2,dy=(leg.dy||0)*1000,inc=(leg.inc||0)*Math.PI/180,ca=Math.cos(inc),sa=Math.sin(inc);
+    out.push({t:'grupo',m:[r6(ca),r6(sa),r6(-sa),r6(ca),Math.round(ox-ca*ox+sa*oy),Math.round(oy-sa*ox-ca*oy)],itens:g.itens})
   });
   return out
 }
@@ -289,7 +284,7 @@ function itensPolaroid(c,proj){
      para a imagem ficar de pé no papel. O grupo aplica giro da grade/orientação. */
   itens.push({t:'foto',n:f.n,x:mm(fr.lado),y:mm(fr.topo),w:mm(fr.jw),h:mm(fr.jh),rot:fr.ori==='h'?-90:0});
   itens=itens.concat(layoutLegenda(f,fr,proj.leg,s));
-  if(s.assin){var w=3.9*2.9,h=w*96/279,dir=LT.assinaturaDir(proj.leg,fr); /* D-128: espelha no Pocket em duas linhas */
+  if(s.assin){var w=3.9*2.9,h=w*96/279,dir=LT.assinaturaPos(proj.leg,fr)==='dir'; /* D-129/D-136: canto oposto ao texto */
     itens.push({t:'img',x:mm(dir?fr.w-fr.lado-w:fr.lado),y:mm(fr.h-3-h),w:mm(w),h:mm(h),src:'assinatura'})}
   return itens
 }

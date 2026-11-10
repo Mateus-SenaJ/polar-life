@@ -1,6 +1,7 @@
 /* T-10 · Inspetor · aba LEGENDAS · DOC-05 FN-07 · DOC-02 §4 (EXC-2) · DOC-12 DV-03/04/05/18/21/23/28
    Estilo dos 3 tipos = projeto todo (ST[0].leg). Texto livre = por foto (ST[n].txt). Histórico vem do quadro.js.
-   D-113: «linhas» do Pocket — posições da data e do local vêm de PLTEXTO.linhas (MT-02). */
+   D-113: «linhas» do Pocket — posições da data e do local vêm de PLTEXTO.linhas (MT-02).
+   D-135: «Polaroid original» é o primeiro controle · D-136: o texto fica só abaixo, alinhado esq|centro|dir. */
 (function(){
 var Q=window.PLQ;if(!Q)return;
 var LT=window.PLTEXTO;if(!LT)return;
@@ -9,6 +10,7 @@ var DATA=new Date(2026,6,14),LOCAL={cidade:'Campos do Jordão',uf:'SP',estado:'S
 var ROT=['14.07.26','14/07/2026','14-07-2026','14/07/26','2026-07-14','07/2026','07.26','14 de julho de 2026','14 jul 2026','14 de julho','Julho de 2026','jul/26','terça, 14 de julho'];
 var FMT=ROT.map(function(r,i){return[r,LT.FMTD[i]]}); /* 13 formatos do FN-07 (DV-05) */
 var CAT=LT.CAT,FONTES=LT.FONTES;
+var ALCSS={esq:'left',centro:'center',dir:'right'},JC={esq:'flex-start',centro:'center',dir:'flex-end'}; /* D-136: alinhamento na tela */
 function fonte(n){return LT.fonte(n)}
 var carregadas={};
 function carregar(lista){ /* sob demanda (LG-04): as fontes são nossas (fonts.css, P-FONTES fechada); só pede as visíveis na lista */
@@ -31,7 +33,7 @@ var DEFL={meta:'junto',ordem:'data-loc',medida:'caixa'}; /* chaves novas (D-113)
 var UI={sel:null,cat:'todas',busca:'',fav:['Caveat'],rec:[],aberto:{},conf:false,err:null};
 var COR={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 function copia(o){return JSON.parse(JSON.stringify(o))}
-function L(){var S=Q.ST()[0];if(!S.leg)S.leg=copia(PADRAO);return S.leg}
+function L(){var S=Q.ST()[0];if(!S.leg)S.leg=copia(PADRAO);return LT.migrar(S.leg)}   /* D-135/D-136: dados antigos viram os novos ao ler */
 function T(){var s=Q.S();return s.txt===null||s.txt===undefined?['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'][(Q.src(Q.cur())-1)%4]:s.txt}
 function getp(o,k){return k.split('.').reduce(function(a,b){return a[b]},o)}
 function setp(o,k,v){var a=k.split('.');a.slice(0,-1).forEach(function(x){o=o[x]});o[a[a.length-1]]=v}
@@ -60,31 +62,34 @@ function checar(v){
 /* ---------- desenho na polaroid ---------- */
 function pintar(){
   var l=L(),pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
-  top.hidden=!!l.limpa;band.hidden=!!l.limpa;
+  var orig=!!l.original,al=l.al||'esq';
+  top.hidden=orig;band.hidden=orig;
   [].slice.call(pq.querySelectorAll('.lg-xl')).forEach(function(n){n.parentNode.removeChild(n)}); /* sai antes: o .lg-lc do fluxo continua achável */
-  if(l.limpa)return; /* D-119: mantém os dados e só esconde a inscrição (inclusive as linhas do Pocket); assinatura segue o plano */
+  pq.setAttribute('data-preset',l.preset);
+  pq.style.setProperty('--al',ALCSS[al]);pq.style.setProperty('--jc',JC[al]);   /* D-136: alinhamento da faixa */
+  pq.style.setProperty('--dy',l.dy);pq.style.setProperty('--inc',l.inc+'deg');
+  var sigE=pq.querySelector('.pq__sig');
+  if(sigE){var sp=LT.assinaturaPos(l,Q.FR);sigE.classList.toggle('pq__sig--dir',sp==='dir');sigE.classList.toggle('pq__sig--centro',sp==='centro')} /* D-129/D-136 */
+  if(orig){                              /* D-135: só a foto e a moldura; nada é apagado */
+    if(top)top.innerHTML='';if(cap)cap.innerHTML='';if(meta)meta.innerHTML='';return
+  }
   if(!l.txt)return;
   var cor=function(k){return COR[l[k].cor]||'#000'};
   var M=Q.meta?Q.meta(Q.cur()):{data:DATA,cidade:LOCAL.cidade,iso:'2026-07-14T08:00'};
   var dt=l.data.on&&M.data?FMT[l.data.fmt][1](M.data):'',lc=l.loc.on&&M.cidade?localTxt(l.loc,M.cidade):'';
   var txt=l.txt.on?caixa(T(),l.txt.caixa):'';
-  var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=l.medida==='letras'&&l.pos!=='acima'&&!!(dt||lc);
-  pq.setAttribute('data-preset',l.preset);
-  var sigE=pq.querySelector('.pq__sig');if(sigE)sigE.classList.toggle('pq__sig--dir',LT.assinaturaDir(l,Q.FR)); /* D-128 */
-  pq.style.setProperty('--dx',l.dx);pq.style.setProperty('--dy',l.dy);pq.style.setProperty('--inc',l.inc+'deg');
+  var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=l.medida==='letras'&&!!(dt||lc);
   var capHTML=txt?'<span class="lg-txt" id="lg-txt" style="font-family:'+fam(l.txt.font)+';font-style:'+(fonte(l.txt.font).it?'italic':'normal')+';font-weight:'+fonte(l.txt.font).w+';--pt:'+l.txt.pt+';letter-spacing:'+l.txt.esp+'em;color:'+cor('txt')+'"></span>':'';
   var dtH=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="font-family:'+fam(l.data.font)+';--pt:'+l.data.pt+';color:'+cor('data')+'"></time>':'';
   var lcH=lc?'<span class="lg-lc" style="font-family:'+fam(l.loc.font)+';--pt:'+l.loc.pt+';color:'+cor('loc')+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
   var sepH=(dt&&lc)?'<span class="lg-sep" aria-hidden="true"> • </span>':'';
   var metaHTML=junto?(ordem==='loc-data'?lcH+sepH+dtH:dtH+sepH+lcH)
    :'<span class="lg-ms">'+(ordem==='loc-data'?[lcH,dtH]:[dtH,lcH]).filter(Boolean).map(function(r){return'<span class="lg-m">'+r+'</span>'}).join('')+'</span>';
-  /* posição: abaixo (tudo embaixo) · acima (tudo na margem de cima) · ambas (texto em cima, data e local embaixo) */
-  var acima=l.pos==='acima',ambas=l.pos==='ambas';
-  top.innerHTML=(acima||ambas)?capHTML:'';
-  top.innerHTML+=acima?'<span class="lg-m">'+metaHTML+'</span>':'';
-  cap.outerHTML=(acima||ambas)?'<span class="pq__cap" id="cap" hidden></span>':'<span class="pq__cap" id="cap">'+capHTML+'</span>';
-  meta.innerHTML=acima||letras?'':metaHTML;   /* letras: o fluxo fica vazio (só as absolutas do .lg-xl contam, senão o fora() lê rects zerados) */
-  meta.hidden=acima||!metaHTML||letras;
+  /* D-136: o texto é sempre abaixo da foto; a faixa de cima fica vazia */
+  top.innerHTML='';
+  cap.outerHTML='<span class="pq__cap" id="cap">'+capHTML+'</span>';
+  meta.innerHTML=letras?'':metaHTML;   /* letras: o fluxo fica vazio (só as absolutas do .lg-xl contam, senão o fora() lê rects zerados) */
+  meta.hidden=!metaHTML||letras;
   var t1=$('lg-txt');if(t1)t1.textContent=txt;
   var dtE=pq.querySelector('.lg-dt');if(dtE)dtE.textContent=dt;
   var lcEl=pq.querySelector('.lg-lc');if(lcEl)lcEl.appendChild(document.createTextNode(lc));
@@ -159,10 +164,23 @@ function seletor(k){
 }
 function sw(k,rot,on){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'" aria-labelledby="s-'+k+'"><span></span></button></div>'}
 function montar(){
-  var l=L(),h='';
-  h+='<section class="mod" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
+  var l=L(),h='',dis=l.original?' aria-disabled="true"':'';   /* D-135: com a Polaroid original as outras seções ficam apagadas */
+  /* 1 · Polaroid original (D-135): primeiro controle do painel */
+  h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Polaroid original</h3>'
+   +sw('original','Polaroid original',!!l.original)
+   +'<p class="f__h" id="lg-orig-est">'+(l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis')+'</p>'
+   +(l.original?'<div class="msg msg--warn lg__aviso"><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>Desligue «Polaroid original» para editar.</p></div></div>':'')
+   +'</section>';
+  h+='<div class="lg__rest'+(l.original?' is-off':'')+'" id="lg-rest">';
+  /* 2 · Posição (D-136): o texto é sempre abaixo, alinhado entre as margens da foto */
+  h+='<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
+   +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al','O texto fica entre as mesmas margens laterais da foto.')
+   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('inc','Inclinação','°',-5,5,0.1,1,'De −5° a +5°.')+'</section>';
+  /* 3 · Estilos prontos */
+  h+='<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
    +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>';
-  h+='<section class="mod" aria-labelledby="lm1"><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('limpa','Polaroid sem textos',!!l.limpa)+'<p class="f__h">'+(l.limpa?'Ligado · textos ocultos':'Desligado · textos visíveis')+'</p>'+sw('txt.on','Mostrar texto livre',l.txt.on)
+  /* 4 · Texto livre */
+  h+='<section class="mod" aria-labelledby="lm1"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
    +'<div class="f" id="f-texto"><div class="f__top"><label class="f__l" for="lg-in">Texto desta foto</label><span class="mono f__h" id="lg-cnt">0/80</span></div><div class="num lg-num"><input id="lg-in" maxlength="80" autocomplete="off" style="text-align:left;padding-left:12px"></div><p class="f__h" id="lg-h">Até 80 caracteres.</p><div id="lg-conf" hidden></div></div>'
    +seletor('txt')
    +sld('txt.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')
@@ -170,11 +188,11 @@ function montar(){
    +seg('caixa','Caixa',[['normal','Normal'],['maiusc','Maiúsc.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
    +sld('txt.esp','Espaçamento','em',-0.05,0.3,0.01,2,'De −0,05 a 0,3 em.')
    +cores('txt',l.txt.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm2"><h3 class="mod__h rotulo rotulo--m" id="lm2">Data</h3>'+sw('data.on','Mostrar data',l.data.on)
+  h+='<section class="mod" aria-labelledby="lm2"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm2">Data</h3>'+sw('data.on','Mostrar data',l.data.on)
    +'<div class="f"><div class="f__top"><span class="f__l" id="l-fmt">Formato</span>'+rst('data.fmt')+'</div><div class="fmts" role="radiogroup" aria-labelledby="l-fmt">'+FMT.map(function(f,i){return'<label class="preset preset--s"><input type="radio" name="fmt" value="'+i+'"'+(l.data.fmt===i?' checked':'')+'><span>'+f[1](DATA)+'</span></label>'}).join('')+'</div><p class="f__h">Origem: data da foto. Sem data, a legenda não mostra data.</p></div>'
    +seletor('data')
    +sld('data.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('data',l.data.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm3"><h3 class="mod__h rotulo rotulo--m" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
+  h+='<section class="mod" aria-labelledby="lm3"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
    +'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>'
    +seg('uf','Estado',[['sigla','Sigla'],['nome','Nome'],['oculto','Oculto']],l.loc.uf,'loc.uf')
    +seg('pais','País',[['oculto','Oculto'],['nome','Nome'],['cod','Código']],l.loc.pais,'loc.pais')
@@ -182,14 +200,12 @@ function montar(){
    +seg('ordem','Ordem',[['cidade','Cidade, Estado'],['estado','Estado, Cidade']],l.loc.ordem,'loc.ordem')
    +seletor('loc')
    +sld('loc.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('loc',l.loc.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm4"><h3 class="mod__h rotulo rotulo--m" id="lm4">Linhas</h3>' /* D-113 */
+  h+='<section class="mod" aria-labelledby="lm4"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm4">Linhas</h3>' /* D-113 */
    +seg('lmeta','Data e local',[['junto','Na mesma linha'],['linhas','Em linhas separadas']],val('meta'),'meta')
    +seg('lordem','Ordem',[['data-loc','Data primeiro'],['loc-data','Local primeiro']],val('ordem'),'ordem')
    +seg('lmedida','Medir espaços por',[['caixa','Caixa do texto'],['letras','Topo das letras']],val('medida'),'medida','Com «topo das letras», a primeira maiúscula fica a 4 mm da foto e a segunda linha, 2 mm abaixo da base da primeira.')
    +'</section>';
-  h+='<section class="mod" aria-labelledby="lm5"><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
-   +seg('pos','Onde fica',[['abaixo','Abaixo'],['acima','Acima'],['ambas','Ambas']],l.pos,'pos','Abaixo: tudo embaixo. Acima: tudo na margem de cima. Ambas: texto em cima, data e local embaixo.')
-   +sld('dx','Deslocar na horizontal','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('inc','Inclinação','°',-5,5,0.1,1,'De −5° a +5°.')+'</section>';
+  h+='</div>';
   h+='<div id="lg-fora" class="msg msg--warn" hidden><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>A legenda passa da área segura e bloqueia a impressão. Reduza o tamanho, encurte o texto ou use «Ajustar para caber».</p><div class="qmsg__act"><button type="button" class="btn2 btn2--sm" data-lfit>Ajustar para caber</button></div></div></div>';
   h+='<div class="pe"><button type="button" class="btn2 btn2--lg pe__b" id="lg-rtudo">Resetar legendas</button><button type="button" class="btn2 btn2--lg pe__b" id="lg-apply">Aplicar legendas</button></div>';
   $('p-legendas').innerHTML=h;
@@ -211,6 +227,7 @@ function sincronizar(){
   [].forEach.call(document.querySelectorAll('[data-chk]'),function(i){i.checked=!!getp(l,i.getAttribute('data-chk'))});
   var inp=$('lg-in');if(inp&&document.activeElement!==inp)inp.value=T();
   $('lg-cnt').textContent=(inp?inp.value.length:0)+'/80';
+  var oe=$('lg-orig-est');if(oe)oe.textContent=l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis';
   $('lg-fora').hidden=!fora()
 }
 function render(){
@@ -262,7 +279,7 @@ P.addEventListener('change',function(e){
 P.addEventListener('focusout',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-n')){e.target.closest('.f').classList.remove('is-err');sincronizar()}});
 P.addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
-  if(b.hasAttribute('data-sw')){var k=b.getAttribute('data-sw');mudar(k,!getp(L(),k));return}
+  if(b.hasAttribute('data-sw')){var k=b.getAttribute('data-sw');mudar(k,!getp(L(),k));if(k==='original')montar();return}
   if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';montar();return}
   if(b.hasAttribute('data-fcat')){UI.cat=b.getAttribute('data-fcat');montar();return}
   if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');UI.rec=[n].concat(UI.rec.filter(function(x){return x!==n})).slice(0,5);var s=UI.sel;UI.sel=null;L()[s].font=n;Q.commit('lg:font');montar();return}

@@ -52,7 +52,9 @@ var LISTA_REAL=lerLista(),DEMO=!(LISTA_REAL&&window.PLTEXTO&&PLTEXTO.ehReal()); 
 var LISTA0=LISTA_REAL||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
 function lerQuadro(){                                              /* estado completo guardado ao sair para as Folhas (D-085) */
   try{var o=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
-    if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'}))return o}catch(e){}
+    if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'})){
+      if(o[0].leg&&window.PLTEXTO)PLTEXTO.migrar(o[0].leg);   /* D-135/D-136: projeto antigo abre com os dados novos */
+      return o}}catch(e){}
   return null}
 var SALVO=lerQuadro();
 if(SALVO){ST=SALVO}

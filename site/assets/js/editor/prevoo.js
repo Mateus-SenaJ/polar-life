@@ -25,7 +25,7 @@ function analisar(){
   if(!F.length)bl.push('O projeto não tem fotos. Adicione ao menos uma foto.');
   else if(R.erro)bl.push('A polaroid não cabe neste papel. Escolha um papel maior ou reduza as margens.');
   else if(!R.sheets.length)bl.push('Nenhuma folha tem fotos.');
-  var fora=R.erro||C.LG&&C.LG.limpa?0:C.foraTodas(); /* D-119 */
+  var fora=R.erro||C.LG&&C.LG.original?0:C.foraTodas(); /* D-135: com a Polaroid original não há texto fora da área segura */
   if(fora)bl.push('A legenda sai da área segura em '+pl(fora,'polaroid','polaroids')+' (inclui a zona da assinatura). Reduza o corpo, use «Ajustar para caber» ou mude a posição na aba Legendas.');
   var coord=F.filter(function(f){return COORD.test(f.leg||'')});
   if(coord.length)bl.push('O texto da '+(coord.length===1?'foto ':'s fotos ')+coord.map(function(f){return f.n}).join(', ')+' tem coordenadas. Troque por uma cidade.');

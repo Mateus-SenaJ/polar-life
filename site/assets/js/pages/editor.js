@@ -16,7 +16,7 @@ var LISTA=[],TXT={},META={},LG=null;
 try{var Qd=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
   if(Array.isArray(Qd)&&Qd.length>=2&&Qd.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0})){
     Qd.slice(1).forEach(function(e,k){LISTA.push(e.src);if(typeof e.txt==='string')TXT[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')META[k+1]=e.meta});
-    if(Qd[0]&&Qd[0].leg&&Qd[0].leg.txt&&Qd[0].leg.data&&Qd[0].leg.loc)LG=Qd[0].leg;   /* estilo da legenda (T-10) vale nas folhas */
+    if(Qd[0]&&Qd[0].leg&&Qd[0].leg.txt&&Qd[0].leg.data&&Qd[0].leg.loc)LG=PLTEXTO.migrar(Qd[0].leg);   /* estilo da legenda (T-10) vale nas folhas · D-135/D-136 */
     var fr=Qd[0]&&Qd[0].fr;                              /* formato escolhido na aba Molduras (D-084) */
     if(fr&&fr.w>0&&fr.h>0&&fr.lado>0&&fr.w-2*fr.lado>0){FR.w=fr.w;FR.h=fr.h;FR.lado=fr.lado;FR.topo=fr.topo;FR.jw=fr.w-2*fr.lado;FR.jh=fr.jh>0?fr.jh:FR.jw;FR.rad=fr.rad}
   }}catch(e){LISTA=[];TXT={};META={};LG=null}
@@ -76,18 +76,18 @@ function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;
 var FMTD=PLTEXTO.FMTD, caixaLG=PLTEXTO.caixaLG, estLG=PLTEXTO.estLG, dadosFoto=PLTEXTO.dadosFoto, localLG=PLTEXTO.localLG, LOC0=PLTEXTO.LOC0;
 function polaroid(c,s,px,det){
   var L=c.x*px,T=c.y*px,W=c.w*px,H=c.h*px,ow=FR.w*px,oh=FR.h*px,ox=(W-ow)/2,oy=(H-oh)/2;
-  var html='<figure class="pol'+(D.contorno&&!D.guias?' is-out':'')+'" data-n="'+c.f.n+'" style="left:'+L+'px;top:'+T+'px;width:'+W+'px;height:'+H+'px">';
+  var al=LG?(LG.al||'esq'):'esq',alCSS=al==='dir'?'right':al==='centro'?'center':'left';   /* D-136: mesmo alinhamento da tela e do PDF */
+  var html='<figure class="pol'+(D.contorno&&!D.guias?' is-out':'')+'" data-n="'+c.f.n+'" style="left:'+L+'px;top:'+T+'px;width:'+W+'px;height:'+H+'px;--al:'+alCSS+'">';
   html+='<div class="pol__in" style="left:'+ox+'px;top:'+oy+'px;width:'+ow+'px;height:'+oh+'px'+(c.giro?';transform:rotate(90deg)':'')+'">';
   html+='<div class="pol__ph" style="left:'+FR.lado*px+'px;top:'+FR.topo*px+'px;width:'+FR.jw*px+'px;height:'+FR.jh*px+'px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19l7-11 4 6 3-4 6 9z"/></svg></div>';
-  if(det&&(!LG||!LG.limpa)){
+  if(det&&(!LG||!LG.original)){                    /* D-135: com a Polaroid original a faixa fica sem texto */
     var yb=(FR.topo+FR.jh)*px;
-    var cap,meta,pos='abaixo',tr='',mls='';
+    var cap,meta,tr='',mls='';
     if(LG){
       var DF=dadosFoto(c.f),dtx=LG.data.on&&DF.d?FMTD[LG.data.fmt||0](DF.d):'',lcx=LG.loc.on&&DF.c?localLG(LG.loc,DF.c):'';
       var t=LG.txt.on?caixaLG(c.f.leg,LG.txt.caixa):'';
       cap=t?'<span class="pol__cap" style="'+estLG(LG.txt,0,px,';letter-spacing:'+LG.txt.esp+'em')+'">'+esc(t)+'</span>':'';
-      pos=LG.pos||'abaixo';
-      tr=';transform-origin:left center;transform:translate('+(LG.dx||0)*px+'px,'+(LG.dy||0)*px+'px) rotate('+(LG.inc||0)+'deg)';
+      tr=';transform-origin:left center;transform:translateY('+(LG.dy||0)*px+'px) rotate('+(LG.inc||0)+'deg)';
       var dE=dtx?'<time datetime="'+DF.iso+'" style="'+estLG(LG.data,0,px)+'">'+esc(dtx)+'</time>':'',
           lE=lcx?'<span style="'+estLG(LG.loc,0,px)+'">'+esc(lcx)+'</span>':'';
       var junto=(LG.meta||'junto')!=='linhas',ordem=LG.ordem||'data-loc';   /* D-113: juntas ou em linhas separadas */
@@ -98,7 +98,7 @@ function polaroid(c,s,px,det){
         var rws=(ordem==='loc-data'?[[LG.loc,lcx],[LG.data,dtx]]:[[LG.data,dtx],[LG.loc,lcx]]).filter(function(r){return r[1]});
         meta=rws.length?'<span class="pol__meta">'+rws.map(function(r){return'<span class="pol__mline" style="'+estLG(r[0],0,px)+'">'+esc(r[1])+'</span>'}).join('')+'</span>':''
       }
-      if(LG.medida==='letras'&&pos!=='acima'&&(dtx||lcx)){   /* D-113 · MT-02: linhas nas posições exatas de PLTEXTO.linhas */
+      if(LG.medida==='letras'&&(dtx||lcx)){      /* D-113 · MT-02: linhas nas posições exatas de PLTEXTO.linhas */
         var LNS=PLTEXTO.linhas(LG,FR,PLTEXTO.medTela,{temData:!!dtx,temLoc:!!lcx});
         var dX=dtx?'<time datetime="'+DF.iso+'" style="'+estLG(LG.data,0,px,';line-height:0')+'">'+esc(dtx)+'</time>':'',
             lX=lcx?'<span style="'+estLG(LG.loc,0,px,';line-height:0')+'">'+esc(lcx)+'</span>':'',
@@ -114,15 +114,10 @@ function polaroid(c,s,px,det){
       meta=pt?'<span class="pol__meta" style="font-size:'+2.5*px+'px">'+esc(pt)+'</span>':''
     }
     var pre=' data-preset="'+(LG?LG.preset:'simples')+'"',gap='margin-top:'+1.2*px+'px',X='left:'+FR.lado*px+'px;width:'+FR.jw*px+'px';
-    var topo='<figcaption class="pol__top"'+pre+' style="'+X+';top:0;height:'+FR.topo*px+'px;gap:'+2*px+'px'+tr+'">';
-    if(pos==='acima')html+=topo+cap+meta+'</figcaption>';
-    else{
-      if(pos==='ambas')html+=topo+cap+'</figcaption>';
-      var metaOut=(pos==='ambas'||pos==='abaixo')&&!mls&&meta?meta.replace('class="pol__meta" style="','class="pol__meta" style="'+gap+';').replace('class="pol__meta">','class="pol__meta" style="'+gap+'">'):'';
-      html+='<figcaption'+pre+' style="'+X+';top:'+(yb+2.2*px)+'px'+tr+'">'+(pos==='ambas'?'':cap)+metaOut+mls+'</figcaption>'
-    }
+    var metaOut=!mls&&meta?meta.replace('class="pol__meta" style="','class="pol__meta" style="'+gap+';').replace('class="pol__meta">','class="pol__meta" style="'+gap+'">'):'';
+    html+='<figcaption'+pre+' style="'+X+';top:'+(yb+2.2*px)+'px'+tr+'">'+cap+metaOut+mls+'</figcaption>'
   }
-  if(det&&D.assin){var dirSig=PLTEXTO.assinaturaDir(LG||PLTEXTO.LEG0,FR); /* D-119: assinatura segue o plano */
+  if(det&&D.assin){var dirSig=PLTEXTO.assinaturaPos(LG||PLTEXTO.LEG0,FR)==='dir'; /* D-129/D-136: canto oposto ao texto */
     html+='<img class="pol__sig" src="../../assets/img/logos/Logo_tipografia_lateral.png" alt="" style="'+(dirSig?'right':'left')+':'+FR.lado*px+'px;bottom:'+3*px+'px;width:'+3.9*2.9*px+'px">'}
   if(det&&window.PLQUALIDADE){var qp=ppiDe(c.f);if(qp)html+=PLQUALIDADE.ponto(qp,{decorativo:true}).outerHTML}   /* D-130: ponto na moldura (a folha é role=img) */
   return html+'</div></figure>'
@@ -164,10 +159,10 @@ function desenhar(el,sh,p,px,det,idx,total){
 var FORA=0;
 function ajustarLeg(el,px){
   FORA=0;if(!LG)return;
-  var min=8*.3528*px,sd=PLTEXTO.assinaturaDir(LG,FR);   /* D-128: assinatura à direita no Pocket em duas linhas */
+  var min=8*.3528*px,sd=PLTEXTO.assinaturaPos(LG,FR)==='dir';   /* D-129/D-136: assinatura no canto oposto ao texto */
   [].forEach.call(el.querySelectorAll('figcaption'),function(fg){
-    var cap=fg.querySelector('.pol__cap'),mt=fg.querySelector('.pol__meta'),top=fg.classList.contains('pol__top');
-    var lim=function(){return fg.clientWidth-(top&&cap&&mt?mt.offsetWidth+2*px:0)};
+    var cap=fg.querySelector('.pol__cap'),mt=fg.querySelector('.pol__meta');
+    var lim=function(){return fg.clientWidth};
     if(cap&&LG.txt.fit){var fs=parseFloat(cap.style.fontSize);while(cap.scrollWidth>lim()+.5&&fs>min){fs-=.25;cap.style.fontSize=fs+'px'}}
     var x=0,base=(FR.h-3)*px,y0=fg.offsetTop,dy=(LG.dy||0)*px;
     var mls=[].slice.call(fg.querySelectorAll('.pol__ml'));  /* D-113: linhas absolutas também contam */
@@ -175,19 +170,16 @@ function ajustarLeg(el,px){
     if(mt&&mt.scrollWidth>fg.clientWidth+.5)x=1;
     [].forEach.call(fg.querySelectorAll('.pol__mline'),function(m){if(m.scrollWidth>m.clientWidth+.5)x=1});
     mls.forEach(function(m){if(m.scrollWidth>m.clientWidth+.5)x=1});
-    if(top){if(Math.max(cap?cap.offsetHeight:0,mt?mt.offsetHeight:0)>fg.offsetHeight+.5)x=1}
-    else{
-      var h=0;[].forEach.call(fg.children,function(c){h=Math.max(h,c.offsetTop+c.offsetHeight)});  /* máximo: cobre as absolutas */
-      if(sd){                                     /* MT-02/D-128: desconta a zona da assinatura na posição nova */
-        var sig=fg.parentNode.querySelector('.pol__sig'),sr=sig?sig.getBoundingClientRect():null;
-        if(sr)[].forEach.call(fg.querySelectorAll('.pol__cap,.pol__ml,.pol__mline > time,.pol__mline > span'),function(e){
-          var b=e.getBoundingClientRect();
-          if(b.right>sr.left+.5&&b.left<sr.right-.5&&b.bottom>sr.top+.5)x=1
-        });
-        if(y0+h+dy>FR.h*px+.5)x=1
-      }else if(y0+h+dy>base)x=1;
-      if(y0+dy<(FR.topo+FR.jh)*px-.5)x=1
-    }
+    var h=0;[].forEach.call(fg.children,function(c){h=Math.max(h,c.offsetTop+c.offsetHeight)});  /* máximo: cobre as absolutas */
+    if(sd){                                     /* MT-02/D-128: desconta a zona da assinatura na posição nova */
+      var sig=fg.parentNode.querySelector('.pol__sig'),sr=sig?sig.getBoundingClientRect():null;
+      if(sr)[].forEach.call(fg.querySelectorAll('.pol__cap,.pol__ml,.pol__mline > time,.pol__mline > span'),function(e){
+        var b=e.getBoundingClientRect();
+        if(b.right>sr.left+.5&&b.left<sr.right-.5&&b.bottom>sr.top+.5)x=1
+      });
+      if(y0+h+dy>FR.h*px+.5)x=1
+    }else if(y0+h+dy>base)x=1;
+    if(y0+dy<(FR.topo+FR.jh)*px-.5)x=1;
     if(x)FORA++
   })
 }
@@ -368,13 +360,13 @@ function painelExtra(id){
   var h=window.PLCTRL.escopo(),ids=alvo(),q=quadro();
   if(id==='tab-fotos')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Suas fotos · '+NF+'</h3><div class="foto-grid">'+FOTOS.map(function(f){return'<button type="button" class="foto-mini" data-abrir="'+f.n+'"><span aria-hidden="true">Foto '+f.n+'</span><small>Foto '+f.n+'</small></button>'}).join('')+'</div><a class="btn2" href="../adicionar-fotos/">Adicionar fotos</a><p class="f__h">Abra uma foto para recortar, duplicar ou remover.</p></section>';
   if(id==='tab-ajustes'){var a=q[ids[0]]&&q[ids[0]].adj||{};h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Luz e cor</h3>'+window.PLCTRL.numero('ef-brilho','Brilho',a.brilho||0,-100,100,1,'')+window.PLCTRL.numero('ef-contraste','Contraste',a.contraste||0,-100,100,1,'')+'<div class="f"><label class="f__l" for="ef-filtro">Filtro</label><div class="sel"><select id="ef-filtro"><option value="original">Original</option><option value="pb">Preto e branco</option><option value="retro">Retrô</option><option value="cinema">Cinema</option></select></div></div><p class="f__h">As alterações respeitam ajustes individuais protegidos.</p></section>'}
-  if(id==='tab-legendas'){h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Legenda</h3><div class="sw-row"><div><span class="f__l">Polaroid sem textos</span><p class="f__h" id="limpa-estado">'+(LG.limpa?'Ligado · textos ocultos':'Desligado · textos visíveis')+'</p></div><button type="button" class="sw" id="ef-limpa" role="switch" aria-checked="'+!!LG.limpa+'" aria-label="Polaroid sem textos"><span></span></button></div><div class="f"><label class="f__l" for="ef-pos">Posição</label><div class="sel"><select id="ef-pos"><option value="abaixo">Abaixo</option><option value="acima">Acima</option><option value="ambas">Ambas</option></select></div></div></section>'}
+  if(id==='tab-legendas'){h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Legenda</h3><div class="sw-row"><div><span class="f__l">Polaroid original</span><p class="f__h" id="orig-estado">'+(LG.original?'Ligado · só a foto e a moldura':'Desligado · textos visíveis')+'</p></div><button type="button" class="sw" id="ef-original" role="switch" aria-checked="'+!!LG.original+'" aria-label="Polaroid original"><span></span></button></div><div class="f"><label class="f__l" for="ef-al">Alinhamento</label><div class="sel"><select id="ef-al"><option value="esq">Esquerda</option><option value="centro">Centro</option><option value="dir">Direita</option></select></div></div></section>'}
   if(id==='tab-molduras')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Formato e estilo das fotos</h3><div class="f"><label class="f__l" for="ef-formato">Moldura</label><div class="sel"><select id="ef-formato"><option value="classico">Polaroid Clássico · 88 × 107 mm</option><option value="mini">Mini quadrado · 60 × 73 mm</option><option value="pocket">Retro Pocket · 66 × 99 mm</option></select></div></div><p class="f__h">A medida da polaroid fica travada; a folha apenas reorganiza.</p></section>';
   if(id==='tab-metadados')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Metadados</h3><p class="f__h">Data e cidade são usadas só na legenda. Coordenadas nunca aparecem.</p><a class="btn2" href="quadro/#foto-1">Editar data e cidade no Quadro</a></section>';
   $('painel-extra').innerHTML=h;var se=$('escopo-folhas');se.value=ESCOPO;escopo();
   se.onchange=function(){ESCOPO=this.value;painelExtra(id)};
-  var limpar=$('ef-limpa');if(limpar)limpar.onclick=function(){LG.limpa=!LG.limpa;salvarQuadro(quadro());render();painelExtra(id)};
-  var pos=$('ef-pos');if(pos){pos.value=LG.pos||'abaixo';pos.onchange=function(){LG.pos=this.value;salvarQuadro(quadro());render()}};
+  var orig=$('ef-original');if(orig)orig.onclick=function(){LG.original=!LG.original;salvarQuadro(quadro());render();painelExtra(id)};
+  var al=$('ef-al');if(al){al.value=LG.al||'esq';al.onchange=function(){LG.al=this.value;salvarQuadro(quadro());render()}};
   var fmt=$('ef-formato');if(fmt)fmt.value=FR.fmt||(POCKET?'pocket':'classico');if(fmt)fmt.onchange=function(){var m={classico:[88,107,6,6,76],mini:[60,73,6,6,48],pocket:[66,99,3,3,79]}[this.value]; /* mesmas medidas do FMT de molduras.js (D-113) */
     FR={fmt:this.value,w:m[0],h:m[1],lado:m[2],topo:m[3],jw:m[0]-2*m[2],jh:m[4],rad:FR.rad!=null?FR.rad:.4,man:false,lock:true,ori:FR.ori||'v'};
     if(this.value==='pocket')LG=PLTEXTO.legPocket(LG||PLTEXTO.LEG0);   /* D-113: legenda em duas linhas */salvarQuadro(quadro());render();toast('Formato aplicado a '+alvo().length+' fotos')};

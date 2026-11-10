@@ -53,8 +53,9 @@ function localLG(l,cid){
   var arr=l.ordem==='cidade'?[cid,e,pa]:[e,cid,pa],sep=l.sep===' '?' ':l.sep===', '?', ':' '+l.sep.trim()+' ';
   return arr.filter(Boolean).join(sep)
 }
-/* ---------- padrões de legenda (mesma ordem de chaves do PADRAO da T-10: projetos salvos comparam por JSON) ---------- */
-var LEG0={pos:'abaixo',preset:'simples',dx:0,dy:0,inc:0,
+/* ---------- padrões de legenda (mesma ordem de chaves do PADRAO da T-10: projetos salvos comparam por JSON) ----------
+   D-135: `original` substitui `limpa` · D-136: `al` (esq|centro|dir) substitui `pos` e `dx`. */
+var LEG0={original:false,al:'esq',preset:'simples',dy:0,inc:0,
  txt:{on:true,font:'Caveat',pt:16,fit:false,caixa:'normal',esp:0,cor:'preto'},
  data:{on:true,font:'IBM Plex Mono',pt:8,fmt:0,cor:'preto'},
  loc:{on:true,font:'IBM Plex Mono',pt:8,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
@@ -66,8 +67,35 @@ function legPocket(b){ /* D-113: padrão do Retro Pocket — duas linhas (local 
   l.data.fmt=3;
   return l
 }
-function assinaturaDir(leg,fr){ /* D-128: Pocket D-113 em duas linhas alinhadas à esquerda → assinatura no canto direito */
-  return !!(fr&&fr.w===66&&fr.h===99&&leg&&leg.meta==='linhas'&&leg.pos!=='acima')
+/* D-136 · MT-02: alinhamento Esquerda · Centro · Direita dentro das margens laterais da foto.
+   Função única: a tela e o PDF chamam esta (a caixa de cada linha vai de L a L+JW). */
+function alinharX(al,L,JW,w){
+  var ww=Math.min(w||0,JW);        /* o texto nunca é mais largo que a janela (30a/T4 corta com «…») */
+  if(al==='centro')return L+(JW-ww)/2;
+  if(al==='dir')return L+JW-ww;
+  return L
+}
+/* D-129 reduzida pela D-136: na automática a assinatura vai para o canto oposto ao texto. */
+function assinaturaPos(leg,fr){
+  var l=leg||{},fixo=l.assin,al=l.al||'esq';
+  if(fixo==='esq'||fixo==='centro'||fixo==='dir')return fixo;
+  if(al==='dir')return 'esq';
+  if(al==='centro')return 'dir';   /* texto centrado deixa a mesma folga dos dois lados: vai para a direita */
+  return 'dir'                      /* texto à esquerda → canto oposto (direita) */
+}
+function assinaturaDir(leg,fr){ /* atalho antigo (D-128): vale até a troca completa por assinaturaPos */
+  return assinaturaPos(leg,fr)==='dir'
+}
+/* D-135/D-136: migração dos dados antigos. Idempotente; nunca lança erro com dados parciais. */
+function migrar(leg){
+  if(!leg||typeof leg!=='object')return leg;
+  if(leg.limpa!=null){if(leg.original==null)leg.original=!!leg.limpa;delete leg.limpa}
+  delete leg.pos;                    /* o texto é sempre abaixo (D-136) */
+  var dx=typeof leg.dx==='number'?leg.dx:0;
+  if(leg.al==null||leg.al==='')leg.al=dx<-1?'esq':dx>1?'dir':'esq';
+  else if(leg.al!=='esq'&&leg.al!=='centro'&&leg.al!=='dir')leg.al='esq';
+  delete leg.dx;                     /* o alinhamento assume a posição horizontal (FN-07) */
+  return leg
 }
 /* ---------- medição na tela: métricas por fonte (1 medida por combinação; LG-04) ---------- */
 var cacheM={},ctxT=null;
@@ -92,8 +120,7 @@ function limparMedTela(){cacheM={}}
 function linhas(leg,fr,medir,opts){
   opts=opts||{};
   var f=fr&&fr.cw?{topo:fr.ct,jh:fr.cjh,jw:fr.cjw,lado:fr.cl}:fr||{};
-  var wb=(f.topo||0)+(f.jh||0),T=f.topo||0;
-  var pos=opts.pos||leg.pos||'abaixo';
+  var wb=(f.topo||0)+(f.jh||0);
   var junto=(leg.meta||'junto')!=='linhas';       /* meta: junto (padrão) | linhas */
   var ordem=leg.ordem||'data-loc';                 /* ordem das duas linhas */
   var medida=leg.medida||'caixa';                  /* caixa | letras */
@@ -113,19 +140,17 @@ function linhas(leg,fr,medir,opts){
     var par=ordem==='loc-data'?[['loc',leg.loc,mL,cL],['data',leg.data,mD,cD]]:[['data',leg.data,mD,cD],['loc',leg.loc,mL,cL]];
     par.forEach(function(p){L.push({k:p[0],est:p[1],corpo:p[3],asc:p[2].asc,desc:p[2].desc,capMax:p[2].cap*p[3]})})
   }
-  if(medida==='letras'&&pos!=='acima'){            /* MT-02: 1ª maiúscula a 4 mm da foto; a 2ª, 2 mm abaixo da base da 1ª */
+  if(medida==='letras'){                          /* MT-02: 1ª maiúscula a 4 mm da foto; a 2ª, 2 mm abaixo da base da 1ª */
     var b=wb+4+L[0].capMax;
     L.forEach(function(ln,i){if(i)b+=2+ln.capMax;
       ln.lh=ln.asc+ln.desc;ln.base=b;ln.top=b-ln.asc*ln.corpo;ln.letrasTop=b-ln.capMax})
   }else{                                          /* caixa: linha de 1,2 corpo (mesma conta do PDF) */
-    var y;
-    if(pos==='acima'){var tot=0;L.forEach(function(ln){tot+=1.2*ln.corpo});y=(T-tot)/2}
-    else y=wb+2.2+1.2+(opts.capTxt&&opts.capBoxH?opts.capBoxH:0);
+    var y=wb+2.2+1.2+(opts.capTxt&&opts.capBoxH?opts.capBoxH:0);
     L.forEach(function(ln){
       ln.lh=1.2;ln.top=y;ln.base=y+((1.2-(ln.asc+ln.desc))/2+ln.asc)*ln.corpo;ln.letrasTop=ln.base-ln.capMax;
       y+=1.2*ln.corpo})
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,assinaturaDir:assinaturaDir,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

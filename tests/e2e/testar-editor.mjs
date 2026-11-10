@@ -1,4 +1,4 @@
-/* 37 · Editor no modo Folhas (T-07): abas funcionando, «Polaroid sem textos» (D-119),
+/* 37 · Editor no modo Folhas (T-07): abas funcionando, «Polaroid original» (D-135),
    formato com as medidas do catálogo (D-113) e guias de 0,15 mm no arquivo (D-121). */
 import { chromium } from 'playwright';
 import { servir } from '../helpers/servidor.mjs';
@@ -38,19 +38,19 @@ try {
   ok(guias.length > 0 && guias.every(i => i.larg === 150), `guias de corte com 150 µm no arquivo (${guias.length} linhas)`);
   ok(l0.some(i => i.t === 'texto'), 'com textos: legenda entra no arquivo');
 
-  /* D-119: sem textos — some na tela e no arquivo, assinatura fica */
-  await page.click('#tab-legendas'); await page.click('#ef-limpa');
+  /* D-135: Polaroid original — some na tela e no arquivo, assinatura fica */
+  await page.click('#tab-legendas'); await page.click('#ef-original');
   const tela = await page.evaluate(() => ({
     cap: [...document.querySelectorAll('#sheet .pol__cap, #sheet .pol__meta')].filter(e => e.offsetParent).length,
     sig: document.querySelectorAll('#sheet .pol__sig').length,
   }));
-  ok(tela.cap === 0, 'sem textos: nenhuma legenda visível nas folhas');
+  ok(tela.cap === 0, 'Polaroid original: nenhuma legenda visível nas folhas');
   const l1 = await listaPdf();
-  ok(!l1.some(i => i.t === 'texto'), 'sem textos: nenhum texto no arquivo');
-  ok(tela.sig === 0 || l1.some(i => i.src === 'assinatura'), 'sem textos: a assinatura segue o plano (tela e arquivo)');
-  ok((await quadro())[0].leg.limpa === true, 'sem textos fica salvo no projeto (desliga sem perder os dados)');
-  await page.click('#ef-limpa');
-  ok((await listaPdf()).some(i => i.t === 'texto'), 'desligar «sem textos» devolve as legendas');
+  ok(!l1.some(i => i.t === 'texto'), 'Polaroid original: nenhum texto no arquivo');
+  ok(tela.sig === 0 || l1.some(i => i.src === 'assinatura'), 'Polaroid original: a assinatura segue o plano (tela e arquivo)');
+  ok((await quadro())[0].leg.original === true, 'a Polaroid original fica salva no projeto (desliga sem perder os dados)');
+  await page.click('#ef-original');
+  ok((await listaPdf()).some(i => i.t === 'texto'), 'desligar a Polaroid original devolve as legendas');
 
   /* D-113 · formato com as medidas do catálogo */
   await page.click('#tab-molduras');

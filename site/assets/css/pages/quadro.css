@@ -35,11 +35,12 @@
 .win__grid line{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
 .win__grid .gk{stroke:rgb(0 0 0/.35);stroke-width:2px}
 .win__grid .gw{stroke:#fff;stroke-width:1px}
-.pq__band{padding-top:calc(var(--k)*24px)}
+.pq__band{padding-top:calc(var(--k)*24px);text-align:var(--al,left)}   /* D-136: o texto segue o alinhamento escolhido */
 .pq__cap{display:block;font-family:var(--font-expressive);font-weight:500;font-size:calc(var(--k)*28px);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pq__meta{display:block;margin-top:calc(var(--k)*8px);font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:400;font-size:calc(var(--k)*11px);line-height:1.2;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pq__sig{position:absolute;left:calc(var(--k)*20px);bottom:calc(var(--k)*14px);width:calc(var(--k)*54px);height:auto}
 .pq__sig--dir{left:auto;right:calc(var(--k)*20px)}
+.pq__sig--centro{left:50%;right:auto;transform:translateX(-50%)}
 
 /* ações da mesa e mensagem de qualidade */
 .acts--q{margin-top:24px;gap:12px}

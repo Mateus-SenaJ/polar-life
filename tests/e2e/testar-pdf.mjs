@@ -98,6 +98,9 @@ try {
     await page.reload({ waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
     await page.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0);
+    /* folha com ~4 px/mm: a borda de 0,26 mm da legenda não é arredondada pelo navegador (MT-02) */
+    await page.addStyleTag({ content: '.stage{height:1200px !important;width:1200px !important}' });
+    await page.waitForTimeout(200);
     for (const src of SCRIPTS) await page.addScriptTag({ url: srv.url + src });
   }
 
@@ -112,11 +115,21 @@ try {
       const sr = sheet.getBoundingClientRect();
       const pxmm = sr.width / (pg.w / 1000);
       const rel = el => { const r = el.getBoundingClientRect(); return { x: (r.left - sr.left) / pxmm, y: (r.top - sr.top) / pxmm, w: r.width / pxmm, h: r.height / pxmm }; };
+      /* caixa do texto (avanço da fonte), não a caixa do bloco: é o que o PDF desenha (D-136) */
+      const txt = el => {
+        if (!el) return null;
+        const rg = document.createRange(); rg.selectNodeContents(el);
+        const rs = Array.from(rg.getClientRects()).filter(b => b.width > 0);
+        if (!rs.length) return null;
+        const l = Math.min(...rs.map(b => b.left)), r = Math.max(...rs.map(b => b.right));
+        const t = Math.min(...rs.map(b => b.top)), b2 = Math.max(...rs.map(b => b.bottom));
+        return { x: (l - sr.left) / pxmm, y: (t - sr.top) / pxmm, w: (r - l) / pxmm, h: (b2 - t) / pxmm };
+      };
       const dom = Array.from(sheet.querySelectorAll('.pol')).map(pol => {
         const q = sel => pol.querySelector(sel);
         return { n: +pol.dataset.n, in: rel(q('.pol__in')), ph: rel(q('.pol__ph')),
-          cap: q('.pol__cap') ? rel(q('.pol__cap')) : null,
-          meta: q('.pol__meta') ? rel(q('.pol__meta')) : null,
+          cap: q('.pol__cap') ? rel(q('.pol__cap')) : null, txt: txt(q('.pol__cap')),
+          meta: q('.pol__meta') ? rel(q('.pol__meta')) : null, txtMeta: txt(q('.pol__meta')),
           sig: q('.pol__sig') ? rel(q('.pol__sig')) : null };
       });
       const mul = (A, B) => ({ a: A.a * B.a + A.c * B.b, b: A.b * B.a + A.d * B.b, c: A.a * B.c + A.c * B.d, d: A.b * B.c + A.d * B.d, e: A.a * B.e + A.c * B.f + A.e, f: A.b * B.e + A.d * B.f + A.f });
@@ -167,7 +180,7 @@ try {
       const ext = p.fr.ori === 'h' ? { w: p.fr.h, h: p.fr.w } : { w: p.fr.w, h: p.fr.h };
       const R = PLFOLHAS.paginar(p.s, ext, p.fotos);
       const cells = R.sheets[0].cells.map(c => ({ n: c.f.n, x: c.x, y: c.y, w: c.w, h: c.h, giro: c.giro }));
-      return { pxmm, dom, cells, frames, bandas, byN, capTxts, fr: p.fr, page: { w: pg.w / 1000, h: pg.h / 1000 } };
+      return { pxmm, dom, cells, frames, bandas, byN, capTxts, fr: p.fr, al: p.leg ? (p.leg.al || 'esq') : 'esq', page: { w: pg.w / 1000, h: pg.h / 1000 } };
     });
   }
 
@@ -238,11 +251,28 @@ try {
       ? rotulo + ': Δx=' + dx.toFixed(3) + ' Δy=' + dy.toFixed(3) + ' Δw=' + dw.toFixed(3) + ' Δh=' + dh.toFixed(3) + ' > ' + tol
       : null;
   };
-  const comparaTexto = (rotulo, a, b) => {
+  const ancora = (b, al, lado) => {                 /* D-136: o alinhamento decide a borda comparada */
+    if (!b) return null;
+    if (lado === 'dir') return b.x + b.w;
+    if (lado === 'centro') return b.x + b.w / 2;
+    return b.x
+  };
+  const ladoDe = al => al === 'dir' ? 'dir' : al === 'centro' ? 'centro' : 'esq';
+  const comparaCaixa = (rotulo, a, b, al, tol) => {
     if (!a || !b) return rotulo + ': caixa ausente';
-    const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+    const lado = ladoDe(al);
+    const dx = Math.abs(ancora(a, al, lado) - ancora(b, al, lado)), dy = Math.abs(a.y - b.y);
     marca(Math.max(dx, dy));
-    return (dx > 0.2 || dy > 0.2) ? rotulo + ': Δx=' + dx.toFixed(3) + ' Δy=' + dy.toFixed(3) : null;   // DOC-08 MT-02: texto ±0,2 mm (o rasterizador de cada sistema varia)
+    return (dx > tol || dy > tol)
+      ? rotulo + ': Δx=' + dx.toFixed(3) + ' Δy=' + dy.toFixed(3) + ' > ' + tol
+      : null;
+  };
+  const comparaTexto = (rotulo, a, b, al) => {    /* só a posição horizontal do texto (a altura da linha é a do PDF) */
+    if (!a || !b) return null;
+    const lado = ladoDe(al);
+    const dx = Math.abs(ancora(a, al, lado) - ancora(b, al, lado));
+    marca(dx);
+    return dx > 0.2 ? rotulo + ': Δx=' + dx.toFixed(3) : null;   // DOC-08 MT-02: texto ±0,2 mm (o rasterizador de cada sistema varia)
   };
 
   const conferirFidelidade = async (nome, opcoes) => {
@@ -266,8 +296,10 @@ try {
         comparaBox('moldura ' + d.n, d.in, r.frames[d.n], 0.05),
         comparaBox('janela ' + d.n, d.ph, foto, 0.05),
         comparaBox('assinatura ' + d.n, d.sig, img, 0.1),
-        comparaTexto('legenda ' + d.n, d.cap, cap),
-        comparaTexto('meta ' + d.n, d.meta, meta)
+        comparaCaixa('legenda ' + d.n, d.cap, cap, r.al, 0.2),
+        comparaCaixa('meta ' + d.n, d.meta, meta, r.al, 0.2),
+        comparaTexto('texto da legenda ' + d.n, d.txt, capText, r.al),
+        comparaTexto('texto do meta ' + d.n, d.txtMeta, meta, r.al)
       ].filter(Boolean);
       erros.push(...e);
       for (const t of texts) if (foto && cruza(t.glyph, foto)) erros.push('T4: texto «' + t.txt + '» cruza a foto ' + d.n);
@@ -344,7 +376,7 @@ try {
 
   console.log('Fidelidade MT-02:');
   const LEG0 = {
-    pos: 'abaixo', preset: 'simples', dx: 0, dy: 0, inc: 0,
+    original: false, al: 'esq', preset: 'simples', dy: 0, inc: 0,
     txt: { on: true, font: 'Caveat', pt: 16, fit: false, caixa: 'normal', esp: 0, cor: 'preto' },
     data: { on: true, font: 'IBM Plex Mono', pt: 8, fmt: 0, cor: 'preto' },
     loc: { on: true, font: 'IBM Plex Mono', pt: 8, cor: 'preto', uf: 'sigla', pais: 'oculto', ocBR: true, sep: ', ', ordem: 'cidade' }
@@ -358,14 +390,15 @@ try {
     return l;
   };
   await conferirFidelidade('padrão', { leg: null, fr: null, folhas: {} });
-  await conferirFidelidade('acima', { leg: leg({ pos: 'acima', txt: { pt: 10 } }), fr: null, folhas: {} });
-  await conferirFidelidade('ambas', { leg: leg({ pos: 'ambas', txt: { pt: 10 } }), fr: null, folhas: {} });
+  await conferirFidelidade('esquerda', { leg: leg({ al: 'esq', txt: { pt: 10 } }), fr: null, folhas: {} });
+  await conferirFidelidade('centro', { leg: leg({ al: 'centro', txt: { pt: 10 } }), fr: null, folhas: {} });
+  await conferirFidelidade('direita', { leg: leg({ al: 'dir', txt: { pt: 10 } }), fr: null, folhas: {} });
   await conferirFidelidade('etiqueta', { leg: leg({ preset: 'etiqueta' }), fr: null, folhas: {} });
   await conferirFidelidade('bilhete', { leg: leg({ preset: 'bilhete' }), fr: null, folhas: {} });
   await conferirFidelidade('carimbo', { leg: leg({ preset: 'carimbo' }), fr: null, folhas: {} });
   await conferirFidelidade('contornada', { leg: leg({ preset: 'contornada' }), fr: null, folhas: {} });
   await conferirFidelidade('calendario', { leg: leg({ preset: 'calendario' }), fr: null, folhas: {} });
-  await conferirFidelidade('inc 5 dx 1', { leg: leg({ dx: 1, inc: 5 }), fr: null, folhas: {} });
+  await conferirFidelidade('inc 5', { leg: leg({ inc: 5 }), fr: null, folhas: {} });
   console.log('Fidelidade de raster MT-02:');
   for (const n of [3, 12]) {
     const r = await fidelidadeFoto(n);
@@ -448,14 +481,14 @@ try {
   const dims = rpDoc.ok ? dimsJpeg(await PDFDocument.load(b64ToBytes(rpDoc.arquivos[0].b64), { updateMetadata: false })) : [];
   ok(dims.some(d => d.w === expW && d.h === expH), 'imagem embutida no PDF tem ' + expW + '×' + expH + ' px (janela orientada)');
 
-  console.log('Renderização com legenda acima:');
-  await carregarEditor({ leg: leg({ pos: 'acima', txt: { pt: 10 } }), fr: null, folhas: {} });
+  console.log('Renderização com legenda à direita:');
+  await carregarEditor({ leg: leg({ al: 'dir', txt: { pt: 10 } }), fr: null, folhas: {} });
   const ra = await gerar({ f: 'pdf' });
-  ok(ra.ok && ra.avisos.length === 0, 'PDF com legenda acima gerado sem avisos');
+  ok(ra.ok && ra.avisos.length === 0, 'PDF com legenda à direita gerado sem avisos');
   const renderA = await renderPdf(ra.arquivos[0].b64);
-  const saidaA = fileURLToPath(new URL('../saida/pdf-acima-p1.png', import.meta.url));
+  const saidaA = fileURLToPath(new URL('../saida/pdf-direita-p1.png', import.meta.url));
   await writeFile(saidaA, Buffer.from(renderA.png, 'base64'));
-  ok(renderA.png.length > 1000 && renderA.naoBrancos > 1000, 'página 1 com legenda acima em tests/saida/pdf-acima-p1.png (' + renderA.naoBrancos + ' px não brancos)');
+  ok(renderA.png.length > 1000 && renderA.naoBrancos > 1000, 'página 1 com legenda à direita em tests/saida/pdf-direita-p1.png (' + renderA.naoBrancos + ' px não brancos)');
 
   console.log('Renderização com legenda bilhete:');
   await carregarEditor({ leg: leg({ preset: 'bilhete' }), fr: null, folhas: {} });
