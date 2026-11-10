@@ -1,0 +1,58 @@
+/* T-26 · página /app/conta/planos/ (brief §3.7). Três cartões radio lendo PLCONTA.limites();
+   um LED «Continuar» → etapa de pagamento compartilhada (PLPORTAO). Chip «Valores de teste»
+   enquanto modo demo (C-f: colchetes ficam na documentação). */
+.plns{margin-top:8px}
+.apoio{margin:12px 0 0;font-size:14px;line-height:1.6}
+.plns__chip{display:inline-flex;align-items:center;gap:6px;height:26px;margin-left:12px;padding:0 12px;border-radius:999px;background:var(--surface-subtle);font:500 12px 'Inter',system-ui,sans-serif;vertical-align:middle}
+.plns__chip svg{width:14px;height:14px;fill:none;stroke:var(--blue);stroke-width:1.5}
+
+/* cartões de plano (radios grandes, um grupo) */
+.plns__grid{display:grid;gap:12px;margin-top:8px}
+.pln{position:relative;display:block}
+.pln input{position:absolute;inset:0;z-index:2;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.pln__c{display:flex;flex-direction:column;gap:12px;min-height:44px;padding:20px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card);transition:box-shadow 150ms var(--ease)}
+.pln:hover .pln__c{box-shadow:var(--shadow-card),0 0 0 1px var(--outline-subtle)}
+.pln input:checked+.pln__c{box-shadow:0 0 0 2px var(--blue)}
+.pln input:focus-visible+.pln__c{outline:2px solid var(--blue);outline-offset:3px}
+.pln__top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pln__nome{margin:0;font-family:var(--font-serif);font-weight:400;font-size:17px;line-height:1.3}
+.pln__preco{margin:0;font:300 22px/1.3 'Inter',system-ui,sans-serif}
+.pln__ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pln__ul li{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.5}
+.pln__ul .ico{flex:none;width:16px;height:16px;margin-top:3px;color:var(--blue)}
+.pln__seu{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;background:var(--black);color:var(--white);font:500 11px 'Inter',system-ui,sans-serif}
+
+/* compra dentro do cartão Avulsa */
+.pln__compra{display:none;flex-direction:column;gap:12px;padding-top:16px;border-top:1px solid var(--outline-subtle)}
+.pln--aberto .pln__compra{display:flex}
+.pln__q{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pln__q-l{font:500 12px 'Inter',system-ui,sans-serif}
+.num{display:flex;align-items:center;height:44px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;overflow:hidden}
+.num:focus-within{box-shadow:0 0 0 2px var(--blue);border-color:transparent}
+.num__b{flex:none;width:44px;height:100%;display:inline-flex;align-items:center;justify-content:center;border:0;background:none;color:var(--black);cursor:pointer}
+.num__b:hover{background:var(--surface-subtle)}
+.num__b:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.num__v{position:relative;flex:1;min-width:64px;height:100%}
+.num__v input{width:100%;height:100%;padding:0 24px 0 8px;border:0;background:none;font:400 16px 'Inter',system-ui,sans-serif;text-align:center;color:var(--black);font-variant-numeric:tabular-nums}
+.num__v input:focus{outline:none}
+.num__u{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:12px}
+.seg{display:flex;gap:0;padding:4px;background:var(--surface-subtle);border-radius:12px}
+.seg label{position:relative;flex:1;min-width:0}
+.seg input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.seg span{display:flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:500;transition:background 150ms var(--ease),color 150ms var(--ease)}
+.seg input:checked+span{background:var(--black);color:var(--white)}
+.seg input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+.pln__tot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px}
+.pln__tot .mono{font-size:11px}
+
+/* LED da tela (T8) */
+.plns__act{margin-top:24px;display:flex;flex-direction:column;gap:8px}
+.plns__act .led-btn:disabled,.plns__act .led-btn[aria-disabled=true]{opacity:.5}
+
+@media (min-width:1024px){
+  .plns__grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+  .pln__c{min-height:100%}
+  .plns__act{align-items:center}
+  .plns__act .led-btn{width:100%;max-width:420px}
+}
+@media (prefers-reduced-motion:reduce){.pln__c,.seg span{transition:none}}

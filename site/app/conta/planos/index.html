@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Folhas e planos</title>
+<meta name="description" content="Folhas grátis, avulsas ou o plano Pro do Polar Life.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../../assets/css/base/fonts.css">
+<link rel="stylesheet" href="../../../assets/css/base/tokens.css">
+<link rel="stylesheet" href="../../../assets/css/base/led.css">
+<!-- D-123: selo + guarda de sessão (modo demonstração) -->
+<link rel="stylesheet" href="../../../assets/css/ui/selo-teste.css">
+<script src="../../../assets/js/nucleo/conta.js"></script>
+<script src="../../../assets/js/ui/guarda.js"></script>
+<link rel="stylesheet" href="../../../assets/css/ui/portao.css">
+<script src="../../../assets/js/ui/portao.js"></script>
+<link rel="stylesheet" href="../../../assets/css/pages/conta.css">
+<link rel="stylesheet" href="../../../assets/css/pages/planos.css">
+</head>
+<body>
+<div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
+
+<header class="app-header"><div class="in">
+<a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<div class="hnav">
+<a class="btn2" href="../">Conta</a>
+<a class="btn2 btn2--on" aria-current="page">Planos</a>
+</div>
+</div></header>
+
+<main class="wrap page">
+<div class="top">
+<h1>Folhas e planos</h1>
+<p class="apoio">Editar e ver o preview são sempre livres. O que se compra são as folhas exportadas.</p>
+</div>
+
+<form id="f-planos" class="plns" novalidate>
+<div id="cartoes" role="radiogroup" aria-label="Escolher plano"></div>
+<div class="plns__act">
+<button type="submit" class="led-btn led-btn--block" id="b-continuar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar</span></button>
+<p class="help" id="ajuda-continuar" aria-live="polite"></p>
+</div>
+</form>
+
+<ul class="legal">
+<li><a href="../../../legal/#privacidade">Privacidade</a></li>
+<li><a href="../../../legal/#termos">Termos</a></li>
+</ul>
+</main>
+
+<div class="scrim led-scrim" id="scrim" hidden></div>
+<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
+<h2 class="led-dialog__title" id="dlg-t"></h2>
+<div id="dlg-corpo"></div>
+<div class="dialog__act led-dialog__actions" id="dlg-act"></div>
+</div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
+
+<script src="../../../assets/js/pages/planos.js" defer></script>
+</body>
+</html>

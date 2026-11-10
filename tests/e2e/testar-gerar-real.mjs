@@ -11,6 +11,7 @@ const page = await nav.newPage({ acceptDownloads: true });
 const falhas = [];
 function ok(v, m) { console.log((v ? '✔ ' : '✘ ') + m); if (!v) falhas.push(m); }
 await page.addInitScript(() => {
+  localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })); // sessão de teste: a guarda de /app/ exige conta (D-123)
   /* mesma chave() de exportar.js/gerar.js: djb2 de pl-quadro + '|' + pl-folhas (vazios aqui) */
   let t = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || ''), x = 5381;
   for (let i = 0; i < t.length; i++) x = ((x << 5) + x + t.charCodeAt(i)) | 0;

@@ -60,18 +60,29 @@ $('grid').addEventListener('click',function(e){
 var EXT=/\.(jpe?g|png|webp|heic|heif)$/i,MIME=/^image\/(jpeg|png|webp|heic|heif)$/i;
 function accepted(f){return EXT.test(f.name)||MIME.test(f.type)}
 function plural(n,s,p){return n+' '+(n===1?s:p)}
+function limiteFotos(){ /* D-027: o teto de fotos vem do plano, nunca copiado em código de tela */
+  var P=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
+  return P&&P.fotosPorProjeto?P.fotosPorProjeto:24
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function receive(list){
   var all=[].slice.call(list||[]);if(!all.length)return;
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
+  var max=limiteFotos(),cabem=Math.max(0,max-picked.length),extra=ok.length-cabem;
+  if(extra>0)ok=ok.slice(0,cabem); /* acima do plano: as primeiras entram, o resto avisa (DOC-03 §7) */
   picked=picked.concat(ok);
   /* Arquivos escolhidos seguem direto para o IndexedDB deste aparelho (DOC-08 §5, T5). */
   if(window.PLFOTOS)salvando=salvando.then(function(){return Promise.all(ok.map(function(f,i){return PLFOTOS.salvar(picked.length-ok.length+i+1,f)}))}).catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
-  render(bad);
+  render(bad,extra);
 }
-function render(bad){
+function render(bad,extra){
   var g=$('got'),h='';
   if(picked.length){
     h+='<div class="msg msg--ok"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><p><strong>'+plural(picked.length,'foto escolhida','fotos escolhidas')+'.</strong> Elas continuam no seu aparelho.</p></div>';
+  }
+  if(extra>0){ /* D-027 · DOC-03 §7: «Escolher quais manter» ou ver planos */
+    var P=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null,nome=P&&P.nome?P.nome:'plano';
+    h+='<div class="msg msg--warn" role="alert"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><p><strong>'+plural(extra,'foto a mais','fotos a mais')+'.</strong> '+(P&&P.codigo?'O código de impressão vale até '+limiteFotos()+' fotos por projeto.':'O plano '+esc(nome)+' leva até '+limiteFotos()+' fotos por projeto. Escolha quais manter, ou <a class="link" href="../conta/planos/">veja os planos</a>.')+'</p></div>';
   }
   if(bad&&bad.length){
     var um=bad.length===1,nm=bad[0].replace(/[<>&"]/g,'');

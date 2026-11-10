@@ -1,0 +1,45 @@
+/* PLPORTAO · T-26 pop-up do portão (brief §3.6). Vai junto com js/ui/portao.js.
+   Pagamento simulado: rádios Cartão·Pix·Boleto, três botões «Simular…», LED tracejado até escolher. */
+.plportao__scrim{position:fixed;inset:0;z-index:900;background:rgb(255 255 255/.8);backdrop-filter:blur(2px)}
+.plportao{z-index:901}
+.plportao[hidden]{display:none}
+.plportao .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.plportao p{margin:8px 0 0;font-size:14px;line-height:1.6}
+
+/* rádios «Como pagar» */
+.pp-pg{margin:16px 0 0;padding:0;border:0}
+.pp-pg__t{font:500 12px 'Inter',system-ui,sans-serif;padding:0}
+.pp-pg__o{display:flex}
+.pp-pg__o input{position:absolute;opacity:0;width:1px;height:1px}
+.pp-pg__o span{display:flex;align-items:center;min-height:44px;padding:0 12px;margin-top:4px;border-radius:10px;font:400 14px 'Inter',system-ui,sans-serif;cursor:pointer}
+.pp-pg__o input:checked+span{background:var(--black);color:var(--white)}
+.pp-pg__o input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+
+/* caixa Informação (borda 1 px, cadeado azul) */
+.pp-sim,.pp-info{display:flex;align-items:flex-start;gap:12px;margin-top:16px;padding:14px 16px;border:1px solid var(--outline-subtle);border-radius:12px;font-size:14px;line-height:1.5}
+.pp-sim .ico,.pp-info .ico{flex:none;width:20px;height:20px;color:var(--blue)}
+.pp-sim p,.pp-info p{margin:0}
+
+/* sucesso / erro (sem cor: só ícone + borda, T2/T3) */
+.pp-sucesso,.pp-erro{display:flex;align-items:flex-start;gap:12px;margin-top:8px;padding:14px 16px;border-radius:12px;font-size:14px;line-height:1.5}
+.pp-sucesso{border:1px solid var(--black)}
+.pp-sucesso .ico{flex:none;color:var(--blue)}
+.pp-erro{border:2px solid var(--black)}
+.pp-erro .ico{flex:none}
+.pp-sucesso p,.pp-erro p{margin:0}
+
+/* botões «Simular…» */
+.pp-sim-b{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.pp-sim__b{width:100%}
+.pp-sim__b.is-on{background:var(--black);color:var(--white)}
+.pp-pix{margin-top:12px;font-size:11px;color:rgb(0 0 0/.55);word-break:break-all}
+
+/* botão terciário (texto sublinhado, 44 px) */
+.plportao .btn2.pp-terc{background:none;border:1px dashed var(--outline-subtle);box-shadow:none}
+
+/* LED do pop-up assume a largura no celular */
+.plportao .led-btn,.plportao .btn2{min-height:48px}
+@media (max-width:479px){
+  .plportao .pp-act{flex-direction:column-reverse}
+  .plportao .pp-act .led-btn,.plportao .pp-act .btn2{width:100%}
+}

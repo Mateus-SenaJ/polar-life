@@ -15,8 +15,14 @@
 <script src="../../assets/js/ui/esqueleto.js"></script>
 <link rel="stylesheet" href="../../assets/css/pages/editor.css">
 <link rel="stylesheet" href="../../assets/css/editor/prevoo.css">
+<!-- D-123: selo + guarda de sessão (modo demonstração) -->
+<link rel="stylesheet" href="../../assets/css/ui/selo-teste.css">
+<script src="../../assets/js/nucleo/conta.js"></script>
+<script src="../../assets/js/ui/guarda.js"></script>
 </head>
 <body>
+<div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
 <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
@@ -192,7 +198,7 @@
 <section class="mod" aria-labelledby="m4">
 <h3 class="mod__h" id="m4">Rodapé e assinatura</h3>
 <div class="sw-row" data-k="rodape"><div><span class="f__l" id="rodape-l">Rodapé da folha</span><p class="f__h">Nome do projeto e número da folha.</p></div><button type="button" class="sw" id="rodape" role="switch" aria-checked="false" aria-labelledby="rodape-l"><span></span></button></div>
-<div class="sw-row" data-k="assin"><div><span class="f__l" id="assin-l">Assinatura Polar Life</span><p class="f__h">Logo no canto inferior esquerdo de cada moldura.</p></div><button type="button" class="sw" id="assin" role="switch" aria-checked="true" aria-labelledby="assin-l"><span></span></button></div>
+<div class="sw-row" data-k="assin"><div><span class="f__l" id="assin-l">Assinatura Polar Life</span><p class="f__h" id="assin-h"><span>Logo no canto inferior esquerdo de cada moldura.</span></p></div><button type="button" class="sw" id="assin" role="switch" aria-checked="true" aria-labelledby="assin-l" aria-describedby="assin-h"><span></span></button></div>
 </section>
 
 <div class="prot"><label class="chk"><input type="checkbox" id="subst"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Substituir ajustes individuais</strong><span class="f__h">Desmarcada, as fotos com ajuste próprio ficam como estão.</span></span></label></div>
