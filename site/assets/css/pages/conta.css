@@ -1,0 +1,94 @@
+/* T-27 · Conta · brief rodada 2 §3.2–3.4. Coluna única de 720 no desktop; largura total no celular.
+   Um LED só para Grátis/Folha avulsa («Ver folhas e planos»); pop-ups nível 3 com LED na opção segura (D-082). */
+body{margin:0;background:var(--surface-subtle);min-height:100vh;color:var(--black);font-family:'Inter',system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ico.sm{width:16px;height:16px}
+
+/* cabeçalho do app (igual à T-01, home.css) */
+.app-header{position:sticky;top:0;z-index:40;height:64px;background:rgb(255 255 255/.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 1px 8px rgb(0 0 0/.04)}
+.app-header .in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px}
+.app-header a.logo{display:inline-flex;align-items:center;min-height:44px}
+.logo-h{height:32px;width:auto}
+.hnav{display:flex;align-items:center;gap:8px}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-subtle);font:500 14px 'Inter',system-ui,sans-serif;color:var(--black);cursor:pointer;text-decoration:none}
+.btn2:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn2--lg{height:48px}
+.btn2--on{background:var(--black);color:var(--white);cursor:default}
+.btn2--danger{color:var(--black)} /* nunca vermelho (T2); o ícone de lixeira diferencia */
+
+/* página */
+.page{padding-top:32px;padding-bottom:64px}
+.wrap{max-width:720px;margin:0 auto;padding:0 24px}
+.top{display:flex;flex-direction:column;gap:24px}
+.top h1{margin:0;font-family:var(--font-serif);font-weight:400;font-size:26px;line-height:1.2}
+.legal{display:flex;gap:24px;margin:48px 0 0;padding:0;list-style:none}
+.legal a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:500;text-underline-offset:4px}
+
+/* cartões */
+.cc{display:flex;flex-direction:column;gap:16px;padding:24px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card);margin-top:16px}
+.cc__t{margin:0;font-family:var(--font-serif);font-weight:400;font-size:17px;line-height:1.3}
+.cc__row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.cc__row--col{flex-direction:column;align-items:flex-start;gap:8px}
+.cc__email{margin:0;font:500 16px 'Inter',system-ui,sans-serif}
+.cc__meta{margin:0;font-size:14px;line-height:1.6}
+.cc__pilha{display:flex;flex-direction:column;gap:8px}
+.cc__plano{margin:0;font:300 22px/1.3 'Inter',system-ui,sans-serif}
+.cc__folhas{display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none}
+.cc__folhas li{display:flex;align-items:baseline;gap:8px;font-size:14px;line-height:1.6}
+.cc__folhas .mono{color:rgb(0 0 0/.55)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 12px;border-radius:999px;background:var(--surface-subtle);font:500 12px 'Inter',system-ui,sans-serif}
+.cc__act{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.cc__act .btn2,.cc__act .led-btn{width:100%}
+
+/* atenções e infos (sem cor de estado, T2) */
+.atn{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--outline-subtle);border-radius:12px;font-size:14px;line-height:1.5}
+.atn .ico{flex:none;color:var(--orange)}
+.atn p{margin:0}
+.info{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--outline-subtle);border-radius:12px;font-size:14px;line-height:1.5}
+.info .ico{flex:none;color:var(--blue)}
+.info p{margin:0}
+.help{margin:8px 0 0;font-size:13px;line-height:1.5}
+
+/* recibos */
+.rec-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rec{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--outline-subtle)}
+.rec:last-child{border-bottom:0}
+.rec__q{flex:1;min-width:0}
+.rec__d{margin:0;font-size:14px;line-height:1.4}
+.rec__v{margin:2px 0 0;font-size:14px;line-height:1.4}
+.rec .btn3{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 8px;border:0;background:none;font:500 14px 'Inter',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.rec .btn3:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.rec-vazio{margin:0;font-size:14px;line-height:1.6;color:rgb(0 0 0/.7)}
+
+/* recibo aberto (nível 2) */
+.dlg-rec dl{margin:0;display:flex;flex-direction:column;gap:12px}
+.dlg-rec dt{font:500 12px 'Inter',system-ui,sans-serif}
+.dlg-rec dd{margin:2px 0 0;font-size:14px;line-height:1.5}
+
+/* interruptor «Desligar a assinatura» (padrão .sw do editor) */
+.sw-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sw-row>div{min-width:0}
+.sw-row .cc__meta{margin:0}
+.sw{flex:none;position:relative;width:44px;height:44px;margin:-8px 0;padding:0;border:0;background:none;cursor:pointer}
+.sw span{position:absolute;left:0;top:10px;width:44px;height:24px;border-radius:999px;background:var(--white);border:1px solid var(--outline-subtle);transition:background 150ms var(--ease)}
+.sw span::after{content:"";position:absolute;left:1px;top:1px;width:20px;height:20px;border-radius:50%;background:var(--black);transition:transform 150ms var(--ease),background 150ms}
+.sw[aria-checked=true] span{background:var(--blue);border-color:var(--blue)}
+.sw[aria-checked=true] span::after{transform:translateX(20px);background:var(--white);box-shadow:0 2px 6px rgb(0 0 0/.18)}
+
+/* pop-ups e toast (padrões do app) */
+.scrim{position:fixed;inset:0;z-index:900;background:rgb(255 255 255/.8);backdrop-filter:blur(2px)}
+.dialog{position:fixed;z-index:901;top:50%;left:50%;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:auto;padding:24px;transform:translate(-50%,-50%)}
+.dialog p{margin:8px 0 0;font-size:14px;line-height:1.6}
+.dialog__act{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid rgb(0 0 0/.08);flex-wrap:wrap}
+.toast{position:fixed;z-index:950;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:16px;padding:6px 16px;font-size:14px;font-weight:500;white-space:nowrap}
+
+/* LED da tela (T8): só Grátis/Folha avulsa */
+.led-btn--block{width:100%}
+
+@media (min-width:1024px){
+  .cc__act{flex-direction:row}
+  .cc__act .btn2,.cc__act .led-btn{width:auto}
+  .dialog__act .btn2,.dialog__act .led-btn{width:auto}
+}
+@media (prefers-reduced-motion:reduce){.sw span,.sw span::after{transition:none}}

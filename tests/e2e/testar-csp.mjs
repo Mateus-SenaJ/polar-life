@@ -14,6 +14,7 @@ const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return sta
 const paginas = walk(SITE).filter(f => f.endsWith('.html')).map(f => relative(SITE, f).split('\\').join('/').replace(/index\.html$/, ''));
 
 const srv = await servir(), nav = await chromium.launch(), ctx = await nav.newContext();
+await ctx.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // sessão de teste: a guarda de /app/ exige conta (D-123)
 await ctx.route('**/*', async r => { const res = await r.fetch(); await r.fulfill({ response: res, headers: { ...res.headers(), 'content-security-policy': csp } }); });
 const falhas = [];
 const vigiar = p => { const v = []; p.on('console', m => { if (/Content Security Policy|Refused to/i.test(m.text())) v.push(m.text().slice(0, 200)); }); p.on('pageerror', e => v.push('erro: ' + e.message)); return v; };

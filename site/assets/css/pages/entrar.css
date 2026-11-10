@@ -1,0 +1,122 @@
+/* T-25 · Entrar (modo demonstração) · brief rodada 2 §1 + adendo D-123/D-124.
+   Faixa preta EXC-5/DS-17; caixa nível 2 única; campos e avisos seguem FN-00a. */
+body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ico.sm{width:16px;height:16px}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-subtle);font:500 14px 'Inter',system-ui,sans-serif;color:var(--black);cursor:pointer;text-decoration:none}
+.btn2:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ---- layout: celular empilhado; desktop 50/50 (brief §1.2) ---- */
+.ent{display:block;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+.ent__l{background:var(--black)}
+.ent__mesa{background:var(--surface-subtle);overflow:hidden}
+.ent__mesa .mesa{display:block;width:100%;height:auto;aspect-ratio:16/10}
+.ent__faixa{padding:56px 24px 40px}
+.ent__kick{display:flex;align-items:center;gap:12px;margin:0;font:500 12px 'Inter',system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--orange)}
+.ent__kick i{width:24px;height:2px;background:var(--orange)}
+.ent__titulo{margin:32px 0 0;font:500 44px/1 'Inter',system-ui,sans-serif;letter-spacing:-.04em;color:var(--white)}
+.ent__apoio{margin:32px 0 0;font:400 18px/1.6 'Inter',system-ui,sans-serif;color:var(--white)}
+.ent__r{display:flex;flex-direction:column;padding:0 24px 48px}
+.ent__head{height:72px;display:flex;align-items:center;border-bottom:1px solid var(--outline-subtle)}
+.ent__head .logo{display:inline-flex;align-items:center;min-height:44px}
+.logo-h{height:32px;width:auto}
+.ent__caixa{box-sizing:border-box;margin-top:24px;padding:24px}
+.ent__nota{margin-top:24px}
+.ent__foot{margin-top:48px;display:flex;flex-direction:column;gap:24px}
+.logo-v{height:96px;width:auto;align-self:flex-start}
+.legal{display:flex;gap:24px;margin:0;padding:0;list-style:none}
+.legal a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:500;text-underline-offset:4px}
+
+/* ---- caixa nível 2: formulário e etapas ---- */
+.cx-f{display:flex;flex-direction:column}
+.cx-t{margin:0;font:300 22px/1.3 var(--font)}
+.cx-lead{margin:8px 0 0;font:400 14px/1.6 'Inter',system-ui,sans-serif}
+.cx-links{margin:24px 0 0;font-size:14px;text-align:center}
+.cx-links a{font-weight:500;text-underline-offset:4px}
+.cx-div{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--black)}
+.cx-div::before,.cx-div::after{content:"";flex:1;height:1px;background:var(--outline-subtle)}
+.cx-div span{font-size:13px}
+.cx-trocar{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;margin-top:8px;padding:0 8px;border:0;background:none;font:500 16px 'Inter',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;color:var(--black);cursor:pointer}
+.cx-trocar:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.cx-trocar[disabled]{border:1px dashed var(--outline-subtle);border-radius:12px;text-decoration:none;color:rgb(0 0 0/.55);cursor:not-allowed}
+
+/* campos (padrão FN-00a, iguais ao resto do site) */
+.fld{margin-top:24px}
+.fld--first{margin-top:20px}
+.lab{display:block;font:500 12px 'Inter',system-ui,sans-serif}
+.fld .txt{margin-top:8px}
+.txt{display:block;width:100%;height:44px;padding:0 14px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font:400 16px 'Inter',system-ui,sans-serif;color:var(--black)}
+.txt:focus{outline:2px solid var(--blue);outline-offset:0;border-color:transparent}
+.txt::placeholder{color:rgb(0 0 0/.55)}
+.fld--err .txt{border:2px solid var(--black)}
+.help{margin:8px 0 0;font-size:13px;line-height:1.5}
+.err{display:flex;align-items:flex-start;gap:8px;margin:8px 0 0;font-size:13px;font-weight:500;line-height:1.5}
+.err .ico{width:16px;height:16px;margin-top:2px;stroke-width:2}
+.cx-erro--topo{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px;padding:12px;border:2px solid var(--black);border-radius:12px;font-size:13px;font-weight:500;line-height:1.5}
+.cx-erro--topo .ico{flex:none;width:18px;height:18px;margin-top:1px}
+
+/* caixa Informação (cadeado azul, borda 1 px) */
+.cx-info{display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:14px;font-size:14px;line-height:1.5}
+.cx-info .ico{flex:none;width:20px;height:20px;color:var(--blue)}
+.cx-info p{margin:0}
+.cx-info strong{font-weight:500}
+.cx-info .cod{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:18px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+
+/* etapa do código (§1.3) */
+.cx-cod{font:400 18px/1 'IBM Plex Mono',ui-monospace,Menlo,monospace;letter-spacing:.02em;text-align:center;height:56px;font-variant-numeric:tabular-nums}
+.cx-min{margin:24px 0 0}
+.cx-retro{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-top:24px;padding:0 8px;border:0;background:none;font:500 14px 'Inter',system-ui,sans-serif;text-decoration:underline;text-underline-offset:4px;color:var(--black);cursor:pointer}
+.cx-retro:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* via código de impressão (D-124): contagem de tentativas */
+.cx-tenta{margin:8px 0 0;font-size:13px;line-height:1.5}
+
+/* contas de teste (§1.2 bloco 5) */
+.cx-testes__t{margin:0;font:400 17px/1.3 var(--font-serif)}
+.cx-testes__p{margin:8px 0 0;font-size:14px;line-height:1.5}
+.cx-testes__lista{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.cx-testes__lista .btn2{width:100%;height:48px;justify-content:flex-start;padding:0 16px}
+.cx-testes__nome{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.cx-testes__nome .mono{color:rgb(0 0 0/.55)}
+
+/* já entrou (§1.4) */
+.cx-sessao{display:flex;flex-direction:column;gap:8px;margin-top:24px}
+.cx-sessao .btn2{width:100%;height:48px}
+.cx-usado{margin-top:16px}
+
+/* toast (padrão do app) */
+.toast{position:fixed;z-index:950;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:16px;padding:6px 16px;font-size:14px;font-weight:500;white-space:nowrap}
+
+/* ---- LED: único botão por tela (T8) ---- */
+.led-btn--block{width:100%;margin-top:24px}
+
+/* ---- animação A1: polaroids pousando (brief §5.4) ---- */
+.mesa .mesa-p{transform-box:fill-box;transform-origin:center;opacity:0;animation:mesa-pousa 600ms var(--ease) both}
+.mesa #mesa-p1{animation-delay:0ms}.mesa #mesa-p2{animation-delay:90ms}.mesa #mesa-p3{animation-delay:180ms}
+.mesa #mesa-p4{animation-delay:270ms}.mesa #mesa-p5{animation-delay:360ms}.mesa #mesa-p6{animation-delay:450ms}.mesa #mesa-p7{animation-delay:540ms}
+@keyframes mesa-pousa{
+  from{transform:translateY(-40px) rotate(var(--a,8deg));opacity:0}
+  to{transform:none;opacity:1}
+}
+
+/* transição entre páginas (A5): fica para a rodada do §5 (T-28/T-29/T-32) */
+
+/* ---- desktop 1440: colunas 50/50 (brief §1.2) ---- */
+@media (min-width:1024px){
+  .ent{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+  .ent__l{display:flex;flex-direction:column}
+  .ent__mesa{flex:0 0 60%;min-height:0}
+  .ent__mesa .mesa{height:100%;aspect-ratio:auto}
+  .ent__faixa{flex:1;display:flex;flex-direction:column;justify-content:center;padding:64px}
+  .ent__r{position:relative;display:flex;flex-direction:column;align-items:center;padding:104px 32px 32px}
+  .ent__head{position:absolute;top:0;left:0;right:0;height:72px;padding:0 32px;box-sizing:border-box}
+  .ent__caixa{width:440px;max-width:100%;margin-top:auto;margin-bottom:auto}
+  .ent__nota{width:440px;max-width:100%}
+  .ent__foot{flex-direction:row;align-items:center;justify-content:space-between;width:100%;max-width:1280px;padding-top:48px}
+}
+
+/* ---- movimento reduzido: tudo no estado final (brief §5.4) ---- */
+@media (prefers-reduced-motion:reduce){
+  .mesa .mesa-p{animation:none;opacity:1;transform:none}
+}

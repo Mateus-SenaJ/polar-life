@@ -25,8 +25,10 @@ const srv = await servir();
 const nav = await chromium.launch();
 try {
   console.log(`Páginas sem pedidos externos (${paginas.length}):`);
+  const sessao = () => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })); // sessão de teste: a guarda de /app/ exige conta (D-123)
   for (const pg of paginas) {
     const page = await nav.newPage(), fora = [];
+    await page.addInitScript(sessao);
     page.on('request', r => { if (!r.url().startsWith(srv.url) && !/^(data|blob|about):/.test(r.url())) fora.push(r.url()); });
     await page.goto(srv.url + pg, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
@@ -36,6 +38,7 @@ try {
 
   console.log('\nCatálogo carregado dos arquivos locais, com acentos:');
   const page = await nav.newPage(), fora = [];
+  await page.addInitScript(sessao);
   page.on('request', r => { if (!r.url().startsWith(srv.url)) fora.push(r.url()); });
   await page.goto(srv.url + 'app/editor/quadro/', { waitUntil: 'networkidle' });
   const res = await page.evaluate(async lista => {

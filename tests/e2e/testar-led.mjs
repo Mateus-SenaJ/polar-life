@@ -24,6 +24,9 @@ const foraDaPaleta = c => {
 
 const srv = await servir();
 const nav = await chromium.launch();
+const sessao = () => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })); // sessão de teste: a guarda de /app/ exige conta (D-123)
+const _newPage = nav.newPage.bind(nav);
+nav.newPage = async opts => { const p = await _newPage(opts); await p.addInitScript(sessao); return p; }; // injeta a sessão em toda página
 const saida = fileURLToPath(new URL('../saida/led/', import.meta.url));
 const saidaRotulos = fileURLToPath(new URL('../saida/rotulos/depois/', import.meta.url));
 const saidaHover = fileURLToPath(new URL('../saida/hover/', import.meta.url));
@@ -163,6 +166,7 @@ try {
   /* Movimento reduzido */
   const ctx = await nav.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
   const rm = await ctx.newPage();
+  await rm.addInitScript(sessao);
   await rm.goto(srv.url + 'app/novo-projeto/', { waitUntil: 'networkidle' });
   const alvoRm = rm.locator('.led-btn:visible:not(:disabled)').first();
   if (await alvoRm.count()) await alvoRm.hover();

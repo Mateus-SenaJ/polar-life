@@ -238,8 +238,18 @@ $('toast-undo').onclick=function(){desfazer()};
 
 /* ---------- estrutura do lote: Duplicar e Remover (FN-09) · entram no histórico ---------- */
 function reindexar(novoST,atual){ST=novoST;N=ST.length-1;cur=Math.max(1,Math.min(N,atual));faixa();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}if(window.PLLOTE)PLLOTE.limpar();commit()}
+function limiteFotos(){ /* D-027: o teto de fotos vem do plano (PLCONTA), nunca copiado em código */
+  var P=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
+  return P&&P.fotosPorProjeto?P.fotosPorProjeto:24
+}
 function duplicar(lista){                      /* cópia logo depois da original; a foto aberta continua a mesma */
   lista=lista.filter(function(i){return i>=1&&i<=N});if(!lista.length)return 0;
+  var max=limiteFotos(),cabem=Math.max(0,max-N);          /* duplicar respeita o plano (D-027) */
+  if(lista.length>cabem){
+    if(!cabem){toast('O plano leva até '+max+' fotos por projeto.');return 0}
+    lista=lista.slice(0,cabem);
+    setTimeout(function(){toast('O plano leva até '+max+' fotos por projeto. Só '+cabem+(cabem===1?' foto foi duplicada':' fotos foram duplicadas')+'.')},400)
+  }
   var out=[{}],at=cur,k=0;
   for(var i=1;i<=N;i++){out.push(ST[i]);if(i===cur)at=out.length-1;
     if(lista.indexOf(i)>=0){var c=copia(ST[i]);out.push(c);k++}}

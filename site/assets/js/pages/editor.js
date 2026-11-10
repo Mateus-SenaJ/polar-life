@@ -28,6 +28,10 @@ document.getElementById('scope-t').textContent='Alterando: Todas as fotos · '+N
 document.getElementById('apply-t').textContent='Aplicar ao lote · '+NF+(NF===1?' foto':' fotos');
 var DEF={papel:'A4',w:210,h:297,orient:'retrato',margem:10,gap:4,girar:true,align:'center',separar:false,guias:true,contorno:false,compr:'continua',cor:'preto',rodape:false,assin:true};
 var D=PLFOLHAS.ler();                                          /* T-06 (pl-orientacao) + o que o editor salvou (D-085) */
+/* assinatura segue a regra do plano (D-123): Grátis e Folha avulsa sempre ligada; Pro pode desligar */
+var PLN=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
+if(PLN&&!PLN.assinaturaPodeDesligar)D.assin=true;
+else if(PLN&&PLN.assinaturaDesligada){try{if(!JSON.parse(sessionStorage.getItem('pl-folhas')||'null'))D.assin=false}catch(e){}}
 var COR={preto:'#000000',azul:'#006194',laranja:'#FD761A'};
 
 /* ---------- estado inicial: escolha da T-06 e estados de revisão por hash ---------- */
@@ -188,6 +192,10 @@ function render(){
   if(document.activeElement!==$('margem'))$('margem').value=nf(D.margem);if(document.activeElement!==$('gap'))$('gap').value=nf(D.gap);
   ['orient','align','compr','cor'].forEach(function(n){[].forEach.call(document.getElementsByName(n),function(r){r.checked=r.value===D[n]})});
   ['girar','separar','guias','contorno','rodape','assin'].forEach(function(n){$(n).setAttribute('aria-checked',!!D[n])});
+  /* assinatura × plano (D-123): desabilitada com o motivo, nunca só por cor (T3) */
+  var assinFixa=!!(PLN&&!PLN.assinaturaPodeDesligar);
+  $('assin').setAttribute('aria-disabled',assinFixa);
+  $('assin-h').firstChild.textContent=assinFixa?'Desligar a assinatura Polar Life é do Pro. Logo no canto inferior esquerdo de cada moldura.':'Logo no canto inferior esquerdo de cada moldura.';
   /* guias × contorno (FN-02) */
   $('contorno').setAttribute('aria-disabled',D.guias);$('contorno-h').hidden=!D.guias;
   [].forEach.call(document.querySelectorAll('[data-k=compr] .seg,[data-k=cor] .seg'),function(s){s.classList.toggle('is-off',!D.guias);[].forEach.call(s.querySelectorAll('input'),function(i){i.disabled=!D.guias})});

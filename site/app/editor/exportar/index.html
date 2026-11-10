@@ -13,8 +13,16 @@
 <link rel="stylesheet" href="../../../assets/css/base/led.css">
 <link rel="stylesheet" href="../../../assets/css/pages/resumo.css">
 <link rel="stylesheet" href="../../../assets/css/pages/exportar.css">
+<!-- D-123: selo + guarda de sessão (modo demonstração) -->
+<link rel="stylesheet" href="../../../assets/css/ui/selo-teste.css">
+<script src="../../../assets/js/nucleo/conta.js"></script>
+<script src="../../../assets/js/ui/guarda.js"></script>
+<link rel="stylesheet" href="../../../assets/css/ui/portao.css">
+<script src="../../../assets/js/ui/portao.js"></script>
 </head>
 <body>
+<div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
+
 <header class="app-header"><div class="in">
 <a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
 </div></header>
@@ -52,6 +60,9 @@
 </div>
 
 <div class="msg" id="aviso-100"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><p>Ao imprimir, escolha <strong>Tamanho real (100%)</strong> e margens <strong>Nenhuma</strong>. Sem isso as polaroids saem fora da medida.</p></div>
+
+<!-- linha Informação do portão (DOC-03 §4, brief §3.6) -->
+<div class="msg" id="info-conta" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p id="info-conta-t"></p></div>
 
 <div class="act">
 <a class="btn2" href="../">Voltar às folhas</a>

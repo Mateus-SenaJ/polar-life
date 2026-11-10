@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="../../assets/img/logos/Logo_favicon_PolarLife.png">
+<title>Polar Life · Painel do admin</title>
+<meta name="description" content="Limites dos planos e contas de teste do Polar Life neste navegador.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../assets/css/base/fonts.css">
+<link rel="stylesheet" href="../../assets/css/base/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base/led.css">
+<!-- D-123: selo + guarda de sessão (modo demonstração) -->
+<link rel="stylesheet" href="../../assets/css/ui/selo-teste.css">
+<script src="../../assets/js/nucleo/conta.js"></script>
+<script src="../../assets/js/ui/guarda.js"></script>
+<link rel="stylesheet" href="../../assets/css/pages/conta.css">
+<link rel="stylesheet" href="../../assets/css/pages/admin.css">
+</head>
+<body>
+<div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
+
+<header class="app-header"><div class="in">
+<a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<div class="hnav">
+<a class="btn2" href="../conta/">Conta</a>
+<a class="btn2 btn2--on" aria-current="page">Painel</a>
+</div>
+</div></header>
+
+<main class="wrap page wrap--wide">
+<div class="top">
+<h1>Painel do admin</h1>
+<p class="apoio">Os valores abaixo valem só neste navegador e alimentam a Conta, o portão de exportação e o aviso de fotos na importação.</p>
+<span class="adm-pend" id="chip-pend" hidden><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>Alterações não salvas</span>
+</div>
+
+<div id="corpo"></div>
+
+<ul class="legal">
+<li><a href="../../legal/#privacidade">Privacidade</a></li>
+<li><a href="../../legal/#termos">Termos</a></li>
+</ul>
+</main>
+
+<footer class="adm-pe" id="pe" hidden>
+<div class="adm-pe__in">
+<button type="button" class="btn2 btn2--lg" id="b-restaurar"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg>Restaurar padrões</button>
+<button type="button" class="led-btn" id="b-salvar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Salvar alterações</span></button>
+</div>
+</footer>
+
+<div class="scrim led-scrim" id="scrim" hidden></div>
+<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
+<h2 class="led-dialog__title" id="dlg-t"></h2>
+<div id="dlg-corpo"></div>
+<div class="dialog__act led-dialog__actions" id="dlg-act"></div>
+</div>
+<div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-desfazer" hidden>Desfazer</button></div>
+
+<script src="../../assets/js/pages/admin.js" defer></script>
+</body>
+</html>

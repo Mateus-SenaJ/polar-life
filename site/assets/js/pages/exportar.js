@@ -46,11 +46,41 @@ function atualiza(){
   var n=o.f==='folhas'||o.f==='pdf'||o.f==='leve'?P.n:P.fotos;
   $('go-t').textContent=ROT[o.f]+' ('+(o.f==='polaroids'?pl(P.fotos,'polaroid','polaroids'):pl(P.n,'folha','folhas'))+')'
 }
-document.addEventListener('change',function(e){if(e.target.closest&&e.target.closest('.card'))atualiza()});
-$('go').onclick=function(){
+document.addEventListener('change',function(e){if(e.target.closest&&e.target.closest('.card')){atualiza();atualizaInfo()}});
+
+/* ---- linha Informação do portão (DOC-03 §4, brief §3.6): só nos formatos de impressão ---- */
+function classeFolha(){return P.w*P.h>210*297?'grande':'padrao'} /* acima de A4 = folha grande */
+function atualizaInfo(){
+  var o=lerOpc(),box=$('info-conta');
+  if(window.PLCONTA&&(o.f==='pdf'||o.f==='leve')&&PLCONTA.temSessao()){
+    var g=PLCONTA.direito(P.n,classeFolha()),t='';
+    if(g.ok){
+      var pl=PLCONTA.plano()||{},MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+      if(pl.id==='gratis')t=g.usaGratis?'Esta exportação usa sua folha grátis de '+MESES[new Date().getMonth()]+'.':'Esta exportação usa '+P.n+' folha'+(P.n>1?'s':'')+' comprada'+(P.n>1?'s':'')+'.';
+      else if(pl.id==='avulsa')t='Esta exportação usa '+P.n+' das suas '+(classeFolha()==='grande'?pl.folhasCompradas.grande:pl.folhasCompradas.padrao)+(classeFolha()==='grande'?' folhas grandes':' folhas compradas')+'.';
+      else if(pl.codigo)t='Esta exportação usa as '+pl.folhas+' folhas do seu código de impressão.';
+      else t='Esta exportação usa o uso razoável do Pro.';
+    }else t='Esta exportação precisa de '+P.n+' folha'+(P.n>1?'s':'')+'.';
+    $('info-conta-t').textContent=t;box.hidden=false
+  }else box.hidden=true
+}
+
+/* ---- portão entre a T-19 e a T-20 (DOC-03 §4, D-123/D-124) ---- */
+function seguir(){
   var o=lerOpc(),m=mb(o.f,o);o.mb=m;o.v=Math.max(1,Math.ceil(m/LIM));o.lim=LIM;
   try{sessionStorage.setItem('pl-exportar',JSON.stringify(o))}catch(e){}
   location.href='../gerar/'                                /* T-20 */
+}
+$('go').onclick=function(){
+  var o=lerOpc();
+  if((o.f==='pdf'||o.f==='leve')&&window.PLPORTAO){       /* imagens: prévia simulada, sem portão (T7) */
+    var classe=classeFolha();
+    PLPORTAO.pedir(P.n,classe).then(function(r){
+      if(r.ok)seguir();
+      else if(r.motivo==='semConta'){/* o pop-up já encaminhou para a T-25 com ?voltar */}
+      /* semFolhas/cancelado/pendente/recusado: fica na T-19 */
+    })
+  }else seguir();
 };
-atualiza()
+atualiza();atualizaInfo();
 })();
