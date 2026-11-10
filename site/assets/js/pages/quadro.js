@@ -129,7 +129,7 @@ function construir(){
   SL.forEach(function(c){
     var slot=document.querySelector('[data-sl='+c.id+']');
     slot.className='f';slot.setAttribute('data-k',c.id);
-    slot.innerHTML='<div class="f__top"><label class="f__l" for="'+c.id+'">'+c.t+'</label>'+((c.adj||c.id==='fint')?'<span class="mix mono" hidden><svg class="ico sm" aria-hidden="true"><use href="#i-info"/></svg>Valores diferentes</span>':'')+'<button type="button" class="rst mono" data-reset="'+c.id+'" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>'
+    slot.innerHTML='<div class="f__top"><label class="f__l" for="'+c.id+'">'+c.t+'</label>'+((c.adj||c.id==='fint')?'<span class="mix rotulo" hidden><svg class="ico sm" aria-hidden="true"><use href="#i-info"/></svg>Valores diferentes</span>':'')+'<button type="button" class="rst mono" data-reset="'+c.id+'" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>'
      +'<div class="sl"><input type="range" id="'+c.id+'-r" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'" aria-label="'+c.t+'"><div class="num num--s"><input id="'+c.id+'" inputmode="decimal" autocomplete="off"'+(c.u?'':' aria-label="'+c.t+'"')+'><span class="num__u mono">'+(c.u||'')+'</span></div></div>'
      +'<p class="f__h" id="'+c.id+'-h"></p>';
     var r=$(c.id+'-r'),n=$(c.id),f=slot,h=$(c.id+'-h'),tmr;
@@ -175,12 +175,12 @@ function dimensionar(){
   pq.style.setProperty('--ar',FR.w+'/'+FR.h);pq.style.setProperty('--wa',FR.jw+'/'+FR.jh);pq.style.setProperty('--pl',(FR.lado*u)+'px');pq.style.setProperty('--pr',(FR.ladoD*u)+'px');pq.style.setProperty('--pt',(FR.topo*u)+'px');pq.style.setProperty('--rd',Math.max(0,FR.rad*u)+'px');
   pq.style.setProperty('--lw',cwp+'px');pq.style.setProperty('--lh',(FR.ch*u)+'px');pq.style.setProperty('--cpl',(FR.cl*u)+'px');pq.style.setProperty('--cpt',(FR.ct*u)+'px');pq.style.setProperty('--cwa',FR.cjw+'/'+FR.cjh);
   if(window.PLMOL)PLMOL.regua();
-  $('ctx-scale').textContent='Escala '+Math.round(pw/(FR.w*96/25.4)*100)+'%'
+  $('ctx-scale').textContent=Math.round(pw/(FR.w*96/25.4)*100)+'%'
 }
 var ROT={boa:'Boa',abaixo:'Abaixo do ideal',ressalvas:'Com ressalvas',ruim:'Ruim'},ICO={boa:'verified',abaixo:'alert',ressalvas:'warn',ruim:'cancel'};
 function qualidade(){
   var s=S(),p=ppi(cur,s),nv=nivel(p),sl=$('seal');
-  sl.setAttribute('data-n',nv);sl.querySelector('use').setAttribute('href','#i-'+ICO[nv]);$('seal-t').textContent=ROT[nv]+' · '+p+' PPI';
+  sl.setAttribute('data-n',nv);sl.querySelector('use').setAttribute('href','#i-'+ICO[nv]);$('seal-level').textContent=ROT[nv];$('seal-ppi').textContent=p+' PPI';
   var m=$('qmsg'),b=$('qmsg-b');m.hidden=nv==='boa';
   if(nv!=='boa'){
     b.className='msg '+(nv==='ruim'?'msg--err':'msg--warn');
@@ -349,11 +349,11 @@ document.addEventListener('keydown',function(e){
 function render(){
   if(window.PLMOL)PLMOL.render();                                  /* aplica a moldura, atualiza os campos e redimensiona a mesa (inclusive em desfazer e refazer) */
   var s=S(),nv;
-  $('ctx-foto').textContent='Modo Quadro · Foto '+p2(cur)+' de '+N;
-  $('faixa-r').textContent='Foto '+p2(cur)+' / '+N;
-  var lt=document.querySelector('#faixa-w .faixa__t span');if(lt)lt.textContent=N;
+  $('ctx-foto').textContent=p2(cur)+' de '+N;
+  $('faixa-current').textContent=p2(cur);$('faixa-total').textContent=N;$('faixa-n').textContent=N;
   $('cap').textContent=LEG[(src(cur)-1)%4];
-  $('cota').textContent=window.PLMOL?PLMOL.cota():'Passe-partout inferior: '+nf(FR.ch-FR.ct-FR.cjh)+' mm';
+  var cota=window.PLMOL?PLMOL.cota():'Passe-partout inferior: '+nf(FR.ch-FR.ct-FR.cjh)+' mm',separador=cota.indexOf(':');
+  $('cota-label').textContent=cota.slice(0,separador+1);$('cota-value').textContent=cota.slice(separador+1).trim();
   $('nb').hidden=!mudou(s);
   $('fprev').disabled=cur<=1;$('fnext').disabled=cur>=N;
   $('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;

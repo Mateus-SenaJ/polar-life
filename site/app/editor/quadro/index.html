@@ -70,10 +70,10 @@
 <div class="eh__l">
 <a class="logo" href="../../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
 <span class="eh__div" aria-hidden="true"></span>
-<span class="eh__studio mono">Polar Life Studio</span>
+<span class="eh__studio rotulo">Polar Life Studio</span>
 <div class="eh__proj">
 <span class="eh__name">Viagem · Serra 2026</span>
-<span class="chip"><span class="dot" aria-hidden="true"></span><span class="mono">Salvo neste dispositivo</span></span>
+<span class="chip"><span class="dot" aria-hidden="true"></span><span class="rotulo">Salvo neste dispositivo</span></span>
 </div>
 </div>
 <div class="eh__r">
@@ -97,16 +97,16 @@
 
 <aside class="rail" aria-label="Navegação de mesa">
 <div>
-<p class="rail__t mono"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
+<p class="rail__t rotulo"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
 <ul class="rail__l">
 <li><a class="rail__i" href="../"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
 <li><a class="rail__i is-on" href="./" aria-current="page"><svg class="ico"><use href="#i-grid"/></svg><span>Quadro</span></a></li>
-<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="mono">Em breve</em></button></li>
-<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="mono">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="rotulo">Em breve</em></button></li>
+<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="rotulo">Em breve</em></button></li>
 </ul>
 </div>
 <div class="rail__card">
-<p class="mono rail__row"><span>Guia de corte</span><span style="color:var(--blue)">0,1 mm</span></p>
+<p class="rail__row"><span class="rotulo">Guia de corte</span><span class="mono" style="color:var(--blue)">0,1 mm</span></p>
 <p class="rail__row2"><svg class="ico sm"><use href="#i-cut"/></svg><span>Guias ligadas · linha contínua</span></p>
 </div>
 </aside>
@@ -114,9 +114,9 @@
 <main class="content" id="main">
 <div class="wrap">
 <div class="ctx">
-<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-photo"/></svg><span class="mono" id="ctx-foto">Modo Quadro · Foto 03 de 24</span></span>
+<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-photo"/></svg><span class="rotulo">Modo Quadro · Foto</span><span class="mono" id="ctx-foto">03 de 24</span></span>
 <div class="ctx__r">
-<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="mono" id="ctx-scale">Escala 100%</span></span>
+<span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Escala</span><span class="mono" id="ctx-scale">100%</span></span>
 <button type="button" class="btn2 btn2--sm ctx__insp" id="insp-toggle" aria-controls="insp" aria-expanded="true"><svg class="ico sm"><use href="#i-panel"/></svg>Inspetor</button>
 </div>
 </div>
@@ -125,8 +125,8 @@
 <section class="mesa-col" aria-label="Mesa">
 <div class="mesa" id="mesa">
 <div class="hud">
-<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="mono">Guias · 0,1 mm</span></span>
-<span class="pill pill--hud seal" id="seal" role="status" aria-live="polite"><svg class="ico sm"><use href="#i-verified"/></svg><span class="mono" id="seal-t">Boa · 326 PPI</span></span>
+<span class="pill pill--hud"><svg class="ico sm" style="color:var(--blue)"><use href="#i-cut"/></svg><span class="rotulo">Guias</span><span class="mono">0,1 mm</span></span>
+<span class="pill pill--hud seal" id="seal" role="status" aria-live="polite"><svg class="ico sm"><use href="#i-verified"/></svg><span class="rotulo" id="seal-level">Boa</span><span class="mono" id="seal-ppi">326 PPI</span></span>
 </div>
 
 <div class="cbar" role="toolbar" aria-label="Recorte">
@@ -157,8 +157,8 @@
 <div class="acts acts--q">
 <button type="button" class="ib" id="fprev" aria-label="Foto anterior" title="Foto anterior ( [ )"><svg class="ico"><use href="#i-prev"/></svg></button>
 <button type="button" class="btn2" data-act="centralizar"><svg class="ico sm" style="color:var(--blue)"><use href="#i-crop"/></svg>Centralizar quadro</button>
-<span class="acts__cota mono"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span id="cota">Passe-partout inferior: 25 mm</span></span>
-<span class="nb mono" id="nb" hidden>Ajustada</span>
+<span class="acts__cota" id="cota"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span class="rotulo" id="cota-label">Passe-partout inferior:</span><span class="mono" id="cota-value">25 mm</span></span>
+<span class="nb rotulo" id="nb" hidden>Ajustada</span>
 <button type="button" class="ib" id="fnext" aria-label="Foto seguinte" title="Foto seguinte ( ] )"><svg class="ico"><use href="#i-next"/></svg></button>
 </div>
 
@@ -170,9 +170,9 @@
 </div>
 
 <div class="faixa faixa--q" id="faixa-w">
-<div class="faixa__l"><span class="mono faixa__t">Lote <span>24</span></span>
+<div class="faixa__l"><span class="faixa__t"><span class="rotulo">Lote</span><span class="mono" id="faixa-n">24</span></span>
 <ol class="faixa__list" id="faixa" aria-label="Fotos do lote"></ol></div>
-<span class="mono faixa__r" id="faixa-r">Foto 03 / 24</span>
+<span class="faixa__r" id="faixa-r"><span class="rotulo">Foto</span> <span class="mono" id="faixa-current">03</span> / <span class="mono" id="faixa-total">24</span></span>
 </div>
 </section>
 
@@ -181,20 +181,20 @@
 <div class="insp__in">
 <h2 class="insp__h">Inspetor</h2>
 <div class="tabs" role="tablist" aria-label="Abas do inspetor">
-<button type="button" role="tab" class="tab mono" id="tab-papel" aria-selected="false" aria-controls="p-papel" tabindex="-1">Papel</button>
-<button type="button" role="tab" class="tab mono" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
-<button type="button" role="tab" class="tab mono is-on" id="tab-ajustes" aria-selected="true" aria-controls="p-ajustes">Ajustes</button>
-<button type="button" role="tab" class="tab mono" id="tab-legendas" aria-selected="false" aria-controls="p-legendas" tabindex="-1">Legendas</button>
-<button type="button" role="tab" class="tab mono" id="tab-molduras" aria-selected="false" aria-controls="p-molduras" tabindex="-1">Molduras</button>
-<button type="button" role="tab" class="tab mono" id="tab-metadados" aria-selected="false" aria-controls="p-metadados" tabindex="-1">Metadados</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-papel" aria-selected="false" aria-controls="p-papel" tabindex="-1">Papel</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
+<button type="button" role="tab" class="tab rotulo is-on" id="tab-ajustes" aria-selected="true" aria-controls="p-ajustes">Ajustes</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-legendas" aria-selected="false" aria-controls="p-legendas" tabindex="-1">Legendas</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-molduras" aria-selected="false" aria-controls="p-molduras" tabindex="-1">Molduras</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-metadados" aria-selected="false" aria-controls="p-metadados" tabindex="-1">Metadados</button>
 </div>
 
-<div class="scope" id="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: só esta foto · Foto 03</span><span class="tag mono" id="scope-tag" hidden>Lote</span></div>
+<div class="scope" id="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: só esta foto · Foto 03</span><span class="tag rotulo" id="scope-tag" hidden>Lote</span></div>
 
 <div id="p-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" class="panel">
 
 <section class="mod" id="m-flt" aria-labelledby="mf">
-<h3 class="mod__h" id="mf">Filtro</h3>
+<h3 class="mod__h rotulo rotulo--m" id="mf">Filtro</h3>
 <div class="seg" role="radiogroup" aria-label="Mostrar filtros">
 <label class="seg__o"><input type="radio" name="fview" value="todos" checked><span>Todos · 12</span></label>
 <label class="seg__o"><input type="radio" name="fview" value="fav"><span>Favoritos</span></label></div>
@@ -210,7 +210,7 @@
 </section>
 
 <section class="mod" aria-labelledby="m1">
-<h3 class="mod__h" id="m1">Recorte e posição</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m1">Recorte e posição</h3>
 <div class="f" data-k="modo"><div class="f__top"><span class="f__l" id="modo-l">Modo do recorte</span><button type="button" class="rst mono" data-reset="modo" hidden><svg class="ico sm"><use href="#i-reset"/></svg>Resetar</button></div>
 <div class="seg" role="radiogroup" aria-labelledby="modo-l">
 <label class="seg__o"><input type="radio" name="modo" value="preencher" data-modo><span>Preencher</span></label>
@@ -236,12 +236,12 @@
 </section>
 
 <section class="mod" aria-labelledby="m2">
-<h3 class="mod__h" id="m2">Luz e cor</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m2">Luz e cor</h3>
 <div data-sl="brilho"></div><div data-sl="contraste"></div><div data-sl="saturacao"></div><div data-sl="temp"></div>
 </section>
 
 <section class="mod" aria-labelledby="m3">
-<h3 class="mod__h" id="m3">Detalhe</h3>
+<h3 class="mod__h rotulo rotulo--m" id="m3">Detalhe</h3>
 <div data-sl="realces"></div><div data-sl="sombras"></div><div data-sl="nitidez"></div><div data-sl="vinheta"></div>
 </section>
 

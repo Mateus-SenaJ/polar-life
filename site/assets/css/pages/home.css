@@ -36,7 +36,7 @@ strong{font-weight:500}
 .card__name a:focus-visible{outline:none}
 .card:has(.card__name a:focus-visible){outline:2px solid var(--blue);outline-offset:3px}
 .card__meta{margin:4px 0 0;font-size:13px;line-height:1.5}
-.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface-subtle);border-radius:999px;font-size:12px;font-weight:500}
+.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface-subtle);border-radius:999px}
 .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue)}
 .more{position:relative;z-index:2;flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:12px;background:none;color:var(--black);cursor:pointer}
 .more:hover{background:var(--surface-subtle)}

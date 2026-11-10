@@ -8,7 +8,7 @@ var D={total:24,land:18,port:6,dups:est==='duplicadas'?2:0,nodate:est==='sem-dat
 var undoN=null,byDate=false;
 function plural(n,s,p){return n+' '+(n===1?s:p)}
 function sheets(){return Math.ceil(D.total/D.perSheet)}
-function cell(l,v,s){return '<div><dt class="mono">'+l+'</dt><dd>'+v+(s?'<span>'+s+'</span>':'')+'</dd></div>'}
+function cell(l,v,s){return '<div><dt class="rotulo">'+l+'</dt><dd>'+v+(s?'<span>'+s+'</span>':'')+'</dd></div>'}
 function paint(){
   $('stats').innerHTML=
     cell('Fotos',D.total,'')+

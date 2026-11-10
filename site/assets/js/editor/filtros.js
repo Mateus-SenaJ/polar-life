@@ -63,7 +63,7 @@ function grade(){
   var mini=Q.cena(n,0).replace('preserveAspectRatio="none"','preserveAspectRatio="xMidYMid slice"'),h='';
   FILTROS.filter(function(x){return!UI.fav||fav.indexOf(x.id)>=0||x.id===f.id}).forEach(function(x){
     var on=x.id===f.id,fv=fav.indexOf(x.id)>=0;
-    h+='<li class="ft"><button type="button" class="ft__b" role="radio" aria-checked="'+on+'" data-f="'+x.id+'"><span class="ft__ph" style="filter:url(#tf-'+x.id+')">'+mini+'</span><span class="ft__n">'+x.n+'</span>'+(x.id===sug?'<span class="ft__s mono">Sugerido</span>':'')+'</button>'
+    h+='<li class="ft"><button type="button" class="ft__b" role="radio" aria-checked="'+on+'" data-f="'+x.id+'"><span class="ft__ph" style="filter:url(#tf-'+x.id+')">'+mini+'</span><span class="ft__n">'+x.n+'</span>'+(x.id===sug?'<span class="ft__s rotulo">Sugerido</span>':'')+'</button>'
      +'<button type="button" class="ib ft__h" data-fav="'+x.id+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar dos favoritos: ':'Favoritar: ')+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'
   });
   $('flt-grid').innerHTML=h||'';

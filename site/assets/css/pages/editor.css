@@ -11,7 +11,7 @@ button{font-family:inherit;color:inherit}
 strong{font-weight:500}
 .ico{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .sm{width:18px;height:18px}
-.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .dot{display:inline-block;flex:none;width:6px;height:6px;border-radius:50%;background:var(--blue)}
 .dot--o{width:8px;height:8px;background:var(--orange)}
 .dot--pulse{width:10px;height:10px;animation:pulse 2s var(--ease) infinite}
@@ -33,7 +33,7 @@ strong{font-weight:500}
 .logo-h{height:32px;width:auto}
 .eh__div{width:1px;height:20px;background:var(--outline-subtle)}
 .eh__div--r{height:24px;margin:0 -4px}
-.eh__studio{font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:500;letter-spacing:.08em;white-space:nowrap}
+.eh__studio{white-space:nowrap}
 .eh__proj{display:flex;align-items:center;gap:12px;padding-left:8px;min-width:0}
 .eh__name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chip{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;background:var(--surface-subtle);border-radius:999px;white-space:nowrap}
@@ -99,14 +99,14 @@ strong{font-weight:500}
 .pol__cap{display:block;font-family:var(--font-expressive);font-weight:500;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pol__meta{display:block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:400;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em}
 .pol__sig{position:absolute;height:auto}
-.sheet__foot{position:absolute;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.sheet__foot{position:absolute;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.04em;white-space:nowrap}
 .guides{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .guides line{vector-effect:non-scaling-stroke;stroke-width:1px;shape-rendering:crispEdges}
 
 /* faixa de folhas */
 .faixa{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px;background:var(--white);border-radius:12px;box-shadow:var(--shadow-subtle)}
 .faixa__l{display:flex;align-items:center;gap:16px;min-width:0;flex:1}
-.faixa__t{flex:none}
+.faixa__t{display:flex;align-items:center;gap:4px;flex:none}
 .faixa__list{display:flex;align-items:center;gap:8px;margin:0;padding:6px 4px;list-style:none;overflow-x:auto;min-width:0}
 .faixa__r{flex:none}
 .th{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:48px;height:64px;padding:4px;border:0;border-radius:4px;background:var(--surface-subtle);opacity:.7;cursor:pointer}
@@ -124,7 +124,7 @@ strong{font-weight:500}
 .insp__h{margin:0;font-size:22px;font-weight:300;line-height:1.2}
 .tabs{display:flex;gap:20px;margin:0 -4px;padding:0 4px;overflow-x:auto;box-shadow:inset 0 -1px 0 var(--outline-subtle)}
 .tab{position:relative;flex:none;min-height:44px;padding:0 2px;border:0;background:none;cursor:pointer;color:var(--black)}
-.tab.is-on{color:var(--blue)}
+.tab.is-on{color:var(--black)}
 .tab.is-on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--blue)}
 .scope{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface-subtle);border-radius:12px;font-size:12px;font-weight:500;line-height:1.4}
 .panel{display:flex;flex-direction:column;gap:24px}
@@ -134,7 +134,7 @@ strong{font-weight:500}
 .result.is-err{border-width:2px}
 .result.is-err .ico{color:var(--black)}
 .mod{display:flex;flex-direction:column;gap:16px;padding:16px;background:var(--surface-subtle);border-radius:14px}
-.mod__h{margin:0;font:500 12px/1.4 'Inter',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.mod__h{margin:0;line-height:1.4}
 .f{display:flex;flex-direction:column;gap:8px;min-width:0}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .f__top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:20px}

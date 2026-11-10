@@ -61,14 +61,14 @@ function preMut(n,i,f){var g=PRE[n][0],x=PRE[n][2][i],d=der(f);
   if(g==='bt')return mutar(f,'bt',x[1]);
   if(g==='mg'){var h=JSON.parse(JSON.stringify(f));h.lock=true;var r=mutar(h,'lado',x[1]);r.lock=f.lock;return r}
   return mutar(f,'rad',x[1])}
-function preHtml(){var h='<section class="mod" aria-labelledby="mo-h3"><h3 class="mod__h" id="mo-h3">Personalizar</h3><p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Atalhos de medida. Você pode digitar qualquer valor em Medidas.</span></p>';
+function preHtml(){var h='<section class="mod" aria-labelledby="mo-h3"><h3 class="mod__h rotulo rotulo--m" id="mo-h3">Personalizar</h3><p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Atalhos de medida. Você pode digitar qualquer valor em Medidas.</span></p>';
   PRE.forEach(function(g,k){h+='<fieldset class="pre"><legend>'+g[1]+' <span class="mono">'+g[3]+'</span></legend><div class="pre__g'+(g[0]==='prop'?' pre__g--8':'')+'">';
     g[2].forEach(function(x,i){h+='<button type="button" class="pre__b" data-pre="'+k+'" data-i="'+i+'" aria-pressed="false"><svg class="ico sm" aria-hidden="true"><use href="#i-check"/></svg><span>'+x[0]+'</span>'+(g[0]==='bt'||g[0]==='mg'||g[0]==='rad'?'<span class="mono">'+(x[1]).toString().replace('.',',')+' mm</span>':'')+'</button>'});
     h+='</div></fieldset>'});
   return h+'</section>'}
 /* orientação (etapa 27, D-109 · [RECOMENDADO]): gira a moldura inteira 90°; a faixa grossa vai para a esquerda e a legenda gira junto */
 var ORI=[['v','Vertical','em pé · faixa grossa embaixo'],['h','Horizontal','deitada · faixa grossa à esquerda']];
-function oriHtml(){var h='<section class="mod" aria-labelledby="mo-ho"><h3 class="mod__h" id="mo-ho">Orientação</h3><div class="pre__g pre__g--2" id="mo-ori" role="group" aria-label="Orientação da polaroid">';
+function oriHtml(){var h='<section class="mod" aria-labelledby="mo-ho"><h3 class="mod__h rotulo rotulo--m" id="mo-ho">Orientação</h3><div class="pre__g pre__g--2" id="mo-ori" role="group" aria-label="Orientação da polaroid">';
   ORI.forEach(function(o){h+='<button type="button" class="pre__b pre__b--ori" data-ori="'+o[0]+'" aria-pressed="false"><svg class="ico sm" aria-hidden="true"><use href="#i-check"/></svg><span class="ori__i ori__i--'+o[0]+'" aria-hidden="true"></span><span>'+o[1]+'</span><span class="mono">'+o[2]+'</span></button>'});
   return h+'</div><p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Gira a polaroid inteira, com a legenda. As medidas abaixo continuam as da polaroid em pé. Atalho: R.</span></p></section>'}
 function girar(o){var f=JSON.parse(JSON.stringify(F()));if(f.ori===o)return;f.ori=o;err=null;grava(f,'mo:ori');
@@ -101,12 +101,12 @@ function reg(ax,mm,px,maj,mnr){
 /* painel */
 function montar(){
   var p=$('p-molduras'),h='';
-  h+='<section class="mod" aria-labelledby="mo-h1"><h3 class="mod__h" id="mo-h1">Formato</h3><ul class="fmt" id="mo-fmt">';
-  FMT.forEach(function(x){h+='<li><button type="button" class="fmt__b" data-fmt="'+x[0]+'"'+(x[4]?'':' disabled')+'><span>'+x[1]+'</span><span class="mono">'+(x[0]==='pers'?'medidas livres':x[2]+' × '+x[3]+' mm')+'</span>'+(x[4]?'':'<em class="mono">Em breve</em>')+'</button></li>'});
+  h+='<section class="mod" aria-labelledby="mo-h1"><h3 class="mod__h rotulo rotulo--m" id="mo-h1">Formato</h3><ul class="fmt" id="mo-fmt">';
+  FMT.forEach(function(x){h+='<li><button type="button" class="fmt__b" data-fmt="'+x[0]+'"'+(x[4]?'':' disabled')+'><span>'+x[1]+'</span>'+(x[0]==='pers'?'<span class="rotulo">Medidas livres</span>':'<span class="mono">'+x[2]+' × '+x[3]+' mm</span>')+(x[4]?'':'<em class="rotulo">Em breve</em>')+'</button></li>'});
   h+='</ul></section>';
   h+=oriHtml();
   h+=preHtml();
-  h+='<section class="mod" aria-labelledby="mo-h2"><h3 class="mod__h" id="mo-h2">Medidas</h3>';
+  h+='<section class="mod" aria-labelledby="mo-h2"><h3 class="mod__h rotulo rotulo--m" id="mo-h2">Medidas</h3>';
   h+='<div class="seg" role="radiogroup" aria-label="Unidade das medidas">';
   Object.keys(UN).forEach(function(k){h+='<label class="seg__o"><input type="radio" name="mo-un" value="'+k+'"><span>'+UN[k].u+'</span></label>'});
   h+='</div>';
@@ -147,8 +147,8 @@ function dialogoFmt(){
   var d=document.createElement('div');d.className='dialog';d.id='fmt-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
   d.setAttribute('aria-labelledby','fmt-t');d.setAttribute('aria-describedby','fmt-d');d.hidden=true;
   d.innerHTML='<h2 id="fmt-t"></h2><p id="fmt-d">A moldura vale para todas as fotos do projeto. O papel e o espaço entre polaroids não mudam.</p>'
-    +'<div class="antdep" role="group" aria-label="Antes e depois"><div><span class="mono antdep__k">Antes</span><strong id="fmt-a1"></strong><span class="mono" id="fmt-a2"></span><span class="mono" id="fmt-a3"></span></div>'
-    +'<div><span class="mono antdep__k">Depois</span><strong id="fmt-d1"></strong><span class="mono" id="fmt-d2"></span><span class="mono" id="fmt-d3"></span></div></div>'
+    +'<div class="antdep" role="group" aria-label="Antes e depois"><div><span class="rotulo antdep__k">Antes</span><strong id="fmt-a1"></strong><span class="mono" id="fmt-a2"></span><span class="mono" id="fmt-a3"></span></div>'
+    +'<div><span class="rotulo antdep__k">Depois</span><strong id="fmt-d1"></strong><span class="mono" id="fmt-d2"></span><span class="mono" id="fmt-d3"></span></div></div>'
     +'<div class="dialog__act"><button type="button" class="btn2 btn2--lg" id="fmt-nao">Manter formato atual</button>'
     +'<button type="button" class="led-btn led-btn--light" id="fmt-sim"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Trocar formato</span></span></button></div>';
   document.body.appendChild(sc);document.body.appendChild(d);
@@ -189,7 +189,9 @@ function render(){
   [].slice.call(p.querySelectorAll('[data-pre]')).forEach(function(b){var k=+b.getAttribute('data-pre');b.setAttribute('aria-pressed',preOn(k,f)[+b.getAttribute('data-i')])});
   [].slice.call(p.querySelectorAll('[name="mo-un"]')).forEach(function(r){r.checked=r.value===un});
   $('mo-lock').checked=!!f.lock;$('mo-man').checked=!!f.man;
-  $('cota').textContent=cota();
+  var cotaEl=$('cota'),cotaLabel=$('cota-label'),cotaValue=$('cota-value'),cotaTexto=cota(),cotaSeparador=cotaTexto.indexOf(':');
+  if(cotaEl&&cotaLabel&&cotaValue){cotaLabel.textContent=cotaTexto.slice(0,cotaSeparador+1);cotaValue.textContent=cotaTexto.slice(cotaSeparador+1).trim()}
+  else if(cotaEl)cotaEl.textContent=cotaTexto;
   Q.pw().classList.toggle('has-rg',ligada());Q.dim()}
 
 document.addEventListener('keydown',function(e){                  /* R gira a moldura (FN-03); não vale dentro de campos nem com pop-up aberto */

@@ -14,7 +14,7 @@ a{color:inherit}
 strong{font-weight:500}
 [hidden]{display:none!important}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;text-transform:uppercase;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:400;font-size:11px;line-height:1.4;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .app-header{position:sticky;top:0;z-index:40;height:64px;background:rgb(255 255 255/.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 1px 8px rgb(0 0 0/.04)}
 .app-header .in{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px}
 .app-header a.logo{display:inline-flex;align-items:center;min-height:44px}

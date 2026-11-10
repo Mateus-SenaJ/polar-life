@@ -8,6 +8,7 @@
 .th--sel .th__n{color:var(--blue);font-weight:500}
 .faixa.is-marcando{outline:2px dashed var(--blue);outline-offset:-2px}
 /* «Valores diferentes» (FN-00a): etiqueta com ícone e texto no cabeçalho do campo; nunca só cor (T3) */
-.mix{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--outline-subtle);border-radius:999px;background:var(--surface-subtle);font-size:11px;white-space:nowrap}
+.mix{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--outline-subtle);border-radius:999px;background:var(--surface-subtle);font-size:var(--rotulo-s);white-space:nowrap}
 .mix[hidden]{display:none}
 .f.is-mix .f__top{flex-wrap:wrap;row-gap:0}
+@media(max-width:480px){.mix{font-size:16px}}

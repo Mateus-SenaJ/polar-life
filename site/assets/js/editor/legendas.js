@@ -137,14 +137,14 @@ function cores(k,v){
 function seletor(k){
   var l=L()[k],f=fonte(l.font),abre=UI.sel===k;
   var h='<div class="f"><div class="f__top"><span class="f__l" id="l-f-'+k+'">Fonte</span>'+rst(k+'.font')+'</div>'
-   +'<button type="button" class="fsel" data-fsel="'+k+'" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(l.font)+';font-style:'+(f.it?'italic':'normal')+'">'+(k==='txt'?T()||'Dia de rolê':FMT[L().data.fmt][1](DATA))+'</span><span class="mono fsel__n">'+(k==='txt'?l.font:l.font)+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
+   +'<button type="button" class="fsel" data-fsel="'+k+'" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(l.font)+';font-style:'+(f.it?'italic':'normal')+'">'+(k==='txt'?T()||'Dia de rolê':FMT[L().data.fmt][1](DATA))+'</span><span class="rotulo fsel__n">'+(k==='txt'?l.font:l.font)+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
   if(abre){
     var lista=FONTES.filter(function(x){return(UI.cat==='todas'||(UI.cat==='fav'?UI.fav.indexOf(x.n)>=0:UI.cat==='rec'?UI.rec.indexOf(x.n)>=0:x.c===UI.cat))&&x.n.toLowerCase().indexOf(UI.busca.toLowerCase())>=0});
     carregar(lista);
     h+='<div class="fpick"><label class="fbusca"><svg class="ico sm"><use href="#i-search"/></svg><input type="search" id="fbusca" placeholder="Buscar fonte" aria-label="Buscar fonte por nome" value="'+UI.busca.replace(/"/g,'&quot;')+'" autocomplete="off"></label>'
-     +'<div class="fcats" role="tablist" aria-label="Categorias de fonte">'+[['todas','Todas'],['fav','Favoritas'],['rec','Recentes']].concat(Object.keys(CAT).map(function(c){return[c,CAT[c]]})).map(function(c){return'<button type="button" role="tab" class="fcat mono" data-fcat="'+c[0]+'" aria-selected="'+(UI.cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
+     +'<div class="fcats" role="tablist" aria-label="Categorias de fonte">'+[['todas','Todas'],['fav','Favoritas'],['rec','Recentes']].concat(Object.keys(CAT).map(function(c){return[c,CAT[c]]})).map(function(c){return'<button type="button" role="tab" class="fcat rotulo" data-fcat="'+c[0]+'" aria-selected="'+(UI.cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
      +'<ul class="flist" aria-label="Fontes">'+(lista.length?lista.map(function(x){var on=x.n===l.font,fv=UI.fav.indexOf(x.n)>=0;
-       return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+(k==='txt'?(T()||'Dia de rolê'):FMT[L().data.fmt][1](DATA))+'</span><span class="fitem__n mono">'+x.n+' · '+CAT[x.c]+'</span></button><button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'}).join(''):'<li class="f__h">Nenhuma fonte encontrada. Limpe a busca ou escolha outra categoria.</li>')+'</ul>'
+       return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+(k==='txt'?(T()||'Dia de rolê'):FMT[L().data.fmt][1](DATA))+'</span><span class="rotulo fitem__n">'+x.n+' · '+CAT[x.c]+'</span></button><button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'}).join(''):'<li class="f__h">Nenhuma fonte encontrada. Limpe a busca ou escolha outra categoria.</li>')+'</ul>'
      +'<p class="f__h">Se uma fonte não carregar, entra a padrão da categoria e a revisão de impressão avisa.</p></div>'
   }
   return h+'</div>'
@@ -152,27 +152,27 @@ function seletor(k){
 function sw(k,rot,on){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'" aria-labelledby="s-'+k+'"><span></span></button></div>'}
 function montar(){
   var l=L(),h='';
-  h+='<section class="mod" aria-labelledby="lm0"><h3 class="mod__h" id="lm0">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
+  h+='<section class="mod" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
    +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>';
-  h+='<section class="mod" aria-labelledby="lm1"><h3 class="mod__h" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
+  h+='<section class="mod" aria-labelledby="lm1"><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
    +'<div class="f" id="f-texto"><div class="f__top"><label class="f__l" for="lg-in">Texto desta foto</label><span class="mono f__h" id="lg-cnt">0/80</span></div><div class="num lg-num"><input id="lg-in" maxlength="80" autocomplete="off" style="text-align:left;padding-left:12px"></div><p class="f__h" id="lg-h">Até 80 caracteres.</p><div id="lg-conf" hidden></div></div>'
    +seletor('txt')
    +sld('txt.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')
    +'<label class="chk"><input type="checkbox" data-chk="txt.fit"'+(l.txt.fit?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Ajustar para caber</strong><span class="f__h">Reduz o tamanho até o texto caber na área segura.</span></span></label>'
-   +seg('caixa','Caixa',[['normal','Normal'],['maiusc','MAIÚSC.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
+   +seg('caixa','Caixa',[['normal','Normal'],['maiusc','Maiúsc.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
    +sld('txt.esp','Espaçamento','em',-0.05,0.3,0.01,2,'De −0,05 a 0,3 em.')
    +cores('txt',l.txt.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm2"><h3 class="mod__h" id="lm2">Data</h3>'+sw('data.on','Mostrar data',l.data.on)
+  h+='<section class="mod" aria-labelledby="lm2"><h3 class="mod__h rotulo rotulo--m" id="lm2">Data</h3>'+sw('data.on','Mostrar data',l.data.on)
    +'<div class="f"><div class="f__top"><span class="f__l" id="l-fmt">Formato</span>'+rst('data.fmt')+'</div><div class="fmts" role="radiogroup" aria-labelledby="l-fmt">'+FMT.map(function(f,i){return'<label class="preset preset--s"><input type="radio" name="fmt" value="'+i+'"'+(l.data.fmt===i?' checked':'')+'><span>'+f[1](DATA)+'</span></label>'}).join('')+'</div><p class="f__h">Origem: data da foto. Sem data, a legenda não mostra data.</p></div>'
    +sld('data.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('data',l.data.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm3"><h3 class="mod__h" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
+  h+='<section class="mod" aria-labelledby="lm3"><h3 class="mod__h rotulo rotulo--m" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
    +'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>'
    +seg('uf','Estado',[['sigla','Sigla'],['nome','Nome'],['oculto','Oculto']],l.loc.uf,'loc.uf')
    +seg('pais','País',[['oculto','Oculto'],['nome','Nome'],['cod','Código']],l.loc.pais,'loc.pais')
    +seg('sep','Separador',[[', ','Vírgula'],['·','Ponto'],['–','Traço'],['/','Barra']],l.loc.sep,'loc.sep')
    +seg('ordem','Ordem',[['cidade','Cidade, Estado'],['estado','Estado, Cidade']],l.loc.ordem,'loc.ordem')
    +sld('loc.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('loc',l.loc.cor)+'</section>';
-  h+='<section class="mod" aria-labelledby="lm4"><h3 class="mod__h" id="lm4">Posição</h3>'
+  h+='<section class="mod" aria-labelledby="lm4"><h3 class="mod__h rotulo rotulo--m" id="lm4">Posição</h3>'
    +seg('pos','Onde fica',[['abaixo','Abaixo'],['acima','Acima'],['ambas','Ambas']],l.pos,'pos','Abaixo: tudo embaixo. Acima: tudo na margem de cima. Ambas: texto em cima, data e local embaixo.')
    +sld('dx','Deslocar na horizontal','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('inc','Inclinação','°',-5,5,0.1,1,'De −5° a +5°.')+'</section>';
   h+='<div id="lg-fora" class="msg msg--warn" hidden><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>A legenda passa da área segura e bloqueia a impressão. Reduza o tamanho, encurte o texto ou use «Ajustar para caber».</p><div class="qmsg__act"><button type="button" class="btn2 btn2--sm" data-lfit>Ajustar para caber</button></div></div></div>';

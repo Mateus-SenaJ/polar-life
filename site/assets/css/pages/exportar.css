@@ -36,7 +36,8 @@
 .est__v{font-size:24px;font-weight:300;line-height:1.2}
 .est__s{font-size:14px;line-height:1.5}
 .est__n{margin-top:4px;font-size:11px;text-transform:none;letter-spacing:0;color:rgb(0 0 0/.65)}
-.est__k{font-size:11px}
+.est__k{font-family:var(--font-rotulo);font-size:var(--rotulo-s);font-weight:400;letter-spacing:0}
+@media(max-width:480px){.est__k{font-size:16px}}
 .act{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--outline-subtle)}
 #trava{margin-top:24px}
 #trava .btn2{margin-top:12px}
