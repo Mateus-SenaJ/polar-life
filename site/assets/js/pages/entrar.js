@@ -73,7 +73,7 @@ function renderEmail(manter){
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
     '<div class="cx-prov" role="group" aria-label="Entrar com Google ou Apple">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span>Continuar com '+pv.nome+'</span></button>'}).join('')+'</div>'+
     '<p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>'+
-    '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>'+
+    '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a> · <a href="../../legal/#cookies">Cookies</a></p>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
     '<section class="cx-testes" aria-labelledby="t-testes">'+
     '<h3 class="cx-testes__t" id="t-testes">Contas de teste</h3>'+

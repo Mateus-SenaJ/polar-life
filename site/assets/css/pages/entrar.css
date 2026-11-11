@@ -154,3 +154,71 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 /* links de texto na cor do texto (T2: nada do azul padrão do navegador) */
 .ent a{color:var(--black)}
 .ent a:hover{color:var(--blue)}
+
+/* ---- D-154: o preto da faixa se dissolve sobre o vídeo e a tela de entrar cabe sem rolagem ----
+   A mídia ocupa a coluna inteira por trás; a faixa preta fica por cima e vai ficando transparente
+   (preto 100% → 0%) sobre o varal, sem corte. Só preto com alfa (T2). */
+.ent__l{position:relative;overflow:hidden;isolation:isolate}
+.ent__midia{position:absolute;inset:0;aspect-ratio:auto;z-index:-1}
+.ent__faixa{position:relative;padding:40px 24px 120px;background:linear-gradient(180deg,#000 0,#000 55%,rgb(0 0 0/.7) 72%,rgb(0 0 0/.25) 88%,rgb(0 0 0/0) 100%)}
+.ent__titulo{margin-top:20px;font-size:32px}
+.ent__apoio{margin-top:16px;font-size:16px}
+@media (min-width:1024px){
+  .ent{min-height:0;height:calc(100vh - 32px);height:calc(100svh - 32px)}
+  .ent__l{position:relative;top:auto;align-self:stretch;height:auto}
+  .ent__faixa{padding:56px 64px 200px}
+  .ent__titulo{margin-top:28px;font-size:44px}
+  .ent__apoio{margin-top:24px;font-size:18px}
+  .ent__r{padding:64px 32px 16px;justify-content:center;overflow-y:auto}
+  .ent__head{height:64px}
+  .ent__caixa{padding:20px 28px;margin:auto 0}
+  .ent__foot{display:none}                                   /* os links legais estão na caixa (Privacidade · Termos · Cookies) */
+  .fld,.fld--first{margin-top:12px}
+  .fld .txt{margin-top:6px}
+  .cx-esq{margin:0}
+  .led-btn--block{margin-top:4px}
+  .cx-criar{height:44px;margin-top:8px}
+  .cx-div{margin:12px 0}
+  .cx-prov{grid-template-columns:1fr 1fr;gap:8px;margin-top:0}
+  .cx-prov__b{height:44px;padding:0 10px;gap:8px;font-size:13px}
+  .cx-cod{margin:6px 0 0}
+  .cx-links{margin:0}
+  .cx-links a{display:inline-flex;align-items:center;min-height:44px}
+  .cx-testes__t{font-size:15px}
+  .cx-testes__p{display:none}
+  .cx-testes__lista{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .cx-testes__lista .btn2{height:44px;padding:0 10px;font-size:13px}
+  .cx-testes__nome .mono{display:none}                       /* o e-mail da conta de teste fica no rótulo acessível do botão */
+}
+/* telas baixas (notebook 768 px ou menos): o aviso da senha some e os espaços encolhem mais */
+@media (min-width:1024px) and (max-height:860px){
+  #ajuda-senha{display:none}
+  .ent__faixa{padding:40px 56px 160px}
+  .ent__titulo{font-size:38px}
+  .cx-div{margin:8px 0}
+  .ent__caixa{padding:16px 24px}
+}
+@media (min-width:1024px){
+  .ent__r{justify-content:flex-start;padding-top:80px}       /* centraliza com margin:auto (seguro): nunca sobe por cima do logo */
+  .ent__nota{display:none}                                   /* «nada sai deste aparelho» já está no selo do topo e na ajuda */
+  .cx-prov__b{white-space:nowrap}
+  .cx-cod,.cx-links{display:inline-flex;align-items:center;width:49%;margin:8px 0 0;vertical-align:middle}
+  .cx-cod{justify-content:flex-start}.cx-cod__b{padding-left:0}
+  .cx-links{justify-content:flex-end;font-size:13px}
+  .cx-links + .cx-div{margin:8px 0 4px}
+  .cx-links + .cx-div span{display:none}
+}
+@media (min-width:1024px) and (max-height:760px){
+  .ent__head{height:56px}
+  .ent__r{padding-top:64px}
+  .cx-testes__t{display:none}
+  .cx-t{font-size:20px}
+  .cx-criar{margin-top:6px}
+  .cx-div{margin:6px 0}
+  .ent__faixa{padding:32px 56px 140px}
+  .ent__titulo{margin-top:20px;font-size:34px}
+}
+@media (min-width:1024px){.cx-links{gap:6px}}
+@media (min-width:1024px) and (max-height:860px){.ent__r{padding-top:72px;padding-bottom:6px}}
+@media (min-width:1024px) and (max-height:760px){.ent__r{padding-top:62px}}
+@media (max-width:1023px){.ent__l{padding-bottom:96px}}   /* celular: uma faixa limpa do varal abaixo do degradê */

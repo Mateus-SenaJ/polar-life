@@ -259,7 +259,7 @@ try {
   /* só carrega quando entra na tela */
   {
     const { c, p, v } = await simular({ viewport: { width: 390, height: 160 } });
-    await p.goto(srv.url + 'app/entrar/', { waitUntil: 'networkidle' });
+    await p.goto(srv.url  /* D-154: na tela de entrar a mídia fica no topo, atrás da faixa; o teste usa o herói da apresentação (no celular, abaixo do texto) */, { waitUntil: 'networkidle' });
     await p.waitForTimeout(700);
     const antes = pediuVideo(v).length, y = await p.evaluate(() => Math.round(document.querySelector('[data-midia]').getBoundingClientRect().top));
     antes === 0 && y > 360 ? ok(`carregamento sob demanda: com a mídia fora da tela (a ${y} px), nenhum vídeo é pedido`) : ruim(`carregamento sob demanda: ${antes} pedido(s) antes de rolar (mídia a ${y} px)`);
