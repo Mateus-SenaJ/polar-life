@@ -26,12 +26,13 @@ try {
   await page.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0);
   for (const s of SCRIPTS) await page.addScriptTag({ url: srv.url + s });
 
-  for (const id of ['tab-fotos', 'tab-ajustes', 'tab-legendas', 'tab-molduras', 'tab-metadados']) {
+  for (const id of ['tab-fotos', 'tab-ajustes', 'tab-legendas', 'tab-molduras']) {
     await page.click('#' + id);
     const txt = await page.locator('#p-outra').innerText();
     ok(!/não está disponível/i.test(txt) && txt.trim().length > 20, `aba ${id.slice(4)} funciona no modo Folhas`);
   }
-  ok(!(await page.locator('#p-outra').innerText()).includes('Campos do Jordão'), 'Metadados sem cidade de exemplo pré-preenchida (T7)');
+  ok(!(await page.locator('#p-outra').innerText()).includes('Campos do Jordão'), 'painéis sem cidade de exemplo pré-preenchida (T7)');
+  ok((await page.locator('#tab-metadados').count()) === 0, 'D-148: a aba Metadados não existe mais (Folhas)');
 
   /* D-121: guias de 0,15 mm no arquivo */
   const l0 = await listaPdf(), guias = l0.filter(i => i.t === 'linha');

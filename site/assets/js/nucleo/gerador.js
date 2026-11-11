@@ -97,6 +97,7 @@ function projeto(){
   }
   var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
   if(pocket){fr={w:66,h:99,jh:79,lado:3,topo:3,rad:.4,ori:'v'};if(!leg)leg=LT.legPocket(LT.LEG0)}
+  if(!leg&&real)leg=LT.legInicial();   /* D-149: projeto real sem legenda salva = Localização · Data */
   var fotos=lista.map(function(e,k){
     var src=e.src;
     return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,pad:e.pad||null,pl:e.pl||null,
@@ -118,17 +119,10 @@ function matrizPolaroid(c,fr){
 
 /* ---------- fontes ---------- */
 var SLUG={'Cormorant Garamond':'cormorant-garamond','Playfair Display':'playfair-display','IBM Plex Mono':'ibm-plex-mono','Courier Prime':'courier-prime','EB Garamond':'eb-garamond','Libre Baskerville':'libre-baskerville','Dancing Script':'dancing-script','Special Elite':'special-elite','Cutive Mono':'cutive-mono','Reenie Beanie':'reenie-beanie','Shadows Into Light':'shadows-into-light','Covered By Your Grace':'covered-by-your-grace','Over the Rainbow':'over-the-rainbow','La Belle Aurore':'la-belle-aurore','Homemade Apple':'homemade-apple','Patrick Hand':'patrick-hand'};
-var PESOS={'caveat':[400,500],'ibm-plex-mono':[400],'inter':[300,400,500],'cormorant-garamond':[300,400],'playfair-display':[400]};
-var ITAL={'cormorant-garamond':[300,400],'playfair-display':[400]};
-var SO_ITAL={'playfair-display':1};
 function slug(fam){if(SLUG[fam])return SLUG[fam];return String(fam).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
-function maisProximo(a,p){var b=a[0],d=1e9;a.forEach(function(v){var x=Math.abs(v-p);if(x<d){d=x;b=v}});return b}
-function arquivoFonte(fam,peso,it){
-  var s=slug(fam),disp=PESOS[s]||[400],ital=ITAL[s]||[],useIt=!!it;
-  if(SO_ITAL[s])useIt=true;
-  if(useIt&&!ital.length)useIt=false;
-  var p=maisProximo(useIt?ital:disp,peso);
-  return s+'-'+p+(useIt?'-italico':'')+'.ttf'
+function arquivoFonte(fam,peso,it){                      /* D-148: só variantes que existem (PLTEXTO.variante), nunca itálico ou negrito sintético */
+  var v=LT.variante(fam,peso,!!it);
+  return slug(fam)+'-'+v.w+(v.i?'-italico':'')+'.ttf'
 }
 function carregarBytes(url){
   if(cacheBytes[url])return Promise.resolve(cacheBytes[url]);
@@ -150,7 +144,7 @@ function carregarFonte(fam,peso,it,avisos){
 }
 function fonteDe(f){return cacheFontes[arquivoFonte(f.fam,f.peso,f.it)]||null}
 function estiloObj(o){
-  var fm=LT.famLG(o.font),fam=String(fm.f).split("'")[1]||o.font;
+  var fm=LT.famLG(o.font,o),fam=String(fm.f).split("'")[1]||o.font;
   return{fam:fam,peso:fm.w,it:!!fm.i,pt:o.pt||9,cor:LT.COR_LG[o.cor]||'#000',esp:o.esp||0,contorno:false}
 }
 function metricas(f){var ft=fonteDe(f);if(ft&&ft.unitsPerEm)return{asc:ft.ascent/ft.unitsPerEm,desc:Math.abs(ft.descent)/ft.unitsPerEm,cap:ft.capHeight!=null?Math.abs(ft.capHeight)/ft.unitsPerEm:.7};return{asc:.8,desc:.2,cap:.7}}
@@ -190,8 +184,8 @@ function layoutLegenda(f,fr,leg,s){
     legOu=leg;
     capTxt=leg.txt.on?LT.caixaLG(f.leg,leg.txt.caixa):'';
     capEst=estiloObj(leg.txt);capEst.esp=leg.txt.esp||0;
-    var dataEst=estiloObj(leg.data),locEst=estiloObj(leg.loc);dataEst.esp=.02;locEst.esp=.02;
-    dataTxt=leg._pad?leg._dt:(leg.data.on&&DF.d?LT.FMTD[leg.data.fmt||0](DF.d):'');locTxt=leg._pad?leg._lc:(leg.loc.on&&DF.c?LT.localLG(leg.loc,DF.c):'');
+    var dataEst=estiloObj(leg.data),locEst=estiloObj(leg.loc);dataEst.esp=leg.data.esp!=null?leg.data.esp:.02;locEst.esp=leg.loc.esp!=null?leg.loc.esp:.02;   /* D-148: espaçamento avançado */
+    dataTxt=leg._pad?leg._dt:(leg.data.on&&DF.d?LT.cxMeta(leg,LT.FMTD[leg.data.fmt||0](DF.d)):'');locTxt=leg._pad?leg._lc:(leg.loc.on&&DF.c?LT.cxMeta(leg,LT.localLG(leg.loc,DF.c)):'');
     sepEst={fam:'IBM Plex Mono',peso:400,it:false,pt:Math.max(dataEst.pt,locEst.pt),cor:'#000000',esp:.02,contorno:false};
     var segD={k:'data',txt:dataTxt,est:dataEst,box:preset==='calendario'},segL={k:'loc',txt:locTxt,est:locEst,box:false};
     metaSegs=((leg.ordem||'data-loc')==='loc-data'?[segL,segD]:[segD,segL]).filter(function(sg){return sg.txt})
@@ -204,6 +198,7 @@ function layoutLegenda(f,fr,leg,s){
     sepEst=metaEst;
     metaSegs=[{k:'data',txt:dataTxt,est:metaEst,box:false},{k:'loc',txt:locTxt,est:metaEst,box:false}].filter(function(sg){return sg.txt})
   }
+  var SEP=LT.sepMeta(legOu);                                    /* D-149: separador escolhido */
   var junto=(legOu.meta||'junto')!=='linhas';                  /* D-113: juntas numa linha ou em linhas separadas */
   metaSegs.forEach(function(seg){var w=medir(seg.txt,seg.est);if(seg.box)w+=2*.4*tamUm(seg.est.pt)+520;seg.w=w});
   var capBox=preset==='etiqueta'||preset==='bilhete'||preset==='carimbo',capBorder=capBox?(preset==='carimbo'?530:260):0;
@@ -230,7 +225,7 @@ function layoutLegenda(f,fr,leg,s){
   function largMeta(ln){                                     /* soma dos segmentos da linha (o « • » entra na conta) */
     var segs=segsDe(ln),w=0;
     segs.forEach(function(sg){w+=sg.w});
-    if(junto&&ln.k==='meta'&&segs.length>1)w+=medir(' • ',sepEst);
+    if(junto&&ln.k==='meta'&&segs.length>1)w+=medir(SEP,sepEst);
     return w
   }
   function capItems(top,x){
@@ -262,8 +257,8 @@ function layoutLegenda(f,fr,leg,s){
         mx+=w
       }
       if(junto&&ln.k==='meta'&&i<segs.length-1){                /* « • » só entre as duas partes da linha única */
-        var sw=medir(' • ',sepEst);
-        if(mx+sw<=maxRight){arr.push(texto(' • ',mx,b,sepEst,false,topU,ln.lh,clip));mx+=sw}
+        var sw=medir(SEP,sepEst);
+        if(mx+sw<=maxRight){arr.push(texto(SEP,mx,b,sepEst,false,topU,ln.lh,clip));mx+=sw}
       }
     });
     return arr
@@ -629,7 +624,9 @@ function preparar(p,avisos){
   function add(fam,peso,it){var k=fam+'|'+peso+'|'+(it?1:0);if(vistos[k])return;vistos[k]=1;jobs.push(carregarFonte(fam,peso,it,avisos))}
   if(!p.nome&&p.real&&window.PLPROJETOS&&window.PLPROJETOS.atual&&window.PLPROJETOS.listar)   /* o nome do projeto no rodapé (L6) */
     jobs.push(PLPROJETOS.listar().then(function(a){var id=PLPROJETOS.atual();for(var i=0;i<a.length;i++)if(a[i].id===id){p.nome=a[i].nome;break}},function(){}));
-  if(p.leg){var a=estiloObj(p.leg.txt);add(a.fam,a.peso,a.it);var b=estiloObj(p.leg.data);add(b.fam,b.peso,b.it);var c=estiloObj(p.leg.loc);add(c.fam,c.peso,c.it);add('IBM Plex Mono',400,false)}
+  if(p.leg){var a=estiloObj(p.leg.txt);add(a.fam,a.peso,a.it);var b=estiloObj(p.leg.data);add(b.fam,b.peso,b.it);var c=estiloObj(p.leg.loc);add(c.fam,c.peso,c.it);add('IBM Plex Mono',400,false);
+    (p.fotos||[]).forEach(function(f){var d=LT.comPadrao(p.leg,f);if(d&&d.data){[d.txt,d.data,d.loc].forEach(function(o){var e=estiloObj(o);add(e.fam,e.peso,e.it)})}})   /* D-149: o estilo de cada linha (fonte, negrito, itálico) também precisa estar carregado */
+  }
   else{add('Caveat',500,false);add('IBM Plex Mono',400,false)}
   if(p.s.rodape)add('IBM Plex Mono',400,false);
   if(p.real&&window.PLFOTOS)jobs.push(Promise.all(p.fotos.map(function(f){return PLFOTOS.ler(f.src).catch(function(){return null})})).then(function(rs){ /* 44 · MT-02: mesma orientação e data reais que a tela */

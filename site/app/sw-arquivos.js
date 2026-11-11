@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='c16475520c91';
+self.PL_VERSAO='4f92c54ae793';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -42,6 +42,8 @@ self.PL_ARQUIVOS=[
 "../assets/fonts/cormorant-garamond-400-italico.woff2",
 "../assets/fonts/cormorant-garamond-400.woff2",
 "../assets/fonts/cormorant-garamond-500.woff2",
+"../assets/fonts/cormorant-garamond-700-italico.woff2",
+"../assets/fonts/cormorant-garamond-700.woff2",
 "../assets/fonts/inter-300.woff2",
 "../assets/fonts/inter-400.woff",
 "../assets/fonts/inter-500.woff",

@@ -170,13 +170,13 @@ try {
   await page.mouse.move(c3.x, c3.y);
   await page.mouse.down();
   await page.mouse.move(c3.x + 500, c3.y, { steps: 10 });
-  const gMeio = await ler();                        /* durante o gesto: a foto recua da beirada (elástico) */
+  const gMeio = await ler();                        /* durante o gesto: a foto cede além da borda, no sentido do arrasto (elástico, D-149) */
   await page.mouse.up();
   await page.waitForTimeout(300);
   const g1 = await ler();
   const cobre = g1.ph.x <= g1.win.x + 0.5 && g1.ph.y <= g1.win.y + 0.5 && g1.ph.x + g1.ph.w >= g1.win.x + g1.win.w - 0.5 && g1.ph.y + g1.ph.h >= g1.win.y + g1.win.h - 0.5;
   ok(cobre, 'a foto cobre a janela depois de arrastar para fora do limite');
-  ok(gMeio.st.ex < 0 && Math.abs(gMeio.st.ex) <= 0.06, 'durante o gesto a foto recua da beirada (elástico ' + gMeio.st.ex.toFixed(4) + ')');
+  ok(gMeio.st.ex > 0 && gMeio.st.ex <= 0.06, 'D-149: durante o gesto a foto cede no sentido do arrasto, com resistência (elástico ' + gMeio.st.ex.toFixed(4) + ')');
   const fundo = await page.evaluate(async b64 => {
     const img = new Image();
     await new Promise((ok2, no) => { img.onload = ok2; img.onerror = no; img.src = 'data:image/png;base64,' + b64; });

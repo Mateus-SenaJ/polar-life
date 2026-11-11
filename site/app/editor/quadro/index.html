@@ -171,6 +171,7 @@
 <div class="acts acts--q">
 <button type="button" class="ib" id="fprev" aria-label="Foto anterior" title="Foto anterior ( [ )"><svg class="ico"><use href="#i-prev"/></svg></button>
 <button type="button" class="btn2" data-act="centralizar"><svg class="ico sm" style="color:var(--blue)"><use href="#i-crop"/></svg>Centralizar quadro</button>
+<button type="button" class="btn2" data-act="excluir" id="excluir"><svg class="ico sm" style="color:var(--blue)"><use href="#i-trash"/></svg>Excluir foto</button>
 <span class="acts__cota" id="cota"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span class="rotulo" id="cota-label">Passe-partout inferior:</span> <span class="mono" id="cota-value">25 mm</span></span>
 <span class="nb rotulo" id="nb" hidden>Ajustada</span>
 <button type="button" class="ib" id="fnext" aria-label="Foto seguinte" title="Foto seguinte ( ] )"><svg class="ico"><use href="#i-next"/></svg></button>
@@ -200,7 +201,6 @@
 <button type="button" role="tab" class="tab rotulo is-on" id="tab-ajustes" aria-selected="true" aria-controls="p-ajustes">Ajustes</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-legendas" aria-selected="false" aria-controls="p-legendas" tabindex="-1">Legendas</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-molduras" aria-selected="false" aria-controls="p-molduras" tabindex="-1">Molduras</button>
-<button type="button" role="tab" class="tab rotulo" id="tab-metadados" aria-selected="false" aria-controls="p-metadados" tabindex="-1">Metadados</button>
 </div>
 
 <div class="scope" id="scope"><span class="dot dot--o dot--pulse" aria-hidden="true"></span><span id="scope-t">Alterando: só esta foto · Foto 03</span><span class="tag rotulo" id="scope-tag" hidden>Lote</span></div>
@@ -278,8 +278,6 @@
 
 <div id="p-molduras" role="tabpanel" aria-labelledby="tab-molduras" class="panel" hidden></div>
 
-<div id="p-metadados" role="tabpanel" aria-labelledby="tab-metadados" class="panel" hidden></div>
-
 <div id="p-outra" role="tabpanel" class="panel" hidden>
 <div class="msg"><svg class="ico"><use href="#i-info"/></svg><p>Esta aba ainda não está disponível.</p></div>
 </div>
@@ -292,6 +290,10 @@
 <div class="bar"><button type="button" class="led-btn led-btn--block" id="go2"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button></div>
 
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" class="undo" id="toast-undo" hidden>Desfazer</button></div>
+
+<div class="thmenu" id="th-menu" role="menu" aria-labelledby="th-menu-t" hidden><span class="thmenu__t rotulo" id="th-menu-t"></span>
+<button type="button" role="menuitem" class="btn2" id="th-menu-dup"><svg class="ico sm" style="color:var(--blue)"><use href="#i-copy"/></svg>Duplicar foto</button>
+<button type="button" role="menuitem" class="btn2" id="th-menu-del"><svg class="ico sm" style="color:var(--blue)"><use href="#i-trash"/></svg>Excluir foto</button></div>
 
 <div class="esq-sk esq-sk--ed" role="status" aria-label="Carregando o projeto">
 <div class="esq-sk__mesa"><i class="folha"></i><i class="leg"></i></div>

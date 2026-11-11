@@ -59,7 +59,7 @@ try {
   await p.goto(srv.url + 'app/editor/');
   await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length === 3);
   const leg = await p.locator('#sheet').innerText();
-  ok(/09\.03\.25/.test(leg), 'legenda usa a data real da foto (09.03.25)');
+  ok(/09\/03\/25/.test(leg), 'legenda usa a data real da foto (09/03/25)');
   ok(!/Campos do Jordão|Dias de sol|Nós dois|14\.07\.26/.test(leg), 'nenhum texto de exemplo nas fotos reais');
   ok(/Viagem de teste/.test(await p.title()) || /Viagem de teste/.test(await p.locator('body').innerText()), 'nome real do projeto na tela');
 

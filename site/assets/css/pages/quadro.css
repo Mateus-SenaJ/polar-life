@@ -24,6 +24,7 @@
 .pq{--k:1;--pw:420px;position:relative;flex:none;width:var(--pqw,var(--pw));aspect-ratio:var(--ar,88/107);margin:0;padding:var(--pt,calc(var(--k)*20px)) var(--pr,var(--pl,calc(var(--k)*20px))) 0 var(--pl,calc(var(--k)*20px));background:var(--white);border-radius:var(--rd,2px);box-shadow:var(--shadow-polaroid)}
 .win{position:relative;width:100%;aspect-ratio:var(--wa,1);background:var(--surface-subtle);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .win.is-drag{cursor:grabbing}
+.win.is-drag .ph{will-change:transform}   /* D-149: o arrasto só muda o transform */
 .win:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .win__clip{position:absolute;inset:0;overflow:hidden}
 .win__ghost{position:absolute;inset:0;display:none;opacity:.3;pointer-events:none}
@@ -88,7 +89,8 @@
   .cbar{margin-bottom:8px;padding:2px 4px;gap:4px;justify-content:flex-start}
   .cbar .seg__o span{padding:0 10px;font-size:12px}
   .stage--q{height:calc(100dvh - 440px - var(--panel)*1dvh);min-height:240px}
-  .acts--q{display:none}
+  .acts--q{margin-top:8px}
+  .acts--q>:not(#excluir){display:none}   /* D-149: no celular só «Excluir foto» fica à mão */
   .qmsg{margin-top:12px}
   .faixa--q{display:flex;padding:8px;box-shadow:none;background:none}
   .faixa--q .faixa__t,.faixa--q .faixa__r{display:none}
@@ -123,3 +125,10 @@
 .pq__sp{display:none}
 .pq.is-h .pq__leg{display:block;position:absolute;left:50%;top:50%;width:var(--lw);height:var(--lh);margin:calc(var(--lh)/-2) 0 0 calc(var(--lw)/-2);padding:var(--cpt) var(--cpl) 0;box-sizing:border-box;transform:rotate(90deg);pointer-events:none}
 .pq.is-h .pq__sp{display:block;width:100%;aspect-ratio:var(--cwa,1)}
+
+/* D-149: menu da miniatura (Duplicar e Excluir foto) */
+.thmenu{position:fixed;z-index:960;display:grid;gap:4px;padding:8px;background:var(--white);border-radius:12px;box-shadow:var(--shadow-floating)}
+.thmenu[hidden]{display:none}
+.thmenu__t{padding:4px 8px}
+.thmenu .btn2{justify-content:flex-start;box-shadow:none}
+.btn2:disabled{opacity:.4;cursor:not-allowed}

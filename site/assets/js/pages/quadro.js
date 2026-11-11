@@ -68,7 +68,7 @@ SRCMAP=function(n){return ST[n]&&ST[n].src||n};
 /* Metadados da foto real ficam no aparelho; GPS só sinaliza existência (BR-06). */
 if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src).catch(function(){return null})})).then(function(a){a.forEach(function(r,i){if(!r)return;var e=ST[i+1],m=e.meta;
   if(!m||(!m.ds&&!m.cs)){var iso=(r.meta&&r.meta.iso||'').slice(0,16);e.meta={iso:iso,ds:iso?'exif':'none',dh:0,c:'',cs:'none',o:'Do aparelho',conv:false}}   /* não sobrescreve o que a pessoa editou */
-  if(r.w&&r.h){VERT[e.src]=r.h>r.w?1:0;REAL_DIM[e.src]={w:r.w,h:r.h}}});if(window.PLLEG)PLLEG.render();render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
+  if(r.w&&r.h){VERT[e.src]=r.h>r.w?1:0;REAL_DIM[e.src]={w:r.w,h:r.h}}});if(window.PLLEG){PLLEG.render();if(PLLEG.iniciar)PLLEG.iniciar()}render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
 function src(n){return SRCMAP(n)}
 function guardarLista(){try{var s=ST.map(function(e,i){if(!i)return e;var o=copia(e);o.ex=0;o.ey=0;return o});   /* o elástico é do gesto: some quando a foto é guardada (MT-02) */
   sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(s));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
@@ -266,7 +266,12 @@ function faixa(){
     var li=document.createElement('li'),b=document.createElement('button');
     b.type='button';b.className='th';b.setAttribute('data-i',i);
     b.innerHTML='<span class="tq"></span><span class="th__n mono">#'+p2(i)+'</span>';
-    (function(k){b.onclick=function(){ir(k)}})(i);
+    (function(k){b.onclick=function(){ir(k)};
+      b.addEventListener('contextmenu',function(e){e.preventDefault();var r=b.getBoundingClientRect();menuTh(k,e.clientX||r.left,e.clientY||r.top)});
+      b.addEventListener('keydown',function(e){if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();excluirFoto(k)}});
+      b.addEventListener('touchstart',function(e){var t=e.touches[0];clearTimeout(lpT);lpT=setTimeout(function(){lpT=null;b.setAttribute('data-lp','1');menuTh(k,t.clientX,t.clientY)},550)},{passive:true});
+      ['touchend','touchmove','touchcancel'].forEach(function(n){b.addEventListener(n,function(){clearTimeout(lpT)},{passive:true})});
+      b.addEventListener('click',function(e){if(b.getAttribute('data-lp')){b.removeAttribute('data-lp');e.stopImmediatePropagation();e.preventDefault()}},true)})(i);
     li.appendChild(b);ol.appendChild(li)
   }
   for(i=1;i<=N;i++)thumb(i)
@@ -292,9 +297,9 @@ function commit(k){
 function assin(){return ST.slice(1).map(function(e){return e.src}).join(',')}
 function manterFotos(){try{PLFOTOTELA.manter(ST.slice(1).map(function(e){return e.src}))}catch(e){}}
 function aplicarHist(j){
-  var antes=assin();hi=j;ST=JSON.parse(hist[hi]);N=ST.length-1;if(cur>N)cur=N;lastK='';keyMain='';
+  var antes=assin(),antesU=usados();hi=j;ST=JSON.parse(hist[hi]);N=ST.length-1;if(cur>N)cur=N;lastK='';keyMain='';
   if(assin()!==antes){faixa();if(window.PLLOTE)PLLOTE.limpar();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}}
-  manterFotos();
+  manterFotos();sincBlobs(antesU);
   guardarLista();render();for(var i=1;i<=N;i++)thumb(i)}
 function desfazer(){if(hi>0){aplicarHist(hi-1);toast('Alteração desfeita')}}
 function refazer(){if(hi<hist.length-1){aplicarHist(hi+1);toast('Alteração refeita')}}
@@ -303,7 +308,20 @@ $('toast-undo').onclick=function(){desfazer()};
 
 
 /* ---------- estrutura do lote: Duplicar e Remover (FN-09) · entram no histórico ---------- */
-function reindexar(novoST,atual){ST=novoST;N=ST.length-1;cur=Math.max(1,Math.min(N,atual));PERTO={};faixa();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}if(window.PLLOTE)PLLOTE.limpar();manterFotos();commit()}
+/* D-149: o arquivo da foto (cópia no aparelho) sai junto com ela e volta com o Desfazer. Só some a cópia da foto que nenhuma polaroid usa mais. */
+var EXCL={},CAD=Promise.resolve();
+function usados(){var u={},i;for(i=1;i<=N;i++)if(ST[i]&&ST[i].src)u[ST[i].src]=1;return u}
+function sincBlobs(antes){
+  if(DEMO||!window.PLFOTOS||!PLFOTOS.removerFoto)return;
+  var depois=usados(),pid=(window.PLPROJETOS&&PLPROJETOS.atual())||'';
+  CAD=CAD.then(function(){
+    var ps=[],voltou=[];
+    Object.keys(antes).forEach(function(sr){if(!depois[sr]&&!EXCL[sr])ps.push(PLFOTOS.removerFoto(sr,pid).then(function(r){EXCL[sr]=r}))});
+    Object.keys(depois).forEach(function(sr){if(!antes[sr]&&EXCL[sr]){var r=EXCL[sr];delete EXCL[sr];voltou.push(sr);ps.push(PLFOTOS.restaurarFoto(sr,pid,r))}});
+    return Promise.all(ps).then(function(){if(voltou.length){voltou.forEach(function(sr){PLFOTOTELA.esquecerFalha(sr);PLFOTOTELA.esquecerFalha(sr)});keyMain='';PERTO={};render();for(var i=1;i<=N;i++)thumb(i)}})
+  }).catch(function(){})
+}
+function reindexar(novoST,atual){var antes=usados();ST=novoST;N=ST.length-1;cur=Math.max(1,Math.min(N,atual));PERTO={};faixa();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}if(window.PLLOTE)PLLOTE.limpar();manterFotos();commit();sincBlobs(antes)}
 function limiteFotos(){ /* D-027: o teto de fotos vem do plano (PLCONTA), nunca copiado em código */
   var P=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
   return P&&P.fotosPorProjeto?P.fotosPorProjeto:24
@@ -328,6 +346,27 @@ function remover(lista){                       /* só sai do projeto; o arquivo 
   if(novoCur===null){var depois=0;for(i=cur;i<=N;i++)if(lista.indexOf(i)<0){depois=i;break}
     var ate=depois||N,q=0;for(i=1;i<=ate;i++)if(lista.indexOf(i)<0)q++;novoCur=q}
   reindexar(out,novoCur);return lista.length}
+
+/* D-149: «Excluir foto» tira só a foto indicada do projeto, das folhas e do PDF (e a cópia dela no aparelho); Desfazer traz tudo de volta */
+function excluirFoto(n){
+  if(n<1||n>N)return;
+  if(N<=1){toast('O projeto precisa ficar com ao menos 1 foto.');return}
+  var k=remover([n]);
+  if(k)toast('Foto '+p2(n)+' excluída do projeto · Desfazer',true)
+}
+/* menu da miniatura: botão direito, toque longo, tecla Menu ou Delete */
+var menuI=0,lpT=null;
+function menuTh(i,x,y){
+  var m=$('th-menu');menuI=i;$('th-menu-del').disabled=N<=1;$('th-menu-t').textContent='Foto '+p2(i);
+  m.hidden=false;var w=m.offsetWidth,h=m.offsetHeight;
+  m.style.left=Math.max(8,Math.min(innerWidth-w-8,x))+'px';m.style.top=Math.max(8,Math.min(innerHeight-h-8,y-h))+'px';
+  $('th-menu-dup').focus()
+}
+function fechaMenu(){var m=$('th-menu');if(m&&!m.hidden){m.hidden=true;return true}return false}
+document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('#th-menu'))fechaMenu()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&fechaMenu())e.preventDefault()});
+$('th-menu-dup').onclick=function(){var i=menuI;fechaMenu();var k=duplicar([i]);if(k)toast('1 foto duplicada · Desfazer',true)};
+$('th-menu-del').onclick=function(){var i=menuI;fechaMenu();excluirFoto(i)};
 
 /* ---------- lote (FN-09) ---------- */
 function outrosIndividuais(){var c=0,a=window.PLLOTE?PLLOTE.conj():null;for(var i=1;i<=N;i++)if(i!==cur&&(!a||a.indexOf(i)>=0)&&ajustou(ST[i]))c++;return c}
@@ -357,6 +396,7 @@ var ACT={
   inteira:function(){UI.inteira=!UI.inteira;sincronizar()},
   centralizar:function(){var s=S();s.px=s.py=0;dbl=null;commit('centralizar')},
   rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta,pdx=s.pad,plx=s.pl;dbl=null;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;if(pdx)ST[cur].pad=pdx;if(plx)ST[cur].pl=plx;commit('rfoto');toast('Recorte da foto restaurado',true)},
+  excluir:function(){excluirFoto(cur)},
   reduzir:function(){
     var s=S(),mx=zmaxPara(cur,s,240),z=Math.max(zmin(s,cur),Math.min(s.z,mx));s.z=z;commit('reduzir');
     toast('Zoom em '+S().z+'% · '+ROT[nivel(ppi(cur,S()))],true)
@@ -386,16 +426,19 @@ function dist(a,b){return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))}
 function meio(a,b){var r=win.getBoundingClientRect();return[((a.x+b.x)/2-r.left)/r.width,((a.y+b.y)/2-r.top)/r.height]}
 
 /* limite da posição: a janela continua coberta pela foto (FN-04 · nunca aparece fundo no modo Preencher) */
+/* D-149: o teto da busca é o tamanho da foto na janela (antes era fixo em 1 janela, o que travava o arrasto com zoom alto:
+   a foto não chegava às bordas). A busca por bisseção acha o maior deslocamento que ainda cobre a janela. */
+function alcance(n,s){var a=nat(n),k=base(n,s)*s.z/100;return Math.max(1,(a.w+a.h)*k*Math.max(1,jq(),1/jq()))}
 function limX(n,s,py){
   if(s.modo==='encaixar')return Math.abs(py)<=.5?0.5:0;
-  var lo=0,hi=1,m,i;if(cabe(n,s,0,py))return 1;
-  for(i=0;i<14;i++){m=(lo+hi)/2;if(cabe(n,s,m,py))lo=m;else hi=m}
+  var lo=0,hi=alcance(n,s),m,i;if(!cabe(n,s,0,py))return 0;if(cabe(n,s,hi,py))return hi;
+  for(i=0;i<22;i++){m=(lo+hi)/2;if(cabe(n,s,m,py))lo=m;else hi=m}
   return lo
 }
 function limY(n,s,px){
   if(s.modo==='encaixar')return Math.abs(px)<=.5?0.5:0;
-  var lo=0,hi=1,m,i;if(cabe(n,s,px,0))return 1;
-  for(i=0;i<14;i++){m=(lo+hi)/2;if(cabe(n,s,px,m))lo=m;else hi=m}
+  var lo=0,hi=alcance(n,s),m,i;if(!cabe(n,s,px,0))return 0;if(cabe(n,s,px,hi))return hi;
+  for(i=0;i<22;i++){m=(lo+hi)/2;if(cabe(n,s,px,m))lo=m;else hi=m}
   return lo
 }
 function prender(n,s,px,py){                     /* posição mais próxima dentro da cobertura */
@@ -415,7 +458,36 @@ function zoomPara(s,z,ax,ay){                   /* zoom final (absoluto) ancorad
 }
 function pintar(){pintaMain();qualidade()}      /* durante o gesto: a foto e o selo de qualidade (BR-12) */
 
-/* arrastar 1:1 com o mouse e com o dedo (Pointer Events + setPointerCapture) */
+/* arrastar 1:1 com o mouse e com o dedo (Pointer Events + setPointerCapture) · D-149
+   Durante o gesto só a foto se move: um transform em px sobre o estilo do início, aplicado no máximo uma vez por quadro (rAF).
+   O filtro, o selo de qualidade e o histórico não são tocados a cada evento (só ao soltar). Dentro dos limites a foto acompanha
+   o ponteiro 1:1; passando da borda, a foto cobre a janela por inteiro em repouso e, enquanto se arrasta, cede com resistência
+   suave (elástico no mesmo sentido do gesto) e a origem do gesto acompanha o excesso, então inverter o sentido responde na hora. */
+var pan=null,panRaf=null;
+var MAXO=.12;                                  /* excesso máximo acumulado além da borda (fração da janela) */
+function elast(o){var r=Math.abs(o),v=.6*.1*r/(r+.1);return o<0?-v:v}   /* resistência suave: inclinação inicial .6, teto .06 */
+function iniciarArrasto(id,x,y){
+  var s=S();if(rafE){cancelAnimationFrame(rafE);rafE=null}
+  s.ex=s.ey=0;
+  gst={tipo:'arrasto',id:id,x:x,y:y,cx:x,cy:y,px:s.px,py:s.py,W:tam(),H:tamH()};
+  pan={els:[].slice.call(document.querySelectorAll('#clip .ph,#ghost .ph,#cmp .ph')),base:estilo(cur,s)};
+  win.classList.add('is-drag')
+}
+function aplicarPan(){
+  panRaf=null;
+  if(!gst||gst.tipo!=='arrasto'||!pan)return;
+  var s=S(),rawx=gst.px+(gst.cx-gst.x)/gst.W,rawy=gst.py+(gst.cy-gst.y)/gst.H,pp=prender(cur,s,rawx,rawy),ox=rawx-pp[0],oy=rawy-pp[1],d;
+  if(Math.abs(ox)>MAXO){d=ox-(ox<0?-MAXO:MAXO);gst.x+=d*gst.W;rawx-=d;ox=rawx-pp[0]}     /* a origem acompanha o excesso: sem zona morta ao voltar */
+  if(Math.abs(oy)>MAXO){d=oy-(oy<0?-MAXO:MAXO);gst.y+=d*gst.H;rawy-=d;oy=rawy-pp[1]}
+  s.px=pp[0];s.py=pp[1];
+  var rec=parado();
+  s.ex=rec?0:elast(ox);s.ey=rec?0:elast(oy);
+  var tx=(s.px+s.ex-gst.px)*gst.W,ty=(s.py+s.ey-gst.py)*gst.H,st=PLFOTOTELA.deslocar(pan.base,tx,ty);
+  if(pan.els.length&&!pan.els[0].isConnected)pan.els=[].slice.call(document.querySelectorAll('#clip .ph,#ghost .ph,#cmp .ph'));   /* a foto cheia chegou e trocou o nó */
+  for(var i=0;i<pan.els.length;i++)pan.els[i].setAttribute('style',st)
+}
+function agendarPan(){if(!panRaf)panRaf=requestAnimationFrame(aplicarPan)}
+function fecharPan(){if(panRaf){cancelAnimationFrame(panRaf);panRaf=null}aplicarPan();pan=null}   /* aplica o último ponto antes de soltar */
 win.addEventListener('pointerdown',function(e){
   if(e.button!=null&&e.button>0)return;
   var s=S();
@@ -423,8 +495,8 @@ win.addEventListener('pointerdown',function(e){
   var k=Object.keys(pts);
   try{win.setPointerCapture(e.pointerId)}catch(x){}
   try{win.focus()}catch(x){}
-  if(k.length===1){gst={tipo:'arrasto',id:e.pointerId,x:e.clientX,y:e.clientY,px:s.px,py:s.py};win.classList.add('is-drag')}
-  else if(k.length===2){var a=pts[k[0]],b=pts[k[1]];gst={tipo:'pinca',d0:dist(a,b),z0:s.z}}
+  if(k.length===1)iniciarArrasto(e.pointerId,e.clientX,e.clientY);
+  else if(k.length===2){if(gst&&gst.tipo==='arrasto')fecharPan();var a=pts[k[0]],b=pts[k[1]];gst={tipo:'pinca',d0:dist(a,b),z0:s.z}}
   e.preventDefault()
 });
 win.addEventListener('pointermove',function(e){
@@ -436,34 +508,29 @@ win.addEventListener('pointermove',function(e){
     if(gst.d0>8&&d>8){dbl=null;zoomPara(s,gst.z0*d/gst.d0,md[0],md[1]);acertar(cur,s);pintar();sincronizar()}
     return
   }
-  if(gst.tipo!=='arrasto')return;
-  var dx=e.clientX-gst.x,dy=e.clientY-gst.y;
-  if(!dx&&!dy)return;
-  ultTap=0;                                                /* arrastar cancela o duplo toque */
-  dbl=null;
-  var rawx=gst.px+dx/tam(),rawy=gst.py+dy/tamH(),pp=prender(cur,s,rawx,rawy);
-  s.px=pp[0];s.py=pp[1];
-  /* elástico na borda: a foto recua um pouco da beirada e volta ao soltar (FN-04) */
-  var rec=parado()?0:.28;
-  s.ex=Math.max(-.06,Math.min(.06,-(rawx-s.px)*rec));
-  s.ey=Math.max(-.06,Math.min(.06,-(rawy-s.py)*rec));
-  pintar()
+  if(gst.tipo!=='arrasto'||gst.id!==e.pointerId)return;
+  var evs=e.getCoalescedEvents?e.getCoalescedEvents():null,u=evs&&evs.length?evs[evs.length-1]:e;   /* último ponto do quadro */
+  if(u.clientX===gst.cx&&u.clientY===gst.cy)return;
+  ultTap=0;dbl=null;                                       /* arrastar cancela o duplo toque */
+  gst.cx=u.clientX;gst.cy=u.clientY;
+  agendarPan()
 });
 function solta(e){
   if(!pts[e.pointerId])return;
   var s=S(),id=e.pointerId,agora=Date.now();
   delete pts[id];
   if(gst&&gst.tipo==='arrasto'&&gst.id===id){
+    fecharPan();
     win.classList.remove('is-drag');
-    if(e.type==='pointerup'&&agora-ultTap<320&&Math.abs(e.clientX-ultX)<32&&Math.abs(e.clientY-ultY)<32){ultTap=0;gst=null;alternaZoom(e);return}   /* duplo clique/toque */
+    if(e.type==='pointerup'&&agora-ultTap<320&&Math.abs(e.clientX-ultX)<32&&Math.abs(e.clientY-ultY)<32){ultTap=0;gst=null;s.ex=s.ey=0;alternaZoom(e);return}   /* duplo clique/toque */
     ultTap=agora;ultX=e.clientX;ultY=e.clientY;
     voltarElastica(s);gst=null;return
   }
   if(gst&&gst.tipo==='pinca'){
     var restam=Object.keys(pts);
-    if(restam.length===1){var q=pts[restam[0]];gst={tipo:'arrasto',id:restam[0],x:q.x,y:q.y,px:s.px,py:s.py}}   /* sobra um dedo: continua arrastando */
-    else gst=null;
-    commit('zoom');return
+    gst=null;commit('zoom');
+    if(restam.length===1){var q=pts[restam[0]];iniciarArrasto(restam[0],q.x,q.y)}   /* sobra um dedo: continua arrastando */
+    return
   }
   if(!Object.keys(pts).length){gst=null;win.classList.remove('is-drag')}
 }
@@ -527,6 +594,7 @@ function render(){
   $('cota-label').textContent=cota.slice(0,separador+1);$('cota-value').textContent=cota.slice(separador+1).trim();
   $('nb').hidden=!mudou(s);
   $('fprev').disabled=cur<=1;$('fnext').disabled=cur>=N;
+  [].forEach.call(document.querySelectorAll('[data-act=excluir]'),function(b){b.disabled=N<=1;b.title=N<=1?'O projeto precisa de ao menos 1 foto':'Excluir esta foto do projeto'});
   $('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;
   document.title='Polar Life · '+NOME+' · Quadro · Foto '+p2(cur);
   pintaMain();pintaGrade();nv=qualidade();sincronizar();lote();if(window.PLLEG)PLLEG.render();if(window.PLFLT)PLFLT.render();if(window.PLMET)PLMET.render();if(window.PLLOTE)PLLOTE.render();
@@ -538,9 +606,9 @@ var ABA='tab-ajustes',tabs=[].slice.call(document.querySelectorAll('.tab'));
 function aba(t){
   tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});
   var id=t.id,esc=$('scope');ABA=id;
-  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-papel').hidden=id!=='tab-papel';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';$('p-metadados').hidden=id!=='tab-metadados';
-  $('p-outra').hidden=['tab-ajustes','tab-papel','tab-legendas','tab-molduras','tab-metadados'].indexOf(id)>=0;$('p-outra').setAttribute('aria-labelledby',id);
-  esc.hidden=id!=='tab-ajustes'&&id!=='tab-legendas';lote();if(window.PLLEG)PLLEG.render();if(window.PLMOL)PLMOL.render();if(window.PLMET)PLMET.render()
+  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-papel').hidden=id!=='tab-papel';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';
+  $('p-outra').hidden=['tab-ajustes','tab-papel','tab-legendas','tab-molduras'].indexOf(id)>=0;$('p-outra').setAttribute('aria-labelledby',id);
+  esc.hidden=id!=='tab-ajustes'&&id!=='tab-legendas';lote();if(window.PLLEG)PLLEG.render();if(window.PLMOL)PLMOL.render()
 }
 tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
 
@@ -557,7 +625,9 @@ $('insp-toggle').onclick=function(){var sh=insp.classList.toggle('is-shut');cont
 function modo(){if(mt.matches){insp.classList.remove('is-shut');content.classList.add('has-insp');$('insp-toggle').setAttribute('aria-expanded','true')}else{content.classList.remove('has-insp');insp.classList.remove('is-shut')}}
 mt.addListener?mt.addListener(modo):mt.addEventListener('change',modo);modo();snap(0);
 
-window.PLQ={sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,midia:midia,real:!DEMO,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
+/* D-149: preencher as linhas sugeridas ao abrir não vira passo de Desfazer */
+function rebase(){if(hi===0&&hist.length===1){hist[0]=JSON.stringify(ST);render()}else commit('lg:auto')}   /* sem gravar: só o próximo gesto grava (evita sobrescrever o estado salvo) */
+window.PLQ={rebase:rebase,sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,midia:midia,real:!DEMO,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
 Object.defineProperty(window.PLQ,'N',{get:function(){return N}});
 /* ---------- partida ---------- */
 construir();faixa();

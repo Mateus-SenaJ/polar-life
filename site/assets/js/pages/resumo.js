@@ -26,9 +26,9 @@ function medirReais(){
 }
 function paint(){
   var dateCell=D.real
-    ?cell('Datas','A data da foto','aparece na legenda, na aba Metadados')
+    ?cell('Datas','A data da foto','aparece na legenda; edite em Legendas › Avançado')
     :cell('Datas',D.nodate?(D.total-D.nodate)+' com data':'14.07.26',D.nodate?plural(D.nodate,'sem data','sem data'):'a 16.07.26');
-  var localCell=D.real?cell('Local','Você escolhe','na aba Metadados'):cell('Local','Campos do Jordão, SP','');
+  var localCell=D.real?cell('Local','Você escolhe','em Legendas › Avançado'):cell('Local','Campos do Jordão, SP','');
   var qualCell=D.real?cell('Qualidade',plural(D.total,'foto pronta','fotos prontas'),'o ponto de qualidade aparece em cada polaroid'):cell('Qualidade',(D.total-D.warn)+' boas','1 com ressalvas · 140 PPI');
   $('stats').innerHTML=
     cell('Fotos',D.total,'')+

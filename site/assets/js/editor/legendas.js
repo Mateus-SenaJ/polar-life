@@ -1,13 +1,15 @@
 /* T-10 · Inspetor · aba LEGENDAS · DOC-05 FN-07 · DOC-02 §4 (EXC-2) · DOC-12 DV-03/04/05/18/21/23/28
    Estilo dos 3 tipos = projeto todo (ST[0].leg). Texto livre = por foto (ST[n].txt). Histórico vem do quadro.js.
    D-113: «linhas» do Pocket — posições da data e do local vêm de PLTEXTO.linhas (MT-02).
+   D-149: no projeto real o painel é o modelo de 2 linhas (Linha 1 e Linha 2, cada uma com tipo e texto), um único conjunto de estilo com alvo e Avançado sem repetir controle;
+   o exemplo mantém o painel antigo (montarEx). D-148: fontes novas, Itálico/Negrito reais e Configurações avançadas (inclinação, formatos, caixa, espaçamento, data e cidade da foto).
    D-135: «Sem legendas» (só a foto e a moldura) é o primeiro controle · D-136: o texto fica só abaixo, alinhado esq|centro|dir. */
 (function(){
 var Q=window.PLQ;if(!Q)return;
 var LT=window.PLTEXTO;if(!LT)return;
 var $=function(i){return document.getElementById(i)};
 var DATA=new Date(2026,6,14),LOCAL={cidade:'Campos do Jordão',uf:'SP',estado:'São Paulo',pais:'Brasil',cod:'BR'};
-var ROT=['14.07.26','14/07/2026','14-07-2026','14/07/26','2026-07-14','07/2026','07.26','14 de julho de 2026','14 jul 2026','14 de julho','Julho de 2026','jul/26','terça, 14 de julho'];
+var ROT=['14.07.26','14/07/2026','14-07-2026','14/07/26','2026-07-14','07/2026','07.26','14 de julho de 2026','14 jul 2026','14 de julho','Julho de 2026','jul/26','terça, 14 de julho','jul/2026','2026'];
 var FMT=ROT.map(function(r,i){return[r,LT.FMTD[i]]}); /* 13 formatos do FN-07 (DV-05) */
 var CAT=LT.CAT,FONTES=LT.FONTES;
 var ALCSS={esq:'left',centro:'center',dir:'right'},JC={esq:'flex-start',centro:'center',dir:'flex-end'}; /* D-136: alinhamento na tela */
@@ -33,13 +35,23 @@ var DEFL={meta:'junto',ordem:'data-loc',medida:'caixa'}; /* chaves novas (D-113)
 var UI={sel:null,cat:'todas',busca:'',fav:['Caveat'],rec:[],aberto:{},conf:false,err:null};
 var COR={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 function copia(o){return JSON.parse(JSON.stringify(o))}
-function L(){var S=Q.ST()[0];if(!S.leg)S.leg=copia(PADRAO);return LT.migrar(S.leg)}   /* D-135/D-136: dados antigos viram os novos ao ler */
+function real(){return LT.ehReal()}
+function L(){var S=Q.ST()[0];if(!S.leg)S.leg=real()?LT.legInicial():copia(PADRAO);return LT.migrar(S.leg)}   /* D-135/D-136: dados antigos viram os novos ao ler */
 function T(){var s=Q.S();return s.txt===null||s.txt===undefined?(LT.ehReal()?'':['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'][(Q.src(Q.cur())-1)%4]):s.txt}   /* projeto real: sem texto de exemplo */
-function getp(o,k){return k.split('.').reduce(function(a,b){return a[b]},o)}
-function setp(o,k,v){var a=k.split('.');a.slice(0,-1).forEach(function(x){o=o[x]});o[a[a.length-1]]=v}
-function getv(o,k){var v=getp(o,k);return v==null&&DEFL[k]!==undefined?DEFL[k]:v}
+function getp(o,k){if(k.indexOf('ln.')===0)return estLn()[k.slice(3)];return k.split('.').reduce(function(a,b){return a==null?a:a[b]},o)}
+function setp(o,k,v){if(k.indexOf('ln.')===0){setLn(k.slice(3),v);return}var a=k.split('.');a.slice(0,-1).forEach(function(x){if(o[x]==null)o[x]={};o=o[x]});o[a[a.length-1]]=v}
+function getv(o,k){var v=getp(o,k);return v==null?defv(k):v}
 function val(k){return getv(L(),k)}
-function defv(k){return DEFL[k]!==undefined?DEFL[k]:getp(PADRAO,k)}
+function defv(k){if(k==='ln.pt')return 8;if(k.indexOf('ln.')===0)return undefined;return k.indexOf('av.')===0?LT.AV0[k.slice(3)]:DEFL[k]!==undefined?DEFL[k]:getp(PADRAO,k)}
+/* ---------- D-149 · modelo de 2 linhas (projeto real) ---------- */
+UI.alvo='a';                                   /* a quem o estilo vale: '0' Linha 1 · '1' Linha 2 · 'a' Ambas */
+function alvosLn(){return UI.alvo==='0'?[0]:UI.alvo==='1'?[1]:[0,1]}
+function estLn(){var c=LT.comPadrao(L(),Q.S()),o=UI.alvo==='1'?c.loc:c.data;return{font:o.font,pt:o.pt,cor:o.cor,b:!!o.b,it:!!o.it}}   /* estilo mostrado: o da primeira linha-alvo */
+function setLn(k,v){
+  var pd=L().pad;if(!pd)return;
+  alvosLn().forEach(function(i){var ln=pd.l[i];if(!ln)return;if(v===undefined||v===false)delete ln[k];else ln[k]=v})
+}
+function stF(o){var f=LT.famLG(o.font,o);return';font-style:'+(f.i?'italic':'normal')+';font-weight:'+f.w}
 function fam(nome){return nome==='IBM Plex Mono'?"'IBM Plex Mono',ui-monospace,monospace":fonte(nome).css}
 function caixa(t,c){return c==='maiusc'?t.toUpperCase():c==='cap'?t.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase()}):t}
 function localTxt(l,c){return LT.localLG(l,c==null?LOCAL.cidade:c)}   /* MT-02: uma conta só (a do PDF e a das Folhas) */
@@ -71,13 +83,14 @@ function pintar(){
   if(!l.txt)return;
   var cor=function(k){return COR[l[k].cor]||'#000'};
   var M=Q.meta?Q.meta(Q.cur()):{data:DATA,cidade:LOCAL.cidade,iso:'2026-07-14T08:00'};
-  var dt=l._pad?l._dt:(l.data.on&&M.data?FMT[l.data.fmt][1](M.data):''),lc=l._pad?l._lc:(l.loc.on&&M.cidade?localTxt(l.loc,M.cidade):'');   /* D-139: padrão de 2 linhas */
+  var dt=l._pad?l._dt:(l.data.on&&M.data?LT.cxMeta(l,FMT[l.data.fmt][1](M.data)):''),lc=l._pad?l._lc:(l.loc.on&&M.cidade?LT.cxMeta(l,localTxt(l.loc,M.cidade)):'');   /* D-139: padrão de 2 linhas */
   var txt=l.txt.on?caixa(T(),l.txt.caixa):'';
   var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=l.medida==='letras'&&!!(dt||lc);
-  var capHTML=txt?'<span class="lg-txt" id="lg-txt" style="font-family:'+fam(l.txt.font)+';font-style:'+(fonte(l.txt.font).it?'italic':'normal')+';font-weight:'+fonte(l.txt.font).w+';--pt:'+l.txt.pt+';letter-spacing:'+l.txt.esp+'em;color:'+cor('txt')+'"></span>':'';
-  var dtH=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="font-family:'+fam(l.data.font)+';--pt:'+l.data.pt+';color:'+cor('data')+'"></time>':'';
-  var lcH=lc?'<span class="lg-lc" style="font-family:'+fam(l.loc.font)+';--pt:'+l.loc.pt+';color:'+cor('loc')+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
-  var sepH=(dt&&lc)?'<span class="lg-sep" aria-hidden="true"> • </span>':'';
+  var fe=LT.famLG(l.txt.font,l.txt),espM=function(o){return o.esp!=null?';letter-spacing:'+o.esp+'em':''};   /* D-148 */
+  var capHTML=txt?'<span class="lg-txt" id="lg-txt" style="font-family:'+fam(l.txt.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+';--pt:'+l.txt.pt+';letter-spacing:'+l.txt.esp+'em;color:'+cor('txt')+'"></span>':'';
+  var dtH=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="font-family:'+fam(l.data.font)+stF(l.data)+';--pt:'+l.data.pt+';color:'+cor('data')+espM(l.data)+'"></time>':'';
+  var lcH=lc?'<span class="lg-lc" style="font-family:'+fam(l.loc.font)+stF(l.loc)+';--pt:'+l.loc.pt+';color:'+cor('loc')+espM(l.loc)+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
+  var sepH=(dt&&lc)?'<span class="lg-sep" aria-hidden="true">'+LT.sepMeta(l)+'</span>':'';
   var metaHTML=junto?(ordem==='loc-data'?lcH+sepH+dtH:dtH+sepH+lcH)
    :'<span class="lg-ms">'+(ordem==='loc-data'?[lcH,dtH]:[dtH,lcH]).filter(Boolean).map(function(r){return'<span class="lg-m">'+r+'</span>'}).join('')+'</span>';
   /* D-136: o texto é sempre abaixo da foto; a faixa de cima fica vazia */
@@ -98,7 +111,7 @@ function pintar(){
       var ult=LNS[LNS.length-1],figH=Math.max(0,ult.top+ult.lh*ult.corpo-figTop);
       var dX=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="'+estXL(l.data,';line-height:0')+'"></time>':'';
       var lX=lc?'<span class="lg-lc" style="'+estXL(l.loc,';line-height:0')+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
-      var sX=(dt&&lc)?'<span class="lg-sep" aria-hidden="true" style="'+estXL({font:'IBM Plex Mono',pt:Math.max(l.data.pt,l.loc.pt),cor:'preto'},';line-height:0')+'"> • </span>':'';
+      var sX=(dt&&lc)?'<span class="lg-sep" aria-hidden="true" style="'+estXL({font:'IBM Plex Mono',pt:Math.max(l.data.pt,l.loc.pt),cor:'preto'},';line-height:0')+'">'+LT.sepMeta(l)+'</span>':'';
       var xl='<div class="lg-xl" style="top:calc(var(--pmm)*'+num((fr.cjh||0)+2.2)+');width:calc(var(--pmm)*'+num(fr.cjw||0)+');height:calc(var(--pmm)*'+num(figH)+')">';
       LNS.forEach(function(ln){
         var dentro=ln.k==='data'?dX:ln.k==='loc'?lX:(ordem==='loc-data'?lX+sX+dX:dX+sX+lX);
@@ -143,9 +156,9 @@ function cores(k,v){
    +[['preto','Preto'],['azul','Azul'],['laranja','Laranja']].map(function(c){return'<label class="cor"><input type="radio" name="cor-'+k+'" value="'+c[0]+'" data-k="'+k+'.cor"'+(v===c[0]?' checked':'')+'><span class="cor__b"><i style="background:'+COR[c[0]]+'"></i>'+c[1]+'</span></label>'}).join('')+'</div></div>'
 }
 function seletor(k){
-  var l=L()[k],f=fonte(l.font),abre=UI.sel===k;
+  var l=L()[k],f=fonte(l.font),abre=UI.sel===k,fe=LT.famLG(l.font,l);
   var h='<div class="f"><div class="f__top"><span class="f__l" id="l-f-'+k+'">Fonte</span>'+rst(k+'.font')+'</div>'
-   +'<button type="button" class="fsel" data-fsel="'+k+'" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(l.font)+';font-style:'+(f.it?'italic':'normal')+'">'+amostra(k)+'</span><span class="rotulo fsel__n">'+l.font+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
+   +'<button type="button" class="fsel" data-fsel="'+k+'" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(l.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+amostra(k)+'</span><span class="rotulo fsel__n">'+l.font+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
   if(abre){
     var lista=FONTES.filter(function(x){return(UI.cat==='todas'||(UI.cat==='fav'?UI.fav.indexOf(x.n)>=0:UI.cat==='rec'?UI.rec.indexOf(x.n)>=0:x.c===UI.cat))&&x.n.toLowerCase().indexOf(UI.busca.toLowerCase())>=0});
     carregar(lista);
@@ -157,17 +170,38 @@ function seletor(k){
   }
   return h+'</div>'
 }
+/* D-148: Itálico e Negrito do texto. Só a variante que a família tem; sem ela o botão fica desabilitado e explica (nada é sintetizado). */
+function estiloTxt(l){
+  var e=LT.estilosDe(l.txt.font,l.txt),fam=fonte(l.txt.font).fam,msg=[];
+  function bt(k,rot,x){return'<button type="button" class="btn2 btn2--sm est-b" data-est="'+k+'" aria-pressed="'+x.on+'"'+(x.ok?'':' disabled')+'>'+rot+'</button>'}
+  if(e.it.natural)msg.push('Esta fonte já é itálica.');else if(!e.it.ok)msg.push(fam+' não tem itálico'+(e.b.on?' em negrito':'')+'.');
+  if(!e.b.ok&&!e.b.on)msg.push(fam+' não tem negrito'+(e.it.on?' em itálico':'')+'.');
+  return'<div class="f" id="f-est"><div class="f__top"><span class="f__l" id="l-est">Estilo do texto</span></div><div class="row2" role="group" aria-labelledby="l-est">'+bt('it','Itálico',e.it)+bt('b','Negrito',e.b)+'</div><p class="f__h" id="lg-est-h">'+(msg.join(' ')||'Normal, itálico ou negrito: só aparecem as variantes reais da fonte.')+'</p></div>'
+}
 function sw(k,rot,on,off){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'"'+(off?' aria-disabled="true"':'')+' aria-labelledby="s-'+k+'"><span></span></button></div>'}
 /* ---------- D-139 · Avançado: padrão de 2 linhas, sugestões e exceção por foto ---------- */
 var TIPOS=[['loc','Localização'],['data','Data'],['pt','Ponto turístico'],['txt','Texto livre'],['nenhum','Nenhum']],TAMS=[[7,'P'],[8,'M'],[10,'G'],[12,'GG']];
 var GPS={};
 function sugOn(){return L().sug!==false&&!L().original}
-function padAlvo(){return Q.S().pad||L().pad||LT.padNovo()}
+function padAlvo(){return real()?(L().pad||LT.padNovo()):(Q.S().pad||L().pad||LT.padNovo())}
 function tipoNome(t){return TIPOS.filter(function(x){return x[0]===t})[0][1]}
+function ajustesAv(l,on){                       /* D-148: tudo que não se repete em outras seções */
+  var a=LT.av(l),h='<div class="mod__sub" id="lg-av-aj">'
+   +sld('inc','Inclinação do texto','°',-8,8,1,0,'De −8° a +8°, de 1 em 1°. Gira o bloco de texto sob a foto.');
+  if(on){
+    h+='<div class="f"><div class="f__top"><label class="f__l" for="av-df">Formato da data</label>'+rst('av.df')+'</div><div class="num num--l"><select id="av-df" data-av="df">'+LT.DATA_AV.map(function(x){return'<option value="'+x[0]+'"'+(a.df===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div><p class="f__h">Vale para as datas sugeridas; o que você digitou não muda.</p></div>'
+     +'<div class="f"><div class="f__top"><label class="f__l" for="av-lf">Formato da localização</label>'+rst('av.lf')+'</div><div class="num num--l"><select id="av-lf" data-av="lf">'+LT.LOC_AV.map(function(x){return'<option value="'+x[0]+'"'+(a.lf===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div><p class="f__h">Vale para as localizações sugeridas; o que você digitou não muda.</p></div>'
+  }else h+='<p class="f__h">O formato da data e o da localização aparecem aqui com o padrão de 2 linhas; sem ele, a data se escolhe na seção Data.</p>';
+  h+=seg('avcx','Caixa de data e local',[['normal','Normal'],['maiusc','MAIÚSCULAS']],a.cx,'av.cx')
+   +sld('av.esp','Espaçamento entre letras (data e local)','em',0,0.2,0.01,2,'De 0 a 0,2 em.');
+  return h+'</div>'
+}
 function avancado(l,dis){
   var on=!!(l.pad&&l.pad.on),h='<section class="mod mod--av" aria-labelledby="lmav"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lmav">Avançado</h3>'
-   +'<button type="button" class="btn2 btn2--sm" id="lg-av-t" aria-expanded="'+(!!UI.aberto.av)+'" aria-controls="lg-av">'+(UI.aberto.av?'Recolher':'Mostrar opções avançadas')+'</button>'
+   +'<button type="button" class="btn2 btn2--sm" id="lg-av-t" aria-expanded="'+(!!UI.aberto.av)+'" aria-controls="lg-av">'+(UI.aberto.av?'Recolher':'Configurações avançadas')+'</button>'
    +'<div id="lg-av"'+(UI.aberto.av?'':' hidden')+'>'
+   +ajustesAv(l,on)
+   +(window.PLMET?PLMET.html():'')
    +sw('padon','Padrão de 2 linhas',on)
    +'<p class="f__h">Cada linha mostra localização («Itacaré - BA»), data («23/11/26»), ponto turístico, texto livre ou nada.</p>';
   if(on){
@@ -196,7 +230,7 @@ function sincPad(){
     inp.disabled=ln.t==='nenhum';if(document.activeElement!==inp)inp.value=ln.t==='nenhum'?'':p.v;
     b.hidden=!(sugOn()&&p.m&&(ln.t==='loc'||ln.t==='data'||ln.t==='pt'))
   }
-  $('pad-own').checked=!!Q.S().pad
+  if($('pad-own'))$('pad-own').checked=!!Q.S().pad
 }
 function gpsDe(n){
   var k=Q.src(n);if(!Q.real||!window.PLFOTOS)return Promise.resolve(null);
@@ -205,12 +239,12 @@ function gpsDe(n){
 }
 function sugestao(n,t){
   var M=Q.meta(n),PL=window.PLLOCAIS;
-  if(t==='data')return Promise.resolve(M.data?LT.FMTD[3](M.data):'');
+  if(t==='data')return Promise.resolve(M.data?LT.FMTD[LT.av(L()).df](M.data):'');
   if(!PL)return Promise.resolve('');
   if(t==='loc'){
     var c=(M.cidade||'').trim();
-    if(c)return PL.buscar(c,40).then(function(r){var q=PL.norm(c.replace(/\s*[-,\/]\s*[A-Za-z]{2}$/,'')),ex=r.filter(function(x){return PL.norm(x.cidade)===q});return ex.length===1?PL.rotulo(ex[0]):c});
-    return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return!r?'':r.cidade?PL.rotulo(r):r.pais||''})})
+    if(c)return PL.buscar(c,40).then(function(r){var q=PL.norm(c.replace(/\s*[-,\/]\s*[A-Za-z]{2}$/,'')),ex=r.filter(function(x){return PL.norm(x.cidade)===q});return ex.length===1?LT.fmtLocal(ex[0],LT.av(L()).lf):c});
+    return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return!r?'':r.cidade?LT.fmtLocal(r,LT.av(L()).lf):r.pais||''})})
   }
   if(t==='pt')return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return r&&r.uf?PL.pontosProximos(g.lat,g.lon,r.uf,2).then(function(p){return p.length?p[0].nome:''}):''})});
   return Promise.resolve('')
@@ -230,17 +264,114 @@ function preencher(ns,so){
   }))
 }
 function todasFotos(){var a=[],j;for(j=1;j<=Q.N;j++)a.push(j);return a}
-function afetadas(){var S=Q.ST(),a=[],j;if(Q.S().pad)return[Q.cur()];for(j=1;j<=Q.N;j++)if(!S[j].pad)a.push(j);return a}
+function afetadas(){var S=Q.ST(),a=[],j;if(real())return todasFotos();if(Q.S().pad)return[Q.cur()];for(j=1;j<=Q.N;j++)if(!S[j].pad)a.push(j);return a}
 function depois(p,k){p.then(function(){Q.commit(k);sincPad()})}
 function acaoPad(e){
   var t=e.target,l=L();
+  if(t.hasAttribute('data-av')){var ka=t.getAttribute('data-av');setp(l,'av.'+ka,ka==='df'?+t.value:t.value);Q.commit('lg:av');depois(preencher(todasFotos()),'lg:av2');return true}   /* D-148: reaplica só nas linhas não digitadas */
   if(t.hasAttribute('data-padt')){var i=+t.getAttribute('data-padt'),pd=padAlvo();pd.l[i].t=t.value;
+    if(real())Q.ST().slice(1).forEach(function(e){if(e.pl&&e.pl[i])e.pl[i]={v:'',m:false}});   /* D-149: o texto à mão pertencia ao tipo antigo */
     Q.commit('lg:padt');depois(preencher(afetadas(),i),'lg:padt2');return true}
   if(t.hasAttribute('data-padp')){padAlvo().l[+t.getAttribute('data-padp')].pt=+t.value;Q.commit('lg:padp');return true}
   if(t.id==='pad-own'){var e1=Q.S();if(t.checked)e1.pad=copia({on:true,l:L().pad.l});else delete e1.pad;Q.commit('lg:padown');montar();depois(preencher([Q.cur()]),'lg:padown2');return true}
   return false
 }
-function montar(){
+/* ---------- painel do projeto real ---------- */
+function topoPainel(l){
+  return'<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Legendas</h3>'
+   +sw('original','Sem legendas',!!l.original)
+   +sw('sug','Sugestões de legendas',l.sug!==false,!!l.original)
+   +(l.original?'<div class="msg msg--warn lg__aviso"><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>Desligue «Sem legendas» para editar.</p></div></div>':'')
+   +'</section>'
+}
+function secLinhas(l,dis){
+  var pd=l.pad,h='<section class="mod" aria-labelledby="lm-lin"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-lin">Linhas</h3><div class="lg-col" id="lg-lin">';
+  for(var i=0;i<2;i++){
+    var ln=LT.padLinha(pd.l[i]);
+    h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Linha '+(i+1)+'</label><button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
+     +'<div class="lg-ln"><div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'" aria-label="Tipo da linha '+(i+1)+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
+     +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da linha '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div></div></div>'
+  }
+  return h+'</div></section>'
+}
+function seletorLn(){
+  var e=estLn(),f=fonte(e.font),abre=UI.sel==='ln',fe=LT.famLG(e.font,e),amo=(function(){var c=LT.comPadrao(L(),Q.S());return(c._dt||c._lc||'Itacaré - BA')})();
+  var h='<div class="f"><div class="f__top"><span class="f__l" id="l-f-ln">Fonte</span></div>'
+   +'<button type="button" class="fsel" data-fsel="ln" aria-expanded="'+abre+'" aria-labelledby="l-f-ln fv-ln"><span id="fv-ln" class="fsel__s" style="font-family:'+fam(e.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+amo+'</span><span class="rotulo fsel__n">'+e.font+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
+  if(abre){
+    var lista=FONTES.filter(function(x){return(UI.cat==='todas'||(UI.cat==='fav'?UI.fav.indexOf(x.n)>=0:UI.cat==='rec'?UI.rec.indexOf(x.n)>=0:x.c===UI.cat))&&x.n.toLowerCase().indexOf(UI.busca.toLowerCase())>=0});
+    carregar(lista);
+    h+='<div class="fpick"><label class="fbusca"><svg class="ico sm"><use href="#i-search"/></svg><input type="search" id="fbusca" placeholder="Buscar fonte" aria-label="Buscar fonte por nome" value="'+UI.busca.replace(/"/g,'&quot;')+'" autocomplete="off"></label>'
+     +'<div class="fcats" role="tablist" aria-label="Categorias de fonte">'+[['todas','Todas'],['fav','Favoritas'],['rec','Recentes']].concat(Object.keys(CAT).map(function(c){return[c,CAT[c]]})).map(function(c){return'<button type="button" role="tab" class="fcat rotulo" data-fcat="'+c[0]+'" aria-selected="'+(UI.cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
+     +'<ul class="flist" aria-label="Fontes">'+(lista.length?lista.map(function(x){var on=x.n===e.font,fv=UI.fav.indexOf(x.n)>=0;
+       return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+amo+'</span><span class="rotulo fitem__n">'+x.n+' · '+CAT[x.c]+'</span></button><button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'}).join(''):'<li class="f__h">Nenhuma fonte encontrada. Limpe a busca ou escolha outra categoria.</li>')+'</ul></div>'
+  }
+  return h+'</div>'
+}
+function estiloLn(){                              /* Itálico e Negrito reais para qualquer linha; sem a variante, o botão fica desabilitado e explica */
+  var e=estLn(),x=LT.estilosDe(e.font,e),ft=FONTES.filter(function(y){return y.n===e.font})[0],fam=ft?ft.fam:e.font,msg=[];
+  function bt(k,rot,y){return'<button type="button" class="btn2 btn2--sm est-b" data-est="'+k+'" aria-pressed="'+y.on+'"'+(y.ok?'':' disabled')+'>'+rot+'</button>'}
+  if(x.it.natural)msg.push('Esta fonte já é itálica.');else if(!x.it.ok)msg.push(fam+' não tem itálico'+(x.b.on?' em negrito':'')+'.');
+  if(!x.b.ok&&!x.b.on)msg.push(fam+' não tem negrito'+(x.it.on?' em itálico':'')+'.');
+  return'<div class="f" id="f-est"><div class="row2" role="group" aria-label="Estilo do texto">'+bt('it','Itálico',x.it)+bt('b','Negrito',x.b)+'</div><p class="f__h" id="lg-est-h">'+msg.join(' ')+'</p></div>'
+}
+function secEstilo(l,dis){
+  var e=estLn();
+  return'<section class="mod" aria-labelledby="lm-est"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-est">Estilo</h3>'
+   +'<div class="f"><div class="seg seg--3" role="radiogroup" aria-label="Aplicar o estilo a">'
+   +[['0','Linha 1'],['1','Linha 2'],['a','Ambas']].map(function(o){return'<label class="seg__o"><input type="radio" name="alvo" value="'+o[0]+'"'+(UI.alvo===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>'
+   +seletorLn()+estiloLn()
+   +sld('ln.pt','Tamanho','pt',6,32,1,0,'')
+   +cores('ln',e.cor)+'</section>'
+}
+function secPosicao(l,dis){
+  return'<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
+   +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al')
+   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'')+'</section>'
+}
+function secPresets(l,dis){
+  return'<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos</h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
+   +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>'
+}
+function secAvancado(l,dis){
+  var a=LT.av(l),jt=(l.meta||'linhas')!=='linhas',ab=!!UI.aberto.av;
+  var h='<section class="mod mod--av" aria-labelledby="lmav"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lmav">Avançado</h3>'
+   +'<button type="button" class="btn2 btn2--sm" id="lg-av-t" aria-expanded="'+ab+'" aria-controls="lg-av">'+(ab?'Recolher':'Configurações avançadas')+'</button>'
+   +'<div class="lg-col" id="lg-av"'+(ab?'':' hidden')+'>'
+   +sld('inc','Inclinação do texto','°',-8,8,1,0,'')
+   +'<div class="f"><div class="f__top"><label class="f__l" for="av-df">Formato da data</label>'+rst('av.df')+'</div><div class="num num--l"><select id="av-df" data-av="df">'+LT.DATA_AV.map(function(x){return'<option value="'+x[0]+'"'+(a.df===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div></div>'
+   +'<div class="f"><div class="f__top"><label class="f__l" for="av-lf">Formato da localização</label>'+rst('av.lf')+'</div><div class="num num--l"><select id="av-lf" data-av="lf">'+LT.LOC_AV.map(function(x){return'<option value="'+x[0]+'"'+(a.lf===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div></div>'
+   +seg('avcx','Caixa',[['normal','Normal'],['maiusc','MAIÚSCULAS']],a.cx,'av.cx')
+   +sld('av.esp','Espaçamento entre letras','em',0,0.2,0.01,2,'')
+   +seg('lmeta','Duas linhas',[['linhas','Separadas'],['junto','Na mesma linha']],l.meta||'linhas','meta')
+   +(jt?seg('avsep','Separador',[['•','•'],['·','·'],['–','–'],['/','/']],a.sep,'av.sep'):'')
+   +seg('lordem','Ordem',[['data-loc','Linha 1 primeiro'],['loc-data','Linha 2 primeiro']],l.ordem||'data-loc','ordem')
+   +seg('lmedida','Medir espaços por',[['caixa','Caixa do texto'],['letras','Topo das letras']],l.medida||'caixa','medida')
+   +(window.PLMET?PLMET.html():'')
+   +'</div></section>';
+  return h
+}
+function montarReal(){
+  var l=L(),dis=l.original?' aria-disabled="true"':'',h=topoPainel(l);
+  h+='<div class="lg__rest'+(l.original?' is-off':'')+'" id="lg-rest">'+secLinhas(l,dis)+secEstilo(l,dis)+secPosicao(l,dis)+secPresets(l,dis)+secAvancado(l,dis)+'</div>';
+  h+='<div id="lg-fora" class="msg msg--warn" hidden><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>A legenda passa da área segura e bloqueia a impressão. Reduza o tamanho ou encurte o texto.</p></div></div>';
+  h+='<div class="pe"><button type="button" class="btn2 btn2--lg pe__b" id="lg-rtudo">Resetar legendas</button><button type="button" class="btn2 btn2--lg pe__b" id="lg-apply">Aplicar legendas</button></div>';
+  $('p-legendas').innerHTML=h;
+  sincronizar()
+}
+/* migração (projeto real): a legenda antiga vira as 2 linhas equivalentes; o texto livre de cada foto vai para a linha de texto livre */
+function iniciarReal(){
+  if(!real())return;
+  var S=Q.ST(),lg=L();
+  if(!(lg.pad&&lg.pad.on)){
+    LT.migrarPad(lg,S.slice(1).map(function(e){return e.txt}));
+    lg.pad.l.forEach(function(ln,i){if(ln.t==='txt')S.slice(1).forEach(function(e){if(typeof e.txt==='string'&&e.txt){e.pl=e.pl||[{v:'',m:false},{v:'',m:false}];e.pl[i]={v:e.txt,m:true}}})})
+  }
+  S.slice(1).forEach(function(e){delete e.pad});
+  DEFL.meta='linhas'
+}
+function montar(){if(real())montarReal();else montarEx()}
+function montarEx(){
   var l=L(),h='',dis=l.original?' aria-disabled="true"':'',real=LT.ehReal();   /* D-135: com a Polaroid original as outras seções ficam apagadas */
   /* 1 · Polaroid original (D-135): primeiro controle do painel */
   h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Legendas</h3>'
@@ -254,14 +385,14 @@ function montar(){
   /* 2 · Posição (D-136): o texto é sempre abaixo, alinhado entre as margens da foto */
   h+='<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
    +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al','O texto fica entre as mesmas margens laterais da foto.')
-   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+sld('inc','Inclinação','°',-5,5,0.1,1,'De −5° a +5°.')+'</section>';
+   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+'</section>';
   /* 3 · Estilos prontos */
   h+='<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
    +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>';
   /* 4 · Texto livre */
   h+='<section class="mod" aria-labelledby="lm1"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
    +'<div class="f" id="f-texto"><div class="f__top"><label class="f__l" for="lg-in">Texto desta foto</label><span class="mono f__h" id="lg-cnt">0/80</span></div><div class="num lg-num"><input id="lg-in" maxlength="80" autocomplete="off" style="text-align:left;padding-left:12px"></div><p class="f__h" id="lg-h">Até 80 caracteres.</p><div id="lg-conf" hidden></div></div>'
-   +seletor('txt')
+   +seletor('txt')+estiloTxt(l)
    +sld('txt.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')
    +'<label class="chk"><input type="checkbox" data-chk="txt.fit"'+(l.txt.fit?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Ajustar para caber</strong><span class="f__h">Reduz o tamanho até o texto caber na área segura.</span></span></label>'
    +seg('caixa','Caixa',[['normal','Normal'],['maiusc','Maiúsc.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
@@ -273,7 +404,7 @@ function montar(){
    +seletor('data')
    +sld('data.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('data',l.data.cor)+'</section>';
   h+='<section class="mod" aria-labelledby="lm3"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
-   +(real?'<p class="f__h">Escreva a cidade como quer ver na legenda (ex.: Recife, PE) na aba Metadados.</p>':'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>')
+   +(real?'<p class="f__h">Escreva a cidade como quer ver na legenda (ex.: Recife, PE) em Configurações avançadas, mais abaixo.</p>':'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>')
    +(real?'':seg('uf','Estado',[['sigla','Sigla'],['nome','Nome'],['oculto','Oculto']],l.loc.uf,'loc.uf'))
    +(real?'':seg('pais','País',[['oculto','Oculto'],['nome','Nome'],['cod','Código']],l.loc.pais,'loc.pais'))
    +seg('sep','Separador',[[', ','Vírgula'],['·','Ponto'],['–','Traço'],['/','Barra'],[' - ','Hífen']],l.loc.sep,'loc.sep')
@@ -297,30 +428,40 @@ function montar(){
 function sincronizar(){
   var l=L();
   [].forEach.call(document.querySelectorAll('[data-lk]'),function(f){
-    var k=f.getAttribute('data-lk'),v=getp(l,k),r=$('r-'+k),n=$('n-'+k),dec=(k==='txt.esp'?2:k.indexOf('pt')>0?0:1);
+    var k=f.getAttribute('data-lk'),v=getp(l,k),r=$('r-'+k),n=$('n-'+k),dec=(k==='txt.esp'||k==='av.esp'?2:k.indexOf('pt')>0||k==='inc'?0:1);
+    if(v==null)v=defv(k);
     r.value=v;if(document.activeElement!==n)n.value=String(dec?Number(v).toFixed(dec):v).replace('.',',');
     f.querySelector('[data-lreset]').hidden=v===defv(k)
   });
-  [].forEach.call(document.querySelectorAll('[data-lreset]'),function(b){var k=b.getAttribute('data-lreset');if(b.closest('[data-lk]'))return;b.hidden=JSON.stringify(getv(l,k))===JSON.stringify(defv(k))});
+  [].forEach.call(document.querySelectorAll('[data-lreset]'),function(b){var k=b.getAttribute('data-lreset');if(b.closest('[data-lk]'))return;
+    if(k.indexOf('ln.')===0){var pdl=l.pad;b.hidden=!(pdl&&alvosLn().some(function(i){return pdl.l[i]&&pdl.l[i][k.slice(3)]!==undefined}));return}b.hidden=JSON.stringify(getv(l,k))===JSON.stringify(defv(k))});
   [].forEach.call(document.querySelectorAll('[data-sw]'),function(b){var k=b.getAttribute('data-sw');b.setAttribute('aria-checked',k==='sug'?l.sug!==false:k==='padon'?!!(l.pad&&l.pad.on):getp(l,k));if(k==='sug')b.setAttribute('aria-disabled',l.original?'true':'false')});
   [].forEach.call(document.querySelectorAll('input[data-k]'),function(i){i.checked=String(getv(l,i.getAttribute('data-k')))===i.value});
   [].forEach.call(document.querySelectorAll('input[name=preset]'),function(i){i.checked=i.value===l.preset});
   [].forEach.call(document.querySelectorAll('input[name=fmt]'),function(i){i.checked=+i.value===l.data.fmt});
   [].forEach.call(document.querySelectorAll('[data-chk]'),function(i){i.checked=!!getp(l,i.getAttribute('data-chk'))});
   var inp=$('lg-in');if(inp&&document.activeElement!==inp)inp.value=T();
-  $('lg-cnt').textContent=(inp?inp.value.length:0)+'/80';
-  var oe=$('lg-orig-est');if(oe)oe.textContent=l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis';
+  if($('lg-cnt'))$('lg-cnt').textContent=(inp?inp.value.length:0)+'/80';
+  var oe=$('lg-orig-est');if(oe)oe.textContent=l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':(real()?'Desligado · textos visíveis':'Desligado · textos e stickers visíveis');
   var se=$('lg-sug-est');if(se)se.textContent=l.original?'Não se aplica com «Sem legendas» ligado.':l.sug!==false?'Ligado · cidade, data e ponto vêm sugeridos da foto e você pode editar.':'Desligado · você escreve tudo; nada é preenchido sozinho.';
   sincPad();
+  [].forEach.call(document.querySelectorAll('[data-av]'),function(e){e.value=String(LT.av(l)[e.getAttribute('data-av')])});
+  var et=$('f-est');if(et)et.outerHTML=real()?estiloLn():estiloTxt(l);
+  [].forEach.call(document.querySelectorAll('input[name=alvo]'),function(i){i.checked=i.value===UI.alvo});
+  var fl=$('fv-ln');if(fl){var ee=estLn(),ff=LT.famLG(ee.font,ee);fl.style.fontFamily=fam(ee.font);fl.style.fontStyle=ff.i?'italic':'normal';fl.style.fontWeight=ff.w}
+  if(window.PLMET)PLMET.render();
   $('lg-fora').hidden=!fora()
 }
 function render(){
   L();pintar();
-  if(!$('p-legendas').hidden){if(!$('lg-in'))montar();else{sincronizar();['txt','data','loc'].forEach(function(k){var e=$('fv-'+k);if(e)e.textContent=amostra(k)})}}
+  if(!$('p-legendas').hidden){if(!$(real()?'lg-lin':'lg-in'))montar();else{sincronizar();['txt','data','loc'].forEach(function(k){var e=$('fv-'+k);if(e)e.textContent=amostra(k)})}}
 }
 function mudar(k,v,chave){setp(L(),k,v);Q.commit(chave||('lg:'+k))}
 function preset(k){
-  var l=L();l.preset=k;var p=PRESETS[k].p;Object.keys(p).forEach(function(x){setp(l,x,p[x])});
+  var l=L();l.preset=k;var p=PRESETS[k].p;
+  Object.keys(p).forEach(function(x){
+    if(real()){var o=UI.alvo;UI.alvo='a';if(x==='txt.font')setLn('font',p[x]);else if(x==='txt.caixa')setp(l,'av.cx',p[x]);else if(x==='txt.esp')setp(l,'av.esp',Math.max(0,Math.min(.2,p[x])));UI.alvo=o}
+    else setp(l,x,p[x])});
   if(k==='pin')l.loc.on=true;if(k==='calendario')l.data.on=true;
   UI.sel=null;Q.commit('lg:preset');montar()
 }
@@ -328,7 +469,7 @@ function preset(k){
    Só troca quando a legenda ainda está no padrão — personalizações ficam de fora. */
 function padraoPocket(){
   var s=Q.ST()[0],cur=s.leg;
-  if(cur&&JSON.stringify(cur)!==JSON.stringify(PADRAO))return false;
+  if(cur&&JSON.stringify(cur)!==JSON.stringify(real()?LT.legInicial():PADRAO))return false;
   s.leg=LT.legPocket(PADRAO);
   return true
 }
@@ -355,6 +496,7 @@ P.addEventListener('input',function(e){
 P.addEventListener('change',function(e){
   var t=e.target;
   if(acaoPad(e))return;
+  if(t.name==='alvo'){UI.alvo=t.value;UI.sel=null;montar();return}
   if(t.name==='preset'){preset(t.value);return}
   if(t.name==='fmt'){mudar('data.fmt',+t.value);return}
   if(t.hasAttribute('data-chk')){mudar(t.getAttribute('data-chk'),t.checked);return}
@@ -368,25 +510,36 @@ P.addEventListener('focusout',function(e){if(e.target.hasAttribute&&e.target.has
 P.addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
   if(b.hasAttribute('data-sw')&&b.getAttribute('data-sw')==='sug'){if(L().original)return;var Ls=L();if(Ls.sug===false)delete Ls.sug;else Ls.sug=false;Q.commit('lg:sug');montar();return}
-  if(b.hasAttribute('data-sw')&&b.getAttribute('data-sw')==='padon'){var Lp=L();if(!Lp.pad)Lp.pad=LT.padNovo();Lp.pad.on=!Lp.pad.on;UI.aberto.av=true;Q.commit('lg:padon');montar();if(Lp.pad.on)depois(preencher(todasFotos()),'lg:padon2');return}
+  if(b.hasAttribute('data-sw')&&b.getAttribute('data-sw')==='padon'){var Lp=L();if(!Lp.pad){Lp.pad=LT.padNovo();Lp.pad.on=false}Lp.pad.on=!Lp.pad.on;UI.aberto.av=true;Q.commit('lg:padon');montar();if(Lp.pad.on)depois(preencher(todasFotos()),'lg:padon2');return}
   if(b.id==='lg-av-t'){UI.aberto.av=!UI.aberto.av;montar();return}
   if(b.hasAttribute('data-restaurar')){var ri=+b.getAttribute('data-restaurar'),er=Q.S();if(er.pl&&er.pl[ri])er.pl[ri]={v:'',m:false};Q.commit('lg:restaurar');depois(preencher([Q.cur()],ri),'lg:restaurar2');return}
   if(b.id==='pad-todas'){var Lt=L(),alvo=padAlvo(),S3=Q.ST(),j3;Lt.pad={on:true,l:copia(alvo.l)};for(j3=1;j3<=Q.N;j3++)delete S3[j3].pad;Q.commit('lg:padtodas');montar();depois(preencher(todasFotos()),'lg:padtodas2');Q.toast('Padrão aplicado a todas as fotos',true);return}
   if(b.hasAttribute('data-sw')){var k=b.getAttribute('data-sw');mudar(k,!getp(L(),k));if(k==='original')montar();return}
+  if(b.hasAttribute('data-est')){var ke=b.getAttribute('data-est'),ch=ke==='it'?'it':'b';
+    if(real()){setLn(ch,!estLn()[ch]);Q.commit('lg:est');montar();return}
+    var tx=L().txt;if(tx[ch])delete tx[ch];else tx[ch]=true;Q.commit('lg:est');montar();return}   /* D-148 */
   if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';montar();return}
   if(b.hasAttribute('data-fcat')){UI.cat=b.getAttribute('data-fcat');montar();return}
-  if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');UI.rec=[n].concat(UI.rec.filter(function(x){return x!==n})).slice(0,5);var s=UI.sel;UI.sel=null;L()[s].font=n;Q.commit('lg:font');montar();return}
+  if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');UI.rec=[n].concat(UI.rec.filter(function(x){return x!==n})).slice(0,5);var s=UI.sel;UI.sel=null;var Lf=L();
+    if(s==='ln'){setLn('font',n);alvosLn().forEach(function(i){var ln=Lf.pad.l[i],ee=LT.estilosDe(n,ln);if(ln.b&&!ee.b.ok)delete ln.b;ee=LT.estilosDe(n,ln);if(ln.it&&!ee.it.ok)delete ln.it});Q.commit('lg:font');montar();return}
+    Lf[s].font=n;if(s==='txt'){var ee=LT.estilosDe(n,Lf.txt);if(Lf.txt.b&&!ee.b.ok)delete Lf.txt.b;ee=LT.estilosDe(n,Lf.txt);if(Lf.txt.it&&!ee.it.ok)delete Lf.txt.it}Q.commit('lg:font');montar();return}
   if(b.hasAttribute('data-fav')){var f=b.getAttribute('data-fav'),i=UI.fav.indexOf(f);if(i>=0)UI.fav.splice(i,1);else UI.fav.push(f);montar();return}
   if(b.hasAttribute('data-lreset')){var kr=b.getAttribute('data-lreset');
     if(DEFL[kr]!==undefined){delete L()[kr];Q.commit('lg:'+kr);montar();return} /* D-113: resetar = tirar a chave */
+    if(kr.indexOf('ln.')===0){setLn(kr.slice(3),undefined);Q.commit('lg:'+kr);montar();return}
+    if(kr.indexOf('av.')===0){var Lr=L();if(Lr.av){delete Lr.av[kr.slice(3)];if(!Object.keys(Lr.av).length)delete Lr.av}Q.commit('lg:'+kr);montar();if(kr==='av.df'||kr==='av.lf')depois(preencher(todasFotos()),'lg:avr');return}
     setp(L(),kr,getp(PADRAO,kr));Q.commit('lg:'+kr);montar();return}
   if(b.hasAttribute('data-usar')){Q.S().txt=UI.pend;$('lg-conf').hidden=true;$('lg-h').textContent='Até 80 caracteres.';Q.commit('lg:txt');return}
   if(b.hasAttribute('data-limpar')){Q.S().txt='';$('lg-in').value='';$('lg-conf').hidden=true;$('lg-h').textContent='Até 80 caracteres.';Q.commit('lg:txt');return}
   if(b.hasAttribute('data-lfit')){L().txt.fit=true;Q.commit('lg:fit');montar();return}
-  if(b.id==='lg-rtudo'){Q.ST()[0].leg=copia(PADRAO);Q.commit('lg:tudo');UI.sel=null;montar();Q.toast('Legendas voltaram ao padrão',true);return}
+  if(b.id==='lg-rtudo'){Q.ST()[0].leg=real()?LT.legInicial():copia(PADRAO);if(real())depois(preencher(todasFotos()),'lg:tudo2');Q.commit('lg:tudo');UI.sel=null;montar();Q.toast('Legendas voltaram ao padrão',true);return}
+  if(b.id==='lg-apply'&&real()){var pdA=L().pad,SA=Q.ST(),ca=0,cur=Q.S().pl||[];[0,1].forEach(function(i){if(pdA.l[i].t!=='txt'||!cur[i])return;for(var j=1;j<=Q.N;j++)if(j!==Q.cur()){SA[j].pl=SA[j].pl||[{v:'',m:false},{v:'',m:false}];SA[j].pl[i]={v:cur[i].v,m:true};ca++}});
+    Q.commit('lg:aplicar');Q.toast(ca?'Texto aplicado às outras fotos':'Nenhuma linha de texto livre para aplicar',!!ca);return}
   if(b.id==='lg-apply'){var tx=Q.S().txt,S=Q.ST(),c=0;if(tx===null)tx=T();for(var j=1;j<=Q.N;j++){if(j!==Q.cur()){S[j].txt=tx;c++}}Q.commit('lg:aplicar');Q.toast('Texto aplicado às outras '+c+' fotos',true)}
 });
-window.PLLEG={render:render,padraoPocket:padraoPocket};
+function iniciar(){if(!real()||!Q.meta)return Promise.resolve();return preencher(todasFotos()).then(function(){if(Q.rebase)Q.rebase();sincPad()})}
+iniciarReal();
+window.PLLEG={iniciar:iniciar,render:render,padraoPocket:padraoPocket,refazer:function(ns){depois(preencher(ns||[Q.cur()]),'lg:md')}};   /* D-148: a cidade ou a data da foto mudou: refaz as linhas não digitadas */
 document.fonts&&document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',function(){LT.limparMedTela();render()}); /* métricas mudaram: recalcula as linhas (D-113) */
-render()
+render();iniciar()
 })();
