@@ -65,6 +65,12 @@ try {
       return {
         faixa: !!faixa, fundoFaixa: cs && cs.backgroundColor, alturaFaixa: faixa && Math.round(faixa.getBoundingClientRect().height),
         slides: document.querySelectorAll('.faixa__slide').length,
+        pontos: document.querySelectorAll('.faixa__ponto').length,
+        rotulos: [...document.querySelectorAll('.faixa__ponto')].map(b => b.getAttribute('aria-label')),
+        simulacoes: document.querySelectorAll('.faixa__slide svg.sim').length,
+        loops: [...document.querySelectorAll('.faixa__slide svg.sim *')].filter(e => {
+          const a = getComputedStyle(e).animationName; return a && a !== 'none';
+        }).map(e => getComputedStyle(e).animationDuration),
         modelos: modelos.length, nomes: modelos.map(m => (m.querySelector('.mdl__nome') || {}).textContent || ''),
         botoes: modelos.filter(m => { const b = m.querySelector('.mdl__b'); return b && b.textContent.trim() === 'Usar este modelo'; }).length,
         breves: breves.length, textoBreve: breves.map(b => b.textContent.trim()),
@@ -79,7 +85,12 @@ try {
     });
     const rot = `${w}×${h}`;
     r.faixa && r.fundoFaixa === 'rgb(0, 0, 0)' ? ok(`${rot}: a faixa preta está na tela`) : ruim(`${rot}: a faixa preta não apareceu (${r.fundoFaixa})`);
-    r.slides === 3 ? ok(`${rot}: a faixa tem 3 banners`) : ruim(`${rot}: ${r.slides} banners`);
+    r.slides === 5 ? ok(`${rot}: a faixa tem 5 banners (3 do brief + 2 de simulação)`) : ruim(`${rot}: ${r.slides} banners`);
+    r.pontos === 5 && r.rotulos.length === 5 && r.rotulos.every(t => /^Banner \d de 5: /.test(t))
+      ? ok(`${rot}: cada banner tem um indicador acessível`) : ruim(`${rot}: indicadores fora do esperado (${r.rotulos.join(' | ')})`);
+    r.simulacoes === 2 ? ok(`${rot}: os 2 banners de simulação estão na faixa`) : ruim(`${rot}: ${r.simulacoes} banners de simulação`);
+    r.loops.length > 0 && r.loops.every(d => parseFloat(d) <= 6)
+      ? ok(`${rot}: o loop da simulação dura no máximo 6 s`) : ruim(`${rot}: loop fora do limite (${r.loops.join(',')})`);
     r.titulo.includes('histórias') && r.expressao.includes('histórias') ? ok(`${rot}: o título do banner tem a expressão em destaque`) : ruim(`${rot}: título fora do esperado (${r.titulo})`);
     r.modelos === 8 ? ok(`${rot}: 8 cartões de modelo`) : ruim(`${rot}: ${r.modelos} cartões de modelo`);
     r.nomes.includes('Praia 🌊') ? ok(`${rot}: o nome do modelo traz o emoji`) : ruim(`${rot}: nomes sem emoji (${r.nomes.join(' | ')})`);
@@ -116,6 +127,13 @@ try {
 
     await p.hover('.faixa__slide.is-active');
     const pausado = await bannerAtivo(p);
+    const congelado = await p.evaluate(() => {
+      const f = document.getElementById('faixa');
+      const sim = document.querySelector('.faixa__slide svg.sim .sim__mini, .faixa__slide svg.sim .sim__foto');
+      return { classe: f ? f.className : '', estado: sim ? sim.getAnimations().map(a => a.playState).join(',') : '' };
+    });
+    /is-pausa/.test(congelado.classe) ? ok('com o cursor em cima, a faixa congela a simulação') : ruim(`com o cursor em cima, a faixa não congelou (${congelado.classe})`);
+    congelado.estado.indexOf('running') === -1 ? ok('com o cursor em cima, a simulação para de rodar') : ruim(`a simulação continua rodando (${congelado.estado})`);
     await p.waitForTimeout(9000);
     (await bannerAtivo(p)) === pausado ? ok('com o cursor em cima, o banner não muda') : ruim('o banner mudou com o cursor em cima');
 
@@ -148,6 +166,21 @@ try {
       return s ? getComputedStyle(s).opacity : '0';
     });
     vis === '1' ? ok('movimento reduzido: as seções já estão no estado final') : ruim(`movimento reduzido: seção com opacidade ${vis}`);
+    /* os banners de simulação mostram o quadro final, sem animação */
+    const sim = await p.evaluate(() => {
+      const mini = document.querySelector('#faixa-b4 .sim__mini--1');
+      const foto = document.querySelector('#faixa-b5 .sim__foto');
+      const filtro = document.querySelector('#faixa-b5 .sim__filtro');
+      return {
+        anims: document.getAnimations().length,
+        mini: mini ? getComputedStyle(mini).translate : '',
+        foto: foto ? getComputedStyle(foto).translate : '',
+        filtro: filtro ? getComputedStyle(filtro).opacity : ''
+      };
+    });
+    sim.anims === 0 ? ok('movimento reduzido: nenhuma animação roda (banner de simulação incluso)') : ruim(`movimento reduzido: ${sim.anims} animações rodando`);
+    sim.mini.indexOf('-') === -1 ? ok('movimento reduzido: as miniaturas já estão encaixadas na folha') : ruim(`movimento reduzido: miniatura fora do lugar (${sim.mini})`);
+    sim.foto !== '0px 0px' && sim.filtro !== '0' ? ok('movimento reduzido: o banner «Editar» mostra o quadro final') : ruim(`movimento reduzido: quadro final fora do esperado (${sim.foto}, ${sim.filtro})`);
     await c.close();
   }
 

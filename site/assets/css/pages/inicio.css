@@ -79,6 +79,65 @@ a{color:inherit}
 .selo-breve{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 12px;background:var(--surface-subtle);border-radius:999px;font:500 13px/1 var(--font)}
 .selo-breve .ico{width:18px;height:18px}
 
+/* ===== banners de simulação (4 e 5) · HTML/CSS/SVG, sem vídeo (D-118) =====
+   O loop dura 6 s e para com o cursor em cima ou com o foco dentro da faixa (a classe `is-pausa`
+   entra quando o PLBANNERS suspende a rotação). Com movimento reduzido, a animação some e a
+   cena fica no quadro final: as miniaturas encaixadas, a foto ampliada, o filtro aplicado e a
+   legenda escrita. */
+.faixa__svg{
+  grid-column:5/13;grid-row:1;
+  align-self:stretch;justify-self:end;
+  width:100%;height:100%;max-height:500px;
+}
+.sim__mini{animation:sim-mini 6s var(--ease) infinite backwards}
+.sim__mini--1{animation-delay:0ms}
+.sim__mini--2{animation-delay:800ms}
+.sim__mini--3{animation-delay:1600ms}
+@keyframes sim-mini{
+  0%{translate:0 -220px;opacity:0}
+  4%{translate:0 -220px;opacity:1}
+  16%{translate:0 0;opacity:1}
+  88%{translate:0 0;opacity:1}
+  100%{translate:0 0;opacity:0}
+}
+.sim__foto{translate:12px -8px;scale:1.12;transform-box:fill-box;transform-origin:center;animation:sim-zoom 6s var(--ease) infinite}
+@keyframes sim-zoom{
+  0%{translate:0 0;scale:1}
+  24%{translate:0 0;scale:1}
+  48%{translate:26px -18px;scale:1.22}
+  70%{translate:26px -18px;scale:1.22}
+  86%{translate:12px -8px;scale:1.12}
+  100%{translate:12px -8px;scale:1.12}
+}
+.sim__filtro{opacity:.2;animation:sim-filtro 6s linear infinite}
+@keyframes sim-filtro{
+  0%{opacity:.2}
+  48%{opacity:.2}
+  62%{opacity:.3}
+  74%{opacity:.12}
+  86%{opacity:.2}
+  100%{opacity:.2}
+}
+.sim__linha{scale:1 1;transform-box:fill-box;transform-origin:left center}
+.sim__linha--1{animation:sim-linha1 6s var(--ease) infinite}
+.sim__linha--2{animation:sim-linha2 6s var(--ease) infinite}
+@keyframes sim-linha1{
+  0%{scale:0 1}
+  18%{scale:1 1}
+  100%{scale:1 1}
+}
+@keyframes sim-linha2{
+  0%{scale:0 1}
+  8%{scale:0 1}
+  28%{scale:1 1}
+  100%{scale:1 1}
+}
+/* a faixa parada (cursor em cima ou foco dentro) congela a simulação */
+.faixa.is-pausa .sim *{animation-play-state:paused}
+@media (prefers-reduced-motion: reduce){
+  .sim *{animation:none !important}
+}
+
 /* ===== 6 e 7 · nota de privacidade e rodapé ===== */
 .note{display:flex;align-items:flex-start;gap:12px;margin-top:64px;padding:16px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:14px;font-size:14px;line-height:1.5}
 .note .ico{color:var(--blue);margin-top:1px}

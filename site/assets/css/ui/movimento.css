@@ -1,7 +1,8 @@
 /* Movimento compartilhado (brief §0.2 e §5.4 · D-118) · classes utilitárias + View Transitions
-   A6 · revelação de seções por rolagem: opacidade 0 → 1 e translateY(16 px → 0), 450 ms, irmãos escalonados 60 ms.
-   Só `transform` e `opacity` (nada de layout). Com `prefers-reduced-motion`: estado final, sem animação.
-   A5 · transição entre páginas do app: `@view-transition { navigation: auto; }` (220 ms).
+   A1 · polaroids pousando na mesa · A2 · câmera soltando a polaroid · A3 · revelação como filme
+   instantâneo · A4 · parallax leve · A5 · transição entre páginas · A6 · revelação por rolagem.
+   Só `transform`, `opacity`, `clip-path` e o filtro da revelação (A3, sem cor): nada de layout.
+   Com `prefers-reduced-motion`: estado final, sem animação.
    Quem não suporta View Transitions navega normalmente (melhoria progressiva). */
 
 /* ---------- A6 · revelação por rolagem ---------- */
@@ -22,12 +23,88 @@ html.mov-js .mov-rise.is-in{transition-delay:calc(var(--mov-i,0) * 60ms)}   /* e
   to{opacity:1;transform:none}
 }
 
+/* ---------- A1 · polaroids pousando na mesa (grupos #mesa-p1…#mesa-p7) ----------
+   A posição de cada grupo é a do arquivo-fonte (o `transform` do SVG): por isso a animação usa a
+   propriedade `translate`, que se soma ao `transform` sem trocar o lugar de ninguém.
+   O estado escondido só existe com o JavaScript ligado (html.mov-js): sem ele a mesa aparece inteira. */
+html.mov-js .mov-pousa{opacity:0;transform-box:fill-box;transform-origin:center}
+html.mov-js .is-in .mov-pousa{animation:mov-pousa 600ms var(--ease) both}
+html.mov-js .is-in #mesa-p1{animation-delay:0ms}
+html.mov-js .is-in #mesa-p2{animation-delay:90ms}
+html.mov-js .is-in #mesa-p3{animation-delay:180ms}
+html.mov-js .is-in #mesa-p4{animation-delay:270ms}
+html.mov-js .is-in #mesa-p5{animation-delay:360ms}
+html.mov-js .is-in #mesa-p6{animation-delay:450ms}
+html.mov-js .is-in #mesa-p7{animation-delay:540ms}
+@keyframes mov-pousa{
+  from{translate:0 -40px;opacity:0}
+  to{translate:0 0;opacity:1}
+}
+/* com `animation-timeline: view()` o escalonamento vem do alcance de cada grupo */
+@supports (animation-timeline: view()){
+  html.mov-js .mov-pousa{
+    animation:mov-pousa 600ms var(--ease) both;
+    animation-timeline:view();
+    animation-range:entry 10% entry 70%;
+  }
+  html.mov-js #mesa-p2{animation-range:entry 15% entry 75%}
+  html.mov-js #mesa-p3{animation-range:entry 20% entry 80%}
+  html.mov-js #mesa-p4{animation-range:entry 25% entry 85%}
+  html.mov-js #mesa-p5{animation-range:entry 30% entry 90%}
+  html.mov-js #mesa-p6{animation-range:entry 35% entry 95%}
+  html.mov-js #mesa-p7{animation-range:entry 40% entry 100%}
+}
+
+/* ---------- A2 · câmera soltando a polaroid (#cam-foto sai da fenda) ----------
+   A foto desce 58% da própria altura: o `translate` em % usa a caixa do próprio grupo
+   (`transform-box: fill-box`). O brilho do flash é a sobreposição #cam-flash-luz. */
+html.mov-js .mov-cam #cam-foto{translate:0 -58%;transform-box:fill-box;transform-origin:center}
+html.mov-js .mov-cam.is-out #cam-foto{animation:cam-sai 1400ms var(--ease) 520ms both}
+html.mov-js .mov-cam.is-out #cam-flash-luz{animation:cam-flash 120ms ease-out 400ms both}
+@keyframes cam-sai{
+  from{translate:0 -58%}
+  to{translate:0 0}
+}
+@keyframes cam-flash{
+  0%{opacity:0}
+  35%{opacity:1}
+  100%{opacity:0}
+}
+
+/* ---------- A3 · revelação como filme instantâneo (janela de qualquer polaroid) ----------
+   Só opacidade, desfoque e brilho: nada de sépia (T2). */
+html.mov-js .mov-dev .mov-cena{opacity:.08;filter:blur(6px) brightness(1.6)}
+html.mov-js .mov-dev.is-dev .mov-cena{animation:mov-dev 2400ms ease-out both}
+@keyframes mov-dev{
+  from{opacity:.08;filter:blur(6px) brightness(1.6)}
+  to{opacity:1;filter:none}
+}
+
+/* ---------- A4 · parallax leve (ilustração das faixas pretas e rolo de filme) ----------
+   Sem alternativa: quem não suporta `animation-timeline` não vê parallax. */
+@supports (animation-timeline: view()){
+  .mov-parallax{
+    animation:mov-parallax auto linear both;
+    animation-timeline:view();
+    animation-range:cover 0% cover 100%;
+  }
+}
+@keyframes mov-parallax{
+  from{transform:translateY(12px)}
+  to{transform:translateY(-12px)}
+}
+
 /* ---------- movimento reduzido: estado final, nada anima ---------- */
 @media (prefers-reduced-motion: reduce){
   html.mov-js .mov-rise{
     opacity:1 !important;transform:none !important;
     transition:none !important;animation:none !important;
   }
+  html.mov-js .mov-pousa{opacity:1 !important;translate:none !important;animation:none !important}
+  html.mov-js .mov-cena{opacity:1 !important;filter:none !important;animation:none !important}
+  html.mov-js .mov-cam #cam-foto{translate:none !important;animation:none !important}
+  html.mov-js .mov-cam #cam-flash-luz{opacity:0 !important;animation:none !important}
+  .mov-parallax{animation:none !important;transform:none !important}
 }
 
 /* ---------- A5 · View Transitions entre as páginas do app ---------- */

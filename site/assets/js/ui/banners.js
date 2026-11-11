@@ -50,6 +50,9 @@ Banners.prototype.rotar=function(){
 Banners.prototype.parar=function(){if(this.tmr){clearTimeout(this.tmr);this.tmr=null}};
 Banners.prototype.suspender=function(ligado){        /* hover, foco, toque e aba escondida */
   this.suspenso=ligado;
+  if(this.el.classList){                              /* a simulação dos banners congela junto */
+    if(ligado)this.el.classList.add('is-pausa');else this.el.classList.remove('is-pausa');
+  }
   if(ligado)this.parar();else if(this.auto)this.rotar();
 };
 /* ---------- botão pausar/retomar ---------- */

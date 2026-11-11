@@ -105,6 +105,24 @@
   .faixa__slide.is-active .faixa__img{animation:none}
 }
 
+/* ===== faixa fixa · T-28 e T-29 (brief §5.2 e §5.3) =====
+   Uma faixa preta só, sem rotação: o texto ocupa as colunas 1–5 e a ilustração as 6–12.
+   O título quebra em linhas normais (a faixa do app usa 10 ch para caber ao lado da ilustração). */
+.faixa--fixa .faixa__pistas{width:100%;max-width:1280px;margin:0 auto;padding:0 32px}
+.faixa--fixa .faixa__txt{padding:96px 0}
+.faixa--fixa .faixa__img{grid-column:6/13;object-fit:contain;object-position:center}   /* a ilustração inteira: o fundo preto dela é o da faixa */
+.faixa--fixa .faixa__tit{max-width:none}
+.faixa--fixa .faixa__apoio{max-width:46ch}
+@media (max-width:767px){
+  .faixa--fixa .faixa__pistas{padding:0}
+  .faixa--fixa .faixa__txt{padding:40px 24px}
+  .faixa--fixa .faixa__img{grid-column:1}
+}
+@media (min-width:768px) and (max-width:1279px){
+  .faixa--fixa .faixa__txt{padding:56px 0;grid-column:1/2;grid-row:2}
+  .faixa--fixa .faixa__img{grid-column:1/2;grid-row:1}
+}
+
 /* 768–1279 px: a ilustração ocupa quase toda a largura e cobriria o texto lado a lado →
    empilha como no celular (ilustração em cima, texto embaixo), com mais altura para a arte */
 @media (min-width:768px) and (max-width:1279px){

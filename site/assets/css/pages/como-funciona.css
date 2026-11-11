@@ -1,4 +1,6 @@
-/* T-29 · como-funciona · CSS específico da página (base + componentes). Tokens: tokens.css · LED: led.css */
+/* T-29 · como-funciona · CSS específico da página (base + componentes). Tokens: tokens.css · LED: led.css
+   Ordem das seções no brief §5.3: cabeçalho · intro com rolo de filme (A4) · passos 1–4 com uma
+   ilustração cada (A2 na câmera, A3 na revelação, A6 em cascata) · nota · faixa de fechamento · rodapé. */
 html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--white)}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -9,9 +11,12 @@ a{color:inherit}
 /* ===== Página T-29 · Como funciona ===== */
 .wrap{width:100%;max-width:1280px;margin:0 auto;padding:0 24px}
 .site-header{height:72px;border-bottom:1px solid var(--outline-subtle);background:var(--white)}
-.site-header .wrap{height:100%;display:flex;align-items:center}
+.site-header .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
 .site-header a{display:inline-flex;align-items:center;min-height:44px}
 .logo-h{height:40px;width:auto}
+.site-header a.logo{view-transition-name:logo}      /* A5: o logo fica parado entre as páginas */
+.link3{display:inline-flex;align-items:center;min-height:44px;font-size:16px;font-weight:500;text-underline-offset:4px}
+.link3:hover{text-decoration-thickness:2px}
 .ico{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 
 .page{padding-top:80px;padding-bottom:80px}
@@ -20,19 +25,48 @@ a{color:inherit}
 .page-title{margin:32px 0 0;font-family:var(--font-serif);font-weight:400;font-size:26px;line-height:1.2;letter-spacing:0}
 .page-lead{margin:32px 0 0;max-width:34ch;font-size:18px;line-height:1.6}
 
+/* intro · rolo de filme decorativo com parallax leve (A4) */
+.intro__rolo{margin-top:40px}
+.intro__rolo img{width:240px;height:auto}
+
+/* passos */
 .steps{margin:48px 0 0;padding:0;list-style:none;border-bottom:1px solid var(--outline-subtle)}
 .step{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:32px 0;border-top:1px solid var(--outline-subtle)}
 .step__n{font-family:var(--font-serif);font-weight:300;font-size:40px;line-height:1;color:var(--blue)}
 .step__t{margin:0;font-size:22px;font-weight:300;line-height:1.25}
 .step__d{margin:12px 0 0;max-width:52ch;font-size:16px;line-height:1.6}
 
+/* ilustração de cada passo (96 px) */
+.step__arte{width:96px}
+.step__arte--cam .cam-svg{display:block;width:100%;height:auto}
+.step__arte--trio{display:flex;align-items:flex-end;gap:4px}
+.trio__p--cidade{width:29px}
+.trio__p--montanha{width:25px}
+.trio__p--praia{width:33px}
+.step__arte--pol{position:relative}
+.pol-svg{display:block;width:100%;height:auto}
+.step__leg{position:absolute;left:9%;right:9%;top:76%;margin:0;font-family:var(--font-expressive);font-weight:500;font-size:13px;line-height:1.1;text-align:left;color:var(--blue)}
+.step__arte--guias{position:relative}
+.guia__p{width:96px;height:auto}
+.step__arte--guias::after{content:"";position:absolute;inset:-10px -6px;border:1px dashed rgb(0 0 0/.45);border-radius:4px}   /* guias de corte (D-121) */
+
 .note{display:flex;align-items:flex-start;gap:12px;margin:48px 0 0;padding:20px;border:1px solid var(--outline-subtle);border-radius:14px;font-size:14px;line-height:1.5}
 .note .ico{color:var(--blue);margin-top:1px}
 .note p{margin:0}
 
-.cta{margin:40px 0 0}
-.cta .led-btn{width:100%}
+.site-footer{border-top:1px solid var(--outline-subtle);padding:48px 0}
+.site-footer .wrap{display:flex;flex-direction:column;gap:32px}
+.logo-v{height:96px;width:auto;align-self:flex-start}
+.legal{display:flex;gap:24px;margin:0;padding:0;list-style:none}
+.legal a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:500;text-underline-offset:4px}
 
+@media (max-width:1023px){
+  /* no celular e no tablet a ilustração fica acima do texto (brief §5.3) */
+  .step{grid-template-columns:48px 1fr;grid-template-areas:"arte arte" "n txt"}
+  .step__arte{grid-area:arte;margin-bottom:8px}
+  .step__n{grid-area:n}
+  .step__txt{grid-area:txt}
+}
 @media (min-width:1024px){
   .wrap{padding:0 32px}
   .page{display:grid;grid-template-columns:5fr 7fr;gap:64px;align-items:start;padding-top:96px;padding-bottom:96px}
@@ -40,14 +74,13 @@ a{color:inherit}
   .page-title{font-size:32px}
   .steps{margin-top:0;border-top:0}
   .step:first-child{border-top:1px solid var(--outline-subtle)}
-  .step{grid-template-columns:72px 1fr}
+  .step{grid-template-columns:72px 1fr 96px;column-gap:24px;align-items:start}
   .step__n{font-size:48px}
-  .cta .led-btn{width:auto;min-width:320px}
 }
-
-.site-footer{border-top:1px solid var(--outline-subtle);padding:48px 0}
-.site-footer .wrap{display:flex;flex-direction:column;gap:32px}
-.logo-v{height:96px;width:auto;align-self:flex-start}
-.legal{display:flex;gap:24px;margin:0;padding:0;list-style:none}
-.legal a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:500;text-underline-offset:4px}
-@media (min-width:768px){.site-footer .wrap{flex-direction:row;align-items:center;justify-content:space-between}}
+@media (max-width:767px){
+  .site-header .wrap{justify-content:flex-start}
+  .site-nav{display:none}                           /* no celular, só o logo (brief §5.3) */
+}
+@media (min-width:768px){
+  .site-footer .wrap{flex-direction:row;align-items:center;justify-content:space-between}
+}

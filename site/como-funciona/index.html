@@ -23,47 +23,269 @@
 <!-- seo:fim -->
 <meta name="description" content="Escolha as fotos, ajuste o recorte e a legenda e imprima polaroids em casa, em papel A4. Tudo acontece no seu aparelho: suas fotos não vão para nenhum servidor.">
 <meta name="color-scheme" content="light">
-<!-- PENDENTE (T6, TP-06): Cormorant Garamond ainda vem do Google Fonts neste protótipo. Hospedar antes de produção. Inter já está embutida. -->
 <link rel="stylesheet" href="../assets/css/base/fonts.css">
 <link rel="stylesheet" href="../assets/css/base/tokens.css">
 <link rel="stylesheet" href="../assets/css/base/led.css">
 <link rel="stylesheet" href="../assets/css/ui/movimento.css">
+<link rel="stylesheet" href="../assets/css/ui/faixa-escura.css">
 <link rel="stylesheet" href="../assets/css/pages/como-funciona.css">
+<script src="../assets/js/ui/movimento.js" defer></script>
 </head>
 <body>
-<header class="site-header"><div class="wrap">
-<a href="../" aria-label="Polar Life, voltar à apresentação"><img class="logo-h" src="../assets/img/logos/Logo_tipografia_lateral.png" width="116" height="40" alt="Polar Life"></a>
+<header class="site-header"><div class="wrap site-header__in">
+  <a class="logo" href="../" aria-label="Polar Life, voltar à apresentação"><img class="logo-h" src="../assets/img/logos/Logo_tipografia_lateral.png" width="116" height="40" alt="Polar Life"></a>
+  <nav class="site-nav" aria-label="Entrar"><a class="link3" href="../app/entrar/">Entrar</a></nav>
 </div></header>
 
 <main>
+<!-- 2 · intro (coluna fixa no desktop) -->
 <div class="wrap page" id="como-funciona">
   <div class="intro">
     <p class="eyebrow rotulo">Como funciona</p>
     <h1 class="page-title">Do celular ao papel, em quatro passos.</h1>
     <p class="page-lead">Você escolhe as fotos, o Polar Life organiza as folhas e você imprime onde quiser.</p>
+    <!-- rolo de filme decorativo com parallax leve (A4) -->
+    <div class="intro__rolo">
+      <img class="mov-parallax" src="../assets/img/ilustracoes/rolo-filme.svg" width="600" height="180" alt="" aria-hidden="true">
+    </div>
   </div>
 
+  <!-- 3 · passos 1 a 4 (revelação em cascata · A6) -->
   <div>
     <ol class="steps">
-      <li class="step"><span class="step__n" aria-hidden="true">1</span><div><h2 class="step__t">Escolha suas fotos</h2><p class="step__d">Importe do aparelho ou tire na hora com a câmera. Fotos de iPhone também funcionam.</p></div></li>
-      <li class="step"><span class="step__n" aria-hidden="true">2</span><div><h2 class="step__t">Defina o formato e o papel</h2><p class="step__d">Escolha entre seis formatos de polaroid ou crie um tamanho só seu. O Polar Life conta quantas folhas você vai precisar.</p></div></li>
-      <li class="step"><span class="step__n" aria-hidden="true">3</span><div><h2 class="step__t">Legende e ajuste</h2><p class="step__d">Recorte, ajuste a luz e aplique um filtro. Escreva a legenda, a data e o local em fontes feitas para o papel.</p></div></li>
-      <li class="step"><span class="step__n" aria-hidden="true">4</span><div><h2 class="step__t">Revise e gere o arquivo</h2><p class="step__d">Uma checagem avisa o que pode sair diferente do esperado. Depois, baixe o PDF e imprima em casa ou na gráfica.</p></div></li>
+      <li class="step mov-rise">
+        <span class="step__n" aria-hidden="true">1</span>
+        <div class="step__txt">
+          <h2 class="step__t">Escolha suas fotos</h2>
+          <p class="step__d">Importe do aparelho ou tire na hora com a câmera. Fotos de iPhone também funcionam.</p>
+        </div>
+        <div class="step__arte step__arte--cam mov-cam" data-mov="cam" aria-hidden="true">
+          <!-- Câmera instantânea · arquivo-fonte: assets/img/ilustracoes/camera-instantanea.svg.
+               Embutida para animar o grupo #cam-foto (A2), sem requisição extra (T6).
+               A foto já fica na posição final (translate 75 255.8 = 150 + 58% da própria altura). -->
+          <svg class="cam-svg" viewBox="0 0 240 250" preserveAspectRatio="xMidYMid meet" focusable="false">
+            <defs>
+              <filter id="cam-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
+                <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000000" flood-opacity=".06" result="cam-s1"/>
+                <feDropShadow in="cam-s1" dx="0" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity=".08" result="cam-s2"/>
+                <feDropShadow in="cam-s2" dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity=".1"/>
+              </filter>
+              <clipPath id="cam-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
+              <g id="cam-cena-montanha">
+                <rect width="76" height="76" fill="#006194" fill-opacity=".14"/>
+                <circle cx="58" cy="17" r="7" fill="#FD761A"/>
+                <path d="M6 19a3.5 3.5 0 0 1 3.5-3.5a4.5 4.5 0 0 1 8.5-1a3 3 0 0 1 4 3a2.5 2.5 0 0 1-2.5 3H9a3 3 0 0 1-3-1.5z" fill="#FFFFFF" opacity=".85"/>
+                <path d="M0 60L15 32L25 45L39 20L54 46L63 33L76 58V76H0Z" fill="#006194" fill-opacity=".55"/>
+                <path d="M39 20L44 28L40.5 26.5L37 30L35 26Z" fill="#FFFFFF" opacity=".9"/>
+                <path d="M15 32L19 39L16 37.5L13.5 40L11.5 37Z" fill="#FFFFFF" opacity=".8"/>
+                <path d="M0 76V68L10 50L20 63L31 42L45 64L56 48L68 63L76 53V76H0Z" fill="#000000" fill-opacity=".85"/>
+                <rect y="68" width="76" height="8" fill="#000000"/>
+                <path d="M60 64L63 56L66 64Z" fill="#000000"/><path d="M68 67L70.5 60L73 67Z" fill="#000000"/>
+              </g>
+            </defs>
+            <g transform="translate(18 14) scale(.68)">
+            <g id="cam-corpo">
+              <rect x="-1.5" y="-1.5" width="303" height="228" rx="37.5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+              <rect width="300" height="225" rx="36" fill="#FFFFFF"/>
+              <path d="M36 0H264A36 36 0 0 1 300 36V88H0V36A36 36 0 0 1 36 0Z" fill="#000000"/>
+              <rect x="1" y="1" width="298" height="223" rx="35" fill="none" stroke="#000000" stroke-opacity=".12" stroke-width="2"/>
+              <path d="M0 88H300" stroke="#000000" stroke-opacity=".1" stroke-width="2"/>
+              <g id="cam-flash">
+                <rect x="24" y="20" width="80" height="48" rx="10" fill="#F8F9FA"/>
+                <rect x="30" y="26" width="68" height="36" rx="6" fill="#FFFFFF"/>
+                <rect id="cam-flash-luz" x="30" y="26" width="68" height="36" rx="6" fill="#FFFFFF" opacity="0"/>
+                <path d="M38 35H90M38 44H90M38 53H90" fill="none" stroke="#006194" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+                <path d="M52 29V59M76 29V59" fill="none" stroke="#006194" stroke-opacity=".3" stroke-width="1.5"/>
+                <path d="M34 30l10-2" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+              </g>
+              <g id="cam-visor">
+                <rect x="184" y="22" width="54" height="44" rx="9" fill="#F8F9FA"/>
+                <rect x="190" y="28" width="42" height="32" rx="5" fill="#006194"/>
+                <rect x="190" y="28" width="42" height="32" rx="5" fill="#000000" fill-opacity=".35"/>
+                <path d="M196 56L222 32" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>
+                <path d="M203 58L226 37" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".35"/>
+              </g>
+              <circle cx="262" cy="44" r="6" fill="#FD761A"/>
+              <circle cx="260" cy="42" r="1.6" fill="#FFFFFF" opacity=".8"/>
+              <circle cx="140" cy="44" r="3" fill="#FFFFFF" opacity=".5"/>
+              <g id="cam-lente">
+                <circle cx="112" cy="152" r="70" fill="#000000" fill-opacity=".06"/>
+                <circle cx="112" cy="152" r="64" fill="#000000"/>
+                <circle cx="112" cy="152" r="57" fill="#F8F9FA"/>
+                <circle cx="112" cy="152" r="53" fill="#000000"/>
+                <circle cx="112" cy="152" r="47" fill="#006194"/>
+                <circle cx="112" cy="152" r="43" fill="none" stroke="#FFFFFF" stroke-opacity=".25" stroke-width="1.5"/>
+                <circle cx="112" cy="152" r="36" fill="#006194"/>
+                <circle cx="112" cy="152" r="36" fill="#000000" fill-opacity=".25"/>
+                <circle cx="112" cy="152" r="26" fill="#000000"/>
+                <circle cx="112" cy="152" r="14" fill="#006194" fill-opacity=".55"/>
+                <circle cx="112" cy="152" r="7" fill="#000000"/>
+                <path d="M78 178A47 47 0 0 0 146 178" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".35"/>
+                <circle cx="90" cy="128" r="11" fill="#FFFFFF" opacity=".92"/>
+                <circle cx="80" cy="144" r="4" fill="#FFFFFF" opacity=".7"/>
+                <circle cx="138" cy="172" r="5" fill="#FD761A"/>
+                <path d="M112 90v6M112 208v6M50 152h6M168 152h6" stroke="#FFFFFF" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+              </g>
+              <g id="cam-botao">
+                <circle cx="246" cy="130" r="25" fill="#000000" fill-opacity=".08"/>
+                <circle cx="246" cy="130" r="20" fill="#FD761A"/>
+                <path d="M233 124a14 14 0 0 1 14-8" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+              </g>
+              <g fill="#000000" opacity=".85"><rect x="214" y="168" width="64" height="6" rx="3"/><rect x="214" y="180" width="64" height="6" rx="3"/><rect x="214" y="192" width="64" height="6" rx="3"/></g>
+              <circle cx="34" cy="196" r="5" fill="#FD761A"/>
+              <rect x="18" y="106" width="22" height="10" rx="5" fill="#000000" fill-opacity=".85"/>
+            </g>
+            <g id="cam-fenda">
+              <rect x="66" y="212" width="168" height="16" rx="8" fill="#000000"/>
+              <path d="M76 216H224" fill="none" stroke="#F8F9FA" stroke-width="1.5" opacity=".35"/>
+            </g>
+            <g clip-path="url(#cam-clip-fenda)">
+              <!-- anima: cam-foto sai pela fenda, translateY 150 → 255.8 (58% da própria altura) -->
+              <g id="cam-foto" transform="translate(75 255.8)" filter="url(#cam-papel)">
+                <rect width="150" height="182.38" rx="3" fill="#FFFFFF"/>
+                <rect x=".5" y=".5" width="149" height="181.38" rx="3" fill="none" stroke="#000000" stroke-opacity=".05"/>
+                <rect x="10.23" y="10.23" width="129.54" height="129.54" fill="#006194" fill-opacity=".08"/>
+                <g transform="translate(10.23 10.23) scale(1.7045)" opacity=".3"><use href="#cam-cena-montanha"/></g>
+                <rect x="10.23" y="10.23" width="129.54" height="129.54" fill="none" stroke="#000000" stroke-opacity=".06"/>
+              </g>
+            </g>
+            </g>
+          </svg>
+        </div>
+      </li>
+
+      <li class="step mov-rise">
+        <span class="step__n" aria-hidden="true">2</span>
+        <div class="step__txt">
+          <h2 class="step__t">Defina o formato e o papel</h2>
+          <p class="step__d">Escolha entre seis formatos de polaroid ou crie um tamanho só seu. O Polar Life conta quantas folhas você vai precisar.</p>
+        </div>
+        <div class="step__arte step__arte--trio" aria-hidden="true">
+          <img class="trio__p trio__p--cidade" src="../assets/img/ilustracoes/polaroid-cidade.svg" width="92" height="112" alt="" loading="lazy">
+          <img class="trio__p trio__p--montanha" src="../assets/img/ilustracoes/polaroid-montanha.svg" width="92" height="112" alt="" loading="lazy">
+          <img class="trio__p trio__p--praia" src="../assets/img/ilustracoes/polaroid-praia.svg" width="92" height="112" alt="" loading="lazy">
+        </div>
+      </li>
+
+      <li class="step mov-rise">
+        <span class="step__n" aria-hidden="true">3</span>
+        <div class="step__txt">
+          <h2 class="step__t">Legende e ajuste</h2>
+          <p class="step__d">Recorte, ajuste a luz e aplique um filtro. Escreva a legenda, a data e o local em fontes feitas para o papel.</p>
+        </div>
+        <div class="step__arte step__arte--pol mov-dev" data-mov="dev" aria-hidden="true">
+          <!-- Polaroid de aniversário · arquivo-fonte: assets/img/ilustracoes/polaroid-aniversario.svg.
+               Embutido para revelar a cena da janela como filme instantâneo (A3). A legenda fica no
+               HTML, sobre a faixa branca (nada sobre a foto · T4). -->
+          <svg class="pol-svg" viewBox="0 0 92 112" preserveAspectRatio="xMidYMid meet" focusable="false">
+            <defs>
+              <filter id="festa-sombra" x="-20%" y="-15%" width="140%" height="132%">
+                <feDropShadow dx="0" dy="1.6" stdDeviation="1.8" flood-color="#000000" flood-opacity=".1"/>
+              </filter>
+              <clipPath id="festa-janela"><rect x="8" y="8" width="76" height="76"/></clipPath>
+            </defs>
+            <g id="festa-moldura" filter="url(#festa-sombra)">
+              <rect x="2" y="2" width="88" height="107" rx="2" fill="#FFFFFF"/>
+              <g clip-path="url(#festa-janela)">
+                <g id="festa-cena" class="mov-cena" transform="translate(8 8)">
+                  <rect width="76" height="76" fill="#006194" fill-opacity=".1"/>
+                  <g id="festa-bandeirinhas">
+                    <path d="M0 8Q19 18 38 11T76 13" fill="none" stroke="#000000" stroke-width="1"/>
+                    <path d="M6 10.5L10 10.5L8 15.5Z" fill="#FD761A"/>
+                    <path d="M15 12.8L19 12.8L17 17.8Z" fill="#FFFFFF"/>
+                    <path d="M24 13.7L28 13.7L26 18.7Z" fill="#000000"/>
+                    <path d="M33 13.2L37 13.2L35 18.2Z" fill="#006194" fill-opacity=".55"/>
+                    <path d="M42 12L46 12L44 17Z" fill="#FD761A"/>
+                    <path d="M51 11.6L55 11.6L53 16.6Z" fill="#FFFFFF"/>
+                    <path d="M60 11.9L64 11.9L62 16.9Z" fill="#000000"/>
+                    <path d="M69 12.5L73 12.5L71 17.5Z" fill="#FD761A"/>
+                  </g>
+                  <g id="festa-balões">
+                    <path d="M65 32L64.5 34H65.5Z" fill="#FD761A"/>
+                    <path d="M65 34C64 38 66 40 65 44" fill="none" stroke="#000000" stroke-width=".8"/>
+                    <circle cx="65" cy="27" r="5" fill="#FD761A"/>
+                    <path d="M71 27L70.5 29H71.5Z" fill="#006194" fill-opacity=".55"/>
+                    <path d="M71 29C70 33 72 35 71 39" fill="none" stroke="#000000" stroke-width=".8"/>
+                    <circle cx="71" cy="22" r="4" fill="#006194" fill-opacity=".55"/>
+                  </g>
+                  <rect y="66" width="76" height="10" fill="#000000" opacity=".92"/>
+                  <ellipse cx="38" cy="64" rx="21" ry="3" fill="#FFFFFF"/>
+                  <rect x="21" y="51" width="34" height="12" rx="2" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+                  <rect x="26" y="42" width="24" height="9" rx="2" fill="#FD761A"/>
+                  <path d="M28 51v2M34 51v2M40 51v2M46 51v2" fill="none" stroke="#FD761A" stroke-width="1.6" stroke-linecap="round"/>
+                  <g fill="#006194" fill-opacity=".55">
+                    <circle cx="30" cy="56" r="1.2"/><circle cx="38" cy="57" r="1.2"/><circle cx="45" cy="55" r="1.2"/>
+                  </g>
+                  <g id="festa-velas">
+                    <g stroke="#000000" stroke-width="1.4">
+                      <path d="M32 42V35"/><path d="M38 42V34"/><path d="M44 42V35"/>
+                    </g>
+                    <g fill="#FD761A">
+                      <path d="M32 34C30.4 32.4 30.4 30.8 32 29.6C33.6 30.8 33.6 32.4 32 34Z"/>
+                      <path d="M38 33C36.2 31.2 36.2 29.2 38 27.8C39.8 29.2 39.8 31.2 38 33Z"/>
+                      <path d="M44 34C42.4 32.4 42.4 30.8 44 29.6C45.6 30.8 45.6 32.4 44 34Z"/>
+                    </g>
+                  </g>
+                  <g fill="#FD761A">
+                    <rect x="7" y="32" width="3" height="3" transform="rotate(20 8.5 33.5)"/>
+                    <rect x="55" y="48" width="2.6" height="2.6" transform="rotate(-15 56.3 49.3)"/>
+                    <rect x="13" y="52" width="2.4" height="2.4" transform="rotate(35 14.2 53.2)"/>
+                  </g>
+                  <g fill="#006194" fill-opacity=".55">
+                    <rect x="51" y="34" width="2.6" height="2.6" transform="rotate(25 52.3 35.3)"/>
+                    <rect x="10" y="43" width="2.2" height="2.2" transform="rotate(-20 11.1 44.1)"/>
+                  </g>
+                  <g fill="#000000">
+                    <rect x="58" y="42" width="2.2" height="2.2" transform="rotate(15 59.1 43.1)"/>
+                    <rect x="17" y="24" width="2.2" height="2.2" transform="rotate(40 18.1 25.1)"/>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <p class="step__leg">Dia de rolê</p>
+        </div>
+      </li>
+
+      <li class="step mov-rise">
+        <span class="step__n" aria-hidden="true">4</span>
+        <div class="step__txt">
+          <h2 class="step__t">Revise e gere o arquivo</h2>
+          <p class="step__d">Uma checagem avisa o que pode sair diferente do esperado. Depois, baixe o PDF e imprima em casa ou na gráfica.</p>
+        </div>
+        <div class="step__arte step__arte--guias" aria-hidden="true">
+          <img class="guia__p" src="../assets/img/ilustracoes/polaroid-viagem.svg" width="92" height="112" alt="" loading="lazy">
+        </div>
+      </li>
     </ol>
 
+    <!-- 4 · nota de privacidade -->
     <div class="note">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
       <p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p>
     </div>
-
-    <div class="cta">
-      <a class="led-btn led-btn--light" href="../app/inicio/">
-        <span class="smoke-layer" aria-hidden="true"></span>
-        <span class="btn-content">Começar agora<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </a>
-    </div>
   </div>
 </div>
+
+<!-- 5 · faixa preta de fechamento (o único LED da T-29) -->
+<section class="faixa faixa--fixa" aria-labelledby="t-fecho">
+  <div class="faixa__pistas">
+    <article class="faixa__slide is-active">
+      <div class="faixa__txt">
+        <p class="faixa__kick"><i aria-hidden="true"></i>Não deixe para depois</p>
+        <h2 class="faixa__tit" id="t-fecho">Seu rolo de câmera está cheio de histórias.</h2>
+        <p class="faixa__apoio">Escolha algumas hoje. Um dia, segurar essas fotos vai significar ainda mais.</p>
+        <p class="faixa__cta">
+          <a class="led-btn led-btn--light" href="../app/inicio/">
+            <span class="smoke-layer" aria-hidden="true"></span>
+            <span class="btn-content">Começar agora<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </p>
+      </div>
+      <img class="faixa__img mov-parallax" src="../assets/img/ilustracoes/banner-design.svg" width="1200" height="500" alt="" loading="lazy">
+    </article>
+  </div>
+</section>
 </main>
 
 <footer class="site-footer"><div class="wrap">
