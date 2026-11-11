@@ -97,7 +97,7 @@ function confirmar(al){
   dialogo();dlgAlvo=al.slice();dlgV=document.activeElement;
   var um=al.length===1;
   $('rem-t').textContent=um?'Remover esta foto do projeto?':'Remover '+al.length+' fotos do projeto?';
-  $('rem-d').textContent=(um?'Ela sai':'Elas saem')+' do Quadro e das folhas. '+(um?'O arquivo continua':'Os arquivos continuam')+' no seu aparelho. Dá para desfazer com Ctrl+Z.';
+  $('rem-d').textContent=(um?'Ela sai':'Elas saem')+' do Quadro, das folhas e do PDF. '+(um?'O arquivo original continua':'Os arquivos originais continuam')+' onde você os guardou. Dá para desfazer com Ctrl+Z.';
   $('rem-sim').lastChild.textContent=um?'Remover esta foto':'Remover '+al.length+' fotos';
   $('rem-scrim').hidden=$('rem-dlg').hidden=false;$('rem-nao').focus()}
 function fecharDlg(semFoco){
@@ -128,7 +128,7 @@ function render(){
   $('est-dup').lastChild.textContent=um?'Duplicar esta foto':'Duplicar '+al.length+' fotos';
   $('est-rem').lastChild.textContent=um?'Remover esta foto':'Remover '+al.length+' fotos';
   $('est-rem').disabled=!cabeRem;
-  $('est-h').lastChild.textContent=cabeRem?'Remover tira do projeto. A foto continua no seu aparelho.':'O projeto precisa ficar com ao menos 1 foto.';
+  $('est-h').lastChild.textContent=cabeRem?'Remover tira do projeto e do PDF. O arquivo original continua com você.':'O projeto precisa ficar com ao menos 1 foto.';
   $('scope-diff').hidden=!d;$('scope-diff').textContent=d;
   var fd=$('flt-dif');
   if(fd){var kf=dif('filtro').length;fd.hidden=!kf;fd.querySelector('span').textContent=kf?'Valores diferentes: '+n(kf,'foto do escopo usa','fotos do escopo usam')+' outro filtro.':''}

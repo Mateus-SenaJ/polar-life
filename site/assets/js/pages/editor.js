@@ -23,7 +23,8 @@ try{var Qd=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
     var fr=Qd[0]&&Qd[0].fr;                              /* formato escolhido na aba Molduras (D-084) */
     if(fr&&fr.w>0&&fr.h>0&&fr.lado>0&&fr.w-2*fr.lado>0){FR.w=fr.w;FR.h=fr.h;FR.lado=fr.lado;FR.topo=fr.topo;FR.jw=fr.w-2*fr.lado;FR.jh=fr.jh>0?fr.jh:FR.jw;FR.rad=fr.rad}
   }}catch(e){LISTA=[];TXT={};META={};EXT={};LG=null}
-if(POCKET&&!LG)LG=PLTEXTO.legPocket(PLTEXTO.LEG0);              /* D-113: sem estado salvo, entra com o padrão do Pocket */
+if(POCKET&&!LG)LG=PLTEXTO.legPocket(PLTEXTO.LEG0);
+if(!LG&&PLTEXTO.ehReal())LG=PLTEXTO.legInicial();   /* D-149 */              /* D-113: sem estado salvo, entra com o padrão do Pocket */
 if(!LISTA.length)try{var _l=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(_l)&&_l.length>=1&&_l.length<=400&&_l.every(function(x){return x>=1&&x<=400&&x%1===0}))LISTA=_l}catch(e){}
 if(!LISTA.length&&!PLTEXTO.ehReal())for(var i=1;i<=24;i++)LISTA.push(i);      /* sem lista: projeto de exemplo (DOC-04 §6); projeto real vazio fica vazio */
 var FOTOS=LISTA.map(function(sr,k){return{n:k+1,src:sr,v:!!VERT[sr],leg:TXT[k+1]!==undefined?TXT[k+1]:(PLTEXTO.ehReal()?'':LEG[(sr-1)%4]),m:META[k+1]||null,pad:EXT[k+1]?EXT[k+1].pad:null,pl:EXT[k+1]?EXT[k+1].pl:null}});
@@ -107,7 +108,7 @@ function polaroid(c,s,px,det){
     var cap,meta,tr='',mls='';
     var LGp=PLTEXTO.comPadrao(LG,c.f);   /* D-139 */
     if(LGp){
-      var DF=dadosFoto(c.f),dtx=LGp._pad?LGp._dt:(LGp.data.on&&DF.d?FMTD[LGp.data.fmt||0](DF.d):''),lcx=LGp._pad?LGp._lc:(LGp.loc.on&&DF.c?localLG(LGp.loc,DF.c):'');
+      var DF=dadosFoto(c.f),dtx=LGp._pad?LGp._dt:(LGp.data.on&&DF.d?PLTEXTO.cxMeta(LGp,FMTD[LGp.data.fmt||0](DF.d)):''),lcx=LGp._pad?LGp._lc:(LGp.loc.on&&DF.c?PLTEXTO.cxMeta(LGp,localLG(LGp.loc,DF.c)):'');   /* D-148 */
       var t=LGp.txt.on?caixaLG(c.f.leg,LGp.txt.caixa):'';
       cap=t?'<span class="pol__cap" style="'+estLG(LGp.txt,0,px,';letter-spacing:'+LGp.txt.esp+'em')+'">'+esc(t)+'</span>':'';
       tr=';transform-origin:left center;transform:translateY('+(LGp.dy||0)*px+'px) rotate('+(LGp.inc||0)+'deg)';
@@ -116,7 +117,7 @@ function polaroid(c,s,px,det){
       var junto=(LGp.meta||'junto')!=='linhas',ordem=LGp.ordem||'data-loc';   /* D-113: juntas ou em linhas separadas */
       if(junto){                                 /* numa linha só: a maior fonte estrutura a linha, igual ao Quadro e ao PDF */
         var par=ordem==='loc-data'?[lE,dE]:[dE,lE];
-        meta=(dtx||lcx)?'<span class="pol__meta" style="font-size:'+Math.max(LGp.data.pt,LGp.loc.pt)*.3528*px+'px">'+par.filter(Boolean).join(dtx&&lcx?' • ':'')+'</span>':''
+        meta=(dtx||lcx)?'<span class="pol__meta" style="font-size:'+Math.max(LGp.data.pt,LGp.loc.pt)*.3528*px+'px">'+par.filter(Boolean).join(dtx&&lcx?PLTEXTO.sepMeta(LGp):'')+'</span>':''
       }else{                                     /* em linhas separadas, cada uma com o próprio corpo (1,2 · igual ao PDF) */
         var rws=(ordem==='loc-data'?[[LGp.loc,lcx],[LGp.data,dtx]]:[[LGp.data,dtx],[LGp.loc,lcx]]).filter(function(r){return r[1]});
         meta=rws.length?'<span class="pol__meta">'+rws.map(function(r){return'<span class="pol__mline" style="'+estLG(r[0],0,px)+'">'+esc(r[1])+'</span>'}).join('')+'</span>':''
@@ -125,7 +126,7 @@ function polaroid(c,s,px,det){
         var LNS=PLTEXTO.linhas(LGp,FR,PLTEXTO.medTela,{temData:!!dtx,temLoc:!!lcx});
         var dX=dtx?'<time datetime="'+DF.iso+'" style="'+estLG(LGp.data,0,px,';line-height:0')+'">'+esc(dtx)+'</time>':'',
             lX=lcx?'<span style="'+estLG(LGp.loc,0,px,';line-height:0')+'">'+esc(lcx)+'</span>':'',
-            sX=(dtx&&lcx)?'<span style="'+estLG({font:'IBM Plex Mono',pt:Math.max(LGp.data.pt,LGp.loc.pt),cor:'preto'},0,px,';line-height:0')+'"> • </span>':'';
+            sX=(dtx&&lcx)?'<span style="'+estLG({font:'IBM Plex Mono',pt:Math.max(LGp.data.pt,LGp.loc.pt),cor:'preto'},0,px,';line-height:0')+'">'+PLTEXTO.sepMeta(LGp)+'</span>':'';
         mls=LNS.map(function(ln){
           var dentro=ln.k==='data'?dX:ln.k==='loc'?lX:(ordem==='loc-data'?lX+sX+dX:dX+sX+lX);
           return'<div class="pol__ml" style="top:'+((ln.top-(FR.topo+FR.jh)-2.2)*px)+'px;'+estLG(ln.est,0,px,';line-height:'+ln.lh+'em')+'">'+dentro+'</div>'
@@ -397,7 +398,6 @@ function painelExtra(id){
   if(id==='tab-ajustes'){var a=q[ids[0]]&&q[ids[0]].adj||{};h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Luz e cor</h3>'+window.PLCTRL.numero('ef-brilho','Brilho',a.brilho||0,-100,100,1,'')+window.PLCTRL.numero('ef-contraste','Contraste',a.contraste||0,-100,100,1,'')+'<div class="f"><label class="f__l" for="ef-filtro">Filtro</label><div class="sel"><select id="ef-filtro"><option value="original">Original</option><option value="pb">Preto e branco</option><option value="retro">Retrô</option><option value="cinema">Cinema</option></select></div></div><p class="f__h">As alterações respeitam ajustes individuais protegidos.</p></section>'}
   if(id==='tab-legendas'){h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Legenda</h3><div class="sw-row"><div><span class="f__l">Sem legendas</span><p class="f__h" id="orig-estado">'+(LG.original?'Ligado · só a foto e a moldura':'Desligado · textos visíveis')+'</p></div><button type="button" class="sw" id="ef-original" role="switch" aria-checked="'+!!LG.original+'" aria-label="Sem legendas"><span></span></button></div><div class="f"><span class="f__l" id="ef-al-l">Alinhamento</span><div class="seg" role="radiogroup" aria-labelledby="ef-al-l" id="ef-al"><label class="seg__o"><input type="radio" name="ef-al" value="esq"><span>Esquerda</span></label><label class="seg__o"><input type="radio" name="ef-al" value="centro"><span>Centro</span></label><label class="seg__o"><input type="radio" name="ef-al" value="dir"><span>Direita</span></label></div><p class="f__h">Sempre abaixo da foto, nas mesmas margens laterais.</p></div></section>'}
   if(id==='tab-molduras')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Formato e estilo das fotos</h3><div class="f"><label class="f__l" for="ef-formato">Moldura</label><div class="sel"><select id="ef-formato"><option value="classico">Polaroid Clássico · 88 × 107 mm</option><option value="mini">Mini quadrado · 60 × 73 mm</option><option value="pocket">Retro Pocket · 66 × 99 mm</option></select></div></div><p class="f__h">A medida da polaroid fica travada; a folha apenas reorganiza.</p></section>';
-  if(id==='tab-metadados')h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Metadados</h3><p class="f__h">Data e cidade são usadas só na legenda. Coordenadas nunca aparecem.</p><a class="btn2" href="quadro/#foto-1">Editar data e cidade no Quadro</a></section>';
   $('painel-extra').innerHTML=h;var se=$('escopo-folhas');se.value=ESCOPO;escopo();
   se.onchange=function(){ESCOPO=this.value;painelExtra(id)};
   var orig=$('ef-original');if(orig)orig.onclick=function(){LG.original=!LG.original;salvarQuadro(quadro());render();painelExtra(id)};

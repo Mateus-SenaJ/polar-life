@@ -17,7 +17,9 @@ var FMTD=[ /* 13 formatos de data (FN-07, DV-05), os mesmos da T-10 */
  function(d){return d.getDate()+' de '+MESX[d.getMonth()]},
  function(d){return MESX[d.getMonth()][0].toUpperCase()+MESX[d.getMonth()].slice(1)+' de '+d.getFullYear()},
  function(d){return MESX[d.getMonth()].slice(0,3)+'/'+String(d.getFullYear()).slice(2)},
- function(d){return SEMX[d.getDay()]+', '+d.getDate()+' de '+MESX[d.getMonth()]}
+ function(d){return SEMX[d.getDay()]+', '+d.getDate()+' de '+MESX[d.getMonth()]},
+ function(d){return MESX[d.getMonth()].slice(0,3)+'/'+d.getFullYear()},   /* 13 · D-148: nov/2026 */
+ function(d){return String(d.getFullYear())}                                     /* 14 · D-148: 2026 */
 ];
 var COR_LG={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 /* Catálogo EXC-2 (DOC-02 §4): 24 fontes, 5 categorias (Nanum Pen Script e Gaegu saíram: sem acentos, D-111). fb = fallback genérico da categoria. */
@@ -27,18 +29,58 @@ var FONTES=[
  ['Caveat','man'],['Reenie Beanie','man'],['Shadows Into Light','man'],['Kalam','man'],['Patrick Hand','man'],['Covered By Your Grace','man'],['Zeyada','man'],['Homemade Apple','man'],['Over the Rainbow','man'],['La Belle Aurore','man'],
  ['Dancing Script','cal'],['Satisfy','cal'],['Sacramento','cal'],['Allura','cal'],['Parisienne','cal'],
  ['Special Elite','dat'],['Courier Prime','dat'],['Cutive Mono','dat'],
- ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],
- ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400]
+ ['Indie Flower','man'],['Handlee','man'],['Amatic SC','man'],   /* D-148: novas manuscritas */
+ ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],['Lora','edi'],['Crimson Pro','edi'],
+ ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400],['Nunito','lim'],['DM Sans','lim']
 ].map(function(f){return{n:f[0],c:f[1],fam:f[2]||f[0],it:!!f[3],w:f[4]||400,css:"'"+(f[2]||f[0])+"',"+FB[f[1]]}});
 function fonte(n){return FONTES.filter(function(f){return f.n===n})[0]||FONTES[0]}
 var FONT_LG={};
 FONTES.forEach(function(f){FONT_LG[f.n]=[f.css,f.it?1:0,f.w]});
 FONT_LG['IBM Plex Mono']=["'IBM Plex Mono',ui-monospace,monospace",0,400];
-function famLG(n){var f=FONT_LG[n];return f?{f:f[0],i:f[1],w:f[2]}:{f:"'"+n+"',cursive",i:0,w:400}}
+/* D-148: variantes que existem como arquivo (site/assets/fonts/ e fonts/pdf/). '700i' = negrito itálico. Nada é sintetizado:
+   a tela e o PDF só usam uma variante que existe; sem ela, o botão fica desabilitado e o resto cai na mais próxima. */
+var VAR={'Inter':['300','400','500'],'Cormorant Garamond':['300','400','500','700','300i','400i','700i'],'Caveat':['400','500','700'],'Kalam':['400','700'],
+ 'Courier Prime':['400','700','400i','700i'],'EB Garamond':['400','700','400i','700i'],'Libre Baskerville':['400','700','400i'],'Playfair Display':['400i'],
+ 'Amatic SC':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
+function temVar(fam,w,i){return(VAR[fam]||['400']).indexOf(w+(i?'i':''))>=0}
+function variante(fam,w,i){                                    /* {w,i} existente mais próximo (mesmo itálico primeiro) */
+  var l=(VAR[fam]||['400']).map(function(v){return{w:parseInt(v,10),i:/i$/.test(v)}}),r=null,d=1e9;
+  [!!i,!i].forEach(function(it){if(r)return;l.forEach(function(v){var x=Math.abs(v.w-w);if(v.i===it&&x<d){d=x;r=v}})});
+  return r||{w:400,i:false}
+}
+function famLG(n,o){                                           /* o = {b,it}: negrito e itálico escolhidos para o texto (D-148) */
+  var f=FONT_LG[n];if(!f)return{f:"'"+n+"',cursive",i:0,w:400};
+  var i=!!f[1]||!!(o&&o.it),w=o&&o.b?700:f[2],v=variante(String(f[0]).split("'")[1],w,i);
+  return{f:f[0],i:v.i?1:0,w:v.w}
+}
+/* UI: o que a família oferece para o texto da legenda (botões Itálico e Negrito) */
+function estilosDe(n,o){
+  var f=FONT_LG[n]||[null,0,400],fam=f[0]?String(f[0]).split("'")[1]:n,bi=!!f[1],b=!!(o&&o.b),i=bi||!!(o&&o.it);
+  return{it:{on:i,ok:!bi&&temVar(fam,b?700:f[2],true),natural:bi},b:{on:b,ok:temVar(fam,700,i)}}
+}
 function caixaLG(t,c){return c==='maiusc'?t.toUpperCase():c==='cap'?t.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase()}):t}
 function estLG(o,mm,px,extra){                               /* só a fonte e a cor; o corpo vem em pt reais (1 pt = 0,3528 mm) */
-  var fm=famLG(o.font);return'font-family:'+fm.f+';font-style:'+(fm.i?'italic':'normal')+';font-weight:'+fm.w+';color:'+(COR_LG[o.cor]||'#000')+';font-size:'+(o.pt*.3528*px)+'px'+(extra||'')
+  var fm=famLG(o.font,o);return'font-family:'+fm.f+';font-style:'+(fm.i?'italic':'normal')+';font-weight:'+fm.w+';color:'+(COR_LG[o.cor]||'#000')+';font-size:'+(o.pt*.3528*px)+'px'+(o.esp!=null?';letter-spacing:'+o.esp+'em':'')+(extra||'')
 }
+/* D-148 · ajustes avançados da legenda (leg.av): fonte única para tela, Folhas e PDF (MT-02).
+   df = formato da data sugerida (índice de FMTD) · lf = formato da localização sugerida · cx = caixa das linhas de data e local ·
+   esp = espaçamento entre letras dessas linhas (em). A inclinação continua em leg.inc (agora de −8° a +8°, passo 1°). */
+var AV0={df:3,lf:'cu',cx:'normal',esp:.02,sep:'•'};   /* sep = separador das duas linhas quando ficam na mesma linha */
+var DATA_AV=[[3,'23/11/26'],[1,'23/11/2026'],[8,'23 nov 2026'],[7,'23 de novembro de 2026'],[13,'nov/2026'],[14,'2026']];
+var LOC_AV=[['cu','Cidade - UF'],['cv','Cidade, UF'],['ce','Cidade · Estado por extenso'],['cp','Cidade, País']];
+var UF_NOME={AC:'Acre',AL:'Alagoas',AM:'Amazonas',AP:'Amapá',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MG:'Minas Gerais',MS:'Mato Grosso do Sul',MT:'Mato Grosso',PA:'Pará',PB:'Paraíba',PE:'Pernambuco',PI:'Piauí',PR:'Paraná',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RO:'Rondônia',RR:'Roraima',RS:'Rio Grande do Sul',SC:'Santa Catarina',SE:'Sergipe',SP:'São Paulo',TO:'Tocantins'};
+function av(leg){var a=(leg&&leg.av)||{},o={},k;for(k in AV0)o[k]=a[k]!=null?a[k]:AV0[k];return o}
+function fmtLocal(r,t){                                         /* r = {cidade,uf,pais}; sem cidade, só o país */
+  if(!r)return'';
+  if(!r.cidade)return r.pais||'';
+  var uf=r.uf||'';
+  if(t==='cv')return r.cidade+(uf?', '+uf:'');
+  if(t==='ce')return r.cidade+(uf?' · '+(UF_NOME[uf]||uf):'');
+  if(t==='cp')return r.cidade+', '+(r.pais||'Brasil');
+  return r.cidade+(uf?' - '+uf:'')
+}
+function sepMeta(leg){return' '+av(leg).sep+' '}
+function cxMeta(leg,t){return(leg&&leg._cx||av(leg).cx)==='maiusc'?String(t||'').toUpperCase():t}   /* caixa das linhas de data e local */
 var LOC0={uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'};
 /* 44: projeto real = fotos escolhidas (pl-fotos) num projeto salvo aberto. O exemplo também grava pl-fotos
    ao passar pelo Quadro, por isso só a lista não basta. Fonte única para tela, Quadro e PDF (MT-02). */
@@ -64,6 +106,7 @@ function copia(o){return JSON.parse(JSON.stringify(o))}
 function legPocket(b){ /* D-113: padrão do Retro Pocket — duas linhas (local e data) ancoradas ao topo das maiúsculas */
   var l=copia(b||LEG0);
   l.txt.on=false;l.meta='linhas';l.ordem='loc-data';l.medida='letras';
+  if(ehReal()){l.pad=padNovo();delete l.ordem}   /* D-149: projeto real = Linha 1 Localização (em cima) e Linha 2 Data */
   l.loc.sep=' - ';l.loc.uf='sigla';l.loc.pais='oculto';l.loc.ocBR=true;
   l.data.fmt=3;
   return l
@@ -104,15 +147,72 @@ function migrar(leg){
    comPadrao devolve uma cópia da legenda em que a linha 1 ocupa o lugar da «data» e a linha 2 o do «local»,
    em linhas separadas, com o corpo de cada linha; _dt e _lc trazem os textos finais. Sem padrão ligado, devolve a própria legenda. */
 var PAD_TIPOS=['loc','data','pt','txt','nenhum'],PAD_PT=[7,8,10,12];
-function padNovo(){return{on:false,l:[{t:'loc',pt:8},{t:'data',pt:8}]}}
-function padLinha(l){var t=l&&PAD_TIPOS.indexOf(l.t)>=0?l.t:'nenhum',pt=l&&PAD_PT.indexOf(l.pt)>=0?l.pt:8;return{t:t,pt:pt}}
-function padTxt(l,p){return l.t==='nenhum'||!p||typeof p.v!=='string'?'':p.v}
+function padNovo(){return{on:true,l:[{t:'loc',pt:8},{t:'data',pt:8}]}}   /* D-149: o modelo de 2 linhas é o padrão do projeto real */
+function legInicial(){                                         /* legenda de um projeto novo: real = 2 linhas (Localização · Data); exemplo = a antiga */
+  var l=copia(LEG0);
+  if(ehReal()){l.meta='linhas';l.pad=padNovo();l.data.font='Courier Prime';l.loc.font='Courier Prime'}   /* mono de máquina de escrever com 400/700/itálicos reais: Itálico e Negrito nascem habilitados */
+  return l
+}
+/* cada linha: tipo (t), corpo (pt, 6 a 40) e, se a pessoa mudou, fonte, cor, negrito (b) e itálico (it); sem eles vale o estilo base de leg.data / leg.loc */
+function padLinha(l){
+  var t=l&&PAD_TIPOS.indexOf(l.t)>=0?l.t:'nenhum',pt=l&&typeof l.pt==='number'&&l.pt>=6&&l.pt<=40?l.pt:8,o={t:t,pt:pt};
+  if(l&&typeof l.font==='string')o.font=l.font;
+  if(l&&COR_LG[l.cor])o.cor=l.cor;
+  if(l&&l.b)o.b=true;
+  if(l&&l.it)o.it=true;
+  return o
+}
+/* migração (real): legenda antiga (texto livre + data + local) vira as 2 linhas equivalentes, com o estilo de cada origem */
+function migrarPad(leg,txts){
+  if(!leg||!leg.data||!leg.loc||(leg.pad&&leg.pad.on))return leg;
+  var t=leg.txt||{},tem=!!(t.on&&txts&&txts.some(function(x){return x})),ord=[];
+  function est(o,k){var r={t:k,pt:o.pt||8,font:o.font,cor:o.cor};if(o.b)r.b=true;if(o.it)r.it=true;return r}
+  if(tem){ord.push(est(t,'txt'));if(leg.loc.on)ord.push(est(leg.loc,'loc'));else if(leg.data.on)ord.push(est(leg.data,'data'))}
+  else{if(leg.loc.on)ord.push(est(leg.loc,'loc'));if(leg.data.on)ord.push(est(leg.data,'data'))}
+  while(ord.length<2)ord.push({t:'nenhum',pt:8});
+  leg.pad={on:true,l:ord.slice(0,2)};
+  if(!leg.meta)leg.meta='linhas';
+  return leg
+}
+function apaDe(m){return m&&(m.iso!==undefined?m:null)}
+/* texto de uma linha: o guardado (pl) ou, sem ele, o que dá para derivar da foto (só projeto real e com «Sugestões de legendas» ligadas) */
+function linhaTexto(leg,l,i,f){
+  if(l.t==='nenhum')return'';
+  var p=f&&f.pl&&f.pl[i];
+  if(p&&typeof p.v==='string')return p.v;
+  if(!ehReal())return'';
+  if(l.t==='txt'){var s=f&&(f.leg!=null?f.leg:f.txt);return typeof s==='string'?s:''}
+  if(leg.sug===false)return'';
+  var m=f&&(f.m||(f.meta&&apaDe(f.meta)));if(!m)return'';
+  if(l.t==='data'){var a=String(m.iso||'').match(/^(\d+)-(\d+)-(\d+)/);return a?FMTD[av(leg).df](new Date(+a[1],+a[2]-1,+a[3])):''}
+  if(l.t==='loc')return m.c||'';
+  return''
+}
+function comAv(c){                                              /* D-148: espaçamento e caixa das linhas de data e local */
+  if(!c||!c.data||!c.loc)return c;
+  var a=av(c);c.data.esp=a.esp;c.loc.esp=a.esp;c._cx=a.cx;return c
+}
 function comPadrao(leg,f){
-  if(!leg||!leg.pad||!leg.pad.on||!leg.data||!leg.loc)return leg;
-  var pd=f&&f.pad&&f.pad.l?f.pad:leg.pad,a=padLinha(pd.l&&pd.l[0]),b=padLinha(pd.l&&pd.l[1]),pl=(f&&f.pl)||[],c=copia(leg);
-  c.meta='linhas';c.ordem='data-loc';c.data.on=true;c.loc.on=true;c.data.pt=a.pt;c.loc.pt=b.pt;
+  if(!leg||!leg.data||!leg.loc)return leg;
+  if(ehReal()&&!(leg.pad&&leg.pad.on))leg=migrarPad(copia(leg),f&&[f.leg!=null?f.leg:f.txt]);   /* projeto real: sempre 2 linhas */
+  var a0=av(leg),padrao=a0.esp===AV0.esp&&a0.cx===AV0.cx;
+  if(!leg.pad||!leg.pad.on)return padrao&&leg.data.esp==null?leg:comAv(copia(leg));
+  return comAv(comPadrao0(leg,f))
+}
+function aplicaEst(dst,L){
+  if(L.font)dst.font=L.font;
+  if(L.cor)dst.cor=L.cor;
+  if(L.b)dst.b=true;else delete dst.b;
+  if(L.it)dst.it=true;else delete dst.it
+}
+function comPadrao0(leg,f){
+  var pd=f&&f.pad&&f.pad.l?f.pad:leg.pad,a=padLinha(pd.l&&pd.l[0]),b=padLinha(pd.l&&pd.l[1]),c=copia(leg);
+  c.meta=leg.meta||'linhas';c.ordem=leg.ordem||'data-loc';c.data.on=true;c.loc.on=true;c.data.pt=a.pt;c.loc.pt=b.pt;
+  aplicaEst(c.data,a);aplicaEst(c.loc,b);
+  c.txt.on=false;                                                /* D-149: não há mais legenda separada; o texto livre é uma das duas linhas */
   if(c.preset==='calendario'||c.preset==='pin')c.preset='simples';
-  c._pad=true;c._dt=padTxt(a,pl[0]);c._lc=padTxt(b,pl[1]);
+  c._pad=true;c._dt=linhaTexto(leg,a,0,f);c._lc=linhaTexto(leg,b,1,f);
+  c._dt=cxMeta(c,c._dt);c._lc=cxMeta(c,c._lc);
   return c
 }
 /* ---------- medição na tela: métricas por fonte (1 medida por combinação; LG-04) ---------- */
@@ -170,5 +270,5 @@ function linhas(leg,fr,medir,opts){
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,cxMeta:cxMeta,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

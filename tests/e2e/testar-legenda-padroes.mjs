@@ -84,9 +84,9 @@ try {
   ok(ordem.join() === 'original,sug', 'a ordem dos interruptores é original, sug (' + ordem + ')');
   ok((await p.getAttribute('[data-sw=sug]', 'aria-checked')) === 'true', 'vem ligado');
 
-  titulo('Padrão de 2 linhas: localização + data a partir do EXIF:');
+  titulo('D-149 · modelo de 2 linhas já ligado: localização + data a partir do EXIF:');
   await abrirAv(p);
-  await p.click('[data-sw=padon]');
+  ok(await p.locator('[data-sw=padon]').count() === 0, 'não há o interruptor «Padrão de 2 linhas»');
   await esperaPl(p, 1, 0, 'Salvador - BA'); await esperaPl(p, 1, 1, '23/11/26');
   await esperaPl(p, 2, 1, '24/11/26');
   let s3 = await st(p, 3);
@@ -96,10 +96,12 @@ try {
   ok(lq.join('|') === 'Salvador - BA|23/11/26', 'Quadro: «Salvador - BA» e «23/11/26» (' + lq + ')');
   const tipos = await p.evaluate(() => [document.getElementById('pad-t-0').value, document.getElementById('pad-t-1').value]);
   ok(tipos[0] === 'loc' && tipos[1] === 'data', 'padrão inicial: linha 1 Localização, linha 2 Data');
-  ok(await p.evaluate(() => !document.getElementById('lm2') && !document.getElementById('lm3')), 'Data e Local antigos saem do painel (sem controle repetido)');
+  ok(await p.evaluate(() => !document.getElementById('lm2') && !document.getElementById('lm3') && !document.getElementById('lm1')), 'não há seções separadas Texto livre, Data e Local');
+  ok(await p.evaluate(() => document.querySelectorAll('[data-lk="ln.pt"]').length === 1 && document.querySelectorAll('#cap-meta, #p-legendas .fsel').length >= 1 && document.querySelectorAll('.fsel').length === 1), 'um único conjunto de Fonte, Tamanho e Cor');
 
   titulo('Tamanho por linha:');
-  await p.click('input[name="pad-p-0"][value="12"]');
+  await p.click('label.seg__o:has(input[name=alvo][value="0"])');
+  await p.evaluate(() => { const r = document.getElementById('r-ln.pt'); r.value = 12; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await p.waitForTimeout(300);
   const tam = await p.evaluate(() => [document.querySelector('#cap-meta .lg-dt'), document.querySelector('#cap-meta .lg-lc')].map(e => parseFloat(getComputedStyle(e).fontSize)));
   ok(tam[0] > tam[1], 'a linha 1 (12) fica maior que a linha 2 (8): ' + tam);
@@ -114,16 +116,17 @@ try {
   const pdf = await pdfTxt(p);
   ok(pdf.includes('Salvador - BA') && pdf.includes('23/11/26') && pdf.includes('24/11/26'), 'PDF: ' + JSON.stringify(pdf));
 
-  titulo('Exceção por foto (padrão próprio) sem afetar as outras:');
+  titulo('O tipo da linha vale para o projeto; o texto é de cada foto:');
   await abrirQuadro(p, 2);
   await abrirAv(p);
-  await p.click('label.chk:has(#pad-own)');
   await p.selectOption('#pad-t-0', 'pt');
   await esperaPl(p, 2, 0, 'Praia de Itapuã');
   const a1 = await st(p, 1), a2 = await st(p, 2);
-  ok(a2.pad && a2.pad.l[0].t === 'pt', 'a foto 2 tem padrão próprio (ponto turístico)');
-  ok(!a1.pad && a1.pl[0].v === 'Salvador - BA', 'a foto 1 não mudou');
+  ok(a1.pad === null && a2.pad === null, 'nenhuma foto tem padrão próprio');
+  ok((await p.evaluate(() => PLQ.ST()[0].leg.pad.l[0].t)) === 'pt', 'o tipo da linha 1 é do projeto (ponto turístico)');
   ok((await linhasQuadro(p))[0] === 'Praia de Itapuã', 'Quadro foto 2: «Praia de Itapuã»');
+  await p.selectOption('#pad-t-0', 'loc');
+  await esperaPl(p, 2, 0, 'Salvador - BA'); await esperaPl(p, 1, 0, 'Salvador - BA');
 
   titulo('Texto manual preservado ao reaplicar; Restaurar sugestão:');
   await abrirQuadro(p, 1);
@@ -131,21 +134,21 @@ try {
   await p.fill('#pl-in-0', 'Meu cantinho');
   await p.waitForTimeout(300);
   ok((await st(p, 1)).pl[0].m === true, 'digitar marca a linha como manual');
-  await p.click('#pad-todas');
-  await esperaPl(p, 2, 0, 'Salvador - BA');
+  await p.selectOption('#av-lf', 'cv');
+  await esperaPl(p, 2, 0, 'Salvador, BA');
   s3 = await st(p, 1);
-  ok(s3.pl[0].v === 'Meu cantinho' && s3.pl[0].m === true, 'reaplicar não sobrescreve o texto manual');
-  ok((await st(p, 2)).pad === null, '«Aplicar a todas» limpa as exceções');
+  ok(s3.pl[0].v === 'Meu cantinho' && s3.pl[0].m === true, 'reaplicar (novo formato) não sobrescreve o texto manual');
   await p.click('[data-restaurar="0"]');
-  await esperaPl(p, 1, 0, 'Salvador - BA');
+  await esperaPl(p, 1, 0, 'Salvador, BA');
   ok((await st(p, 1)).pl[0].m === false, 'Restaurar sugestão volta ao valor da foto');
+  await p.selectOption('#av-lf', 'cu'); await esperaPl(p, 1, 0, 'Salvador - BA');
 
   titulo('Autocomplete «Cidade - UF»:');
   await p.fill('#pl-in-0', 'bom jes');
   await p.waitForFunction(() => document.querySelectorAll('#pl-dl-0 option').length > 0);
   const ops = await p.evaluate(() => [].map.call(document.querySelectorAll('#pl-dl-0 option'), o => o.value));
   ok(ops.includes('Bom Jesus - RS') && ops.every(o => /^.+ - [A-Z]{2}$/.test(o)), 'sugere «Bom Jesus - RS» etc. (' + ops.slice(0, 3) + ')');
-  await p.click('[data-restaurar="0"]'); await esperaPl(p, 1, 0, 'Salvador - BA');
+  await p.selectOption('#pad-t-0', 'loc'); await p.fill('#pl-in-0', ''); await p.waitForTimeout(200); await p.click('[data-restaurar="0"]'); await esperaPl(p, 1, 0, 'Salvador - BA');
 
   titulo('«Sugestões de legendas» desligado: nada é preenchido; o que existe não some:');
   const antes = await st(p, 2);
@@ -155,11 +158,9 @@ try {
   ok(JSON.stringify((await st(p, 2)).pl) === JSON.stringify(antes.pl), 'textos existentes continuam');
   await p.fill('#pl-in-0', 'itacar'); await p.waitForTimeout(500);
   ok(await p.evaluate(() => ![].some.call(document.querySelectorAll('#pl-dl-0 option'), o => o.value === 'Itacaré - BA')), 'sem novo autocomplete');
-  await p.fill('#pl-in-0', 'Salvador - BA'); await p.waitForTimeout(200);
-  await abrirQuadro(p, 2); await abrirAv(p);
-  await p.click('label.chk:has(#pad-own)'); await p.selectOption('#pad-t-0', 'pt'); await p.waitForTimeout(800);
-  ok(JSON.stringify((await st(p, 2)).pl) === JSON.stringify(antes.pl), 'trocar o tipo da linha não pré-preenche');
-  await p.click('label.chk:has(#pad-own)'); await p.waitForTimeout(500);
+  await p.selectOption('#pad-t-0', 'pt'); await p.waitForTimeout(800);
+  ok((await st(p, 2)).pl[0].v === '', 'trocar o tipo da linha não pré-preenche (o texto antigo era do tipo anterior)');
+  await p.selectOption('#pad-t-0', 'loc'); await p.fill('#pl-in-0', 'Salvador - BA'); await p.waitForTimeout(300);
 
   titulo('«Sem legendas» desabilita o interruptor de sugestões:');
   await p.click('[data-sw=original]'); await p.waitForTimeout(300);

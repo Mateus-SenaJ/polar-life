@@ -118,6 +118,7 @@ function tem(src,mini){                /* URL já pronta (síncrono) */
   return ''
 }
 function falhou(src){return !!FALHOU[Number(src)]}
+function esquecerFalha(src){delete FALHOU[Number(src)];delete PROM[Number(src)];delete PMINI[Number(src)]}   /* D-149: a foto voltou (Desfazer) */
 function html(u,vin,encaixe){
   if(!u)return '';
   var s='display:block;width:100%;height:100%'+(encaixe==='cover'?';object-fit:cover':'');
@@ -131,6 +132,9 @@ function estilo(dim,s,q){              /* recorte na tela: a mesma conta do PDF 
   var a=1/e.w,b=1/(q*e.h),base=modo==='encaixar'?Math.min(a,b):Math.max(a,b);
   var k=base*z/100;
   return 'width:'+d.w*k*100+'%;height:'+d.h*k*q*100+'%;left:'+(50+((S.px||0)+(S.ex||0))*100)+'%;top:'+(50+((S.py||0)+(S.ey||0))*100)+'%;transform:translate(-50%,-50%) rotate('+(S.ang||0)+'deg) scaleX('+(S.flip?-1:1)+') rotate('+rot+'deg)'
+}
+function deslocar(est,tx,ty){          /* D-149: o arrasto acrescenta um deslocamento em px ao estilo do início do gesto (só transform) */
+  return est.replace('transform:translate(-50%,-50%)','transform:translate('+tx+'px,'+ty+'px) translate(-50%,-50%)')
 }
 function ajustou(s){                   /* a foto tem ajuste próprio? */
   var a=(s&&s.adj)||{},f=s&&s.flt,k;
@@ -163,6 +167,6 @@ var LIMPOU=false;
 window.addEventListener('pagehide',function(){LIMPOU=true;limpar()});
 window.addEventListener('pageshow',function(e){if(e.persisted&&LIMPOU){LIMPOU=false;location.reload()}});
 
-window.PLFOTOTELA={LADO_MINI:LADO_MINI,MAX_CHEIAS:MAX_CHEIAS,url:url,mini:mini,tem:tem,falhou:falhou,html:html,estilo:estilo,
+window.PLFOTOTELA={LADO_MINI:LADO_MINI,MAX_CHEIAS:MAX_CHEIAS,url:url,mini:mini,tem:tem,falhou:falhou,esquecerFalha:esquecerFalha,html:html,estilo:estilo,deslocar:deslocar,
   ID:ID,mat:mat,FILTROS:FILTROS,por:por,lerp:lerp,ajustou:ajustou,filtro:filtro,manter:manter,limpar:limpar,ativos:ativos};
 })();

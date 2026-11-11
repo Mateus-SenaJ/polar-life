@@ -3,7 +3,7 @@
 // e grava duas cópias: .woff2 para o site (site/assets/fonts/) e .ttf para embutir no PDF (site/assets/fonts/pdf/).
 // Também confere a acentuação do DOC-02 §4 (á ã ç é ê í ó õ ú) e junta as licenças em LICENCAS.txt.
 // Uso (precisa de rede; só quem atualiza as fontes roda): npm run fontes
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import subsetFont from 'subset-font';
 import * as fontkit from 'fontkit';
@@ -25,6 +25,24 @@ const LISTA = [
   ['Dancing Script', 400], ['Satisfy', 400], ['Sacramento', 400], ['Allura', 400], ['Parisienne', 400],
   ['Special Elite', 400], ['Courier Prime', 400], ['Cutive Mono', 400],
   ['Playfair Display', 400, 1], ['EB Garamond', 400], ['Libre Baskerville', 400],
+  // D-148: negrito e itálico reais (a legenda é conteúdo da pessoa; o peso 500 da T1 vale para a interface, D-148)
+  ['Caveat', 700], ['Kalam', 700], ['Courier Prime', 700], ['Courier Prime', 400, 1], ['Courier Prime', 700, 1],
+  ['Cormorant Garamond', 700], ['Cormorant Garamond', 700, 1],
+  ['EB Garamond', 400, 1], ['EB Garamond', 700], ['EB Garamond', 700, 1],
+  ['Libre Baskerville', 400, 1], ['Libre Baskerville', 700],
+];
+// D-148: famílias novas, baixadas do repositório google/fonts no GitHub (OFL). [família, pasta, arquivo, peso, itálico, eixos fixos]
+// Fontes variáveis são fixadas em um peso por subset-font (variationAxes), então cada variante vira um TTF/WOFF2 estático.
+const GH = [
+  ['Indie Flower', 'indieflower', 'IndieFlower-Regular.ttf', 400, 0],
+  ['Handlee', 'handlee', 'Handlee-Regular.ttf', 400, 0],
+  ['Amatic SC', 'amaticsc', 'AmaticSC-Regular.ttf', 400, 0], ['Amatic SC', 'amaticsc', 'AmaticSC-Bold.ttf', 700, 0],
+  ...[[400, 0], [700, 0], [400, 1], [700, 1]].flatMap(([w, i]) => [
+    ['Lora', 'lora', i ? 'Lora-Italic[wght].ttf' : 'Lora[wght].ttf', w, i, { wght: w }],
+    ['Crimson Pro', 'crimsonpro', i ? 'CrimsonPro-Italic[wght].ttf' : 'CrimsonPro[wght].ttf', w, i, { wght: w }],
+    ['Nunito', 'nunito', i ? 'Nunito-Italic[wght].ttf' : 'Nunito[wght].ttf', w, i, { wght: w }],
+    ['DM Sans', 'dmsans', i ? 'DMSans-Italic[opsz,wght].ttf' : 'DMSans[opsz,wght].ttf', w, i, { wght: w, opsz: 14 }],
+  ]),
 ];
 const WEB_PULA = new Set(['inter-400', 'inter-500']);           // o site segue com os .woff atuais
 
@@ -39,24 +57,37 @@ const nome = (f, w, it) => `${slug(f)}-${w}${it ? '-italico' : ''}`;
 const baixar = async (u, tipo = 'buffer') => { const r = await fetch(u); if (!r.ok) throw new Error(`${r.status} ${u}`); return tipo === 'text' ? r.text() : Buffer.from(await r.arrayBuffer()); };
 
 const relatorio = [], faltam = [];
+const FORCAR = process.argv.includes('--forcar');
+const dirDe = f => f.toLowerCase().replace(/ /g, '');
+async function gravar(fam, w, it, ttf, n, axes) {
+  const opt = axes ? { variationAxes: axes } : {};
+  const sub = await subsetFont(ttf, TEXTO, { targetFormat: 'truetype', ...opt });
+  writeFileSync(PDF + n + '.ttf', sub);
+  if (!WEB_PULA.has(n)) writeFileSync(FONTS + n + '.woff2', await subsetFont(ttf, TEXTO, { targetFormat: 'woff2', ...opt }));
+  const fk = fontkit.create(sub), sem = [...ACENTOS].filter(c => !fk.hasGlyphForCodePoint(c.codePointAt(0)));
+  if (sem.length) faltam.push(`${fam} ${w}${it ? ' itálico' : ''}: ${sem.join(' ')}`);
+  relatorio.push(`${n.padEnd(34)} ${(sub.length / 1024).toFixed(0).padStart(4)} KB (pdf) ${existsSync(FONTS + n + '.woff2') ? (statSync(FONTS + n + '.woff2').size / 1024).toFixed(0).padStart(4) + ' KB (woff2)' : ''}`);
+}
+for (const [fam, pasta, arq, w, it, axes] of GH) {
+  const n = nome(fam, w, it);
+  if (!FORCAR && existsSync(PDF + n + '.ttf') && existsSync(FONTS + n + '.woff2')) continue;
+  const ttf = await baixar(`https://raw.githubusercontent.com/google/fonts/main/ofl/${pasta}/${encodeURIComponent(arq)}`);
+  await gravar(fam, w, it, ttf, n, axes);
+}
 for (const [fam, w, it] of LISTA) {
   const n = nome(fam, w, it);
+  if (!FORCAR && existsSync(PDF + n + '.ttf') && (WEB_PULA.has(n) || existsSync(FONTS + n + '.woff2'))) continue;
   const css = await baixar(`https://fonts.googleapis.com/css2?family=${fam.replace(/ /g, '+')}:ital,wght@${it ? 1 : 0},${w}&display=swap`, 'text');
   const url = (css.match(/url\((https:[^)]+\.ttf)\)/) || [])[1];
   if (!url) throw new Error(`Sem TTF para ${n}`);
   const ttf = await baixar(url);
-  const sub = await subsetFont(ttf, TEXTO, { targetFormat: 'truetype' });
-  writeFileSync(PDF + n + '.ttf', sub);
-  if (!WEB_PULA.has(n)) writeFileSync(FONTS + n + '.woff2', await subsetFont(ttf, TEXTO, { targetFormat: 'woff2' }));
-  const fk = fontkit.create(sub), sem = [...ACENTOS].filter(c => !fk.hasGlyphForCodePoint(c.codePointAt(0)));
-  if (sem.length) faltam.push(`${fam} ${w}${it ? ' itálico' : ''}: ${sem.join(' ')}`);
-  relatorio.push(`${n.padEnd(34)} ${(sub.length / 1024).toFixed(0).padStart(4)} KB (pdf)`);
+  await gravar(fam, w, it, ttf, n);
 }
 
 // Licenças (OFL 1.1 ou Apache 2.0), lidas do repositório oficial google/fonts.
 let lic = 'Licenças das fontes autohospedadas do Polar Life (subconjunto latino + pt-BR).\n' +
   'Fonte original: Google Fonts (https://fonts.google.com) e repositório google/fonts.\n';
-for (const fam of [...new Set(LISTA.map(f => f[0]))]) {
+for (const fam of [...new Set([...LISTA.map(f => f[0]), ...GH.map(f => f[0])])]) {
   const d = fam.toLowerCase().replace(/ /g, '');
   let txt = null, tipo = '';
   for (const [pasta, arq, t] of [['ofl', 'OFL.txt', 'SIL Open Font License 1.1'], ['apache', 'LICENSE.txt', 'Apache License 2.0'], ['ufl', 'UFL.txt', 'Ubuntu Font Licence']]) {

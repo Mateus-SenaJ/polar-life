@@ -75,3 +75,11 @@
 
 @media (max-width:767.98px){.presets{grid-template-columns:repeat(2,1fr)}.fsel__n{display:none}}
 @media (max-width:480px){.fcat,.fitem__n{font-size:16px}}
+
+/* D-149: colunas com espaço consistente entre campos (Linhas e Avançado) */
+.lg-col{display:grid;gap:16px}
+.lg-col[hidden]{display:none}
+.f__h:empty{display:none}
+.est-b{min-width:0}
+.lg-ln{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:8px}
+@media (max-width:420px){.lg-ln{grid-template-columns:1fr}}

@@ -16,5 +16,16 @@ function todos(){return tx('fotos','readonly',function(s){return pedido(s.getAll
 function limpar(){return tx('fotos','readwrite',function(s){s.clear()})}function limparArquivos(){return tx('arquivos','readwrite',function(s){s.clear()})}
 function guardarArquivos(k,lista){return limparArquivos().then(function(){return tx('arquivos','readwrite',function(s){lista.forEach(function(a){s.put({bytes:a.bytes,tipo:a.tipo||'application/pdf',k:k},a.nome)})})})}
 function lerArquivos(k){return tx('arquivos','readonly',function(s){var r=s.getAll(),q=s.getAllKeys();return new Promise(function(ok,no){var a=null,b=null;function fim(){if(a&&b)ok(a.map(function(v,i){v.nome=b[i];return v}).filter(function(v){return v.k===k}))}r.onsuccess=function(){a=r.result||[];fim()};q.onsuccess=function(){b=q.result||[];fim()};r.onerror=q.onerror=function(){no(r.error||q.error)}})})}
-window.PLFOTOS={abrirDB:abrirDB,salvar:salvar,salvarProjeto:salvarProjeto,ler:ler,limpar:limpar,todos:todos,limparArquivos:limparArquivos,guardarArquivos:guardarArquivos,lerArquivos:lerArquivos};
+/* D-149: excluir uma foto apaga só a cópia dela (lojas fotos e fotosProjeto, chave do projeto atual) e devolve os registros, para o Desfazer. */
+function removerFoto(src,pid){return abrirDB().then(function(db){return new Promise(function(ok,no){
+  var t=db.transaction(pid?['fotos','fotosProjeto']:['fotos'],'readwrite'),a=t.objectStore('fotos'),r={fotos:null,proj:null},g=a.get(Number(src));
+  g.onsuccess=function(){r.fotos=g.result||null;a.delete(Number(src))};
+  if(pid){var b=t.objectStore('fotosProjeto'),k=String(pid)+':'+Number(src),g2=b.get(k);g2.onsuccess=function(){r.proj=g2.result||null;b.delete(k)}}
+  t.oncomplete=function(){db.close();ok(r)};t.onerror=function(){db.close();no(t.error)}})})}
+function restaurarFoto(src,pid,r){return abrirDB().then(function(db){return new Promise(function(ok,no){
+  var t=db.transaction(pid?['fotos','fotosProjeto']:['fotos'],'readwrite');
+  if(r&&r.fotos)t.objectStore('fotos').put(r.fotos,Number(src));
+  if(pid&&r&&r.proj)t.objectStore('fotosProjeto').put(r.proj,String(pid)+':'+Number(src));
+  t.oncomplete=function(){db.close();ok()};t.onerror=function(){db.close();no(t.error)}})})}
+window.PLFOTOS={removerFoto:removerFoto,restaurarFoto:restaurarFoto,abrirDB:abrirDB,salvar:salvar,salvarProjeto:salvarProjeto,ler:ler,limpar:limpar,todos:todos,limparArquivos:limparArquivos,guardarArquivos:guardarArquivos,lerArquivos:lerArquivos};
 })();

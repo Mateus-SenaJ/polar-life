@@ -17,6 +17,11 @@ async function ctxNovo() {
   await c.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   return c;
 }
+async function abrirMeta(p) {   // D-148: a aba Metadados saiu; data e cidade vivem em Legendas › Avançado
+  await p.click('#tab-legendas'); await p.waitForSelector('#lg-av-t');
+  if (await p.locator('#lg-av').isHidden()) await p.click('#lg-av-t');
+  await p.waitForSelector('#md-c');
+}
 async function criar(p, nome, datas, pocket) {
   await p.goto(srv.url + 'app/adicionar-fotos/');
   await p.waitForFunction(() => !!window.PLFOTOS && !!window.PLPROJETOS && !!window.PLSESSAO);
@@ -82,6 +87,7 @@ const polFolhas = p => p.evaluate(() => [].map.call(document.querySelectorAll('#
   cap: (e.querySelector('.pol__cap') || {}).textContent || '',
   meta: (e.querySelector('.pol__meta') || {}).textContent || '',
   ml: [].map.call(e.querySelectorAll('.pol__ml'), m => m.textContent),
+  lin: [].map.call(e.querySelectorAll('.pol__mline'), m => m.textContent),
   foot: (document.querySelector('.sheet__foot') || {}).textContent || ''
 })));
 
@@ -98,32 +104,33 @@ try {
   const q0 = await capQuadro(p);
   ok(q0.cap === '', 'a legenda da foto 1 fica vazia no Quadro («' + q0.cap + '»)');
   await p.click('#tab-legendas');
-  await p.waitForSelector('#lg-in');
-  ok((await p.inputValue('#lg-in')) === '', 'o campo «Texto desta foto» vem vazio');
+  await p.waitForSelector('#pl-in-0');
+  ok(await p.locator('#lg-in').count() === 0, 'D-149: não há mais a seção «Texto livre» separada');
+  ok((await p.inputValue('#pl-in-0')) === '' && (await p.inputValue('#pl-in-1')) === '09/03/25', 'Linha 1 (Localização) vem vazia e Linha 2 (Data) vem com 09/03/25');
   await p.click('#fnext'); await p.waitForTimeout(250);
   const q1 = await capQuadro(p);
-  ok(q1.cap === '' && (await p.inputValue('#lg-in')) === '', 'a foto 2 também fica sem legenda de exemplo');
+  ok(q1.cap === '' && (await p.inputValue('#pl-in-0')) === '', 'a foto 2 também fica sem legenda de exemplo');
   await p.click('#fprev'); await p.waitForTimeout(250);
 
   titulo('L1 · o texto digitado vale só para a foto:');
   await p.click('#tab-legendas');
-  await p.waitForSelector('#lg-in');
-  await p.fill('#lg-in', 'Praia do Forte');
+  await p.waitForSelector('#pl-in-0');
+  await p.selectOption('#pad-t-0', 'txt'); await p.waitForTimeout(300);
+  await p.fill('#pl-in-0', 'Praia do Forte');
   await p.waitForTimeout(300);
-  const comTexto = await capQuadro(p);
-  ok(comTexto.cap === 'Praia do Forte', 'a foto 1 mostra o texto digitado (' + comTexto.cap + ')');
+  const comTexto = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent));
+  ok(comTexto[0] === 'Praia do Forte', 'a foto 1 mostra o texto digitado na Linha 1 (' + comTexto + ')');
   await p.click('#fnext'); await p.waitForTimeout(250);
-  const outra = await capQuadro(p);
-  ok(outra.cap === '', 'a foto 2 continua sem legenda');
+  const outra = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent));
+  ok(!outra.includes('Praia do Forte'), 'a foto 2 continua sem esse texto (' + outra + ')');
   await p.click('#fprev'); await p.waitForTimeout(250);
 
   titulo('L2 · metadados editados persistem:');
-  await p.click('#tab-metadados');
-  await p.waitForSelector('#md-c');
-  const painel = await p.evaluate(() => document.getElementById('md-rd').innerText.replace(/\n+/g, ' | '));
+  await p.selectOption('#pad-t-0', 'loc'); await p.waitForTimeout(400);
+  await abrirMeta(p);
+  const painel = await p.evaluate(() => document.getElementById('md-info').innerText);
   ok(/09\.03\.25 · 10:11/.test(painel), 'o painel mostra a data da foto (' + painel.slice(0, 40) + ')');
-  ok(/Data da foto \(EXIF\)/.test(painel), 'o painel diz «Data da foto (EXIF)»');
-  ok(/Origem \| Do aparelho/.test(painel), 'a origem é «Do aparelho»');
+  ok(/data lida da foto/.test(painel), 'o painel diz que a data foi lida da foto');
   ok(!/undefined/.test(painel), 'o painel não mostra «undefined»');
   ok((await p.inputValue('#md-d')) === '09/03/2025', 'o campo Data vem com 09/03/2025');
   await p.fill('#md-c', 'Recife'); await p.dispatchEvent('#md-c', 'change');
@@ -140,23 +147,21 @@ try {
   const recarregado = await capQuadro(p);
   ok(recarregado.meta1.c === 'Recife', 'recarregar mantém a cidade (' + recarregado.meta1.c + ')');
   ok(String(recarregado.meta1.iso).indexOf('2025-03-09') === 0, 'recarregar mantém a data (' + recarregado.meta1.iso + ')');
-  ok(/Recife/.test(recarregado.meta) && /09\.03\.25/.test(recarregado.meta), 'a legenda mostra a data e «Recife» (' + recarregado.meta + ')');
-  ok(!/SP/.test(recarregado.meta), 'a legenda não inventa o estado («' + recarregado.meta + '»)');
+  ok(/Recife - PE/.test(recarregado.meta) && /09\/03\/25/.test(recarregado.meta), 'a legenda mostra «Recife - PE» e a data (' + recarregado.meta + ')');
 
   titulo('L4 · o local é exatamente o texto digitado (D-138):');
   await p.goto(srv.url + 'app/editor/');
   await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length === 4);
   await p.waitForTimeout(900);
   let pols = await polFolhas(p);
-  ok(pols[0].meta === '09.03.25 • Recife', 'nas Folhas o local é «Recife» (' + pols[0].meta + ')');
+  ok(pols[0].lin.join('|') === 'Recife - PE|09/03/25', 'nas Folhas as duas linhas são «Recife - PE» e «09/03/25» (' + pols[0].lin + ')');
   ok(!/SP/.test(pols.map(x => x.meta).join('|')), 'nenhum «SP» nas Folhas');
   const info = await pdfInfo(p);
   ok(info.fotos[0].m.c === 'Recife', 'o PDF lê a cidade digitada');
-  ok(info.txt.some(t => t === 'Recife'), 'o PDF escreve «Recife» (' + JSON.stringify(info.txt) + ')');
+  ok(info.txt.some(t => t === 'Recife - PE'), 'o PDF escreve «Recife - PE» (' + JSON.stringify(info.txt) + ')');
   ok(!info.txt.some(t => /SP/.test(t)), 'o PDF não acrescenta estado');
-  ok(info.txt.some(t => t === '09.03.25'), 'o PDF escreve a data (' + JSON.stringify(info.txt) + ')');
-  ok(info.fotos[0].leg === 'Praia do Forte', 'o PDF escreve o texto da foto 1');
-  ok(info.fotos[1].leg === '', 'a foto 2 vai sem texto para o PDF');
+  ok(info.txt.some(t => t === '09/03/25'), 'o PDF escreve a data (' + JSON.stringify(info.txt) + ')');
+  ok(!info.txt.includes('Praia do Forte'), 'o texto livre foi trocado pela localização na Linha 1');
 
   /* ============ reabrir o projeto (mesmo aparelho: o mesmo IndexedDB) ============ */
   titulo('L2 · reabrir o projeto mantém cidade e data:');
@@ -171,14 +176,14 @@ try {
   await p2.waitForTimeout(700);
   const reab = await capQuadro(p2);
   ok(reab.meta1.c === 'Recife', 'reaberto: a cidade continua (' + JSON.stringify(reab.meta1) + ')');
-  ok(/09\.03\.25/.test(reab.meta), 'reaberto: a data continua (' + reab.meta + ')');
+  ok(/09\/03\/25/.test(reab.meta), 'reaberto: a data continua (' + reab.meta + ')');
   await p2.goto(srv.url + 'app/editor/');
   await p2.waitForFunction(() => document.querySelectorAll('#sheet .pol').length === 4);
   await p2.waitForTimeout(800);
   const reabFolhas = await polFolhas(p2);
   ok(/Recife/.test(reabFolhas[0].meta), 'reaberto: as Folhas mostram «Recife» (' + reabFolhas[0].meta + ')');
   const reabPdf = await pdfInfo(p2);
-  ok(reabPdf.txt.some(t => t === 'Recife'), 'reaberto: o PDF mostra «Recife»');
+  ok(reabPdf.txt.some(t => /^Recife/.test(t)), 'reaberto: o PDF mostra «Recife»');
   await p2.close();
 
   titulo('L3 · a mesma data no Quadro, nas Folhas e no PDF:');
@@ -186,26 +191,26 @@ try {
   await p.waitForFunction(() => window.PLQ && PLQ.ST()[1] && PLQ.ST()[1].meta);
   await p.waitForTimeout(600);
   const dataQuadro = (await capQuadro(p)).meta;
-  ok(/09\.03\.25/.test(dataQuadro), 'o Quadro mostra a data EXIF (' + dataQuadro + ')');
-  ok(/09\.03\.25/.test(pols[0].meta), 'as Folhas mostram a mesma data');
-  ok(info.txt.some(t => t === '09.03.25'), 'o PDF mostra a mesma data');
+  ok(/09\/03\/25/.test(dataQuadro), 'o Quadro mostra a data EXIF (' + dataQuadro + ')');
+  ok(/09\/03\/25/.test(pols[0].meta), 'as Folhas mostram a mesma data');
+  ok(info.txt.some(t => t === '09/03/25'), 'o PDF mostra a mesma data');
   await p.click('#fnext'); await p.click('#fnext'); await p.waitForTimeout(400);
   const semData = await capQuadro(p);
-  ok(semData.metaAtual.iso === '' && !/\d\d\.\d\d\.\d\d/.test(semData.meta), 'a foto 3 (sem EXIF) fica sem data no Quadro (' + semData.meta + ')');
+  ok(semData.metaAtual.iso === '' && !/\d\d\/\d\d\/\d\d/.test(semData.meta), 'a foto 3 (sem EXIF) fica sem data no Quadro (' + semData.meta + ')');
   await p.click('#fprev'); await p.click('#fprev'); await p.waitForTimeout(300);
 
   titulo('L4 · os controles de estado e país ficam só no exemplo:');
   await p.click('#tab-legendas');
-  await p.waitForSelector('#lg-in');
+  await p.waitForSelector('#pl-in-0');
   const realGrupos = await p.evaluate(() => ({
     uf: !!document.getElementById('l-uf'), pais: !!document.getElementById('l-pais'), ordem: !!document.getElementById('l-ordem'),
     texto: (document.getElementById('p-legendas') || {}).innerText || ''
   }));
   ok(!realGrupos.uf && !realGrupos.pais && !realGrupos.ordem, 'em projeto real não há Estado, País nem Ordem');
-  ok(/Escreva a cidade como quer ver na legenda/.test(realGrupos.texto), 'há a orientação de escrever a cidade na aba Metadados');
+  ok(await p.locator('#pad-t-0 option[value=txt]').count() === 1 && await p.locator('#lg-in').count() === 0, 'Texto livre, Data e Local são tipos de linha, não seções separadas');
 
   titulo('L2 · «Sem data» fica sem data:');
-  await p.click('#tab-metadados');
+  await abrirMeta(p);
   await p.waitForSelector('#md-d');
   await p.click('[data-clr="d"]');
   await p.waitForTimeout(300);
@@ -213,7 +218,7 @@ try {
   await p.waitForFunction(() => window.PLQ && PLQ.ST()[1] && PLQ.ST()[1].meta);
   await p.waitForTimeout(600);
   const semDataDef = await capQuadro(p);
-  ok(!/09\.03\.25/.test(semDataDef.meta), 'a foto continua sem data no Quadro (' + semDataDef.meta + ')');
+  ok(!/09\/03\/25/.test(semDataDef.meta), 'a foto continua sem data no Quadro (' + semDataDef.meta + ')');
   ok(semDataDef.meta1.ds === 'none', 'o estado registra «sem data»');
 
   titulo('L2 · projeto salvo com registro antigo:');
@@ -228,7 +233,7 @@ try {
   const antigo = await capQuadro(p);
   ok(antigo.meta1.iso === '2025-03-09T10:11', 'o registro antigo vira iso sem segundos (' + antigo.meta1.iso + ')');
   ok(antigo.meta1.ds === 'exif', 'o registro antigo passa a ter ds=exif');
-  ok(/09\.03\.25/.test(antigo.meta), 'a data volta a aparecer (' + antigo.meta + ')');
+  ok(/09\/03\/25/.test(antigo.meta), 'a data volta a aparecer (' + antigo.meta + ')');
 
   titulo('L6 · o nome real do projeto:');
   await p.waitForTimeout(400);
@@ -261,19 +266,19 @@ try {
   await p3.goto(srv.url + 'app/editor/quadro/#foto-1');
   await p3.waitForFunction(() => window.PLQ && PLQ.ST()[1] && PLQ.ST()[1].meta);
   await p3.waitForTimeout(700);
-  await p3.click('#tab-metadados');
+  await abrirMeta(p3);
   await p3.waitForSelector('#md-c');
   await p3.fill('#md-c', 'Olinda'); await p3.dispatchEvent('#md-c', 'change');
   await p3.waitForTimeout(400);
   const pk = await capQuadro(p3);
-  ok(pk.xl.length === 2 && pk.xl[0] === 'Olinda' && pk.xl[1] === '09/03/25', 'no Quadro do Pocket as linhas são «Olinda» e «09/03/25» (' + JSON.stringify(pk.xl) + ')');
+  ok(pk.xl.length === 2 && /^Olinda( - PE)?$/.test(pk.xl[0]) && pk.xl[1] === '09/03/25', 'no Quadro do Pocket as linhas são «Olinda…» e «09/03/25» (' + JSON.stringify(pk.xl) + ')');
   await p3.goto(srv.url + 'app/editor/');
   await p3.waitForFunction(() => document.querySelectorAll('#sheet .pol').length === 2);
   await p3.waitForTimeout(900);
   const pkF = await polFolhas(p3);
-  ok(pkF[0].ml.length === 2 && pkF[0].ml[0] === 'Olinda' && pkF[0].ml[1] === '09/03/25', 'nas Folhas do Pocket as linhas são «Olinda» e «09/03/25» (' + JSON.stringify(pkF[0].ml) + ')');
+  ok(pkF[0].ml.length === 2 && /^Olinda( - PE)?$/.test(pkF[0].ml[0]) && pkF[0].ml[1] === '09/03/25', 'nas Folhas do Pocket as linhas são «Olinda…» e «09/03/25» (' + JSON.stringify(pkF[0].ml) + ')');
   const pkPdf = await pdfInfo(p3);
-  ok(pkPdf.txt.some(t => t === 'Olinda') && pkPdf.txt.some(t => t === '09/03/25'), 'no PDF do Pocket saem «Olinda» e «09/03/25» (' + JSON.stringify(pkPdf.txt) + ')');
+  ok(pkPdf.txt.some(t => /^Olinda( - PE)?$/.test(t)) && pkPdf.txt.some(t => t === '09/03/25'), 'no PDF do Pocket saem «Olinda…» e «09/03/25» (' + JSON.stringify(pkPdf.txt) + ')');
   await p3.screenshot({ path: SAIDA + '02-pocket.png' });
   await ctx3.close();
 

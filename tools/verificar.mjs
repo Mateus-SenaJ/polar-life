@@ -86,7 +86,8 @@ for (const h of htmls) {
 for (const c of arquivos.filter(f => extname(f) === '.css')) {
   const s = readFileSync(c, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');   // ignora comentários
   for (const m of s.matchAll(/url\(\s*['"]?([^'")]+)/g)) conferir(c, m[1]);
-  for (const m of s.matchAll(/font-weight\s*:\s*(\d+|bold|bolder)/g))
+  // D-148: o peso 700 só vale em @font-face (negrito real do texto da legenda, conteúdo da pessoa); a interface segue em ≤ 500 (T1)
+  for (const m of s.replace(/@font-face\s*\{[^}]*\}/g, '').matchAll(/font-weight\s*:\s*(\d+|bold|bolder)/g))
     if (+m[1] > 500 || /bold/.test(m[1])) erros.push(`${rel(c)}: font-weight ${m[1]} (T1: máx. 500)`);
   for (const m of s.matchAll(/#([0-9a-fA-F]{3,8})\b/g)) {
     let h = m[1].toLowerCase(); if (h.length === 3) h = [...h].map(x => x + x).join('');
