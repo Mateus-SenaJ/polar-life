@@ -63,7 +63,7 @@ var P={
      +disc('Ajuste fino',sld('dy','Deslocar na vertical','mm',-50,50,0,'De −5 a +5 mm.')+sld('inc','Inclinação','°',-50,50,0,'De −5° a +5°.'))+'</section>';
     h+='<section class="mod"><h3 class="mod__h">Assinatura</h3>'+seg('assin','Posição',[['auto','Automática'],['esq','Esq.'],['centro','Centro'],['dir','Dir.']],'auto')+'<p class="f__h">Automática: fica no canto que o texto não ocupa.</p></section>';
     h+='</div>';
-    return{h:h,ft:'<button type="button" class="btn2"><svg class="ico sm"><use href="#i-reset"/></svg>Resetar textos</button><button type="button" class="btn2">Aplicar texto às demais · 23</button>'}
+    return{h:h,ft:'<button type="button" class="btn2"><svg class="ico sm"><use href="#i-reset"/></svg>Resetar textos</button><button type="button" class="btn2">Aplicar às demais · 23</button>'}
   },
   stickers:function(){
     var o=EST.original,h='',e=elSel();
@@ -72,7 +72,7 @@ var P={
     if(e){
       h+='<section class="mod"><h3 class="mod__h">Elemento selecionado · '+(e.t==='emoji'?e.v:nomeSt(e.v))+'</h3><div class="row2">'+num('w','Tamanho',e.w,'mm',1)+num('rot','Giro',e.rot,'°',15)+'</div>'
        +(e.t==='sticker'&&e.v!=='confete'?cores('el',e.cor,[['preto','Preto'],['azul','Azul'],['laranja','Laranja'],['branco','Branco']]):'')
-       +'<div class="row2"><button type="button" class="btn2 btn2--sm" data-el="front"><svg class="ico sm"><use href="#i-front"/></svg>Trazer para frente</button><button type="button" class="btn2 btn2--sm" data-el="back"><svg class="ico sm"><use href="#i-back"/></svg>Enviar para trás</button></div><div class="row2"><button type="button" class="btn2 btn2--sm" data-el="dup"><svg class="ico sm"><use href="#i-copy"/></svg>Duplicar</button><button type="button" class="btn2 btn2--sm" data-el="del"><svg class="ico sm" style="color:var(--black)"><use href="#i-trash"/></svg>Excluir</button></div></section>'
+       +'<p class="f__h">Duplicar, ordem das camadas e excluir ficam na barra sobre a polaroid.</p></section>'
     }
     h+='<section class="mod"><div class="seg" role="radiogroup" aria-label="Tipo" style="margin-bottom:12px"><label class="seg__o"><input type="radio" name="stt" value="st" checked><span>Stickers</span></label><label class="seg__o"><input type="radio" name="stt" value="em"><span>Emojis</span></label></div>'
      +'<div class="txt" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;color:#0009"><svg class="ico sm"><use href="#i-search"/></svg>Buscar sticker ou emoji</div>';
@@ -80,13 +80,11 @@ var P={
     temas.forEach(function(t){h+='<h3 class="mod__h" style="margin-top:8px">'+t+'</h3><div class="grade">'+STK.filter(function(s){return s[2]===t}).map(function(s){return'<button type="button" data-add="sticker|'+s[0]+'" aria-label="'+s[1]+'" title="'+s[1]+'" style="color:var(--black)"><svg><use href="#st-'+s[0]+'"/></svg></button>'}).join('')+'</div>'});
     h+='<h3 class="mod__h" style="margin-top:14px">Emojis <small class="f__h" style="display:inline">· fonte do aparelho</small></h3><div class="grade">'+EMO.map(function(e){return'<button type="button" data-add="emoji|'+e+'" aria-label="Emoji '+e+'">'+e+'</button>'}).join('')+'</div>';
     h+='<p class="f__h" style="margin-top:12px">Stickers são desenhos do Polar Life e saem em vetor no PDF. Emojis usam a fonte deste aparelho e saem como imagem nítida (600 PPI).</p></section></div>';
-    return{h:h,ft:'<button type="button" class="btn2">Aplicar stickers às demais · 23</button>'}
+    return{h:h,ft:'<button type="button" class="btn2">Aplicar às demais · 23</button>'}
   },
   recorte:function(){
     return{h:'<section class="mod">'+seg('modo','Modo do recorte',[['preencher','Preencher'],['encaixar','Encaixar']],'preencher')+sld('zoom','Zoom','%',100,400,100,'De 100 a 400%. Roda do mouse, pinça ou duplo toque também.')+sld('ang','Endireitar','°',-15,15,0,'De −15° a +15°. A grade fina aparece enquanto você ajusta.')
-      +'<div class="row2"><button type="button" class="btn2"><svg class="ico sm"><use href="#i-rotate"/></svg>Girar 90°</button><button type="button" class="btn2" aria-pressed="false"><svg class="ico sm"><use href="#i-flip"/></svg>Espelhar</button></div>'
-      +sw('inteira','Mostrar a foto inteira',false,'Desligado · um traço fino marca a janela; o que fica fora será cortado.')
-      +'<div class="row2"><button type="button" class="btn2"><svg class="ico sm"><use href="#i-crop"/></svg>Centralizar</button><button type="button" class="btn2"><svg class="ico sm"><use href="#i-reset"/></svg>Resetar recorte</button></div></section>',ft:''}
+      +'<div class="row2"><button type="button" class="btn2"><svg class="ico sm"><use href="#i-crop"/></svg>Centralizar</button><button type="button" class="btn2"><svg class="ico sm"><use href="#i-reset"/></svg>Resetar recorte</button></div><p class="f__h">Girar 90°, espelhar, grade e «foto inteira» ficam na barra sobre a polaroid.</p></section>',ft:''}
   },
   ajustes:function(){
     var fl=['Original','P&B','Noir','Retrô','Foto Antiga','Praia','Pastel','Polaroid Clássico','Instantânea','Verão','Desbotado','Cinema'];
@@ -111,28 +109,28 @@ var P={
       +'<section class="mod">'+disc('Corrigir várias de uma vez',num('h','Somar ou subtrair horas às datas',0,'h',1)+'<p class="f__h">Informe as horas para ver como a data desta foto fica.</p><button type="button" class="btn2" style="width:100%" disabled>Aplicar em 24 fotos com data</button>')+'</section>'+aviso('Só o que você quer lembrar. O arquivo gerado não leva os metadados originais.'),ft:''}
   },
   fotos:function(){
-    var h='<section class="mod"><div class="row2"><button type="button" class="btn2"><svg class="ico sm"><use href="#i-plus"/></svg>Adicionar fotos</button><button type="button" class="btn2" aria-pressed="false">Marcar</button></div><p class="f__h" style="margin:-4px 0 10px">2 selecionadas · Ctrl + clique marca, Shift + clique marca um intervalo.</p><div class="chips"><button type="button" class="chip-o">Selecionar todas</button><button type="button" class="chip-o">Só esta folha</button><button type="button" class="chip-o">Limpar</button></div></section>';
+    var h='<section class="mod"><div class="row2"><button type="button" class="btn2" aria-pressed="false">Marcar</button></div><p class="f__h" style="margin:-4px 0 10px">2 selecionadas · Ctrl + clique marca, Shift + clique marca um intervalo.</p><div class="chips"><button type="button" class="chip-o">Selecionar todas</button><button type="button" class="chip-o">Só esta folha</button><button type="button" class="chip-o">Limpar</button></div></section>';
     h+='<section class="mod"><h3 class="mod__h">Ações da seleção</h3><div class="row2"><button type="button" class="btn2 btn2--sm"><svg class="ico sm"><use href="#i-copy"/></svg>Copiar estilo</button><button type="button" class="btn2 btn2--sm" disabled style="opacity:.5">Colar estilo</button></div><div class="row2"><button type="button" class="btn2 btn2--sm">Duplicar · 2</button><button type="button" class="btn2 btn2--sm"><svg class="ico sm" style="color:var(--black)"><use href="#i-trash"/></svg>Remover · 2</button></div><p class="f__h">Estilo = ajustes, filtro e stickers. O texto segue «Aplicar texto».</p></section>';
     h+='<section class="mod"><h3 class="mod__h">Suas fotos · 24</h3><div class="grade">';
     for(var i=1;i<=12;i++)h+='<button type="button" aria-label="Foto '+i+'" style="padding:0;overflow:hidden;position:relative;border-color:'+(i===3?'var(--black)':'')+'">'+cena(i)+(i===2||i===5?'<span class="th__chk" style="display:flex"><svg class="ico sm"><use href="#i-check"/></svg></span>':'')+'</button>';
-    return{h:h+'</div><p class="f__h">Arraste para reordenar.</p></section>',ft:''}
+    return{h:h+'</div><p class="f__h">Arraste para reordenar. Para incluir fotos, use «+ Adicionar» na faixa.</p></section>',ft:''}
   }
 };
 function nomeSt(id){var s=STK.filter(function(x){return x[0]===id})[0];return s?s[1]:id}
 function elSel(){if(!sel||sel.length<5)return null;return EST.el.filter(function(e){return e.id===sel})[0]||null}
 
 /* ---------- barra flutuante contextual ---------- */
-function bf(){
+function bf(){                                                /* §1.5: ≤ 4 ações diretas, nenhuma repetida no painel */
   var b=$('bf'),h='',e=elSel();
   if(EST.original&&(sel==='texto'||e)){b.hidden=true;return}
   if(e){
-    h='<button type="button" class="ib" data-el="menor" aria-label="Diminuir"><svg class="ico"><use href="#i-minus"/></svg></button><span class="bf__t mono" aria-live="polite">'+e.w+' mm</span><button type="button" class="ib" data-el="maior" aria-label="Aumentar"><svg class="ico"><use href="#i-plus"/></svg></button><span class="bf__div"></span><button type="button" class="ib" data-el="girar" aria-label="Girar 15°"><svg class="ico"><use href="#i-rotate"/></svg></button><button type="button" class="ib" data-el="dup" aria-label="Duplicar"><svg class="ico"><use href="#i-copy"/></svg></button><button type="button" class="ib" data-el="front" aria-label="Trazer para frente"><svg class="ico"><use href="#i-front"/></svg></button><span class="bf__div"></span><button type="button" class="ib" data-el="del" aria-label="Excluir"><svg class="ico"><use href="#i-trash"/></svg></button>'
+    h='<button type="button" class="ib" data-el="dup" aria-label="Duplicar"><svg class="ico"><use href="#i-copy"/></svg></button><button type="button" class="ib" data-el="front" aria-label="Trazer para frente"><svg class="ico"><use href="#i-front"/></svg></button><button type="button" class="ib" data-el="back" aria-label="Enviar para trás"><svg class="ico"><use href="#i-back"/></svg></button><span class="bf__div"></span><button type="button" class="ib" data-el="del" aria-label="Excluir"><svg class="ico"><use href="#i-trash"/></svg></button>'
   }else if(sel==='texto'){
-    h='<div class="seg seg--ico" role="radiogroup" aria-label="Alinhamento">'+[['esq','Esquerda','i-al-e'],['centro','Centro','i-al-c'],['dir','Direita','i-al-d']].map(function(o){return'<label class="seg__o"><input type="radio" name="bf-al" value="'+o[0]+'"'+(EST.al===o[0]?' checked':'')+'><span><svg class="ico sm"><use href="#'+o[2]+'"/></svg><span class="vh">'+o[1]+'</span></span></label>'}).join('')+'</div><span class="bf__div"></span><button type="button" class="btn2 btn2--sm" style="height:40px;box-shadow:none;font-family:Caveat;font-size:17px">Caveat</button><button type="button" class="ib" data-pt="-1" aria-label="Diminuir tamanho"><svg class="ico"><use href="#i-minus"/></svg></button><span class="bf__t mono">'+EST.pt+' pt</span><button type="button" class="ib" data-pt="1" aria-label="Aumentar tamanho"><svg class="ico"><use href="#i-plus"/></svg></button><span class="bf__div"></span><button type="button" class="btn2 btn2--sm" style="height:40px;box-shadow:none" data-foco="lg-in"><svg class="ico sm"><use href="#i-text"/></svg>Editar texto</button>'
+    h='<button type="button" class="btn2 btn2--sm" style="height:40px;box-shadow:none" data-foco="lg-in"><svg class="ico sm"><use href="#i-text"/></svg>Editar texto</button>'
   }else if(sel==='moldura'){
-    h='<span class="bf__t">Clássico · 88 × 107 mm</span><span class="bf__div"></span><div class="seg" role="radiogroup" aria-label="Orientação"><label class="seg__o"><input type="radio" name="bf-ori" checked><span>Vertical</span></label><label class="seg__o"><input type="radio" name="bf-ori"><span>Horizontal</span></label></div><span class="bf__div"></span><button type="button" class="btn2 btn2--sm" style="height:40px;box-shadow:none" data-p="moldura"><svg class="ico sm"><use href="#i-ruler"/></svg>Medidas</button>'
+    b.hidden=true;return                                        /* formato, orientação e medidas: só no painel Moldura */
   }else{
-    h='<div class="seg" role="radiogroup" aria-label="Modo do recorte"><label class="seg__o"><input type="radio" name="bf-modo" checked><span>Preencher</span></label><label class="seg__o"><input type="radio" name="bf-modo"><span>Encaixar</span></label></div><span class="bf__div"></span><button type="button" class="ib" aria-label="Diminuir zoom"><svg class="ico"><use href="#i-minus"/></svg></button><span class="bf__t mono">100%</span><button type="button" class="ib" aria-label="Aumentar zoom"><svg class="ico"><use href="#i-plus"/></svg></button><span class="bf__div"></span><button type="button" class="ib" aria-label="Girar 90°"><svg class="ico"><use href="#i-rotate"/></svg></button><button type="button" class="ib" aria-label="Espelhar" aria-pressed="false"><svg class="ico"><use href="#i-flip"/></svg></button><button type="button" class="ib" aria-label="Grade de composição"><svg class="ico"><use href="#i-grid"/></svg></button><button type="button" class="ib" aria-label="Mostrar a foto inteira" aria-pressed="false"><svg class="ico"><use href="#i-eye"/></svg></button>'
+    h='<button type="button" class="ib" aria-label="Girar 90°"><svg class="ico"><use href="#i-rotate"/></svg></button><button type="button" class="ib" aria-label="Espelhar" aria-pressed="false"><svg class="ico"><use href="#i-flip"/></svg></button><button type="button" class="ib" aria-label="Grade de composição"><svg class="ico"><use href="#i-grid"/></svg></button><button type="button" class="ib" aria-label="Mostrar a foto inteira" aria-pressed="false"><svg class="ico"><use href="#i-eye"/></svg></button>'
   }
   b.innerHTML=h;b.hidden=false
 }
@@ -193,7 +191,6 @@ function acaoEl(k){
   if(k==='dup'){var c=copia(e);c.id=uid();c.x+=3;c.y+=3;prender(c);EST.el.splice(i+1,0,c);sel=c.id;commit();return}
   if(k==='front'){EST.el.splice(i,1);EST.el.push(e)}
   if(k==='back'){EST.el.splice(i,1);EST.el.unshift(e)}
-  if(k==='maior')e.w+=1;if(k==='menor')e.w-=1;if(k==='girar')e.rot+=15;
   prender(e);commit()
 }
 
@@ -209,8 +206,7 @@ function render(){
   pintarEl();bf();
   $('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;
   var ESC={esta:'só esta foto',sel:'2 selecionadas',folha:'esta folha · 4',todas:'todas · 24'};$('escopo-t').textContent=ESC[EST.escopo];$('escopo-dot').hidden=EST.escopo==='esta';
-  $('orig-atalho').checked=EST.original;
-  montar()
+    montar()
 }
 function montar(){
   var e=elSel();if(e&&painel!=='stickers'){painel='stickers'}
@@ -230,19 +226,19 @@ document.addEventListener('click',function(ev){
   if(b.hasAttribute('data-pt')){EST.pt=Math.max(8,Math.min(32,EST.pt+ +b.getAttribute('data-pt')));commit();return}
   if(b.hasAttribute('data-foco')){abrir('texto');var i=$(b.getAttribute('data-foco'));if(i){i.focus();i.select()}return}
   if(b.hasAttribute('data-step')){var s=b.getAttribute('data-step').split('|'),e=elSel();if(e&&s[0]==='w'){e.w+=+s[1];prender(e);commit()}if(e&&s[0]==='rot'){e.rot+=+s[1];prender(e);commit()}return}
+  if(b.id==='mais-b'){var o2=$('mais-pop').hidden;$('mais-pop').hidden=!o2;b.setAttribute('aria-expanded',o2);return}
   if(b.id==='escopo-b'){var o=$('escopo-pop').hidden;$('escopo-pop').hidden=!o;b.setAttribute('aria-expanded',o);return}
   if(b.id==='panel-x'){$('panel').classList.remove('is-open');return}
   if(b.id==='grab'){var v=['38vh','22vh','78vh'],cur=document.documentElement.style.getPropertyValue('--sheet')||'38vh',i2=(v.indexOf(cur)+1)%3;document.documentElement.style.setProperty('--sheet',v[i2]);setTimeout(dimensionar,300);return}
   if(b.classList.contains('chip-o')&&b.parentNode.classList.contains('chips')){[].forEach.call(b.parentNode.children,function(c){c.setAttribute('aria-pressed',c===b)});return}
   if(b.getAttribute('role')==='radio'){[].forEach.call(b.parentNode.children,function(c){c.setAttribute('aria-checked',c===b)});return}
-  if(b.classList.contains('th')&&!b.classList.contains('th--add')){[].forEach.call($('faixa-l').children,function(c){c.setAttribute('aria-current',c===b)});$('ctx-n').textContent=b.getAttribute('data-n')+' de 24';$('faixa-n').textContent=b.getAttribute('data-n')+' / 24';return}
+  if(b.classList.contains('th')&&!b.classList.contains('th--add')){[].forEach.call($('faixa-l').children,function(c){c.setAttribute('aria-current',c===b)});$('ctx-n').textContent=b.getAttribute('data-n')+' de 24';return}
 });
 document.addEventListener('change',function(ev){
   var t=ev.target;
   if(t.name==='al'||t.name==='bf-al'){EST.al=t.value;commit();return}
   if(t.name==='escopo'){EST.escopo=t.value;$('escopo-pop').hidden=true;$('escopo-b').setAttribute('aria-expanded','false');render();return}
-  if(t.id==='orig-atalho'){EST.original=t.checked;sel=null;commit();return}
-  if(t.hasAttribute('data-sel')&&t.getAttribute('data-sel')==='fmt'){EST.fmt=+t.value;commit();return}
+    if(t.hasAttribute('data-sel')&&t.getAttribute('data-sel')==='fmt'){EST.fmt=+t.value;commit();return}
   if(t.name==='cor-txt'){EST.cor=t.value;commit();return}
   if(t.name==='cor-el'){var e=elSel();if(e){e.cor=t.value;commit()}return}
 });
@@ -257,7 +253,7 @@ document.addEventListener('keydown',function(ev){
   if(m&&ev.key.toLowerCase()==='z'&&tag!=='INPUT'){ev.preventDefault();ev.shiftKey?refazer():desfazer();return}
   if(m&&ev.key.toLowerCase()==='y'){ev.preventDefault();refazer();return}
   if(tag==='INPUT'||tag==='SELECT')return;
-  if(ev.key==='Escape'){sel=null;$('escopo-pop').hidden=true;render();return}
+  if(ev.key==='Escape'){sel=null;$('escopo-pop').hidden=true;$('mais-pop').hidden=true;render();return}
   var e=elSel();if(!e)return;
   var st=ev.shiftKey?2:.5;
   if(ev.key==='Delete'||ev.key==='Backspace'){acaoEl('del');ev.preventDefault()}
@@ -267,7 +263,7 @@ document.addEventListener('keydown',function(ev){
   else if(ev.key==='ArrowUp'){e.y-=st;prender(e);commit();ev.preventDefault()}
   else if(ev.key==='ArrowDown'){e.y+=st;prender(e);commit();ev.preventDefault()}
 });
-document.addEventListener('pointerdown',function(ev){if(!ev.target.closest('.ctx__wrap')){$('escopo-pop').hidden=true;$('escopo-b').setAttribute('aria-expanded','false')}});
+document.addEventListener('pointerdown',function(ev){if(!ev.target.closest('.ctx__wrap')){$('escopo-pop').hidden=true;$('escopo-b').setAttribute('aria-expanded','false');$('mais-pop').hidden=true;$('mais-b').setAttribute('aria-expanded','false')}});
 
 /* ---------- faixa ---------- */
 (function(){var h='';for(var i=1;i<=24;i++)h+='<button type="button" class="th'+(i===2||i===5?' is-sel':'')+'" data-n="'+(i<10?'0':'')+i+'" aria-current="'+(i===3)+'" aria-label="Foto '+i+' de 24'+(i===2||i===5?', selecionada':'')+'">'+cena(i)+'<span class="th__n mono">'+(i<10?'0':'')+i+'</span><span class="th__q" aria-hidden="true"></span><span class="th__chk"><svg class="ico sm"><use href="#i-check"/></svg></span></button>';

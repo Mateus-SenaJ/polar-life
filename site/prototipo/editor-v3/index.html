@@ -80,7 +80,7 @@
     <button type="button" class="btn2"><svg class="ico sm"><use href="#i-download"/></svg>Salvar .polarlife</button>
     <button type="button" class="led-btn led-btn--sm"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><svg class="ico sm"><use href="#i-print"/></svg><span>Revisar impressão</span></span></button>
     <span class="avatar" aria-hidden="true"><svg class="ico sm"><use href="#i-person"/></svg></span>
-    <button type="button" class="ib" aria-label="Mais opções"><svg class="ico"><use href="#i-more"/></svg></button>
+    <span class="ctx__wrap"><button type="button" class="ib" id="mais-b" aria-label="Mais opções" aria-haspopup="true" aria-expanded="false"><svg class="ico"><use href="#i-more"/></svg></button><div class="pop pop--dir" id="mais-pop" hidden role="group" aria-label="Mais opções"><button type="button" class="pop__i so-m"><svg class="ico sm"><use href="#i-download"/></svg>Salvar .polarlife</button><button type="button" class="pop__i so-m"><svg class="ico sm"><use href="#i-person"/></svg>Conta</button><button type="button" class="pop__i"><svg class="ico sm"><use href="#i-text"/></svg>Renomear projeto</button><button type="button" class="pop__i"><svg class="ico sm"><use href="#i-info"/></svg>Atalhos de teclado</button></div></span>
   </div>
 </header>
 
@@ -104,7 +104,7 @@
   <div class="ctx">
     <span class="pill ctx--m"><span class="rotulo">Passo 2 de 3</span></span>
     <span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-photos"/></svg><span class="rotulo">Foto</span><span class="mono" id="ctx-n">03 de 24</span></span>
-    <button type="button" class="pill pill--btn" data-p="moldura"><span class="rotulo">Clássico</span><span class="mono">88 × 107 mm</span></button>
+    <span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-frame"/></svg><span class="rotulo">Clássico</span><span class="mono">88 × 107 mm</span></span>
     <span class="pill" id="ctx-q" role="status"><span class="q" aria-hidden="true"></span><span>Excelente</span></span>
     <span class="ctx__wrap">
       <button type="button" class="pill pill--btn pill--escopo" id="escopo-b" aria-haspopup="true" aria-expanded="false"><span class="dot dot--o" id="escopo-dot" aria-hidden="true" hidden></span><span class="rotulo">Alterando</span><span id="escopo-t">só esta foto</span><svg class="ico sm"><use href="#i-down"/></svg></button>
@@ -113,9 +113,7 @@
         <label><input type="radio" name="escopo" value="sel">Selecionadas · 2</label>
         <label><input type="radio" name="escopo" value="folha">Esta folha · 4 fotos</label>
         <label><input type="radio" name="escopo" value="todas">Todas · 24</label>
-        <hr>
-        <label><input type="checkbox" id="orig-atalho">Sem legendas</label>
-      </div>
+              </div>
     </span>
     <span class="ctx__sp"></span>
     <span class="pill"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Escala</span><span class="mono" id="ctx-esc">100%</span></span>
@@ -124,7 +122,7 @@
   <div class="faixa" id="faixa">
     <span class="faixa__t"><span class="rotulo">Lote</span><span class="mono">24</span></span>
     <div class="faixa__l" id="faixa-l"></div>
-    <span class="faixa__t"><span class="rotulo">Foto</span><span class="mono" id="faixa-n">03 / 24</span></span>
+    
   </div>
 
   <div class="stage" id="stage">
@@ -142,8 +140,7 @@
   </div>
   <div class="under">
     <button type="button" class="ib" id="fprev" aria-label="Foto anterior"><svg class="ico"><use href="#i-prev"/></svg></button>
-    <button type="button" class="btn2 btn2--sm"><svg class="ico sm"><use href="#i-crop"/></svg>Centralizar</button>
-    <span class="cota"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Passe-partout inferior</span><span class="mono">25 mm</span></span>
+        <span class="cota"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Passe-partout inferior</span><span class="mono">25 mm</span></span>
     <span class="chip">Ajustada</span>
     <button type="button" class="ib" id="fnext" aria-label="Foto seguinte"><svg class="ico"><use href="#i-next"/></svg></button>
   </div>

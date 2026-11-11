@@ -102,74 +102,58 @@ Princípios que organizam a v3 (os mesmos do Canva, adaptados às travas):
 
 Mesma casca: trilho (Fotos · Papel · Ajustes · Texto · Stickers · Moldura · Dados — «Papel» substitui «Recorte», que só faz sentido no Quadro), palco com a folha e a faixa de **folhas** (D-133), chip de escopo padrão «Todas as fotos». Tocar numa polaroid da folha abre-a no Quadro (`#foto-n`). Os painéis são os mesmos módulos (tarefa 37 §A). Esta tarefa não redesenha o conteúdo do painel Papel (já segue FN-00); só o move para a casca v3.
 
-### 1.4 Tabela mestra: cada função do inventário → lugar na v3
+### 1.4 Tabela mestra sem repetição (comando → lugar principal → atalho opcional → motivo)
 
-Legenda dos lugares: **BS** barra superior · **BC** barra de contexto · **BF** barra flutuante do palco (contextual) · **P:x** painel x · **FX** faixa de fotos · **M** menu «⋯» · **BX** barra fixa do celular. Tipo: **int** interruptor · **seg** segmentado · **sel** caixa de seleção · **cart** cartões/grade · **sld** deslizador + campo · **num** campo −/+ · **btn** botão · **chip** chip/pílula · **txt** campo de texto.
+Legenda: **BS** barra superior · **BC** barra de contexto · **TR** trilho (desktop) ≡ **AB** abas do painel (celular) · **P:x** painel x · **BF** barra flutuante do palco · **SP** sob a polaroid · **FX** faixa de fotos · **M** menu «⋯» · **BX** barra fixa do celular · **TEC** teclado/gesto (não conta como repetição visual). Cada linha tem **um** lugar principal; a coluna «Atalho» só é preenchida para comandos de uso muito frequente.
 
-| Função hoje (aba) | Lugar na v3 (desktop / celular) | Controle | Motivo |
+| Comando | Lugar principal | Atalho opcional | Motivo |
 | --- | --- | --- | --- |
-| Desfazer / Refazer (cabeçalho) | BS / barra superior | btn ícone + Ctrl+Z/Y | Igual; fica ao lado do nome do projeto |
-| Salvar .polarlife | BS / M | btn | No celular é raro; vai para «⋯» |
-| Revisar impressão (LED) | BS / BX | LED (único, T8) | Igual; no celular mostra «· 6 folhas» |
-| Modo Folhas / Quadro / Colagem | Topo do trilho / 2ª linha da barra superior | seg | Modo é navegação, não ferramenta |
-| Lembranças (Em breve) | Fim do trilho / M | item apagado | Igual |
-| Guia de corte (cartão do trilho) | BC do Modo Folhas (chip) + P:Papel | chip + int | No Quadro só informa; some do trilho |
-| Contador «Foto 03 de 24» | BC / chip de contexto | texto | Igual |
-| Escala | BC (fim) / oculta no celular | texto | Informação secundária |
-| Alternar inspetor | Tablet: botão na BC | btn | Só onde o painel cobre o palco |
-| Selo de qualidade (Excelente/Boa/Pode sair borrada) | BC (ponto + palavra) + ponto na moldura (D-130) / chip de contexto | chip | D-130 |
-| Aviso «Reduzir recorte / Trocar foto» (qualidade) | Abaixo da polaroid, como hoje | msg + 2 btn | Mantido |
-| Modo do recorte Preencher / Encaixar | BF (foto selecionada) + P:Recorte | seg | 2 opções exclusivas |
-| Zoom (100–400 %) | BF −/+ e P:Recorte | sld + campo; roda, pinça, duplo toque (adendo 37) | Faixa contínua com prévia |
-| Endireitar (−15° a 15°) | P:Recorte | sld + campo; grade fina enquanto ajusta | Faixa contínua |
-| Girar 90° · Espelhar | BF + P:Recorte | btn ícone+rótulo; Espelhar com `aria-pressed` | Ações |
-| Grade de composição (nenhuma/terços/diagonais) | BF: botão «Grade ▾» (popover seg) | seg | Só na tela; raramente mudada |
-| Mostrar a foto inteira | BF (olho, `aria-pressed`) + P:Recorte | int | Ligado/desligado |
-| Centralizar · Resetar foto | Abaixo da polaroid («Centralizar») + P:Recorte («Resetar recorte») | btn | Igual |
-| Arrastar, setas, +/−, roda, pinça | Palco | gesto/teclado | Igual (adendo 37: 1:1, roda ≈ 10 %) |
-| Filtros (12) · favoritos · «Sugerido» | P:Ajustes, seção **Filtro** (grade 3 col.; «Todos · Favoritos» seg) | cart | Amostra visual importa |
-| Intensidade do filtro | P:Ajustes, abaixo da grade | sld + campo | Faixa |
-| Comparar · Ver original (segurar) | BF quando o painel Ajustes está aberto | btn | Ação sobre o palco, não configuração |
-| Brilho · Contraste · Saturação · Temperatura | P:Ajustes, seção **Luz e cor** | sld + campo | Faixa |
-| Realces · Sombras · Nitidez · Vinheta | P:Ajustes, seção **Detalhe** (disclosure aberta) | sld + campo | Faixa |
-| «Valores diferentes» (D-110) | Mesma etiqueta no cabeçalho do campo | etiqueta ícone+texto | D-110 |
-| Replicar para as demais · Substituir ajustes individuais · Aplicar às demais | **Rodapé do painel** Ajustes: «Resetar» · «Aplicar às demais · n» + caixa «Substituir ajustes individuais» | btn + chk | O escopo já está no chip; «Replicar» (checkbox) some: escolher escopo ≠ «Só esta» já liga o lote (§7.4) |
-| Resetar tudo (ajustes e filtro) | Rodapé de P:Ajustes | btn | Igual |
-| Escopo (Só esta · Selecionadas · Esta folha · Todas) | **Chip na BC** com popover | chip + seg vertical (radio) | Visível em todos os painéis sem ocupar o painel |
-| Marcar na faixa · Selecionar todas · Só esta folha · Limpar | P:Fotos (cabeçalho da grade) + FX | btn | Seleção vive com as fotos |
-| Copiar estilo · Colar estilo | P:Fotos (ações da seleção) + atalho Ctrl+Shift+C/V + menu ⋯ | btn | Passa a copiar também texto e stickers (§6) |
-| Duplicar · Remover (pop-up nível 3) | P:Fotos (ações da seleção) | btn (Remover com lixeira, nunca LED) | D-081/D-082 |
-| Estilos prontos (8) | P:Texto, seção **Estilo** (chips roláveis) | cart (chips) | 5+ opções com amostra |
-| Polaroid sem textos (D-119) | **Substituído** por «Polaroid original», **1º controle** de P:Texto; também no popover do chip de contexto | int | D-135 |
-| Mostrar texto livre · Texto desta foto (80) · validação (coordenada/arquivo) | P:Texto, seção **Texto** | int + txt + contador | Igual |
-| Sugestões de frases (tarefa 52) | P:Texto, botão «Sugestões» abaixo do campo | btn → 3 chips | Dependência da 52 |
-| Fonte do texto (catálogo 24 + importar D-126) | P:Texto: botão «Fonte» (amostra + nome) abre **lista** (busca, categorias, favoritas, recentes) | sel (lista em folha) | 5+ opções com amostra |
-| Tamanho (8–32 pt) | P:Texto | sld + campo | Faixa |
-| Cor da inscrição (preto/azul/laranja) | P:Texto: 3 amostras com nome | seg (radio com amostra) | 3 opções exclusivas |
-| Caixa (normal/maiúsc./capitalizada) · Espaçamento · Ajustar para caber | P:Texto → «Mais opções do texto» | seg · sld · int | Raros |
-| Alinhamento (**novo**, D-136) | P:Texto, seção **Posição** (2º bloco, logo após o interruptor) + BF quando o texto está selecionado | seg Esquerda · Centro · Direita (ícone + rótulo) | D-136 |
-| Posição Abaixo/Acima/Ambas · Deslocar horizontal | **Removidos** (D-136; migração §4.3) | — | D-136 |
-| Deslocar na vertical · Inclinação | P:Texto → «Ajuste fino» | sld + campo | Raros |
-| Mostrar data · Formato (13) · Fonte · Tamanho · Cor | P:Texto, seção **Data**: int; **sel** de formato (mostra a data da foto em cada opção); linha compacta Fonte · Tamanho · Cor | int · sel · sel/num/seg | 13 opções → caixa de seleção |
-| Mostrar local · Estado · País · Separador · Ordem · Fonte · Tamanho · Cor | P:Texto, seção **Local**: int; linha compacta Fonte · Tamanho · Cor; «Como escrever o local» (disclosure) com Estado (seg 3), País (seg 3), Separador (**sel** 5), Ordem (seg 2) | int · seg · sel | 5 separadores → caixa de seleção |
-| Linhas: Data e local (junto/linhas) · Ordem · Medir por | P:Texto → «Linhas» (disclosure) | seg · seg · seg | D-113; raros |
-| Assinatura (Automática/E/C/D, D-129) | P:Texto, seção **Assinatura** (fim) | seg 4 | D-129 (parte que a D-136 não revogou) |
-| Legenda fora da área segura (aviso + Ajustar para caber) | Abaixo da polaroid (msg) + no painel | msg + btn | BR-13 |
-| Resetar legendas · Aplicar legendas | Rodapé de P:Texto: «Resetar textos» · «Aplicar texto às demais · n» | btn | Igual |
-| Formato (7 cartões) + pop-up «Trocar formato» | P:Moldura, seção **Formato** (cartões nome + medida; travas da tarefa 52) | cart | Igual |
-| Orientação Vertical/Horizontal (R) | P:Moldura | seg com miniatura | 2 opções |
-| Personalizar (proporção 8 · faixa inferior 4 · margens 4 · cantos 4) | P:Moldura → «Atalhos de medida» (disclosure) | cart pequenos | D-108 |
-| Medidas (8 campos) · unidade mm/cm/pol · cadeado · manter proporções · Resetar formato | P:Moldura → «Medidas» (disclosure; campos **num −/+**; unidade = seg 3) | num · seg · chk | Campo com unidade e passo |
-| Réguas na mesa (aba Molduras aberta) | Palco, só com P:Moldura aberto | — | Igual |
-| Metadados: leitura (data, orientação, dimensões, perfil, origem, local, selos) | P:Dados, seção **Esta foto** | lista | Igual |
-| Editar data (dd/mm/aaaa) · Sem data · Cidade · Sem local · Origem | P:Dados, seção **Editar** | txt · btn · txt · btn · sel | Igual |
-| Somar/subtrair horas (lote) | P:Dados → «Corrigir várias de uma vez» | num −/+ + btn | Igual |
-| Papel (A3…10 × 15, personalizado) · orientação · margem · espaço · girar · alinhamento · separar · guias · contorno · comprimento · cor · rodapé · assinatura | P:Papel (Modo Folhas); no Quadro, o chip «A4 · 6 folhas» da BX/BC abre Folhas | como hoje (FN-00) | Fora do escopo desta tarefa |
-| Pré-voo (T-18) | LED → Folhas `#revisar` | pop-up nível 3 | Igual; ganha itens de sticker (§5.8) |
-| Trocar foto (adicionar-fotos) | FX «+ Adicionar» e aviso de qualidade | btn/link | Igual |
-| **Stickers e emojis (novo)** | P:Stickers (catálogo) + BF do elemento selecionado | cart · gestos | D-137 |
+| Desfazer · Refazer | BS (desktop e celular) | TEC Ctrl+Z/Y; «Desfazer» do toast (transitório) | Ação global |
+| Salvar .polarlife | BS (desktop) · M (celular) | — | Global; raro no celular |
+| Revisar impressão (LED) | BS (desktop) · BX (celular) | — | Global; único LED (T8) |
+| Conta | BS avatar (desktop) · M (celular) | — | Global |
+| Voltar aos projetos | BS (logo no desktop, ‹ no celular) | — | Global |
+| Renomear projeto · Atalhos de teclado | M | — | Raros; não existem em outro lugar |
+| Modo Folhas ⟷ Quadro | Topo do TR (desktop) · 2ª linha da BS (celular) | — | Navegação |
+| Fotos · Recorte · Ajustes · Texto · Stickers · Moldura · Dados | TR (desktop) **ou** AB (celular), nunca os dois | TEC: clicar na foto abre Recorte, no texto abre Texto, no sticker abre Stickers | Navegação entre ferramentas |
+| Escopo (Só esta · Selecionadas · Esta folha · Todas) | BC chip «Alterando» (popover) | — | Vale para todos os painéis; só escopo no popover |
+| Foto n de N · formato · qualidade · escala · «Passo» | BC (informação, não é botão) | — | Chips informativos; o formato não abre mais o painel |
+| Foto anterior · seguinte | SP ‹ › (desktop) · FX (toque na miniatura) | TEC ← → | Frequente |
+| Adicionar fotos | FX «+ Adicionar» | — | Visível em qualquer ferramenta; some de P:Fotos |
+| Marcar · Selecionar todas · Só esta folha · Limpar · reordenar | P:Fotos | TEC Ctrl/Shift + clique na FX | Seleção vive com as fotos |
+| Copiar estilo · Colar estilo · Duplicar · Remover (fotos) | P:Fotos «Ações da seleção» | TEC Ctrl+Shift+C/V | Lote |
+| Modo do recorte Preencher/Encaixar · Zoom · Endireitar | P:Recorte | TEC roda, pinça, duplo toque (zoom) | Opções da ferramenta |
+| Centralizar · Resetar recorte | P:Recorte | — | Some de SP |
+| Girar 90° · Espelhar · Grade de composição · Foto inteira | **BF** (foto selecionada; 4 ações) | — | Manipulação direta; somem de P:Recorte |
+| Filtro · intensidade · Luz e cor · Detalhe · Substituir ajustes individuais | P:Ajustes | — | Opções da ferramenta |
+| Comparar · Ver original | BF (P:Ajustes aberto; 2 ações) | — | Ação sobre o palco |
+| Resetar · Aplicar às demais · n (por painel) | Rodapé do painel ativo | — | Uma vez por painel |
+| «Sem legendas» (chave `leg.original`) | P:Texto, 1º controle | — | Some do popover de escopo |
+| Alinhamento Esquerda · Centro · Direita (texto sempre abaixo) | P:Texto «Posição» | — | Some da BF |
+| Estilos · Mostrar texto · Texto desta foto · Sugestões · Fonte · Tamanho · Cor · Mais opções · Data · Local · Linhas · Ajuste fino · Assinatura | P:Texto | — | Opções da ferramenta; Fonte e Tamanho somem da BF |
+| Editar texto (focar o campo) | **BF** (texto selecionado; 1 ação) | TEC Enter / duplo toque na faixa | Atalho de manipulação direta, não repete controle |
+| Inserir sticker / emoji · buscar · tipo | P:Stickers (catálogo) | — | Opções da ferramenta |
+| Tamanho · Giro · Cor do sticker | P:Stickers «Elemento selecionado» | TEC alças (redimensionar, girar), setas (mover) | −/+ e girar somem da BF |
+| Duplicar · Trazer para frente · Enviar para trás · Excluir (sticker) | **BF** (sticker selecionado; 4 ações) | TEC Ctrl+D, Delete | Manipulação direta; somem de P:Stickers |
+| Formato · Orientação · Atalhos de medida · Medidas · Resetar formato | P:Moldura | TEC R (orientação) | Clicar na moldura abre o painel; **sem BF** |
+| Metadados · Editar data/cidade/origem · Corrigir várias de uma vez | P:Dados | — | Opções da ferramenta |
+| Papel e guias (Modo Folhas) | P:Papel | — | Fora do Quadro |
+| Pré-voo | LED → Folhas `#revisar` | — | Igual |
+| Lembranças · Colagem (Em breve) | Fim do TR | — | Item apagado |
 
-Nenhuma função some; as únicas remoções são as que a D-136 já decidiu (Acima/Ambas) e o deslocamento horizontal, cuja função o alinhamento absorve (§7.3).
+Removidos por repetição em relação ao protótipo anterior: alinhamento, fonte e tamanho na BF do texto; Preencher/Encaixar e zoom na BF da foto; Girar/Espelhar/Foto inteira em P:Recorte; −/+ e girar na BF do sticker; Duplicar/Frente/Trás/Excluir em P:Stickers; BF da moldura inteira (formato, orientação, «Medidas»); «Centralizar» sob a polaroid; «Sem legendas» no popover de escopo; «Adicionar fotos» em P:Fotos; chip do formato como botão; contador «Foto 03 / 24» na faixa.
+
+### 1.5 Regra anti-repetição
+
+1. Cada comando tem **um lugar principal**. No máximo **um atalho adicional**, e só se o uso for muito frequente; atalho de teclado ou gesto não conta como repetição visual.
+2. **Ações globais** (desfazer/refazer, salvar backup, revisar impressão, conta) ficam **só no cabeçalho** (no celular: LED na barra fixa, Salvar e Conta no «⋯»).
+3. **Navegação entre ferramentas** só no trilho (desktop) **ou** nas abas do painel (celular), nunca nos dois ao mesmo tempo. Chips da barra de contexto informam; não navegam.
+4. **Opções da ferramenta ativa** (interruptores, segmentados, deslizadores, listas) ficam **só no painel contextual**.
+5. A **barra flutuante** sobre o palco mostra **no máximo 4 ações de manipulação direta** do objeto selecionado (girar, espelhar, duplicar, camada, excluir, editar) e **nunca repete** um controle do painel. Seleção sem ação direta (moldura) não tem barra.
+6. O **menu «⋯»** guarda só ações raras que **não estão em nenhum outro lugar** (mais, no celular, o que saiu do cabeçalho).
+7. **Celular:** as abas ficam **dentro** do painel inferior, e o palco **reserva a altura do painel** (painel e barra fixa no fluxo da grade), para a barra flutuante nunca ficar embaixo do painel.
+
+Quando o §2 abaixo (conteúdo das BF) divergir desta tabela, a tabela prevalece.
 
 ---
 
