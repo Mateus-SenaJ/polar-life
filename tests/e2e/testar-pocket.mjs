@@ -62,7 +62,8 @@ const guardarQuadro = (fr, leg, n, cidade) => page.evaluate(({ fr, leg, n, cidad
   if (leg) q[0].leg = leg;
   for (let i = 1; i <= n; i++) q.push({ src: i, ...( cidade && i === 1 ? { meta: { iso: '2026-07-14T08:00', c: cidade } } : {}) });
   sessionStorage.setItem('pl-quadro', JSON.stringify(q));
-  ['pl-fmt', 'pl-fotos', 'pl-folhas', 'pl-orientacao'].forEach(k => { try { sessionStorage.removeItem(k) } catch (e) { } });
+  ['pl-fmt', 'pl-fotos', 'pl-orientacao'].forEach(k => { try { sessionStorage.removeItem(k) } catch (e) { } });
+  sessionStorage.setItem('pl-folhas', JSON.stringify({ papel: 'A4', margem: 10, gap: 4 }));   // projeto salvo com 10/4: as conferências de legenda abaixo valem para ele (D-150)
 }, { fr, leg, n, cidade });
 const abrirEditor = async () => {
   await page.goto(srv.url + 'app/editor/', { waitUntil: 'networkidle' });
@@ -147,8 +148,8 @@ try {
 
   console.log('Contagem de folhas (motor compartilhado):');
   const rb = await page.evaluate(() => PLFOLHAS.contar(PLFOLHAS.ler(), { w: 66, h: 99 }, window.PLQ.N, 0));
-  ok(rb.folhas === 6 && rb.porFolha === 4 && !rb.naoCabe,
-    'A4 (margem 10, espaço 4): 4 por folha e 6 folhas para 24 fotos (' + rb.porFolha + '/' + rb.folhas + ')');
+  ok(rb.folhas === 3 && rb.porFolha === 8 && !rb.naoCabe,
+    'A4 (padrão D-150: margem 3, espaço 0): 8 por folha e 3 folhas para 24 fotos (' + rb.porFolha + '/' + rb.folhas + ')');
 
   console.log('Fluxo T-02 → Quadro → T-07 (pl-fmt):');
   await limpar();
@@ -171,10 +172,10 @@ try {
       leg: c.LG, ml: document.querySelectorAll('#sheet .pol__ml').length, meta: document.querySelectorAll('#sheet .pol__meta').length
     };
   });
-  ok(rc2.fr.w === 66 && rc2.fr.h === 99 && rc2.fr.jw === 60 && rc2.fr.jh === 79 && rc2.folhas === 6
+  ok(rc2.fr.w === 66 && rc2.fr.h === 99 && rc2.fr.jw === 60 && rc2.fr.jh === 79 && rc2.folhas === 3
     && rc2.leg.meta === 'linhas' && rc2.leg.ordem === 'loc-data' && rc2.leg.medida === 'letras' && rc2.leg.txt.on === false,
-    'a T-07 recebe o projeto Pocket do Quadro (66 × 99, 6 folhas, legenda em linhas)');
-  ok(rc2.ml === 8 && rc2.meta === 0, 'T-07: 4 polaroids × 2 linhas .pol__ml na folha 1 e nada de .pol__meta');
+    'a T-07 recebe o projeto Pocket do Quadro (66 × 99, 3 folhas, legenda em linhas)');
+  ok(rc2.ml === 16 && rc2.meta === 0, 'T-07: 8 polaroids × 2 linhas .pol__ml na folha 1 e nada de .pol__meta');
   await page.evaluate(() => { try { sessionStorage.removeItem('pl-quadro') } catch (e) { } try { sessionStorage.setItem('pl-fmt', 'pocket') } catch (e) { } });
   await page.goto(srv.url + 'app/editor/', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0);
@@ -182,7 +183,7 @@ try {
     const c = window.PLEDITOR.ctx();
     return { w: c.FR.w, h: c.FR.h, ml: document.querySelectorAll('#sheet .pol__ml').length, meta: c.LG.meta };
   });
-  ok(rc3.w === 66 && rc3.h === 99 && rc3.ml === 8 && rc3.meta === 'linhas',
+  ok(rc3.w === 66 && rc3.h === 99 && rc3.ml === 16 && rc3.meta === 'linhas',
     'T-07 direto do T-02 (sem passar pelo Quadro) também entra no Pocket');
 
   console.log('Novo projeto (T-02):');
@@ -202,6 +203,7 @@ try {
 
   console.log('Display list do PDF (medidas D-113):');
   await page.evaluate(() => ['pl-quadro', 'pl-fotos', 'pl-folhas', 'pl-orientacao'].forEach(k => { try { sessionStorage.removeItem(k) } catch (e) { } }));
+  await page.evaluate(() => sessionStorage.setItem('pl-folhas', JSON.stringify({ papel: 'A4', margem: 10, gap: 4 })));   // projeto salvo com 10/4: os números abaixo valem para ele (D-150)
   await abrirEditor();
   const re = await page.evaluate(async () => {
     const p = PLGERADOR.projeto();
@@ -234,7 +236,7 @@ try {
   ok(re.dataY !== null && Math.abs((re.dataY - re.locY) / 1000 - (2 + re.capU / 1000)) <= 0.1,
     'PDF: topo das maiúsculas da 2ª linha = linha de base da 1ª + 2 mm (Δ ' + ((re.dataY - re.locY) / 1000).toFixed(3) + ' mm)');
   ok(re.locX === 3000 && re.dataX === 3000, 'PDF: as duas linhas coladas na margem lateral (x = 3 mm)');
-  ok(re.paginas === 6, 'PDF: 24 fotos do Pocket em A4 = 6 páginas (' + re.paginas + ')');
+  ok(re.paginas === 6, 'PDF: 24 fotos do Pocket em A4 (10/4) = 6 páginas (' + re.paginas + ')');
 
   console.log('T-07 DOM (mesma conferência, ±0,3 mm):');
   const rf = await page.evaluate(() => {

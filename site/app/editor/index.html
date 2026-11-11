@@ -82,18 +82,18 @@
 </header>
 
 <nav class="modes" aria-label="Modos">
-<a class="modes__o is-on" href="./" aria-current="page">Folhas</a>
+<a class="modes__o is-on" id="modes-folhas" href="./" aria-current="page">Folhas</a>
 <a class="modes__o" id="modes-q" href="quadro/#foto-1">Quadro</a>
-<button type="button" class="modes__o" disabled>Colagem</button>
+<button type="button" class="modes__o" id="modes-colagem">Colagem</button>
 </nav>
 
 <aside class="rail" aria-label="Navegação de mesa">
 <div>
 <p class="rail__t rotulo"><span>Navegação de mesa</span><span class="dot dot--o" aria-hidden="true"></span></p>
 <ul class="rail__l">
-<li><a class="rail__i is-on" href="./" aria-current="page"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
+<li><a class="rail__i is-on" id="rail-folhas" href="./" aria-current="page"><svg class="ico"><use href="#i-layers"/></svg><span>Folhas</span></a></li>
 <li><a class="rail__i" id="rail-q" href="quadro/#foto-1"><svg class="ico"><use href="#i-grid"/></svg><span>Quadro</span></a></li>
-<li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span><em class="rotulo">Em breve</em></button></li>
+<li><button type="button" class="rail__i" id="rail-colagem"><svg class="ico"><use href="#i-collage"/></svg><span>Colagem</span></button></li>
 <li><button type="button" class="rail__i" disabled><svg class="ico"><use href="#i-memory"/></svg><span>Lembranças</span><em class="rotulo">Em breve</em></button></li>
 </ul>
 </div>
@@ -106,7 +106,7 @@
 <main class="content" id="main">
 <div class="wrap">
 <div class="ctx">
-<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-layers"/></svg><span class="rotulo">Modo Folhas</span><span class="rotulo" id="ctx-sheet-label">Folha</span><span class="mono" id="ctx-sheet">1 de 6</span><span class="rotulo" id="ctx-empty" hidden>Sem folhas</span><span class="rotulo" id="ctx-grupo" hidden></span></span>
+<span class="pill"><svg class="ico sm" style="color:var(--blue)"><use href="#i-layers"/></svg><span class="rotulo" id="ctx-modo">Modo Folhas</span><span class="rotulo" id="ctx-sheet-label">Folha</span><span class="mono" id="ctx-sheet">1 de 6</span><span class="rotulo" id="ctx-empty" hidden>Sem folhas</span><span class="rotulo" id="ctx-grupo" hidden></span></span>
 <div class="ctx__r">
 <span class="pill pill--sq"><svg class="ico sm"><use href="#i-ruler"/></svg><span class="rotulo">Escala</span><span class="mono" id="ctx-scale">50%</span></span>
 <button type="button" class="btn2 btn2--sm ctx__insp" id="insp-toggle" aria-controls="insp" aria-expanded="true"><svg class="ico sm"><use href="#i-panel"/></svg>Inspetor</button>
@@ -126,7 +126,7 @@
 </div>
 <div class="acts">
 <button type="button" class="btn2" id="prev"><svg class="ico sm"><use href="#i-prev"/></svg>Folha anterior</button>
-<span class="acts__cota"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span class="rotulo">Margem</span><span class="mono" id="cota-margem">10 mm</span><span class="rotulo">Entre polaroids</span><span class="mono" id="cota-gap">4 mm</span></span>
+<span class="acts__cota"><svg class="ico sm" style="color:var(--blue)"><use href="#i-ruler"/></svg><span class="rotulo">Margem</span><span class="mono" id="cota-margem">3 mm</span><span class="rotulo">Entre polaroids</span><span class="mono" id="cota-gap">0 mm</span></span>
 <button type="button" class="btn2" id="next">Folha seguinte<svg class="ico sm"><use href="#i-next"/></svg></button>
 </div>
 <p class="status mono" id="status" role="status" aria-live="polite">A4 retrato · 4 clássicas por folha · 6 folhas no total</p>
@@ -146,6 +146,7 @@
 <h2 class="insp__h">Inspetor</h2>
 <div class="tabs" role="tablist" aria-label="Abas do inspetor">
 <button type="button" role="tab" class="tab rotulo is-on" id="tab-papel" aria-selected="true" aria-controls="p-papel">Papel</button>
+<button type="button" role="tab" class="tab rotulo" id="tab-colagem" aria-selected="false" aria-controls="p-outra" tabindex="-1">Colagem</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-ajustes" aria-selected="false" aria-controls="p-outra" tabindex="-1">Ajustes</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-legendas" aria-selected="false" aria-controls="p-outra" tabindex="-1">Legendas</button>
@@ -244,6 +245,7 @@
 <div class="esq-sk__insp"><i></i><i></i><i></i><i></i></div>
 </div>
 <script src="../../assets/js/nucleo/motor-folhas.js" defer></script>
+<script src="../../assets/js/nucleo/colagem.js" defer></script>
 <script src="../../assets/js/nucleo/fotos-locais.js" defer></script>
 <script src="../../assets/js/nucleo/projetos.js" defer></script>
 <script src="../../assets/js/nucleo/sessao.js" defer></script>
