@@ -88,7 +88,9 @@ function renderEmail(manter){
   $('b-esqueci').addEventListener('click',function(){renderEsqueci($('email').value.trim())});
   $('b-criar').addEventListener('click',function(){renderCriar($('email').value.trim())});
   $('b-via-codigo').addEventListener('click',renderImpressao);
-  [].forEach.call(document.querySelectorAll('[data-prov]'),function(b){b.addEventListener('click',function(){var pv=b.getAttribute('data-prov');renderDados({origem:pv,nomeProv:b.textContent.replace('Continuar com ','')})})});
+  [].forEach.call(document.querySelectorAll('[data-prov]'),function(b){b.addEventListener('click',function(){var pv=b.getAttribute('data-prov');
+    if(pv==='google'&&window.PLGOOGLE&&PLGOOGLE.ativo()&&PLGOOGLE.iniciar(voltar))return;   /* D-147g: Google de verdade */
+    renderDados({origem:pv,nomeProv:b.textContent.replace('Continuar com ','')})})});
   var ls=[].slice.call(document.querySelectorAll('.cx-testes__lista .btn2'));
   for(var i=0;i<ls.length;i++)ls[i].addEventListener('click',entrarContaTeste);
   var em=$('email');focar(em);
@@ -424,6 +426,8 @@ function renderDados(ctx){
   if(ctx.origem==='codigo'){
     var pk=ctx.pacote||{};
     aviso=cxInfo('<strong>Código conferido.</strong> '+esc(pk.pacote||'Pacote de folhas')+(pk.folhas?' · '+pk.folhas+' folhas':'')+(pk.fotos?' · até '+pk.fotos+' fotos':'')+'.')
+  }else if(ctx.verificado){
+    aviso=cxInfo('<strong>Conta Google confirmada.</strong> Falta só aceitar os Termos. Seus dados ficam neste aparelho.')
   }else if(ctx.origem!=='email'){                            /* T7: não fingir que o provedor foi acessado */
     aviso=cxInfo('<strong>Demonstração.</strong> A entrada com '+esc(ctx.nomeProv||ctx.origem)+' ainda não acessa a sua conta. Preencha seus dados para continuar; eles ficam só neste navegador.')
   }
@@ -433,7 +437,7 @@ function renderDados(ctx){
     '<form id="f-dados" class="cx-f" novalidate>'+
     '<div class="fld fld--first" id="g-d-nome">'+
     '<label class="lab" for="d-nome">Nome</label>'+
-    '<input class="txt" id="d-nome" type="text" autocomplete="name" maxlength="60" placeholder="Como você quer ser chamado">'+
+    '<input class="txt" id="d-nome" type="text" autocomplete="name" maxlength="60" placeholder="Como você quer ser chamado" value="'+esc(ctx.nome||'')+'">'+
     '<p class="help" id="ajuda-d-nome">Aparece só para você, na sua conta.</p>'+
     '</div>'+
     '<div class="fld" id="g-d-email">'+
@@ -506,9 +510,17 @@ function semSuporte(){ /* §1.4: sem localStorage */
   var ls=[].slice.call(document.querySelectorAll('.cx-testes__lista .btn2'));
   for(var i=0;i<ls.length;i++)ls[i].disabled=true
 }
+/* volta do Google (D-147g): lida antes de tudo, e o token sai da barra de endereço */
+var GR=window.PLGOOGLE&&PLGOOGLE.lerRetorno();
+if(GR&&GR.voltar&&!voltar)voltar=GR.voltar;
 if(C&&G){
   if(!C.temLocalStorage())semSuporte();
-  else if(C.temSessao()&&C.cadastroPendente&&C.cadastroPendente()){var sc0=C.sessaoCodigo(),s0=C.sessao();renderDados(sc0?{origem:'codigo',email:''}:{origem:(s0&&s0.provedor)||'email',email:s0&&s0.email})}
+  else if(GR&&GR.erro){renderEmail('');toast(GR.erro==='cancelado'?'Entrada com Google cancelada.':'Não foi possível confirmar a conta Google. Tente de novo.')}
+  else if(GR){var rg=C.entrarComProvedor({email:GR.email,nome:GR.nome,provedor:'google'});
+    if(rg.ok){toast('Olá, '+String(rg.nome||GR.email).split(' ')[0]+'!');tmIr=setTimeout(irPara,700)}
+    else if(rg.pendente)renderDados({origem:'google',email:GR.email,nome:rg.nome,verificado:true});
+    else{renderEmail('');toast('Não foi possível confirmar a conta Google. Tente de novo.')}}
+  else if(C.temSessao()&&C.cadastroPendente&&C.cadastroPendente()){var sc0=C.sessaoCodigo(),s0=C.sessao();renderDados(sc0?{origem:'codigo',email:''}:{origem:(s0&&s0.provedor)||'email',email:s0&&s0.email,nome:s0&&s0.nome,verificado:!!(s0&&s0.provedor==='google')})}
   else if(C.temSessao())renderEntrou();
   else renderEmail('');
 }else{

@@ -31,7 +31,7 @@
     "testar:led": "node tests/e2e/testar-led.mjs",
     "testar:gerar-real": "node tests/e2e/testar-gerar-real.mjs",
     "testar:recorte": "node tests/e2e/testar-recorte.mjs",
-    "testar:node": "node tests/unit/testar-quadro.mjs && node tests/unit/testar-importar.mjs && node tests/unit/testar-exif.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs && node tests/e2e/testar-led.mjs && node tests/e2e/testar-csp.mjs && node tests/e2e/testar-gerar-real.mjs && node tests/e2e/testar-pocket.mjs && node tests/e2e/testar-contas.mjs && node tests/e2e/testar-projetos.mjs && node tests/e2e/testar-projetos-salvos.mjs && node tests/e2e/testar-editor.mjs && node tests/e2e/testar-qualidade-folhas.mjs && node tests/e2e/testar-pwa.mjs && node tests/e2e/testar-entrar-mesa.mjs && node tests/e2e/testar-recorte.mjs && node tests/unit/testar-legenda-migracao.mjs && node tests/e2e/testar-texto-alinhado.mjs && node tests/e2e/testar-inicio.mjs && node tests/e2e/testar-apresentacao.mjs && node tests/e2e/testar-ilustracoes-fotos.mjs && node tests/e2e/testar-fotos-tela.mjs && node tests/e2e/testar-legendas-reais.mjs && node tests/e2e/testar-midia.mjs && node tests/unit/testar-locais.mjs && node tests/e2e/testar-legenda-padroes.mjs && node tests/unit/testar-colagem.mjs && node tests/e2e/testar-colagem-pdf.mjs",
+    "testar:node": "node tests/unit/testar-quadro.mjs && node tests/unit/testar-importar.mjs && node tests/unit/testar-exif.mjs && node tests/e2e/testar-fontes.mjs && node tests/e2e/testar-pdf.mjs && node tests/e2e/testar-led.mjs && node tests/e2e/testar-csp.mjs && node tests/e2e/testar-gerar-real.mjs && node tests/e2e/testar-pocket.mjs && node tests/e2e/testar-contas.mjs && node tests/e2e/testar-projetos.mjs && node tests/e2e/testar-projetos-salvos.mjs && node tests/e2e/testar-editor.mjs && node tests/e2e/testar-qualidade-folhas.mjs && node tests/e2e/testar-pwa.mjs && node tests/e2e/testar-entrar-mesa.mjs && node tests/e2e/testar-recorte.mjs && node tests/unit/testar-legenda-migracao.mjs && node tests/e2e/testar-texto-alinhado.mjs && node tests/e2e/testar-inicio.mjs && node tests/e2e/testar-apresentacao.mjs && node tests/e2e/testar-ilustracoes-fotos.mjs && node tests/e2e/testar-fotos-tela.mjs && node tests/e2e/testar-legendas-reais.mjs && node tests/e2e/testar-midia.mjs && node tests/unit/testar-locais.mjs && node tests/e2e/testar-legenda-padroes.mjs && node tests/e2e/testar-google.mjs && node tests/unit/testar-colagem.mjs && node tests/e2e/testar-colagem-pdf.mjs",
     "testar:inicio": "node tests/e2e/testar-inicio.mjs",
     "testar:apresentacao": "node tests/e2e/testar-apresentacao.mjs",
     "testar:ilustracoes-fotos": "node tests/e2e/testar-ilustracoes-fotos.mjs",
@@ -53,7 +53,8 @@
     "testar:editor": "node tests/e2e/testar-editor.mjs",
     "testar:fotos-tela": "node tests/e2e/testar-fotos-tela.mjs",
     "testar:legendas-reais": "node tests/e2e/testar-legendas-reais.mjs",
-    "testar:qualidade": "node tests/e2e/testar-qualidade-folhas.mjs"
+    "testar:qualidade": "node tests/e2e/testar-qualidade-folhas.mjs",
+    "testar:google": "node tests/e2e/testar-google.mjs"
   },
   "engines": {
     "node": ">=20"
