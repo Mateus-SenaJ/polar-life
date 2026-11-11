@@ -91,13 +91,23 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 /* ---- LED: único botão por tela (T8) ---- */
 .led-btn--block{width:100%;margin-top:24px}
 
-/* ---- animação A1: polaroids pousando (brief §5.4) ---- */
-.mesa .mesa-p{transform-box:fill-box;transform-origin:center;opacity:0;animation:mesa-pousa 600ms var(--ease) both}
+/* ---- animação A1: polaroids pousando e foto saindo da câmera (brief §5.4) ----
+   A posição de cada grupo é a do arquivo-fonte (o `transform` do SVG). Por isso a animação usa a
+   propriedade `translate`: ela se soma ao `transform` sem trocar o lugar de ninguém — animar o
+   `transform` (ou pôr `transform:none`) zeraria a posição que o arquivo já define. */
+.mesa .mesa-p{opacity:0;animation:mesa-pousa 600ms var(--ease) both}
 .mesa #mesa-p1{animation-delay:0ms}.mesa #mesa-p2{animation-delay:90ms}.mesa #mesa-p3{animation-delay:180ms}
 .mesa #mesa-p4{animation-delay:270ms}.mesa #mesa-p5{animation-delay:360ms}.mesa #mesa-p6{animation-delay:450ms}.mesa #mesa-p7{animation-delay:540ms}
 @keyframes mesa-pousa{
-  from{transform:translateY(-40px) rotate(var(--a,8deg));opacity:0}
-  to{transform:none;opacity:1}
+  from{translate:0 -40px;opacity:0}
+  to{translate:0 0;opacity:1}
+}
+/* foto saindo da fenda: repouso em translate(75 186) (nota de animação do arquivo-fonte: 96 → 186),
+   depois que as sete polaroids pousam */
+.mesa #mesa-cam-foto{animation:mesa-foto-sai 900ms var(--ease) 1140ms both}
+@keyframes mesa-foto-sai{
+  from{translate:0 -90px}
+  to{translate:0 0}
 }
 
 /* transição entre páginas (A5): fica para a rodada do §5 (T-28/T-29/T-32) */
@@ -106,9 +116,8 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 @media (min-width:1024px){
   .ent{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
   .ent__l{display:flex;flex-direction:column}
-  .ent__mesa{flex:0 0 60%;min-height:0}
-  .ent__mesa .mesa{height:100%;aspect-ratio:auto}
-  .ent__faixa{flex:1;display:flex;flex-direction:column;justify-content:center;padding:64px}
+  .ent__mesa{flex:0 0 auto;aspect-ratio:16/10}
+  .ent__faixa{flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-start;padding:64px}
   .ent__r{position:relative;display:flex;flex-direction:column;align-items:center;padding:104px 32px 32px}
   .ent__head{position:absolute;top:0;left:0;right:0;height:72px;padding:0 32px;box-sizing:border-box}
   .ent__caixa{width:440px;max-width:100%;margin-top:auto;margin-bottom:auto}
@@ -118,7 +127,8 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 
 /* ---- movimento reduzido: tudo no estado final (brief §5.4) ---- */
 @media (prefers-reduced-motion:reduce){
-  .mesa .mesa-p{animation:none;opacity:1;transform:none}
+  .mesa .mesa-p{animation:none;opacity:1;translate:none}
+  .mesa #mesa-cam-foto{animation:none;opacity:1;translate:none}
 }
 /* Entradas comuns (Google, Apple, Facebook) · marcas monocromáticas (T2) desenhadas localmente (T6) */
 .cx-prov{display:grid;gap:10px;margin-top:20px}
