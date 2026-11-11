@@ -245,7 +245,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.locator('#d-nome').fill('Cliente Avulso'); await p.locator('#b-dados').click();
   (await p.locator('#erro-d-aceite').isVisible()) ? ok('dados: aceite obrigatório') : ruim('dados sem aceite');
   await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
-  await p.waitForURL('**/app/', { timeout: 5000 });      /* veio de ?voltar=%2Fapp%2F: volta para /app/ */
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });   /* veio de ?voltar=%2Fapp%2F: a raiz do app leva ao Início (D-118) */
   const sc = await p.evaluate(() => ({ sc: PLCONTA.sessaoCodigo(), pl: PLCONTA.plano() }));
   sc.sc && sc.sc.folhas === 8 && sc.pl.id === 'codigo' && sc.pl.fotosPorProjeto === 24
     ? ok('código certo: sessão de impressão (8 folhas, 24 fotos)') : ruim('sessão de código: ' + JSON.stringify(sc));

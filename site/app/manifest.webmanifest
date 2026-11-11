@@ -4,7 +4,7 @@
   "description": "Seus projetos de polaroids, salvos neste aparelho.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "./",
+  "start_url": "./inicio/",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

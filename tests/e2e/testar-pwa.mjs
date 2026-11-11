@@ -45,7 +45,7 @@ try {
   // 1. manifesto
   const mf = JSON.parse(readFileSync(SITE + 'app/manifest.webmanifest', 'utf8'));
   ok(mf.name === 'Polar Life' && mf.short_name === 'Polar Life' && mf.lang === 'pt-BR' && mf.dir === 'ltr', 'manifesto: nome, short_name, lang e dir');
-  ok(mf.start_url === './' && mf.scope === './' && mf.display === 'standalone' && mf.orientation === 'any', 'manifesto: start_url, scope, display e orientation');
+  ok(mf.start_url === './inicio/' && mf.scope === './' && mf.display === 'standalone' && mf.orientation === 'any', 'manifesto: start_url, scope, display e orientation');
   ok(mf.background_color === '#FFFFFF' && mf.theme_color === '#FFFFFF' && !!mf.description, 'manifesto: cores e descrição');
   ok(['photo', 'design', 'productivity'].every(c => (mf.categories || []).includes(c)), 'manifesto: categorias');
   ok(mf.shortcuts && mf.shortcuts[0].name === 'Novo projeto' && mf.shortcuts[0].url === './novo-projeto/', 'manifesto: atalho «Novo projeto»');

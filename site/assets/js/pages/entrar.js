@@ -18,7 +18,7 @@ var RE_EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function lerVoltar(){
   var q=null;try{q=new URLSearchParams(location.search).get('voltar')}catch(e){}
   if(!q||q.indexOf('/')!==0)return null;
-  if(G&&G.raiz()){try{var rp=new URL(G.raiz()).pathname;if(q.indexOf(rp)===0&&q.indexOf(rp+'entrar/')!==0)return q}catch(e){}}
+  if(G&&G.raiz()){try{var rp=new URL(G.raiz()).pathname;if(q.indexOf(rp)===0&&q.indexOf(rp+'entrar/')!==0&&q.split('?')[0].split('#')[0]!==rp)return q   /* a raiz do app (lista de projetos) não é destino: depois de entrar vai ao Início (D-118) */}catch(e){}}
   return null
 }
 /* D-118: depois de entrar, a pessoa cai no Início (a lista de projetos fica em «Projetos») */
