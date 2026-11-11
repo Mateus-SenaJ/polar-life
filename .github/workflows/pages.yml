@@ -14,7 +14,8 @@ jobs:
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run verificar
-      - run: npx playwright install --with-deps chromium
+      - run: |
+          timeout 480 npx playwright install --with-deps chromium || { echo "espelho apt indisponivel, instalando so o navegador"; npx playwright install chromium; }
       - run: npm run testar:node        # motor do Quadro, fontes locais (T6) e PDF (MT-02)
       - if: failure()                   # capturas e PDFs dos testes para diagnóstico
         uses: actions/upload-artifact@v4

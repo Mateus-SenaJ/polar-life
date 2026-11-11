@@ -28,8 +28,11 @@
 <link rel="stylesheet" href="../assets/css/base/led.css">
 <link rel="stylesheet" href="../assets/css/ui/movimento.css">
 <link rel="stylesheet" href="../assets/css/ui/faixa-escura.css">
+<link rel="stylesheet" href="../assets/css/ui/midia.css">
 <link rel="stylesheet" href="../assets/css/pages/como-funciona.css">
 <script src="../assets/js/ui/movimento.js" defer></script>
+<script src="../assets/js/ui/midia-arquivos.js" defer></script>
+<script src="../assets/js/ui/midia.js" defer></script>
 </head>
 <body>
 <header class="site-header"><div class="wrap site-header__in">
@@ -59,7 +62,7 @@
           <h2 class="step__t">Escolha suas fotos</h2>
           <p class="step__d">Importe do aparelho ou tire na hora com a câmera. Fotos de iPhone também funcionam.</p>
         </div>
-        <div class="step__arte step__arte--cam mov-cam" data-mov="cam" aria-hidden="true">
+        <div class="step__arte step__arte--cam mov-cam" data-mov="cam" data-midia-cam aria-hidden="true">
           <!-- Câmera instantânea · arquivo-fonte: assets/img/ilustracoes/camera-instantanea.svg.
                Embutida para animar o grupo #cam-foto (A2), sem requisição extra (T6).
                A foto já fica na posição final (translate 75 255.8 = 150 + 58% da própria altura). -->
@@ -151,6 +154,8 @@
             </g>
             </g>
           </svg>
+          <!-- câmera realista (D-142): entra no lugar do desenho quando o arquivo existe -->
+          <img class="cam-real" data-midia-camera="frente" data-midia-base="../assets/" width="800" height="800" alt="" hidden>
         </div>
       </li>
 

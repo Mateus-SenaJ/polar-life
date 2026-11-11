@@ -29,8 +29,11 @@
 <link rel="stylesheet" href="assets/css/base/led.css">
 <link rel="stylesheet" href="assets/css/ui/movimento.css">
 <link rel="stylesheet" href="assets/css/ui/faixa-escura.css">
+<link rel="stylesheet" href="assets/css/ui/midia.css">
 <link rel="stylesheet" href="assets/css/pages/apresentacao.css">
 <script src="assets/js/ui/movimento.js" defer></script>
+<script src="assets/js/ui/midia-arquivos.js" defer></script>
+<script src="assets/js/ui/midia.js" defer></script>
 </head>
 <body>
 
@@ -65,9 +68,14 @@
       </p>
     </div>
 
-    <!-- câmera instantânea com a polaroid saindo (A2) e duas polaroids pousadas ao lado -->
+    <!-- vídeo realista ao lado do título (D-140): mesa de fim de tarde, o celular é guardado e as polaroids ficam.
+         Decorativo (aria-hidden), mudo, em loop; o PLMIDIA carrega o arquivo só quando ele existe e entra na tela.
+         Reserva: poster local + câmera com a polaroid saindo (A2) e duas polaroids com legenda. -->
     <div class="hero__arte">
-      <div class="cam mov-cam" data-mov="cam" data-mov-quando="carregar" aria-hidden="true">
+     <div class="midia midia--hero" data-midia="mesa-polaroids" data-midia-base="assets/" aria-hidden="true">
+      <video class="midia__video" muted autoplay loop playsinline preload="none" poster="assets/img/fotos/mesa.jpg" tabindex="-1" disablepictureinpicture></video>
+      <div class="midia__reserva">
+      <div class="cam mov-cam" data-mov="cam" data-mov-quando="carregar" data-midia-cam>
         <!-- Câmera instantânea · ilustração definitiva (arquivo-fonte: assets/img/ilustracoes/camera-instantanea.svg).
              O arquivo está embutido aqui para animar o grupo #cam-foto (A2), sem requisição extra (T6).
              A foto já fica na posição final (translate 75 255.8 = 150 + 58% da própria altura): a animação
@@ -81,7 +89,7 @@
             </filter>
             <clipPath id="cam-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
             <g id="cam-cena-montanha">
-              <image href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+              <image data-midia-foto="familia-parque" data-midia-base="assets/" href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
             </g>
           </defs>
           <g transform="translate(18 14) scale(.68)">
@@ -157,10 +165,14 @@
           </g>
           </g>
         </svg>
+        <!-- câmera realista (D-142): entra no lugar do desenho quando o arquivo existe -->
+        <img class="cam-real" data-midia-camera="perfil" data-midia-base="assets/" width="800" height="800" alt="" hidden>
       </div>
-      <!-- as polaroids pousadas viraram moldura em HTML com a foto real dentro (design §3) -->
-      <figure class="hero__pol hero__pol--praia"><img src="assets/img/fotos/praia.jpg" width="76" height="76" alt="" loading="lazy"></figure>
-      <figure class="hero__pol hero__pol--viagem"><img src="assets/img/fotos/viagem.jpg" width="76" height="76" alt="" loading="lazy"></figure>
+      <!-- polaroids pousadas: moldura em HTML com a foto dentro, legenda e data manuscritas (D-143) -->
+      <figure class="hero__pol hero__pol--praia"><img data-midia-foto="amigos-praia" data-midia-base="assets/" src="assets/img/fotos/praia.jpg" width="76" height="76" alt="" loading="lazy"><figcaption class="hero__pol-leg">Praia com a turma<span>12/01/2025</span></figcaption></figure>
+      <figure class="hero__pol hero__pol--viagem"><img data-midia-foto="amigos-viagem" data-midia-base="assets/" src="assets/img/fotos/viagem.jpg" width="76" height="76" alt="" loading="lazy"><figcaption class="hero__pol-leg">Pé na estrada<span>03/2025</span></figcaption></figure>
+      </div>
+     </div>
     </div>
   </section>
 
@@ -175,7 +187,7 @@
           <a class="faixa__link" href="app/inicio/">Começar agora<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
         <!-- o banner virou SVG embutido: dentro de um <img> uma foto não carrega (design §4) -->
-        <svg class="faixa__img faixa__img--svg mov-parallax" viewBox="0 0 1200 500" preserveAspectRatio="xMaxYMid slice" focusable="false" aria-hidden="true">
+        <svg class="faixa__img faixa__img--svg mov-parallax" data-midia-cam viewBox="0 0 1200 500" preserveAspectRatio="xMaxYMid slice" focusable="false" aria-hidden="true">
           <defs>
             <filter id="bimp-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
               <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity=".06" result="bimp-s1"/>
@@ -184,13 +196,13 @@
             </filter>
             <clipPath id="bimp-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
             <g id="bimp-cena-montanha">
-              <image href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+              <image data-midia-foto="amigos-trilha" data-midia-base="assets/" href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
             </g>
             <g id="bimp-cena-praia">
-              <image href="assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+              <image data-midia-foto="amigos-praia" data-midia-base="assets/" href="assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
             </g>
             <g id="bimp-cena-sol">
-              <image href="assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+              <image data-midia-foto="casal-por-do-sol" data-midia-base="assets/" href="assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
             </g>
           </defs>
           <rect width="1200" height="500" fill="#000000"/>
@@ -201,7 +213,7 @@
               <rect x=".5" y=".5" width="289.4" height="352.1" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
               <g transform="translate(19.8 19.8) scale(3.3)"><use href="#bimp-cena-sol"/></g>
               <rect x="19.8" y="19.8" width="250.8" height="250.8" fill="none" stroke="#000000" stroke-opacity=".06"/>
-              <g transform="scale(3.3)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+              <text class="pol-leg" x="145.2" y="321.8">Fim de tarde a dois</text>
             </g>
           </g>
           <!-- anima: bimp-p1 flutua em sentido contrário, centro 158.4 192.6 -->
@@ -211,11 +223,12 @@
               <rect x=".5" y=".5" width="315.8" height="384.2" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
               <g transform="translate(21.6 21.6) scale(3.6)"><use href="#bimp-cena-praia"/></g>
               <rect x="21.6" y="21.6" width="273.6" height="273.6" fill="none" stroke="#000000" stroke-opacity=".06"/>
-              <g transform="scale(3.6)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+              <text class="pol-leg" x="158.4" y="338.4">Praia com a turma</text>
+              <text class="pol-data" x="158.4" y="369">12/01/2025</text>
             </g>
           </g>
           <!-- anima: bimp-camera entra deslizando, centro 612 240 -->
-          <g id="bimp-camera" transform="translate(430 96) rotate(-6 150 112) scale(1.2)">
+          <g id="bimp-camera" class="cam-desenho" transform="translate(430 96) rotate(-6 150 112) scale(1.2)">
           <!-- anima: bimp-corpo bascula de leve, centro 150 112 -->
           <g id="bimp-corpo" filter="url(#bimp-papel)">
             <rect x="-1.5" y="-1.5" width="303" height="228" rx="37.5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
@@ -291,6 +304,8 @@
             <path d="M470 54v18M461 63h18"/><path d="M1150 452v14M1143 459h14" opacity=".7"/>
           </g>
           <circle cx="1120" cy="60" r="7" fill="#FD761A"/>
+          <!-- câmera realista (D-142) -->
+          <image data-midia-camera="perfil" data-midia-base="assets/" x="420" y="60" width="380" height="380" preserveAspectRatio="xMidYMid meet" display="none"/>
         </svg>
       </article>
     </div>
@@ -305,7 +320,7 @@
            O arquivo está embutido aqui para animar cada grupo pelo CSS (A1), sem requisição extra (T6).
            A posição de cada grupo é a do arquivo-fonte: a animação usa a propriedade `translate`,
            que se soma ao `transform` do SVG sem trocar o lugar de ninguém. -->
-      <svg class="mesa" viewBox="0 0 1200 750" preserveAspectRatio="xMidYMid meet" focusable="false">
+      <svg class="mesa" data-midia-cam viewBox="0 0 1200 750" preserveAspectRatio="xMidYMid meet" focusable="false">
         <defs>
           <filter id="mesa-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
             <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity=".06" result="mesa-s1"/>
@@ -314,25 +329,25 @@
           </filter>
           <clipPath id="mesa-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
           <g id="mesa-cena-praia">
-            <image href="assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="amigos-praia" data-midia-base="assets/" href="assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-montanha">
-            <image href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="amigos-trilha" data-midia-base="assets/" href="assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-cidade">
-            <image href="assets/img/fotos/cidade.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="casal-cidade" data-midia-base="assets/" href="assets/img/fotos/cidade.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-sol">
-            <image href="assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="casal-por-do-sol" data-midia-base="assets/" href="assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-festa">
-            <image href="assets/img/fotos/aniversario.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="familia-aniversario" data-midia-base="assets/" href="assets/img/fotos/aniversario.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-viagem">
-            <image href="assets/img/fotos/viagem.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="amigos-viagem" data-midia-base="assets/" href="assets/img/fotos/viagem.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
           <g id="mesa-cena-noite">
-            <image href="assets/img/fotos/casal.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+            <image data-midia-foto="casal-cafe" data-midia-base="assets/" href="assets/img/fotos/casal.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
           </g>
         </defs>
         <!-- fundo da mesa: foto da mesa com um véu branco (o desenho continua legível) -->
@@ -345,7 +360,8 @@
             <rect x=".5" y=".5" width="289.4" height="352.1" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(19.8 19.8) scale(3.3)"><use href="#mesa-cena-praia"/></g>
             <rect x="19.8" y="19.8" width="250.8" height="250.8" fill="none" stroke="#000000" stroke-opacity=".06"/>
-            <g transform="scale(3.3)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+            <text class="pol-leg" x="145.2" y="310.2">Praia com a turma</text>
+            <text class="pol-data" x="145.2" y="338.3">12/01/2025</text>
           </g>
         </g>
         <!-- anima: mesa-p2 entra e repousa, centro 140.8 171.2 -->
@@ -355,6 +371,7 @@
             <rect x=".5" y=".5" width="280.6" height="341.4" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(19.2 19.2) scale(3.2)"><use href="#mesa-cena-montanha"/></g>
             <rect x="19.2" y="19.2" width="243.2" height="243.2" fill="none" stroke="#000000" stroke-opacity=".06"/>
+            <text class="pol-leg" x="140.8" y="312">Trilha na serra</text>
           </g>
         </g>
         <!-- anima: mesa-p4 entra e repousa, centro 136.4 165.85 -->
@@ -364,7 +381,7 @@
             <rect x=".5" y=".5" width="271.8" height="330.7" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(18.6 18.6) scale(3.1)"><use href="#mesa-cena-sol"/></g>
             <rect x="18.6" y="18.6" width="235.6" height="235.6" fill="none" stroke="#000000" stroke-opacity=".06"/>
-            <g transform="scale(3.1)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+            <text class="pol-leg" x="136.4" y="302.3">Fim de tarde a dois</text>
           </g>
         </g>
         <!-- anima: mesa-p3 entra e repousa, centro 149.6 181.9 -->
@@ -374,6 +391,8 @@
             <rect x=".5" y=".5" width="298.2" height="362.8" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(20.4 20.4) scale(3.4)"><use href="#mesa-cena-cidade"/></g>
             <rect x="20.4" y="20.4" width="258.4" height="258.4" fill="none" stroke="#000000" stroke-opacity=".06"/>
+            <text class="pol-leg" x="149.6" y="319.6">Nós dois no Rio</text>
+            <text class="pol-data" x="149.6" y="348.5">08/06/2024</text>
           </g>
         </g>
         <!-- anima: mesa-p5 entra e repousa, centro 145.2 176.55 -->
@@ -383,6 +402,8 @@
             <rect x=".5" y=".5" width="289.4" height="352.1" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(19.8 19.8) scale(3.3)"><use href="#mesa-cena-viagem"/></g>
             <rect x="19.8" y="19.8" width="250.8" height="250.8" fill="none" stroke="#000000" stroke-opacity=".06"/>
+            <text class="pol-leg" x="145.2" y="310.2">Pé na estrada</text>
+            <text class="pol-data" x="145.2" y="338.3">03/2025</text>
           </g>
         </g>
         <!-- anima: mesa-p6 entra e repousa, centro 149.6 181.9 -->
@@ -392,6 +413,8 @@
             <rect x=".5" y=".5" width="298.2" height="362.8" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(20.4 20.4) scale(3.4)"><use href="#mesa-cena-festa"/></g>
             <rect x="20.4" y="20.4" width="258.4" height="258.4" fill="none" stroke="#000000" stroke-opacity=".06"/>
+            <text class="pol-leg" x="149.6" y="319.6">Parabéns, vó!</text>
+            <text class="pol-data" x="149.6" y="348.5">21/09/2024</text>
           </g>
         </g>
         <!-- anima: mesa-p7 entra e repousa, centro 140.8 171.2 -->
@@ -401,10 +424,11 @@
             <rect x=".5" y=".5" width="280.6" height="341.4" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
             <g transform="translate(19.2 19.2) scale(3.2)"><use href="#mesa-cena-noite"/></g>
             <rect x="19.2" y="19.2" width="243.2" height="243.2" fill="none" stroke="#000000" stroke-opacity=".06"/>
+            <text class="pol-leg" x="140.8" y="312">Café de domingo</text>
           </g>
         </g>
         <!-- anima: mesa-camera entra girando, centro 150 112 -->
-        <g id="mesa-camera" transform="translate(800 348) rotate(-8 150 112) scale(1.25)">
+        <g id="mesa-camera" class="cam-desenho" transform="translate(800 348) rotate(-8 150 112) scale(1.25)">
         <!-- anima: mesa-cam-corpo bascula de leve, centro 150 112 -->
         <g id="mesa-cam-corpo" filter="url(#mesa-papel)">
           <rect x="-1.5" y="-1.5" width="303" height="228" rx="37.5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
@@ -475,6 +499,8 @@
           </g>
         </g>
         </g>
+        <!-- câmera realista (D-142): o PLMIDIA põe o arquivo aqui e esconde o desenho -->
+        <image data-midia-camera="perfil" data-midia-base="assets/" x="790" y="330" width="400" height="400" preserveAspectRatio="xMidYMid meet" display="none"/>
       </svg>
     </div>
 

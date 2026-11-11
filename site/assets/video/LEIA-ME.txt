@@ -1,0 +1,2 @@
+Vídeos realistas do Polar Life (D-140). Nomes definitivos e prompts: docs/prompts-flow.md.
+Depois de salvar um arquivo aqui: npm run midia && npm run sw.

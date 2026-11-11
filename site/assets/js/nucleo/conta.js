@@ -228,6 +228,60 @@ function completarCadastro(d){
 function precisaCadastro(){var s=sessao();if(!s)return false;var c=contaDe(s.email);return !c.aceiteEm&&!CONTAS_PADRAO[s.email]}
 function cadastroPendente(){var sc=sessaoCodigo();if(sc)return !sc.email;return precisaCadastro()}   /* código conferido ou e-mail novo sem «Seus dados» */
 
+/* ---------- e-mail e senha (D-144) ----------
+   A senha nunca é guardada nem sai do aparelho (T5): fica só a derivação PBKDF2-SHA-256 com sal aleatório
+   por conta, em pl-contas-teste[email].senha = {alg, it, sal, hash}. 5 erros seguidos → espera de 30 s.
+   Modo demonstração: «Esqueci a senha» usa o código de 6 dígitos mostrado na tela (D-116). */
+var IT_SENHA=150000,TENTA_SENHA={n:0,bloqueadoAte:0},SAL_VAZIO='00000000000000000000000000000000';
+function paraHex(buf){var b=new Uint8Array(buf),h='',i,c;for(i=0;i<b.length;i++){c=b[i].toString(16);h+=c.length<2?'0'+c:c}return h}
+function deHex(h){var b=new Uint8Array(h.length/2),i;for(i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);return b}
+function derivarSenha(senha,sal,it){
+  if(!(window.crypto&&window.crypto.subtle&&window.TextEncoder))return Promise.reject({tipo:'indisponivel'});
+  return window.crypto.subtle.importKey('raw',new TextEncoder().encode(String(senha)),'PBKDF2',false,['deriveBits']).then(function(k){
+    return window.crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:deHex(sal),iterations:it},k,256)
+  }).then(paraHex,function(){return Promise.reject({tipo:'indisponivel'})})}
+function senhaValida(s){return typeof s==='string'&&s.length>=8&&s.length<=128}
+function normEmail(e){return String(e||'').trim().toLowerCase()}
+function guardarSenha(email,senha){
+  var b=new Uint8Array(16);window.crypto.getRandomValues(b);var sal=paraHex(b);
+  return derivarSenha(senha,sal,IT_SENHA).then(function(h){
+    var c=contaDe(email);c.senha={alg:'PBKDF2-SHA256',it:IT_SENHA,sal:sal,hash:h};salvarConta(email,c);return c})}
+function temConta(email){var t=ler('pl-contas-teste',null)||{},c=t[email];return !!(CONTAS_PADRAO[email]||(c&&(c.senha||c.aceiteEm)))}
+function criarConta(d){ /* «Criar nova conta»: nome, e-mail, senha e aceite; já entra */
+  var nome=String(d&&d.nome||'').replace(/\s+/g,' ').trim(),email=normEmail(d&&d.email),senha=d&&d.senha;
+  if(nome.length<2||nome.length>60)return Promise.reject({erro:'nome'});
+  if(!EMAIL_RE.test(email))return Promise.reject({erro:'email'});
+  if(!senhaValida(senha))return Promise.reject({erro:'senha'});
+  if(!d||d.aceite!==true)return Promise.reject({erro:'aceite'});
+  if(temConta(email))return Promise.reject({erro:'existe'});
+  if(!(window.crypto&&window.crypto.subtle&&window.crypto.getRandomValues))return Promise.reject({erro:'indisponivel'});
+  return guardarSenha(email,senha).then(function(c){
+    c.nome=nome;c.provedor='senha';c.aceiteEm=agora();salvarConta(email,c);
+    gravar('pl-conta',{email:email,nome:nome,provedor:'senha',entrouEm:agora()});
+    return {email:email,nome:nome,perfil:c.perfil||'gratis'}
+  },function(){return Promise.reject({erro:'indisponivel'})})}
+function entrarComSenha(emailBruto,senha){
+  var email=normEmail(emailBruto);
+  if(agora()<TENTA_SENHA.bloqueadoAte)return Promise.reject({tipo:'tentativas',esperaMs:TENTA_SENHA.bloqueadoAte-agora()});
+  var t=ler('pl-contas-teste',null)||{},c=t[email],reg=c&&c.senha;
+  /* conta sem senha ou inexistente: deriva do mesmo jeito e responde igual (não revela se o e-mail existe) */
+  return derivarSenha(senha,reg?reg.sal:SAL_VAZIO,reg?reg.it:IT_SENHA).then(function(h){
+    if(reg&&h===reg.hash){
+      TENTA_SENHA.n=0;
+      gravar('pl-conta',{email:email,nome:c.nome,provedor:'senha',entrouEm:agora()});
+      return {email:email,nome:c.nome,perfil:c.perfil||'gratis'}
+    }
+    TENTA_SENHA.n++;
+    if(TENTA_SENHA.n>=5){TENTA_SENHA={n:0,bloqueadoAte:agora()+30000};return Promise.reject({tipo:'tentativas',esperaMs:30000})}
+    return Promise.reject({tipo:'incorreto'})
+  })}
+function definirSenha(senha){ /* depois de confirmar o código por e-mail («Esqueci a senha»): vale para a sessão aberta */
+  var s=sessao();
+  if(!s)return Promise.reject({erro:'sessao'});
+  if(!senhaValida(senha))return Promise.reject({erro:'senha'});
+  if(!(window.crypto&&window.crypto.subtle&&window.crypto.getRandomValues))return Promise.reject({erro:'indisponivel'});
+  return guardarSenha(s.email,senha).then(function(){TENTA_SENHA={n:0,bloqueadoAte:0};return {ok:true}},function(){return Promise.reject({erro:'indisponivel'})})}
+
 /* ---------- compra simulada (brief §3.6: sem campo de cartão; botões «Simular…») ---------- */
 function novoRecibo(c,desc,valor){var r={id:'R'+String(agora()).slice(-6),data:fmtDataCurta(agora()),desc:desc,valor:valor};c.recibos=c.recibos||[];c.recibos.unshift(r);return r}
 function comprar(n,classe,metodo){
@@ -328,11 +382,12 @@ function listarCodigos(){
 
 PLCONTA={
   modo:function(){return 'demo'},                             /* 'servidor' quando houver backend (DOC-12 §6) */
-  provedores:function(){return [{id:'google',nome:'Google'},{id:'apple',nome:'Apple'},{id:'facebook',nome:'Facebook'}]}, /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
+  provedores:function(){return [{id:'google',nome:'Google'},{id:'apple',nome:'Apple'}]},      /* D-144: Google e Apple, no segundo bloco */ /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
   completarCadastro:completarCadastro,precisaCadastro:precisaCadastro,cadastroPendente:cadastroPendente,
   temLocalStorage:temLocalStorage,
   sessao:sessao,sessaoCodigo:sessaoCodigo,temSessao:temSessao,
   pedirCodigo:pedirCodigo,confirmarCodigo:confirmarCodigo,entrarComo:entrarComo,sair:sair,
+  criarConta:criarConta,entrarComSenha:entrarComSenha,definirSenha:definirSenha,              /* e-mail e senha (D-144) */
   plano:plano,direito:direito,consumir:consumir,
   comprar:comprar,assinarPro:assinarPro,cancelarPro:cancelarPro,rebaixarGratis:rebaixarGratis,
   trocarAssinatura:trocarAssinatura,excluirConta:excluirConta,exportarDados:exportarDados,

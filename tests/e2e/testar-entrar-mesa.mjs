@@ -61,7 +61,23 @@ try {
       ? ok(`${rotulo}: ilustração definitiva (viewBox ${mesa.viewBox}, ${mesa.corte})`)
       : ruim(`${rotulo}: viewBox/corte fora do esperado (${mesa.viewBox} · ${mesa.corte})`);
     mesa.cenas >= 7 ? ok(`${rotulo}: as sete polaroids têm a cena desenhada (${mesa.cenas} usos)`) : ruim(`${rotulo}: polaroids sem cena (${mesa.cenas})`);
-    Math.abs(mesa.proporcao - 1.6) < 0.02 ? ok(`${rotulo}: mesa em 16:10 (${mesa.proporcao})`) : ruim(`${rotulo}: mesa fora de 16:10 (${mesa.proporcao})`);
+    /* D-145: a faixa preta fica em cima e a mídia (mesa de reserva / vídeo) abaixo dela;
+       no celular o quadro é 16:10, no desktop ocupa o resto da coluna (corte central, sem distorção) */
+    const col = await page.evaluate(() => {
+      const f = document.querySelector('.ent__faixa').getBoundingClientRect(), m = document.querySelector('.ent__midia').getBoundingClientRect();
+      return { faixaAcima: f.bottom <= m.top + 1, fundo: Math.round(m.bottom), alto: Math.round(m.height), tela: window.innerHeight };
+    });
+    col.faixaAcima ? ok(`${rotulo}: a faixa preta fica acima da mídia`) : ruim(`${rotulo}: a faixa preta não está acima da mídia`);
+    if (w < 1024) Math.abs(mesa.proporcao - 1.6) < 0.02 ? ok(`${rotulo}: mesa em 16:10 (${mesa.proporcao})`) : ruim(`${rotulo}: mesa fora de 16:10 (${mesa.proporcao})`);
+    else col.alto >= 300 && Math.abs(col.fundo - (col.tela + 32)) <= 2 ? ok(`${rotulo}: a mídia ocupa o resto da coluna (${col.alto} px de altura)`) : ruim(`${rotulo}: a mídia não ocupa o resto da coluna (${JSON.stringify(col)})`);
+    const leg = await page.evaluate(() => ({
+      legendas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-leg')].map(t => t.textContent),
+      datas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-data')].map(t => t.textContent),
+      rabiscos: [...document.querySelectorAll('.ent__mesa .mesa-p path')].length
+    }));
+    leg.legendas.length === 7 && leg.legendas.every(t => t.trim().length > 3) ? ok(`${rotulo}: as sete polaroids têm legenda manuscrita`) : ruim(`${rotulo}: legendas ${JSON.stringify(leg.legendas)}`);
+    leg.datas.length >= 3 && leg.datas.every(t => /^(\d{2}\/)?\d{2}\/\d{4}$/.test(t)) ? ok(`${rotulo}: algumas têm data (${leg.datas.join(', ')})`) : ruim(`${rotulo}: datas ${JSON.stringify(leg.datas)}`);
+    leg.rabiscos === 0 ? ok(`${rotulo}: nenhum rabisco no lugar do texto`) : ruim(`${rotulo}: ${leg.rabiscos} rabisco(s)`);
     mesa.rolagem <= 0 ? ok(`${rotulo}: sem rolagem lateral`) : ruim(`${rotulo}: rolagem lateral de ${mesa.rolagem} px`);
     mesa.foco === 'false' ? ok(`${rotulo}: SVG fora da tabulação (focusable=false)`) : ruim(`${rotulo}: focusable=${mesa.foco}`);
     erros.length === 0 ? ok(`${rotulo}: página sem erro`) : ruim(`${rotulo}: ${erros[0]}`);

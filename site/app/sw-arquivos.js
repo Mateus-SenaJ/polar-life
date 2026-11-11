@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='f8b2274f7dad';
+self.PL_VERSAO='fed822e0d2e8';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -31,6 +31,7 @@ self.PL_ARQUIVOS=[
 "../assets/css/ui/app-header.css",
 "../assets/css/ui/esqueleto.css",
 "../assets/css/ui/faixa-escura.css",
+"../assets/css/ui/midia.css",
 "../assets/css/ui/movimento.css",
 "../assets/css/ui/portao.css",
 "../assets/css/ui/pwa.css",
@@ -95,6 +96,8 @@ self.PL_ARQUIVOS=[
 "../assets/js/ui/esqueleto.js",
 "../assets/js/ui/foto-tela.js",
 "../assets/js/ui/guarda.js",
+"../assets/js/ui/midia-arquivos.js",
+"../assets/js/ui/midia.js",
 "../assets/js/ui/movimento.js",
 "../assets/js/ui/portao.js",
 "../assets/js/ui/pwa.js",
