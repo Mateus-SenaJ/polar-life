@@ -325,3 +325,5 @@
   .led-btn, .led-box, .led-pop, .led-menu { border: 2px solid ButtonText; background: ButtonFace; color: ButtonText; box-shadow: none; }
   .led-btn .smoke-layer { display: none; }
 }
+/* D-155: botão LED feito com <a> não herda o sublinhado padrão de link (o texto é rótulo de botão) */
+a.led-btn,a.led-btn:hover,a.led-btn:focus-visible,a.led-btn .btn-content{text-decoration:none}
