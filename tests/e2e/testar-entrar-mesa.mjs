@@ -65,15 +65,14 @@ try {
       ? ok(`${rotulo}: ilustração definitiva (viewBox ${mesa.viewBox}, ${mesa.corte})`)
       : ruim(`${rotulo}: viewBox/corte fora do esperado (${mesa.viewBox} · ${mesa.corte})`);
     mesa.cenas >= 7 ? ok(`${rotulo}: as sete polaroids têm a cena desenhada (${mesa.cenas} usos)`) : ruim(`${rotulo}: polaroids sem cena (${mesa.cenas})`);
-    /* D-145: a faixa preta fica em cima e a mídia (mesa de reserva / vídeo) abaixo dela;
-       no celular o quadro é 16:10, no desktop ocupa o resto da coluna (corte central, sem distorção) */
+    /* D-145 + D-154: a faixa preta fica no topo, POR CIMA da mídia (mesa de reserva / vídeo), e se dissolve
+       nela; a mídia ocupa a coluna inteira por trás (corte central, sem distorção) */
     const col = await page.evaluate(() => {
-      const f = document.querySelector('.ent__faixa').getBoundingClientRect(), m = document.querySelector('.ent__midia').getBoundingClientRect();
-      return { faixaAcima: f.bottom <= m.top + 1, fundo: Math.round(m.bottom), alto: Math.round(m.height), tela: window.innerHeight };
+      const l = document.querySelector('.ent__l').getBoundingClientRect(), f = document.querySelector('.ent__faixa').getBoundingClientRect(), m = document.querySelector('.ent__midia').getBoundingClientRect();
+      return { faixaNoTopo: Math.abs(f.top - l.top) <= 1, cobre: Math.abs(m.top - l.top) <= 1 && Math.abs(m.bottom - l.bottom) <= 1 && Math.abs(m.width - l.width) <= 1, alto: Math.round(m.height), faixa: Math.round(f.height) };
     });
-    col.faixaAcima ? ok(`${rotulo}: a faixa preta fica acima da mídia`) : ruim(`${rotulo}: a faixa preta não está acima da mídia`);
-    if (w < 1024) Math.abs(mesa.proporcao - 1.6) < 0.02 ? ok(`${rotulo}: mesa em 16:10 (${mesa.proporcao})`) : ruim(`${rotulo}: mesa fora de 16:10 (${mesa.proporcao})`);
-    else col.alto >= 300 && Math.abs(col.fundo - (col.tela + 32)) <= 2 ? ok(`${rotulo}: a mídia ocupa o resto da coluna (${col.alto} px de altura)`) : ruim(`${rotulo}: a mídia não ocupa o resto da coluna (${JSON.stringify(col)})`);
+    col.faixaNoTopo ? ok(`${rotulo}: a faixa preta fica no topo`) : ruim(`${rotulo}: a faixa preta não está no topo (${JSON.stringify(col)})`);
+    col.cobre && col.alto > col.faixa ? ok(`${rotulo}: a mídia ocupa a coluna inteira por trás da faixa (${col.alto} px)`) : ruim(`${rotulo}: a mídia não cobre a coluna (${JSON.stringify(col)})`);
     const leg = await page.evaluate(() => ({
       legendas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-leg')].map(t => t.textContent),
       datas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-data')].map(t => t.textContent),
