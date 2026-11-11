@@ -10,8 +10,11 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 /* ---- layout: celular empilhado; desktop 50/50 (brief §1.2) ---- */
 .ent{display:block;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
 .ent__l{background:var(--black)}
-.ent__mesa{background:var(--surface-subtle);overflow:hidden}
-.ent__mesa .mesa{display:block;width:100%;height:auto;aspect-ratio:16/10}
+/* a faixa preta fica em cima; abaixo, o vídeo do varal (D-145). O quadro tem proporção fixa (16:10) no celular
+   e ocupa o resto da coluna no desktop: nada pula quando o vídeo chega. A mesa de polaroids é a reserva. */
+.ent__midia{aspect-ratio:16/10;background:var(--surface-subtle)}
+.ent__mesa{width:100%;height:100%;overflow:hidden}
+.ent__mesa .mesa{display:block;width:100%;height:100%}
 .ent__faixa{padding:56px 24px 40px}
 .ent__kick{display:flex;align-items:center;gap:12px;margin:0;font:500 12px 'Inter',system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--orange)}
 .ent__kick i{width:24px;height:2px;background:var(--orange)}
@@ -115,9 +118,9 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 /* ---- desktop 1440: colunas 50/50 (brief §1.2) ---- */
 @media (min-width:1024px){
   .ent{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
-  .ent__l{display:flex;flex-direction:column}
-  .ent__mesa{flex:0 0 auto;aspect-ratio:16/10}
+  .ent__l{display:flex;flex-direction:column;position:sticky;top:0;align-self:start;height:100vh;height:100svh}   /* a coluna da mídia acompanha a rolagem do formulário */
   .ent__faixa{flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-start;padding:64px}
+  .ent__midia{flex:1 1 0;aspect-ratio:auto;min-height:0}
   .ent__r{position:relative;display:flex;flex-direction:column;align-items:center;padding:104px 32px 32px}
   .ent__head{position:absolute;top:0;left:0;right:0;height:72px;padding:0 32px;box-sizing:border-box}
   .ent__caixa{width:440px;max-width:100%;margin-top:auto;margin-bottom:auto}
@@ -134,6 +137,10 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 .cx-prov{display:grid;gap:10px;margin-top:20px}
 .cx-prov__b{width:100%;height:48px;gap:12px}
 .ico--marca{width:20px;height:20px;fill:currentColor;stroke:none;flex:none}
+/* primeiro bloco (D-144): «Esqueci a senha» discreto sob a senha e «Criar nova conta» como botão secundário */
+.cx-esq{margin:4px 0 0;text-align:right}
+.cx-esq .cx-cod__b{padding:0 4px}
+.cx-criar{width:100%;height:48px;margin-top:12px}
 /* «Entrar com código»: secundário e discreto, abaixo de tudo (alvo de 44 px, T3) */
 .cx-cod{margin:16px 0 0;text-align:center}
 .cx-cod__b{min-height:44px;padding:0 12px;border:0;background:none;font:400 14px 'Inter',system-ui,sans-serif;color:var(--black);opacity:.72;text-decoration:underline;text-underline-offset:4px;cursor:pointer}

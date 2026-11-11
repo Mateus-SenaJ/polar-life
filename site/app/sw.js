@@ -38,6 +38,7 @@ self.addEventListener('fetch',function(e){
   var u;try{u=new URL(req.url)}catch(x){return}
   if(u.protocol!=='http:'&&u.protocol!=='https:')return; /* blob:, data: */
   if(!permitido(u))return;
+  if(req.headers.has('range')||/\.(mp4|webm)$/.test(u.pathname))return; /* vídeo (D-140): direto da rede, com pedidos parciais; não entra no cache */
   if(req.mode==='navigate'){ /* rede primeiro; offline abre a última versão */
     e.respondWith(fetch(req).then(function(r){return guardar(req,r)}).catch(function(){
       return caches.match(chave(req.url)).then(function(c){return c||caches.match(chave(url('./')))}).then(function(c){return c||Response.error()})

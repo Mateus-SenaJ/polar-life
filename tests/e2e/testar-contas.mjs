@@ -95,7 +95,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
     await p.close(); await c.close();
     return n;
   };
-  (await led1(null, 'entrar/')) === 1 ? ok('entrar/: um LED («Enviar código»)') : ruim('entrar/: LEDs divergem do T8');
+  (await led1(null, 'entrar/')) === 1 ? ok('entrar/: um LED («Entrar»)') : ruim('entrar/: LEDs divergem do T8');
   (await led1('gratis@polarlife.test', 'conta/')) === 1 ? ok('conta/ (Grátis): um LED («Ver folhas e planos»)') : ruim('conta/: LEDs divergem do T8');
   (await led1('pro@polarlife.test', 'conta/planos/')) === 1 ? ok('planos/: um LED («Continuar»)') : ruim('planos/: LEDs divergem do T8');
   (await led1('admin@polarlife.test', 'admin/')) === 1 ? ok('admin/: um LED («Salvar alterações»)') : ruim('admin/: LEDs divergem do T8');
@@ -112,12 +112,16 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.waitForURL('**/app/inicio/', { timeout: 5000 });
   (await p.evaluate(() => PLCONTA.plano().id)) === 'admin' ? ok('conta de teste: entrou como Admin') : ruim('conta de teste: Admin não entrou');
 
-  /* e-mail → código certo e errado */
+  /* «Esqueci a senha» → e-mail → código certo e errado → senha nova (D-144) */
+  const pedirCodigo = async email => {
+    await p.locator('#b-esqueci').click();
+    await p.locator('#rec-email').fill(email);
+    await p.locator('#b-rec').click();
+    await p.locator('text=Confira o código').waitFor({ timeout: 5000 });
+  };
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(srv.url + 'app/entrar/');
-  await p.locator('#email').fill('dona@exemplo.com');
-  await p.locator('#b-enviar').click();
-  await p.locator('text=Confira o código').waitFor({ timeout: 5000 });
+  await pedirCodigo('dona@exemplo.com');
   const cod = (await p.locator('.cx-info .cod').textContent()).replace(/\D/g, '');
   const errado = cod === '000000' ? '111111' : '000000';
   await p.locator('#cod').fill(errado);
@@ -126,6 +130,12 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
     ? ok('código errado: erro em tela, sem entrar') : ruim('código errado: erro esperado');
   await p.locator('#cod').fill(cod);
   await p.locator('#b-confirmar').click();
+  await p.locator('#f-nova').waitFor({ timeout: 5000 });
+  ok('código certo: pede a senha nova');
+  await p.locator('#n-senha').fill('curta'); await p.locator('#b-nova').click();
+  (await p.locator('#erro-n-senha').isVisible()) && /8 caracteres/.test(await p.locator('#erro-n-senha').textContent())
+    ? ok('senha nova curta: erro em tela') : ruim('senha nova curta aceita');
+  await p.locator('#n-senha').fill('senha-da-dona-1'); await p.locator('#b-nova').click();
   await p.locator('#f-dados').waitFor({ timeout: 5000 });
   ok('e-mail novo confirmado: pede «Seus dados» antes de entrar');
   await p.locator('#d-nome').fill('Dona Teste'); await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
@@ -134,14 +144,74 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   pl.id === 'gratis' && pl.email === 'dona@exemplo.com'
     ? ok('código certo: entrou (plano Grátis para e-mail novo)') : ruim('código certo: ' + JSON.stringify(pl.id));
 
-  /* provedores comuns (demonstração) → Seus dados → entra; «Entrar com código» é um link discreto abaixo */
+  /* a senha definida pelo «Esqueci a senha» vale na entrada; a senha nunca fica em texto puro (D-144) */
+  await p.evaluate(() => PLCONTA.sair());
+  await p.goto(srv.url + 'app/entrar/');
+  await p.locator('#email').fill('Dona@Exemplo.com'); await p.locator('#senha').fill('senha-errada-9'); await p.locator('#b-enviar').click();
+  await p.locator('#erro-senha').waitFor({ timeout: 5000 });
+  /E-mail ou senha incorretos/.test(await p.locator('#erro-senha').textContent()) && !(await p.evaluate(() => PLCONTA.temSessao()))
+    ? ok('senha errada: «E-mail ou senha incorretos», sem entrar') : ruim('senha errada: mensagem esperada');
+  await p.locator('#email').fill('ninguem@exemplo.com'); await p.locator('#senha').fill('senha-da-dona-1'); await p.locator('#b-enviar').click();
+  await p.locator('#erro-senha').waitFor({ timeout: 5000 });
+  /E-mail ou senha incorretos/.test(await p.locator('#erro-senha').textContent())
+    ? ok('e-mail sem conta: mesma mensagem (não revela se o e-mail existe)') : ruim('e-mail sem conta: mensagem diferente');
+  await p.locator('#email').fill('Dona@Exemplo.com'); await p.locator('#senha').fill('senha-da-dona-1'); await p.locator('#b-enviar').click();
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });
+  const ss = await p.evaluate(() => ({ s: PLCONTA.sessao(), bruto: Object.keys(localStorage).map(k => localStorage.getItem(k)).join('\n'), reg: JSON.parse(localStorage.getItem('pl-contas-teste'))['dona@exemplo.com'].senha, exp: JSON.stringify(PLCONTA.plano()) }));
+  ss.s.email === 'dona@exemplo.com' && ss.s.provedor === 'senha' ? ok('e-mail + senha certos: entrou') : ruim('sessão por senha: ' + JSON.stringify(ss.s));
+  ss.bruto.indexOf('senha-da-dona-1') < 0 && ss.reg.alg === 'PBKDF2-SHA256' && /^[0-9a-f]{32}$/.test(ss.reg.sal) && /^[0-9a-f]{64}$/.test(ss.reg.hash) && ss.reg.it >= 100000
+    ? ok('a senha não fica em texto puro: só sal aleatório + derivação PBKDF2-SHA-256') : ruim('armazenamento da senha: ' + JSON.stringify(ss.reg));
+  ss.exp.indexOf(ss.reg.hash) < 0 ? ok('o plano da sessão não carrega a derivação da senha') : ruim('a derivação da senha vazou no plano');
+
+  /* «Criar nova conta»: nome, e-mail, senha e aceite; e-mail repetido é recusado */
+  await p.evaluate(() => PLCONTA.sair());
+  await p.goto(srv.url + 'app/entrar/');
+  await p.locator('#b-criar').click();
+  await p.locator('#c-nome').fill('Bia Nova'); await p.locator('#c-email').fill('bia@exemplo.com'); await p.locator('#c-senha').fill('1234567'); await p.locator('#c-aceite').check();
+  await p.locator('#b-criar-conta').click();
+  await p.locator('#erro-c-senha').waitFor({ timeout: 5000 });
+  ok('criar conta: senha com menos de 8 caracteres é recusada');
+  await p.locator('#c-senha').fill('senha-da-bia-22'); await p.locator('#c-aceite').uncheck(); await p.locator('#b-criar-conta').click();
+  await p.locator('#erro-c-aceite').waitFor({ timeout: 5000 });
+  ok('criar conta: aceite obrigatório');
+  (await p.locator('.led-btn').count()) === 1 ? ok('criar conta: um único LED (T8)') : ruim('criar conta: mais de um LED');
+  await p.locator('#c-aceite').check(); await p.locator('#b-criar-conta').click();
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });
+  const sb = await p.evaluate(() => ({ s: PLCONTA.sessao(), pend: PLCONTA.cadastroPendente(), pl: PLCONTA.plano().id }));
+  sb.s.email === 'bia@exemplo.com' && sb.s.nome === 'Bia Nova' && !sb.pend && sb.pl === 'gratis' ? ok('criar conta: entrou no plano Grátis, sem etapa extra') : ruim('criar conta: ' + JSON.stringify(sb));
+  const rep = await p.evaluate(async () => { PLCONTA.sair(); const r = []; for (const em of ['BIA@exemplo.com', 'pro@polarlife.test']) { try { await PLCONTA.criarConta({ nome: 'Outra', email: em, senha: 'outra-senha-33', aceite: true }); r.push('criou'); } catch (e) { r.push(e.erro); } } return r.join('|') + '|' + PLCONTA.temSessao(); });
+  const nomeS = await p.evaluate(async () => { const c = await PLCONTA.criarConta({ nome: '  Mateus   Sena ', email: 'sss@exemplo.com', senha: 'senha-sss-123', aceite: true }); const n = PLCONTA.sessao().nome; PLCONTA.sair(); return n; });
+  nomeS === 'Mateus Sena' ? ok('criar conta: nome normalizado sem perder letras «s»') : ruim('criar conta: nome virou ' + JSON.stringify(nomeS));
+  rep === 'existe|existe|false' ? ok('criar conta: e-mail já usado (ou de conta de teste) é recusado') : ruim('criar conta repetida: ' + rep);
+
+  /* 5 senhas erradas → espera de 30 s com contagem no botão */
+  await p.goto(srv.url + 'app/entrar/');
+  for (let i = 0; i < 5; i++) { await p.locator('#email').fill('bia@exemplo.com'); await p.locator('#senha').fill('errada-' + i + '-xyz'); await p.locator('#b-enviar').click(); await p.locator('#b-enviar[aria-busy=false]').waitFor({ timeout: 5000 }); }
+  /Muitas tentativas/.test(await p.locator('#erro-senha').textContent()) && await p.locator('#b-enviar').isDisabled()
+    ? ok('5 senhas erradas: «Muitas tentativas» e LED em espera') : ruim('bloqueio por senha errada ausente');
+
+  /* entrada: 1º bloco e-mail + senha («Esqueci a senha», «Criar nova conta»); 2º bloco Google e Apple; código discreto abaixo */
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(srv.url + 'app/entrar/');
   const provs = await p.locator('[data-prov]').allTextContents();
-  provs.join('|') === 'Continuar com Google|Continuar com Apple|Continuar com Facebook' ? ok('entrada: Google, Apple e Facebook') : ruim('provedores: ' + provs.join('|'));
-  const ordem = await p.evaluate(() => { const a = document.querySelector('[data-prov]'), b = document.querySelector('#b-enviar'), c = document.querySelector('#b-via-codigo'); return !!(a.compareDocumentPosition(b) & 4) && !!(b.compareDocumentPosition(c) & 4) && !c.classList.contains('led-btn') && !c.classList.contains('btn2'); });
-  ordem ? ok('«Entrar com código» fica abaixo, como link secundário') : ruim('ordem/peso do link de código');
-  (await p.locator('.led-btn').count()) === 1 ? ok('um único LED na entrada (T8)') : ruim('mais de um LED');
+  provs.join('|') === 'Continuar com Google|Continuar com Apple' ? ok('segundo bloco: Google e Apple') : ruim('provedores: ' + provs.join('|'));
+  const ordem = await p.evaluate(() => {
+    const q = s => document.querySelector(s), antes = (a, b) => !!(a.compareDocumentPosition(b) & 4);
+    const em = q('#email'), se = q('#senha'), esq = q('#b-esqueci'), led = q('#b-enviar'), criar = q('#b-criar'), prov = q('[data-prov]'), cod = q('#b-via-codigo');
+    return {
+      bloco1: antes(em, se) && antes(se, esq) && antes(esq, led) && antes(led, criar),
+      bloco2: antes(criar, prov) && antes(prov, cod),
+      senha: se.type === 'password' && se.autocomplete === 'current-password',
+      discretos: [esq, cod].every(b => !b.classList.contains('led-btn') && !b.classList.contains('btn2')),
+      alvos: [esq, criar, cod].every(b => b.getBoundingClientRect().height >= 44),
+      led: led.textContent.trim()
+    };
+  });
+  ordem.bloco1 ? ok('primeiro bloco: e-mail, senha, «Esqueci a senha», «Entrar» e «Criar nova conta»') : ruim('ordem do primeiro bloco');
+  ordem.bloco2 ? ok('segundo bloco (Google e Apple) vem depois; «Entrar com código» fica abaixo') : ruim('ordem do segundo bloco');
+  ordem.senha ? ok('campo de senha mascarado, com autocomplete correto') : ruim('campo de senha');
+  ordem.discretos && ordem.alvos ? ok('«Esqueci a senha» e «Entrar com código» são links discretos com alvo ≥ 44 px (T3)') : ruim('peso/alvo dos links discretos');
+  (await p.locator('.led-btn').count()) === 1 && ordem.led === 'Entrar' ? ok('um único LED na entrada: «Entrar» (T8)') : ruim('LED da entrada: ' + ordem.led);
   await p.locator('[data-prov=google]').click();
   /Demonstração/.test(await p.locator('#caixa').textContent()) ? ok('Google: aviso honesto de demonstração (T7)') : ruim('sem aviso de demonstração');
   await p.locator('#d-nome').fill('Ana Google'); await p.locator('#d-email').fill('ana@exemplo.com'); await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
@@ -152,9 +222,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   /* 5 tentativas erradas bloqueiam e trocam o LED (brief §2.4: a 6ª vê o bloqueio) */
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(srv.url + 'app/entrar/');
-  await p.locator('#email').fill('outro@exemplo.com');
-  await p.locator('#b-enviar').click();
-  await p.locator('text=Confira o código').waitFor({ timeout: 5000 });
+  await pedirCodigo('outro@exemplo.com');
   for (let i = 0; i < 6; i++) { await p.locator('#cod').fill('000000'); await p.locator('#b-confirmar').click(); await p.waitForTimeout(100); }
   (await p.locator('#erro-cod').isVisible()) && /Muitas tentativas/.test(await p.locator('#erro-cod').textContent())
     ? ok('5 tentativas: «Muitas tentativas» e pede código novo') : ruim('5 tentativas: mensagem esperada');
@@ -167,9 +235,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
     ? ok('estado #estado-email-invalido') : ruim('#estado-email-invalido sem erro');
   for (const [hash, texto] of [['#estado-incorreto', 'Código incorreto'], ['#estado-expirado', 'expirou'], ['#estado-tentativas', 'Muitas tentativas']]) {
     await p.goto(srv.url + 'app/entrar/' + hash); await p.reload();
-    await p.locator('#email').fill('revisao@exemplo.com');
-    await p.locator('#b-enviar').click();
-    await p.locator('text=Confira o código').waitFor({ timeout: 5000 });
+    await pedirCodigo('revisao@exemplo.com');
     const achou = await p.locator('#erro-cod').textContent().catch(() => '');
     new RegExp(texto).test(achou || '') ? ok('estado ' + hash) : ruim(`estado ${hash} sem «${texto}»`);
   }

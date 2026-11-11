@@ -78,13 +78,16 @@ try {
           const g = document.getElementById(id);
           const ims = g ? [...g.querySelectorAll('image')] : [];
           conta[id] = ims.map(i => i.getAttribute('href') || '');
+          /* D-143: quando a foto de pessoas do slot existe, o PLMIDIA troca a de reserva por ela */
+          const slot = ims[0] && ims[0].getAttribute('data-midia-foto');
+          if (slot && (window.PLMIDIA_ARQUIVOS || []).indexOf('img/fotos/' + slot + '.jpg') >= 0) cenas[id] = slot + '.jpg';
         }
         const cam = document.getElementById('cam-foto') || document.getElementById('mesa-cam-foto');
         const cenaCam = cam ? cam.querySelector('use') : null;
         const cenaCamId = cenaCam ? (cenaCam.getAttribute('href') || '').slice(1) : '';
         const cenaCamEl = cenaCamId ? document.getElementById(cenaCamId) : null;
         return {
-          conta,
+          conta, certas: cenas,
           camTemFoto: !!(cenaCamEl && cenaCamEl.querySelector('image')),
           camHref: cenaCamEl && cenaCamEl.querySelector('image') ? cenaCamEl.querySelector('image').getAttribute('href') : '',
           h1: document.querySelectorAll('h1').length,
@@ -96,7 +99,7 @@ try {
       erradas.length === 0
         ? ok(`${rot}: as sete cenas da mesa são fotos de assets/img/fotos/`)
         : ruim(`${rot}: cenas sem foto ou com mais de uma imagem (${erradas.join(', ')})`);
-      const fora = Object.keys(CENAS).filter(id => r.conta[id][0] && r.conta[id][0].indexOf('assets/img/fotos/' + CENAS[id]) < 0);
+      const fora = Object.keys(CENAS).filter(id => r.conta[id][0] && r.conta[id][0].indexOf('assets/img/fotos/' + r.certas[id]) < 0);
       fora.length === 0
         ? ok(`${rot}: cada cena aponta para a foto certa`)
         : ruim(`${rot}: foto errada em ${fora.join(', ')}`);

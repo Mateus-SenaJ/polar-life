@@ -99,6 +99,9 @@ for (const c of arquivos.filter(f => extname(f) === '.css')) {
 // 36: a lista de arquivos do service worker precisa estar em dia (arquivo novo de /app/ sem entrar no cache)
 try { execFileSync(process.execPath, [fileURLToPath(new URL('./gerar-sw.mjs', import.meta.url)), '--checar'], { stdio: 'pipe' }); }
 catch (e) { erros.push('site/app/sw-arquivos.js desatualizado: rode npm run sw'); }
+// 42: a lista de mídias realistas (D-140) precisa refletir os arquivos que existem em site/assets/
+try { execFileSync(process.execPath, [fileURLToPath(new URL('./gerar-midia.mjs', import.meta.url)), '--checar'], { stdio: 'pipe' }); }
+catch (e) { erros.push('site/assets/js/ui/midia-arquivos.js desatualizado: rode npm run midia'); }
 /* 41 · T2 também nas ilustrações vetoriais: só a paleta (com opacidade), sem texto e sem recurso externo */
 for (const f of arquivos.filter(f => f.endsWith('.svg') && f.includes(join('img', 'ilustracoes')))) {
   const s = readFileSync(f, 'utf8');

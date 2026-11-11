@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Polar Life">
 <link rel="stylesheet" href="../../assets/css/ui/pwa.css">
 <title>Polar Life · Entrar</title>
-<meta name="description" content="Entre no Polar Life neste navegador. Sem senha e sem servidor: nada sai do seu aparelho.">
+<meta name="description" content="Entre no Polar Life neste navegador. Sua conta fica só neste aparelho: nada sai dele.">
 <meta name="color-scheme" content="light">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="../../assets/css/base/fonts.css">
@@ -22,19 +22,29 @@
 <link rel="stylesheet" href="../../assets/css/ui/selo-teste.css">
 <script src="../../assets/js/nucleo/conta.js"></script>
 <script src="../../assets/js/ui/guarda.js"></script>
+<link rel="stylesheet" href="../../assets/css/ui/midia.css">
 <link rel="stylesheet" href="../../assets/css/pages/entrar.css">
 </head>
 <body>
 <div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
 
 <main class="ent">
-<section class="ent__l" aria-hidden="true">
-  <div class="ent__mesa">
+<section class="ent__l">
+  <div class="ent__faixa">
+    <p class="ent__kick"><i aria-hidden="true"></i>Não deixe para depois</p>
+    <h1 class="ent__titulo">Seu rolo de câmera está cheio de histórias.</h1>
+    <p class="ent__apoio">Escolha algumas hoje. Um dia, segurar essas fotos vai significar ainda mais.</p>
+  </div>
+  <!-- vídeo realista (D-145): parede com varal de luzinhas e polaroids de amigos. Decorativo (aria-hidden), mudo,
+       em loop; o PLMIDIA carrega o arquivo só quando ele existe e entra na tela. Reserva: a mesa de polaroids. -->
+  <div class="ent__midia midia" data-midia="varal-polaroids" data-midia-base="../../assets/" aria-hidden="true">
+  <video class="midia__video" muted autoplay loop playsinline preload="none" poster="../../assets/img/fotos/mesa.jpg" tabindex="-1" disablepictureinpicture></video>
+  <div class="ent__mesa midia__reserva">
     <!-- Mesa de polaroids · ilustração definitiva (arquivo-fonte: assets/img/ilustracoes/mesa-polaroids.svg).
          O arquivo está embutido aqui para animar cada grupo pelo CSS, sem requisição extra (T6).
          A posição de cada grupo é a do arquivo-fonte: a animação usa a propriedade `translate`,
          que se soma ao `transform` do SVG sem trocar o lugar de ninguém. -->
-    <svg class="mesa" viewBox="0 0 1200 750" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <svg class="mesa" data-midia-cam viewBox="0 0 1200 750" preserveAspectRatio="xMidYMid slice" focusable="false">
       <defs>
         <filter id="mesa-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
           <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity=".06" result="mesa-s1"/>
@@ -43,25 +53,25 @@
         </filter>
         <clipPath id="mesa-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
         <g id="mesa-cena-praia">
-          <image href="../../assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="amigos-praia" data-midia-base="../../assets/" href="../../assets/img/fotos/praia.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-montanha">
-          <image href="../../assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="amigos-trilha" data-midia-base="../../assets/" href="../../assets/img/fotos/montanha.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-cidade">
-          <image href="../../assets/img/fotos/cidade.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="casal-cidade" data-midia-base="../../assets/" href="../../assets/img/fotos/cidade.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-sol">
-          <image href="../../assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="casal-por-do-sol" data-midia-base="../../assets/" href="../../assets/img/fotos/por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-festa">
-          <image href="../../assets/img/fotos/aniversario.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="familia-aniversario" data-midia-base="../../assets/" href="../../assets/img/fotos/aniversario.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-viagem">
-          <image href="../../assets/img/fotos/viagem.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="amigos-viagem" data-midia-base="../../assets/" href="../../assets/img/fotos/viagem.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
         <g id="mesa-cena-noite">
-          <image href="../../assets/img/fotos/casal.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
+          <image data-midia-foto="casal-cafe" data-midia-base="../../assets/" href="../../assets/img/fotos/casal.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
         </g>
       </defs>
       <!-- fundo da mesa: foto da mesa com um véu branco (o desenho continua legível) -->
@@ -74,7 +84,8 @@
           <rect x=".5" y=".5" width="289.4" height="352.1" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(19.8 19.8) scale(3.3)"><use href="#mesa-cena-praia"/></g>
           <rect x="19.8" y="19.8" width="250.8" height="250.8" fill="none" stroke="#000000" stroke-opacity=".06"/>
-          <g transform="scale(3.3)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+          <text class="pol-leg" x="145.2" y="310.2">Praia com a turma</text>
+          <text class="pol-data" x="145.2" y="338.3">12/01/2025</text>
         </g>
       </g>
       <!-- anima: mesa-p2 entra e repousa, centro 140.8 171.2 -->
@@ -84,6 +95,7 @@
           <rect x=".5" y=".5" width="280.6" height="341.4" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(19.2 19.2) scale(3.2)"><use href="#mesa-cena-montanha"/></g>
           <rect x="19.2" y="19.2" width="243.2" height="243.2" fill="none" stroke="#000000" stroke-opacity=".06"/>
+          <text class="pol-leg" x="140.8" y="312">Trilha na serra</text>
         </g>
       </g>
       <!-- anima: mesa-p4 entra e repousa, centro 136.4 165.85 -->
@@ -93,7 +105,7 @@
           <rect x=".5" y=".5" width="271.8" height="330.7" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(18.6 18.6) scale(3.1)"><use href="#mesa-cena-sol"/></g>
           <rect x="18.6" y="18.6" width="235.6" height="235.6" fill="none" stroke="#000000" stroke-opacity=".06"/>
-          <g transform="scale(3.1)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+          <text class="pol-leg" x="136.4" y="302.3">Fim de tarde a dois</text>
         </g>
       </g>
       <!-- anima: mesa-p3 entra e repousa, centro 149.6 181.9 -->
@@ -103,7 +115,8 @@
           <rect x=".5" y=".5" width="298.2" height="362.8" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(20.4 20.4) scale(3.4)"><use href="#mesa-cena-cidade"/></g>
           <rect x="20.4" y="20.4" width="258.4" height="258.4" fill="none" stroke="#000000" stroke-opacity=".06"/>
-          <g transform="scale(3.4)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+          <text class="pol-leg" x="149.6" y="319.6">Nós dois no Rio</text>
+          <text class="pol-data" x="149.6" y="348.5">08/06/2024</text>
         </g>
       </g>
       <!-- anima: mesa-p5 entra e repousa, centro 145.2 176.55 -->
@@ -113,6 +126,8 @@
           <rect x=".5" y=".5" width="289.4" height="352.1" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(19.8 19.8) scale(3.3)"><use href="#mesa-cena-viagem"/></g>
           <rect x="19.8" y="19.8" width="250.8" height="250.8" fill="none" stroke="#000000" stroke-opacity=".06"/>
+          <text class="pol-leg" x="145.2" y="310.2">Pé na estrada</text>
+          <text class="pol-data" x="145.2" y="338.3">03/2025</text>
         </g>
       </g>
       <!-- anima: mesa-p6 entra e repousa, centro 149.6 181.9 -->
@@ -122,7 +137,8 @@
           <rect x=".5" y=".5" width="298.2" height="362.8" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(20.4 20.4) scale(3.4)"><use href="#mesa-cena-festa"/></g>
           <rect x="20.4" y="20.4" width="258.4" height="258.4" fill="none" stroke="#000000" stroke-opacity=".06"/>
-          <g transform="scale(3.4)"><path d="M14 94q3 -5 6 0q2.5 4 5 0q3.5 -6 7 0q3 5 6 0q2.5 -4 5 0q4 6 8 0q3 -5 6 0q2.5 4 5 0" fill="none" stroke="#000000" stroke-opacity=".8" stroke-width="1.6" stroke-linecap="round"/></g>
+          <text class="pol-leg" x="149.6" y="319.6">Parabéns, vó!</text>
+          <text class="pol-data" x="149.6" y="348.5">21/09/2024</text>
         </g>
       </g>
       <!-- anima: mesa-p7 entra e repousa, centro 140.8 171.2 -->
@@ -132,10 +148,11 @@
           <rect x=".5" y=".5" width="280.6" height="341.4" rx="5" fill="none" stroke="#000000" stroke-opacity=".05"/>
           <g transform="translate(19.2 19.2) scale(3.2)"><use href="#mesa-cena-noite"/></g>
           <rect x="19.2" y="19.2" width="243.2" height="243.2" fill="none" stroke="#000000" stroke-opacity=".06"/>
+          <text class="pol-leg" x="140.8" y="312">Café de domingo</text>
         </g>
       </g>
       <!-- anima: mesa-camera entra girando, centro 150 112 -->
-      <g id="mesa-camera" transform="translate(800 348) rotate(-8 150 112) scale(1.25)">
+      <g id="mesa-camera" class="cam-desenho" transform="translate(800 348) rotate(-8 150 112) scale(1.25)">
       <!-- anima: mesa-cam-corpo bascula de leve, centro 150 112 -->
       <g id="mesa-cam-corpo" filter="url(#mesa-papel)">
         <rect x="-1.5" y="-1.5" width="303" height="228" rx="37.5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
@@ -206,12 +223,10 @@
         </g>
       </g>
       </g>
+      <!-- câmera realista (D-142): o PLMIDIA põe o arquivo aqui e esconde o desenho -->
+      <image data-midia-camera="perfil" data-midia-base="../../assets/" x="790" y="330" width="400" height="400" preserveAspectRatio="xMidYMid meet" display="none"/>
     </svg>
   </div>
-  <div class="ent__faixa">
-    <p class="ent__kick"><i aria-hidden="true"></i>Não deixe para depois</p>
-    <h1 class="ent__titulo">Seu rolo de câmera está cheio de histórias.</h1>
-    <p class="ent__apoio">Escolha algumas hoje. Um dia, segurar essas fotos vai significar ainda mais.</p>
   </div>
 </section>
 
@@ -228,17 +243,30 @@
 
     <form id="f-email" class="cx-f" novalidate>
       <h2 class="cx-t">Entrar</h2>
-            <div class="fld fld--first" id="g-email">
+      <div class="fld fld--first" id="g-email">
         <label class="lab" for="email">E-mail</label>
         <input class="txt" id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="nome@exemplo.com">
-        <p class="err" id="erro-email" hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Digite um e-mail válido, como nome@exemplo.com.</span></p>
-        <p class="help" id="ajuda-email">Sem senha: geramos um código de 6 dígitos. Nada sai do seu aparelho.</p>
+        <p class="help" id="ajuda-email" hidden></p>
       </div>
-      <button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar com e-mail</span></button>
-      <p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>
+      <div class="fld" id="g-senha">
+        <label class="lab" for="senha">Senha</label>
+        <input class="txt" id="senha" name="senha" type="password" autocomplete="current-password" maxlength="128" aria-describedby="ajuda-senha">
+        <p class="help" id="ajuda-senha">Sua conta fica só neste aparelho. Nada sai dele.</p>
+      </div>
+      <p class="cx-esq"><button type="button" class="cx-cod__b" id="b-esqueci">Esqueci a senha</button></p>
+      <button type="submit" class="led-btn led-btn--block" id="b-enviar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Entrar</span></button>
     </form>
+    <button type="button" class="btn2 cx-criar" id="b-criar"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Criar nova conta</button>
+
+    <div class="cx-div" aria-hidden="true"><span>ou</span></div>
+
+    <div class="cx-prov" role="group" aria-label="Entrar com Google ou Apple">
+      <button type="button" class="btn2 cx-prov__b" data-prov="google"><span>Continuar com Google</span></button>
+      <button type="button" class="btn2 cx-prov__b" data-prov="apple"><span>Continuar com Apple</span></button>
+    </div>
 
     <p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>
+    <p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a></p>
 
     <div class="cx-div" aria-hidden="true"><span>ou</span></div>
 
@@ -272,6 +300,8 @@
 
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
 
+<script src="../../assets/js/ui/midia-arquivos.js" defer></script>
+<script src="../../assets/js/ui/midia.js" defer></script>
 <script src="../../assets/js/pages/entrar.js" defer></script>
 <script src="../../assets/js/ui/pwa.js" defer></script>
 </body>
