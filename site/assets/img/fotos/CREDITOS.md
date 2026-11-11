@@ -13,4 +13,15 @@ Todas via Wikimedia Commons, apenas domínio público ou CC0. Recortadas e reduz
 | casal.jpg | Close-up of espresso machine with two brown coffee cups.jpg | Chevanon Photography | CC0 | https://commons.wikimedia.org/wiki/File:Close-up_of_espresso_machine_with_two_brown_coffee_cups.jpg |
 | mesa.jpg | Wood 004 plywood.jpg | Dprojects | CC0 | https://commons.wikimedia.org/wiki/File:Wood_004_plywood.jpg |
 
+## Câmera e vídeos (gerados por IA)
+
+Imagens geradas por inteligência artificial (Google Flow) especialmente para o Polar Life. Nenhuma pessoa real identificável aparece nelas: os rostos nas polaroids e na foto da câmera são sintéticos. A câmera não tem marca.
+
+| Arquivo | O que mostra | Origem |
+|---|---|---|
+| camera-perfil.png | Câmera instantânea retrô, sem marca, com uma foto saindo pela lateral | Gerada por IA (Google Flow) para o Polar Life; fundo removido |
+| ../../video/camera-foto.mp4 · .webm · -poster.jpg | A mesma câmera soltando a foto | Gerado por IA (Google Flow) para o Polar Life |
+| ../../video/mesa-polaroids.mp4 · .webm · -poster.jpg (e a versão -vertical) | Mãos trocando o celular por polaroids sobre uma mesa | Gerado por IA (Google Flow) para o Polar Life |
+| ../../video/varal-polaroids.mp4 · .webm · -poster.jpg | Varal de luzinhas com polaroids numa parede | Gerado por IA (Google Flow) para o Polar Life |
+
 > Recortes feitos pelo Polar Life: `cidade.jpg` mostra só os prédios e a baía (sem a estátua do morro); `aniversario.jpg` mostra só as velas (sem o texto do bolo). Licenças conferidas na API do Commons em 2026-11-11: todas CC0.

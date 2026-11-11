@@ -26,7 +26,7 @@ a{color:inherit}
 .page-lead{margin:32px 0 0;max-width:34ch;font-size:18px;line-height:1.6}
 
 /* intro · rolo de filme decorativo com parallax leve (A4) */
-.intro__rolo{margin-top:40px}
+.intro__cam{margin-top:24px;margin-left:-24px}
 .intro__rolo img{width:240px;height:auto}
 
 /* passos */
@@ -71,6 +71,8 @@ a{color:inherit}
   .wrap{padding:0 32px}
   .page{display:grid;grid-template-columns:5fr 7fr;gap:64px;align-items:start;padding-top:96px;padding-bottom:96px}
   .intro{position:sticky;top:32px}
+  .midia--cam{max-width:400px}
+  .intro__cam{margin-left:-48px}
   .page-title{font-size:32px}
   .steps{margin-top:0;border-top:0}
   .step:first-child{border-top:1px solid var(--outline-subtle)}

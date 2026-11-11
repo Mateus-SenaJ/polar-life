@@ -173,6 +173,8 @@ try {
   /* ---- E · A2: a câmera solta a polaroid uma vez por carregamento ---- */
   {
     const c = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+    /* a câmera desenhada é a reserva do vídeo do hero (D-140): com os arquivos reais ela fica escondida; aqui vale o estado sem os arquivos */
+    await c.route('**/assets/js/ui/midia-arquivos.js', r => r.fulfill({ contentType: 'text/javascript', body: 'window.PLMIDIA_ARQUIVOS=[];' }));
     const p = await c.newPage();
     await p.goto(srv.url, { waitUntil: 'networkidle' });
     await p.waitForTimeout(400);

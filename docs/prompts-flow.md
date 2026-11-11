@@ -17,7 +17,7 @@ otimização, poster e recorte de fundo ficam com o orquestrador.
 | 2 | `mesa-polaroids-vertical.mp4` | `site/assets/video/` | Vídeo 1, em pé (celular) | 4:5 (ou 9:16 se o Flow não der 4:5) · 1080 px de largura · 8 s |
 | 3 | `varal-polaroids.mp4` | `site/assets/video/` | Vídeo 2, varal iluminado | 16:9 · 1920×1080 · 8 s · sem áudio |
 | 4 | `camera-perfil.png` | `site/assets/img/fotos/` | Câmera, 3/4 de perfil | 1:1 · ≥ 2048 px · fundo branco puro |
-| 5 | `camera-frente.png` | `site/assets/img/fotos/` | Câmera, de frente | 1:1 · ≥ 2048 px · fundo branco puro |
+| 5 | `camera-frente.png` | `site/assets/img/fotos/` | Câmera, de frente · **dispensada (D-146)**: o site usa só a `camera-perfil.png` e o vídeo `camera-foto` | 1:1 · ≥ 2048 px · fundo branco puro |
 | 6 | `amigos-praia.jpg` | `site/assets/img/fotos/` | Legenda «Praia com a turma · 12/01/2025» | 1:1 · ≥ 1024 px |
 | 7 | `amigos-trilha.jpg` | `site/assets/img/fotos/` | «Trilha na serra» | 1:1 · ≥ 1024 px |
 | 8 | `casal-cidade.jpg` | `site/assets/img/fotos/` | «Nós dois no Rio · 08/06/2024» | 1:1 · ≥ 1024 px |

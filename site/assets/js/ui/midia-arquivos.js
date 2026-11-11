@@ -1,2 +1,2 @@
 /* Gerado por tools/gerar-midia.mjs (npm run midia). Não edite à mão. */
-window.PLMIDIA_ARQUIVOS=[];
+window.PLMIDIA_ARQUIVOS=["video/mesa-polaroids.mp4","video/mesa-polaroids.webm","video/mesa-polaroids-poster.jpg","video/mesa-polaroids-vertical.mp4","video/mesa-polaroids-vertical.webm","video/mesa-polaroids-vertical-poster.jpg","video/varal-polaroids.mp4","video/varal-polaroids.webm","video/varal-polaroids-poster.jpg","img/fotos/camera-perfil.png","video/camera-foto.mp4","video/camera-foto.webm","video/camera-foto-poster.jpg"];

@@ -7,10 +7,19 @@
 .midia.is-tocando .midia__reserva,.midia.tem-poster .midia__reserva{opacity:0;visibility:hidden}
 
 /* câmera realista: entra no lugar do desenho quando o arquivo existe */
-.cam-real{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:contain}
+.cam-real{display:block;width:100%;height:auto;aspect-ratio:800/626;object-fit:contain}
+/* o recorte do arquivo deixou uma base clara sob a câmera: o contorno abaixo tira essa sobra (vale no <img> e no <image> do SVG) */
+[data-midia-camera]{-webkit-clip-path:polygon(0 0,100% 0,100% 78.6%,72% 78.6%,71.3% 80.4%,68.1% 81.8%,62.5% 82.2%,57.5% 81.47%,50% 80.1%,37.5% 78.04%,25% 75.96%,12.5% 73.6%,11.6% 72.5%,11.4% 71.1%,0 71.1%);clip-path:polygon(0 0,100% 0,100% 78.6%,72% 78.6%,71.3% 80.4%,68.1% 81.8%,62.5% 82.2%,57.5% 81.47%,50% 80.1%,37.5% 78.04%,25% 75.96%,12.5% 73.6%,11.6% 72.5%,11.4% 71.1%,0 71.1%)}
 .cam-real[hidden]{display:none}
 [data-midia-cam].tem-camera .cam-svg{display:none}
 svg[data-midia-cam].tem-camera .cam-desenho{display:none}
+
+/* vídeo da câmera soltando a foto (D-146): o fundo quase branco do arquivo vira o branco da página
+   (o brilho leva o fundo ao branco e a máscara desfaz a borda do quadro: nenhuma caixa visível) */
+.midia--cam{aspect-ratio:1/1;width:100%;max-width:300px}
+.midia--cam .midia__video{mix-blend-mode:multiply;filter:brightness(1.05);
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 6%,#000 94%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 6%,#000 94%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 6%,#000 94%,transparent 100%);-webkit-mask-composite:source-in;mask-composite:intersect}
+.midia--cam .midia__reserva{position:absolute;inset:0;display:flex;align-items:center}
 
 /* legenda e data manuscritas das polaroids (SVG e HTML) */
 .pol-leg{font-family:var(--font-expressive);font-weight:400;font-size:30px;fill:#000000;text-anchor:middle}

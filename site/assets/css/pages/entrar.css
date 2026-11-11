@@ -13,6 +13,7 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 /* a faixa preta fica em cima; abaixo, o vídeo do varal (D-145). O quadro tem proporção fixa (16:10) no celular
    e ocupa o resto da coluna no desktop: nada pula quando o vídeo chega. A mesa de polaroids é a reserva. */
 .ent__midia{aspect-ratio:16/10;background:var(--surface-subtle)}
+.ent__midia .midia__video{object-position:80% 50%}        /* o foco do varal está nas polaroids da direita */
 .ent__mesa{width:100%;height:100%;overflow:hidden}
 .ent__mesa .mesa{display:block;width:100%;height:100%}
 .ent__faixa{padding:56px 24px 40px}

@@ -24,6 +24,10 @@ const vigiar = p => {
 
 const srv = await servir();
 const nav = await chromium.launch();
+/* A mesa ilustrada é a reserva do vídeo do varal (D-145): com os arquivos reais no site ela fica escondida.
+   Este teste confere a reserva, então cada contexto recebe a lista de mídias vazia (estado sem os arquivos). */
+{ const novo = nav.newContext.bind(nav);
+  nav.newContext = async o => { const c = await novo(o); await c.route('**/assets/js/ui/midia-arquivos.js', r => r.fulfill({ contentType: 'text/javascript', body: 'window.PLMIDIA_ARQUIVOS=[];' })); return c; }; }
 try {
   /* ---- 1 · ilustração definitiva no lugar da provisória (1440×900 e 390×844) ---- */
   for (const [w, h] of [[1440, 900], [390, 844]]) {

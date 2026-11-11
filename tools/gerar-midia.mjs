@@ -17,7 +17,9 @@ export const ESPERADOS = [
   // vídeo 2 · varal iluminado com polaroids (tela de entrar)
   'video/varal-polaroids.mp4', 'video/varal-polaroids.webm', 'video/varal-polaroids-poster.jpg',
   // câmera instantânea realista, sem marca
-  'img/fotos/camera-perfil.png', 'img/fotos/camera-frente.png',
+  'img/fotos/camera-perfil.png',
+  // vídeo 3 · a câmera solta a foto (como funciona, passo 1) · fundo quase branco, fundido por multiply (D-146)
+  'video/camera-foto.mp4', 'video/camera-foto.webm', 'video/camera-foto-poster.jpg',
   // fotos de pessoas para as polaroids
   'img/fotos/amigos-praia.jpg', 'img/fotos/amigos-trilha.jpg', 'img/fotos/casal-cidade.jpg', 'img/fotos/casal-por-do-sol.jpg',
   'img/fotos/amigos-viagem.jpg', 'img/fotos/familia-aniversario.jpg', 'img/fotos/casal-cafe.jpg', 'img/fotos/familia-parque.jpg'

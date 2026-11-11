@@ -47,9 +47,13 @@
     <p class="eyebrow rotulo">Como funciona</p>
     <h1 class="page-title">Do celular ao papel, em quatro passos.</h1>
     <p class="page-lead">Você escolhe as fotos, o Polar Life organiza as folhas e você imprime onde quiser.</p>
-    <!-- rolo de filme decorativo com parallax leve (A4) -->
-    <div class="intro__rolo">
-      <img class="mov-parallax" src="../assets/img/ilustracoes/rolo-filme.svg" width="600" height="180" alt="" aria-hidden="true">
+    <!-- vídeo da câmera soltando a foto (D-146): decorativo, mudo, toca uma vez ao entrar na tela e para no último quadro.
+         O fundo quase branco do vídeo funde com a página (CSS). Reserva: o rolo de filme com parallax leve (A4). -->
+    <div class="intro__cam midia midia--cam" data-midia="camera-foto" data-midia-vez data-midia-base="../assets/" aria-hidden="true">
+      <video class="midia__video" muted autoplay playsinline preload="none" tabindex="-1" disablepictureinpicture></video>
+      <div class="intro__rolo midia__reserva">
+        <img class="mov-parallax" src="../assets/img/ilustracoes/rolo-filme.svg" width="600" height="180" alt="">
+      </div>
     </div>
   </div>
 
@@ -155,7 +159,7 @@
             </g>
           </svg>
           <!-- câmera realista (D-142): entra no lugar do desenho quando o arquivo existe -->
-          <img class="cam-real" data-midia-camera="frente" data-midia-base="../assets/" width="800" height="800" alt="" hidden>
+          <img class="cam-real" data-midia-camera="perfil" data-midia-base="../assets/" width="800" height="626" alt="" hidden>
         </div>
       </li>
 
