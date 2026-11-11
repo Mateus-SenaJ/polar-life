@@ -109,7 +109,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   /* contas de teste */
   await p.goto(srv.url + 'app/entrar/');
   await p.locator('[data-perfil=admin]').click();
-  await p.waitForURL('**/app/', { timeout: 5000 });
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });
   (await p.evaluate(() => PLCONTA.plano().id)) === 'admin' ? ok('conta de teste: entrou como Admin') : ruim('conta de teste: Admin não entrou');
 
   /* e-mail → código certo e errado */
@@ -129,7 +129,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.locator('#f-dados').waitFor({ timeout: 5000 });
   ok('e-mail novo confirmado: pede «Seus dados» antes de entrar');
   await p.locator('#d-nome').fill('Dona Teste'); await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
-  await p.waitForURL('**/app/', { timeout: 5000 });
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });
   const pl = await p.evaluate(() => PLCONTA.plano());
   pl.id === 'gratis' && pl.email === 'dona@exemplo.com'
     ? ok('código certo: entrou (plano Grátis para e-mail novo)') : ruim('código certo: ' + JSON.stringify(pl.id));
@@ -145,7 +145,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.locator('[data-prov=google]').click();
   /Demonstração/.test(await p.locator('#caixa').textContent()) ? ok('Google: aviso honesto de demonstração (T7)') : ruim('sem aviso de demonstração');
   await p.locator('#d-nome').fill('Ana Google'); await p.locator('#d-email').fill('ana@exemplo.com'); await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
-  await p.waitForURL('**/app/', { timeout: 5000 });
+  await p.waitForURL('**/app/inicio/', { timeout: 5000 });
   const sg = await p.evaluate(() => PLCONTA.sessao());
   sg.nome === 'Ana Google' && sg.provedor === 'google' && sg.email === 'ana@exemplo.com' ? ok('Google (demo): entrou com nome e e-mail') : ruim('sessão google: ' + JSON.stringify(sg));
 
@@ -245,7 +245,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.locator('#d-nome').fill('Cliente Avulso'); await p.locator('#b-dados').click();
   (await p.locator('#erro-d-aceite').isVisible()) ? ok('dados: aceite obrigatório') : ruim('dados sem aceite');
   await p.locator('#d-aceite').check(); await p.locator('#b-dados').click();
-  await p.waitForURL('**/app/', { timeout: 5000 });
+  await p.waitForURL('**/app/', { timeout: 5000 });      /* veio de ?voltar=%2Fapp%2F: volta para /app/ */
   const sc = await p.evaluate(() => ({ sc: PLCONTA.sessaoCodigo(), pl: PLCONTA.plano() }));
   sc.sc && sc.sc.folhas === 8 && sc.pl.id === 'codigo' && sc.pl.fotosPorProjeto === 24
     ? ok('código certo: sessão de impressão (8 folhas, 24 fotos)') : ruim('sessão de código: ' + JSON.stringify(sc));
@@ -408,7 +408,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p2.locator('#imp').fill(mascara(codigo));
   await p2.locator('#b-imp').click();
   await p2.locator('#d-nome').fill('Cliente Dois'); await p2.locator('#d-aceite').check(); await p2.locator('#b-dados').click();
-  await p2.waitForURL('**/app/', { timeout: 5000 });
+  await p2.waitForURL('**/app/inicio/', { timeout: 5000 });
   await p2.goto(srv.url + 'app/conta/planos/');
   await p2.locator('#b-continuar').click(); /* avulsa já vem marcada para sessão de código */
   await p2.locator('#dialog:not([hidden])').waitFor({ timeout: 5000 });

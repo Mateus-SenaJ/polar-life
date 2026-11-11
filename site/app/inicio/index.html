@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" sizes="32x32" href="../../assets/img/icones/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../../assets/img/icones/favicon-16.png">
+<link rel="apple-touch-icon" href="../../assets/img/icones/apple-touch-icon-180.png">
+<link rel="manifest" href="../../app/manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-title" content="Polar Life">
+<link rel="stylesheet" href="../../assets/css/ui/pwa.css">
+<title>Polar Life · Início</title>
+<meta name="description" content="Seu rolo de câmera cheio de histórias: modelos prontos, colagens para as redes e onde você parou. Tudo neste aparelho.">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../assets/css/base/fonts.css">
+<link rel="stylesheet" href="../../assets/css/base/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base/led.css">
+<!-- D-123: selo + guarda de sessão (modo demonstração) -->
+<link rel="stylesheet" href="../../assets/css/ui/selo-teste.css">
+<link rel="stylesheet" href="../../assets/css/ui/esqueleto.css">
+<link rel="stylesheet" href="../../assets/css/ui/faixa-escura.css">
+<link rel="stylesheet" href="../../assets/css/ui/movimento.css">
+<link rel="stylesheet" href="../../assets/css/ui/app-header.css">
+<script src="../../assets/js/nucleo/conta.js"></script>
+<script src="../../assets/js/ui/guarda.js"></script>
+<script src="../../assets/js/ui/movimento.js"></script>
+<script src="../../assets/js/ui/banners.js"></script>
+<link rel="stylesheet" href="../../assets/css/pages/inicio.css">
+</head>
+<body class="com-barra">
+<div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
+
+<header class="app-header"><div class="in">
+<a class="logo" href="../../" aria-label="Polar Life, página inicial"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<nav class="app-nav" aria-label="Navegação do app">
+<a class="app-nav__l" href="./" aria-current="page"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg>Início</a>
+<a class="app-nav__l" href="../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>Projetos</a>
+</nav>
+<div class="hnav">
+<a class="btn2" href="../conexoes/"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span class="hd-t">Conexões</span></a>
+<a class="btn2" href="../conta/" id="conta"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M14 10h4M14 14h4"/></svg><span class="hd-t" id="conta-t">Conta</span></a>
+<a class="btn2" id="painel" href="../admin/" hidden><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="hd-t">Painel</span></a>
+</div>
+</div></header>
+
+<main class="ini" id="main">
+<h1 class="sr">Início · Polar Life</h1>
+
+<!-- 2 · faixa preta com banners (EXC-1 · DS-17 · D-117) -->
+<section class="faixa" id="faixa" aria-roledescription="carrossel" aria-label="Sugestões do Polar Life">
+<div class="faixa__pistas" id="faixa-pistas">
+
+<article class="faixa__slide is-active" id="faixa-b1" role="group" aria-roledescription="banner" aria-label="Banner 1 de 3: Imprimir">
+<div class="faixa__txt">
+<p class="faixa__kick"><i aria-hidden="true"></i>Não deixe para depois</p>
+<h2 class="faixa__tit">Seu rolo de câmera está cheio de <span class="faixa__expr">histórias.</span></h2>
+<p class="faixa__apoio">Escolha algumas hoje. Um dia, segurar essas fotos vai significar ainda mais.</p>
+<p class="faixa__cta"><a class="led-btn led-btn--light" id="led-comecar" href="../novo-projeto/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Começar agora<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></p>
+<a class="faixa__link" href="../../como-funciona/">Como imprimir em casa<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</div>
+<img class="faixa__img" src="../../assets/img/ilustracoes/banner-imprimir.svg" width="1200" height="500" alt="">
+</article>
+
+<article class="faixa__slide" id="faixa-b2" role="group" aria-roledescription="banner" aria-label="Banner 2 de 3: Design">
+<div class="faixa__txt">
+<p class="faixa__kick"><i aria-hidden="true"></i>Pronto para usar</p>
+<h2 class="faixa__tit">Um modelo para cada <span class="faixa__expr">ocasião.</span></h2>
+<p class="faixa__apoio">Praia, aniversário, viagem: fonte, formato e legenda já combinados. É só trocar as fotos.</p>
+<p class="faixa__cta"></p>
+<a class="faixa__link" href="#sec-modelos">Ver sugestões de design<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+</div>
+<img class="faixa__img" src="../../assets/img/ilustracoes/banner-design.svg" width="1200" height="500" alt="" loading="lazy">
+</article>
+
+<article class="faixa__slide" id="faixa-b3" role="group" aria-roledescription="banner" aria-label="Banner 3 de 3: Colagem">
+<div class="faixa__txt">
+<p class="faixa__kick"><i aria-hidden="true"></i>Para compartilhar</p>
+<h2 class="faixa__tit">As mesmas fotos, prontas para o <span class="faixa__expr">feed.</span></h2>
+<p class="faixa__apoio">Monte uma colagem com suas polaroids e compartilhe em imagem. Não gasta folha.</p>
+<p class="faixa__cta"></p>
+<a class="faixa__link" href="#sec-colagens">Ver colagens<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+</div>
+<img class="faixa__img" src="../../assets/img/ilustracoes/banner-colagem.svg" width="1200" height="500" alt="" loading="lazy">
+</article>
+
+</div>
+<div class="faixa__ctrl">
+<ul class="faixa__pontos" id="faixa-pontos" role="tablist" aria-label="Escolher banner">
+<li><button type="button" class="faixa__ponto" role="tab" id="faixa-p1" aria-controls="faixa-b1" aria-selected="true" aria-label="Banner 1 de 3: Imprimir"><i aria-hidden="true"></i></button></li>
+<li><button type="button" class="faixa__ponto" role="tab" id="faixa-p2" aria-controls="faixa-b2" aria-selected="false" aria-label="Banner 2 de 3: Design"><i aria-hidden="true"></i></button></li>
+<li><button type="button" class="faixa__ponto" role="tab" id="faixa-p3" aria-controls="faixa-b3" aria-selected="false" aria-label="Banner 3 de 3: Colagem"><i aria-hidden="true"></i></button></li>
+</ul>
+<button type="button" class="faixa__pausa" id="faixa-pausa" aria-label="Pausar a rotação dos banners"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg><span>Pausar</span></button>
+</div>
+</section>
+
+<!-- 3 · Continue de onde parou -->
+<section class="sec sec--projetos mov-rise" id="sec-projetos" aria-labelledby="t-projetos">
+<div class="sec__top">
+<h2 class="sec__t" id="t-projetos">Continue de onde parou</h2>
+<a class="sec__link" id="ver-todos" href="../">Ver todos os projetos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</div>
+<div class="esq-sk esq-sk--ini is-on" id="esq-projetos" aria-hidden="true"><div class="esq-sk__card"><i></i><div class="esq-sk__lin"><i></i><i></i></div></div></div>
+<ul class="projs" id="projs"></ul>
+<div class="proj-vazio" id="proj-vazio" hidden>
+<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+<p class="proj-vazio__t">Nenhum projeto ainda</p>
+<p class="proj-vazio__p">Escolha um modelo abaixo ou toque em Começar agora.</p>
+</div>
+</section>
+
+<!-- 4 · Sugestões de design (8 modelos · D-120) -->
+<section class="sec sec--modelos mov-rise" id="sec-modelos" aria-labelledby="t-modelos">
+<div class="sec__top">
+<h2 class="sec__t" id="t-modelos">Sugestões de design</h2>
+</div>
+<p class="sec__apoio">Modelos prontos: formato, fonte e estilo da legenda já combinados. Troque o que quiser depois.</p>
+<ul class="modelos" id="modelos"></ul>
+</section>
+
+<!-- 5 · Colagens para as redes (6 sugestões · D-054) -->
+<section class="sec sec--colagens mov-rise" id="sec-colagens" aria-labelledby="t-colagens">
+<div class="sec__top">
+<h2 class="sec__t" id="t-colagens">Colagens para as redes</h2>
+</div>
+<p class="sec__apoio">As mesmas polaroids, em imagem para compartilhar. Não gastam folha. Em preparação: a colagem chega na próxima versão.</p>
+<div class="colags" id="colags"></div>
+</section>
+
+<!-- 6 · nota de privacidade -->
+<div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p></div>
+
+<!-- 7 · rodapé do app -->
+<ul class="legal">
+<li><a href="../../legal/#privacidade">Privacidade</a></li>
+<li><a href="../../legal/#termos">Termos</a></li>
+<li><a href="../../legal/#cookies">Cookies</a></li>
+</ul>
+</main>
+
+<nav class="app-barra" aria-label="Navegação do app">
+<a class="app-barra__i" href="./" aria-current="page"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg>Início</a>
+<a class="app-barra__i" href="../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>Projetos</a>
+<a class="app-barra__i" href="../conta/"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M14 10h4M14 14h4"/></svg>Conta</a>
+</nav>
+
+<script src="../../assets/js/nucleo/legenda-texto.js"></script>
+<script src="../../assets/js/nucleo/motor-folhas.js"></script>
+<script src="../../assets/js/nucleo/fotos-locais.js"></script>
+<script src="../../assets/js/nucleo/projetos.js"></script>
+<script src="../../assets/js/pages/inicio.js" defer></script>
+</body>
+</html>

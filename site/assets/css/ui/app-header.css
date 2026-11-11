@@ -1,0 +1,44 @@
+/* Cabeçalho do app com navegação (Início · Projetos · Conta) · brief §0.2 e §2.2 (C-a)
+   T-01 (Seus projetos), T-27 (Conta), T-32 (Início) e T-33 (Painel).
+   No desktop a navegação fica no centro do cabeçalho; no celular (390) vira a barra inferior fixa
+   de 56 px (nunca no editor nem nas páginas públicas). */
+
+/* ---------- navegação do centro do cabeçalho (desktop) ---------- */
+.app-nav{display:none}
+@media (min-width:768px){
+  .app-header .in{position:relative}
+  .app-nav{
+    display:flex;align-items:center;gap:4px;
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  }
+  .app-nav__l{
+    display:inline-flex;align-items:center;gap:8px;
+    min-height:44px;padding:0 12px;border-radius:12px;
+    font:500 14px/1 var(--font);color:var(--black);text-decoration:none;
+  }
+  .app-nav__l .ico{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .app-nav__l[aria-current="page"]{color:var(--blue);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+  .app-nav__l:hover{background:var(--surface-subtle)}
+}
+
+/* ---------- barra inferior (celular) ---------- */
+.app-barra{display:none}
+@media (max-width:767px){
+  body.com-barra{padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
+  .app-barra{
+    display:flex;align-items:stretch;
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    height:calc(56px + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    background:var(--white);
+    border-top:1px solid var(--outline-subtle);
+  }
+  .app-barra__i{
+    flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    min-height:44px;padding:4px 0;
+    font:500 12px/1.1 var(--font);color:var(--black);text-decoration:none;
+  }
+  .app-barra__i .ico{flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .app-barra__i[aria-current="page"]{color:var(--blue);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+}

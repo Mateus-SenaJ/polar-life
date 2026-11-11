@@ -21,7 +21,8 @@ function lerVoltar(){
   if(G&&G.raiz()){try{var rp=new URL(G.raiz()).pathname;if(q.indexOf(rp)===0&&q.indexOf(rp+'entrar/')!==0)return q}catch(e){}}
   return null
 }
-function irPara(){var d=voltar||(G?G.raiz():'../');if(d)location.href=d}
+/* D-118: depois de entrar, a pessoa cai no Início (a lista de projetos fica em «Projetos») */
+function irPara(){var d=voltar||(G?G.raiz()+'inicio/':'../inicio/');if(d)location.href=d}
 
 function led(btn,txt){var c=btn.querySelector('.btn-content');if(c)c.textContent=txt}
 function focar(el){ /* foco sem arrastar a rolagem ao carregar (Chromium) */

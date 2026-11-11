@@ -17,18 +17,24 @@
 <link rel="stylesheet" href="../../assets/css/base/fonts.css">
 <link rel="stylesheet" href="../../assets/css/base/tokens.css">
 <link rel="stylesheet" href="../../assets/css/base/led.css">
+<link rel="stylesheet" href="../../assets/css/ui/movimento.css">
 <!-- D-123: selo + guarda de sessão (modo demonstração) -->
 <link rel="stylesheet" href="../../assets/css/ui/selo-teste.css">
 <script src="../../assets/js/nucleo/conta.js"></script>
 <script src="../../assets/js/ui/guarda.js"></script>
+<link rel="stylesheet" href="../../assets/css/ui/app-header.css">
 <link rel="stylesheet" href="../../assets/css/pages/conta.css">
 <link rel="stylesheet" href="../../assets/css/pages/admin.css">
 </head>
-<body>
+<body class="com-barra">
 <div class="selo-teste" aria-description="Ambiente de teste · nada sai deste aparelho"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg><span class="selo-teste__t">Ambiente de teste</span><span class="selo-teste__resto"> · nada sai deste aparelho</span></div>
 
 <header class="app-header"><div class="in">
 <a class="logo" href="../" aria-label="Polar Life, seus projetos"><img class="logo-h" src="../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="Polar Life"></a>
+<nav class="app-nav" aria-label="Navegação do app">
+<a class="app-nav__l" href="../inicio/"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg>Início</a>
+<a class="app-nav__l" href="../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>Projetos</a>
+</nav>
 <div class="hnav">
 <a class="btn2" href="../conta/">Conta</a>
 <a class="btn2 btn2--on" aria-current="page">Painel</a>
@@ -64,6 +70,12 @@
 <div class="dialog__act led-dialog__actions" id="dlg-act"></div>
 </div>
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span><button type="button" id="toast-desfazer" hidden>Desfazer</button></div>
+
+<nav class="app-barra" aria-label="Navegação do app">
+<a class="app-barra__i" href="../inicio/"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg>Início</a>
+<a class="app-barra__i" href="../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>Projetos</a>
+<a class="app-barra__i" href="../conta/"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Conta</a>
+</nav>
 
 <script src="../../assets/js/pages/admin.js" defer></script>
 <script src="../../assets/js/ui/pwa.js" defer></script>

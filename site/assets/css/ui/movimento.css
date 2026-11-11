@@ -1,0 +1,43 @@
+/* Movimento compartilhado (brief §0.2 e §5.4 · D-118) · classes utilitárias + View Transitions
+   A6 · revelação de seções por rolagem: opacidade 0 → 1 e translateY(16 px → 0), 450 ms, irmãos escalonados 60 ms.
+   Só `transform` e `opacity` (nada de layout). Com `prefers-reduced-motion`: estado final, sem animação.
+   A5 · transição entre páginas do app: `@view-transition { navigation: auto; }` (220 ms).
+   Quem não suporta View Transitions navega normalmente (melhoria progressiva). */
+
+/* ---------- A6 · revelação por rolagem ---------- */
+html.mov-js .mov-rise{opacity:0;transform:translateY(16px)}
+html.mov-js .mov-rise.is-in{opacity:1;transform:none;transition:opacity 450ms var(--ease),transform 450ms var(--ease)}
+html.mov-js .mov-rise.is-in{transition-delay:calc(var(--mov-i,0) * 60ms)}   /* escada de 60 ms (máx. 6) */
+
+@supports (animation-timeline: view()){
+  html.mov-js .mov-rise{
+    animation:mov-sobe 450ms var(--ease) both;
+    animation-timeline:view();
+    animation-range:entry 0% entry 40%;
+    transition:none;
+  }
+}
+@keyframes mov-sobe{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:none}
+}
+
+/* ---------- movimento reduzido: estado final, nada anima ---------- */
+@media (prefers-reduced-motion: reduce){
+  html.mov-js .mov-rise{
+    opacity:1 !important;transform:none !important;
+    transition:none !important;animation:none !important;
+  }
+}
+
+/* ---------- A5 · View Transitions entre as páginas do app ---------- */
+@view-transition{navigation:auto}
+@keyframes vt-sai{to{opacity:0}}
+@keyframes vt-entra{from{opacity:0;transform:translateY(8px)}}
+::view-transition-old(root){animation:vt-sai 220ms var(--ease) both}
+::view-transition-new(root){animation:vt-entra 220ms var(--ease) both}
+.app-header a.logo{view-transition-name:logo}      /* o logo fica parado entre as páginas */
+.faixa__cta .led-btn{view-transition-name:cta}       /* um único LED por página (T8) */
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none !important}
+}
