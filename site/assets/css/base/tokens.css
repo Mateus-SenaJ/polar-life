@@ -46,3 +46,6 @@
 }
 .rotulo--m{font-size:var(--rotulo-m);font-weight:400}
 @media(max-width:480px){.rotulo:not(.rotulo--m){font-size:16px}}
+
+/* atributo hidden sempre esconde (o .led-box com display próprio deixava o toast vazio visível) */
+[hidden]{display:none!important}
