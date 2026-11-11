@@ -80,10 +80,11 @@ function rasterizar(f,fr,W,H,real,qualidade){
 function projeto(){
   var q=null;try{q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null')}catch(e){}
   if(!(Array.isArray(q)&&q.length>=2&&q.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0})))q=null;
-  var lista=[],txt={},meta={},leg=null,fr={w:88,h:107,jh:76,lado:6,topo:6,rad:.4,ori:'v'};
+  var lista=[],txt={},meta={},leg=null,nome=null,fr={w:88,h:107,jh:76,lado:6,topo:6,rad:.4,ori:'v'};
   var real=LT.ehReal();   /* 44: projeto real → nada de exemplo */
   if(q){
     var g=q[0]||{},f0=g.fr;
+    if(real)nome=g.nome||null;   /* o nome real do projeto no rodapé (L6) */
     if(f0&&f0.w>0&&f0.h>0&&f0.lado>0&&f0.w-2*f0.lado>0){fr={w:f0.w,h:f0.h,jh:f0.jh>0?f0.jh:f0.w-2*f0.lado,lado:f0.lado,topo:f0.topo==null?6:f0.topo,rad:f0.rad==null?.4:f0.rad,ori:f0.ori==='h'?'h':'v'}}
     if(g.leg&&g.leg.txt&&g.leg.data&&g.leg.loc)leg=LT.migrar(g.leg);   /* D-135/D-136: projeto antigo abre com os dados novos */
     q.slice(1).forEach(function(e,k){lista.push(e);if(typeof e.txt==='string')txt[k+1]=e.txt;if(e.meta&&typeof e.meta==='object')meta[k+1]=e.meta});
@@ -101,7 +102,7 @@ function projeto(){
       adj:Object.assign({},ADJ0,e.adj||{}),flt:Object.assign({id:'original',int:100},e.flt||{})}
   });
   fr.jw=fr.w-2*fr.lado;fr.jh=fr.jh>0?fr.jh:fr.jw;
-  return{s:FL.ler(),fr:fr,fotos:fotos,leg:leg,real:real}
+  return{s:FL.ler(),fr:fr,fotos:fotos,leg:leg,real:real,nome:nome}
 }
 
 function mul(A,B){return{a:A.a*B.a+A.c*B.b,b:A.b*B.a+A.d*B.b,c:A.a*B.c+A.c*B.d,d:A.b*B.c+A.d*B.d,e:A.a*B.e+A.c*B.f+A.e,f:A.b*B.e+A.d*B.f+A.f}}
@@ -320,8 +321,8 @@ function linhas(sh,p,s){
 function contornos(sh,fr){
   return sh.cells.map(function(c){return{t:'grupo',m:matrizPolaroid(c,fr),itens:[ret(44,44,mm(fr.w)-88,mm(fr.h)-88,0,'#000000',88,false)]}})
 }
-function rodape(i,N,p,s){
-  var txt='Viagem · Serra 2026 · Folha '+(i+1)+' de '+N,f={fam:'IBM Plex Mono',peso:400,it:false,pt:2.2*72/25.4,cor:'#000000',esp:.04,contorno:false};
+function rodape(i,N,p,s,nome){
+  var txt=(nome||'Viagem · Serra 2026')+' · Folha '+(i+1)+' de '+N,f={fam:'IBM Plex Mono',peso:400,it:false,pt:2.2*72/25.4,cor:'#000000',esp:.04,contorno:false};
   var w=medir(txt.toUpperCase(),f),base=Math.max(1,s.margem/2-1.2),size=tamUm(f.pt),m=metricas(f),lh=m.asc+m.desc;
   /* MT-02: bottom é o fim da caixa de linha; a linha de base desconta meia-entrelinha e descendente. */
   var y=p.h*1000-mm(base)-(lh-(m.asc+m.desc))/2*size-m.desc*size;
@@ -337,7 +338,7 @@ function lista(proj){
     var itens=[];
     sh.cells.forEach(function(c){itens.push({t:'grupo',m:matrizPolaroid(c,fr),itens:itensPolaroid(c,proj)})});
     if(s.guias)itens=itens.concat(linhas(sh,R.p,s));else if(s.contorno)itens=itens.concat(contornos(sh,fr));
-    if(s.rodape)itens.push(rodape(i,R.sheets.length,R.p,s));
+    if(s.rodape)itens.push(rodape(i,R.sheets.length,R.p,s,proj.nome));
     return{w:mm(R.p.w),h:mm(R.p.h),itens:itens}
   });
   return{paginas:paginas,erro:false,p:R.p}
@@ -492,6 +493,8 @@ function construirVolumes(L,p,jpegs,lim,avisos,sinal,escala){
 function preparar(p,avisos){
   var jobs=[],vistos={};
   function add(fam,peso,it){var k=fam+'|'+peso+'|'+(it?1:0);if(vistos[k])return;vistos[k]=1;jobs.push(carregarFonte(fam,peso,it,avisos))}
+  if(!p.nome&&p.real&&window.PLPROJETOS&&window.PLPROJETOS.atual&&window.PLPROJETOS.listar)   /* o nome do projeto no rodapé (L6) */
+    jobs.push(PLPROJETOS.listar().then(function(a){var id=PLPROJETOS.atual();for(var i=0;i<a.length;i++)if(a[i].id===id){p.nome=a[i].nome;break}},function(){}));
   if(p.leg){var a=estiloObj(p.leg.txt);add(a.fam,a.peso,a.it);var b=estiloObj(p.leg.data);add(b.fam,b.peso,b.it);var c=estiloObj(p.leg.loc);add(c.fam,c.peso,c.it);add('IBM Plex Mono',400,false)}
   else{add('Caveat',500,false);add('IBM Plex Mono',400,false)}
   if(p.s.rodape)add('IBM Plex Mono',400,false);

@@ -49,6 +49,7 @@ function dadosFoto(f){
   return{d:a?new Date(+a[1],+a[2]-1,+a[3]):null,iso:a?a[0]:'',c:cid||''}
 }
 function localLG(l,cid){
+  if(ehReal())return cid||'';   /* D-138: em projeto real o local é exatamente o texto digitado (sem estado, sem país) */
   var e=l.uf==='oculto'?'':l.uf==='sigla'?'SP':'São Paulo',pa=l.pais==='oculto'||l.ocBR?'':l.pais==='nome'?'Brasil':'BR';
   var arr=l.ordem==='cidade'?[cid,e,pa]:[e,cid,pa],sep=l.sep===' '?' ':l.sep===', '?', ':' '+l.sep.trim()+' ';
   return arr.filter(Boolean).join(sep)

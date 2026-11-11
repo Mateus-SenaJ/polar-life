@@ -11,7 +11,7 @@ var HEIC={5:1,7:1,12:1,13:1,18:1,22:1};   /* mesmas fotos «convertidas» da T-0
 function def(n){if(sessionStorage.getItem('pl-fotos'))return{iso:'',ds:'',dh:0,c:'',cs:'',o:'Do aparelho',conv:false};n=Q.src(n);var m=480+30*(n-1);return{iso:'2026-07-14T'+z(Math.floor(m/60))+':'+z(m%60),ds:'exif',dh:0,c:'Campos do Jordão',cs:'gps',o:'Do aparelho',conv:!!HEIC[n]}}
 function M(n){return Q.ST()[n].meta||def(n)}
 function cp(n){return JSON.parse(JSON.stringify(M(n)))}
-function pd(iso){var a=(iso||'').match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+)$/);return a?{y:+a[1],m:+a[2],d:+a[3],h:+a[4],i:+a[5]}:null}
+function pd(iso){var a=(iso||'').match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+)(?::\d+)?$/);return a?{y:+a[1],m:+a[2],d:+a[3],h:+a[4],i:+a[5]}:null}   /* o EXIF pode vir com segundos */
 function lido(iso){var p=pd(iso);return p?z(p.d)+'.'+z(p.m)+'.'+String(p.y).slice(2)+' · '+z(p.h)+':'+z(p.i):''}
 function br(iso){var p=pd(iso);return p?z(p.d)+'/'+z(p.m)+'/'+p.y:''}
 function desloca(iso,h){var p=pd(iso),t=new Date(Date.UTC(p.y,p.m-1,p.d,p.h,p.i)+h*3600000);

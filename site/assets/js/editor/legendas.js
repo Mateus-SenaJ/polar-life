@@ -34,7 +34,7 @@ var UI={sel:null,cat:'todas',busca:'',fav:['Caveat'],rec:[],aberto:{},conf:false
 var COR={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 function copia(o){return JSON.parse(JSON.stringify(o))}
 function L(){var S=Q.ST()[0];if(!S.leg)S.leg=copia(PADRAO);return LT.migrar(S.leg)}   /* D-135/D-136: dados antigos viram os novos ao ler */
-function T(){var s=Q.S();return s.txt===null||s.txt===undefined?['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'][(Q.src(Q.cur())-1)%4]:s.txt}
+function T(){var s=Q.S();return s.txt===null||s.txt===undefined?(LT.ehReal()?'':['Dias de sol','Nós dois','Dia de rolê','Meu parceiro'][(Q.src(Q.cur())-1)%4]):s.txt}   /* projeto real: sem texto de exemplo */
 function getp(o,k){return k.split('.').reduce(function(a,b){return a[b]},o)}
 function setp(o,k,v){var a=k.split('.');a.slice(0,-1).forEach(function(x){o=o[x]});o[a[a.length-1]]=v}
 function getv(o,k){var v=getp(o,k);return v==null&&DEFL[k]!==undefined?DEFL[k]:v}
@@ -42,12 +42,7 @@ function val(k){return getv(L(),k)}
 function defv(k){return DEFL[k]!==undefined?DEFL[k]:getp(PADRAO,k)}
 function fam(nome){return nome==='IBM Plex Mono'?"'IBM Plex Mono',ui-monospace,monospace":fonte(nome).css}
 function caixa(t,c){return c==='maiusc'?t.toUpperCase():c==='cap'?t.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase()}):t}
-function localTxt(l,c){var cid=c==null?LOCAL.cidade:c;
-  var e=l.uf==='oculto'?'':l.uf==='sigla'?LOCAL.uf:LOCAL.estado,p=l.pais==='oculto'||(l.ocBR&&l.pais!=='oculto')?'':l.pais==='nome'?LOCAL.pais:LOCAL.cod;
-  var a=l.ordem==='cidade'?[cid,e,p]:[e,cid,p];
-  var sep=l.sep===' '?' ':l.sep===', '?', ':' '+l.sep.trim()+' ';
-  return a.filter(Boolean).join(sep)
-}
+function localTxt(l,c){return LT.localLG(l,c==null?LOCAL.cidade:c)}   /* MT-02: uma conta só (a do PDF e a das Folhas) */
 function amostra(k){return k==='txt'?(T()||'Dia de rolê'):k==='data'?FMT[L().data.fmt][1](DATA):localTxt(L().loc)}
 function num(v){return Math.round(v*100)/100}
 function estXL(o,extra){ /* linha absoluta: corpo em mm reais via --pmm, reescala junto com a mesa (D-113) */
@@ -164,7 +159,7 @@ function seletor(k){
 }
 function sw(k,rot,on){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'" aria-labelledby="s-'+k+'"><span></span></button></div>'}
 function montar(){
-  var l=L(),h='',dis=l.original?' aria-disabled="true"':'';   /* D-135: com a Polaroid original as outras seções ficam apagadas */
+  var l=L(),h='',dis=l.original?' aria-disabled="true"':'',real=LT.ehReal();   /* D-135: com a Polaroid original as outras seções ficam apagadas */
   /* 1 · Polaroid original (D-135): primeiro controle do painel */
   h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Legendas</h3>'
    +sw('original','Sem legendas',!!l.original)
@@ -193,11 +188,11 @@ function montar(){
    +seletor('data')
    +sld('data.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('data',l.data.cor)+'</section>';
   h+='<section class="mod" aria-labelledby="lm3"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm3">Local</h3>'+sw('loc.on','Mostrar local',l.loc.on)
-   +'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>'
-   +seg('uf','Estado',[['sigla','Sigla'],['nome','Nome'],['oculto','Oculto']],l.loc.uf,'loc.uf')
-   +seg('pais','País',[['oculto','Oculto'],['nome','Nome'],['cod','Código']],l.loc.pais,'loc.pais')
+   +(real?'<p class="f__h">Escreva a cidade como quer ver na legenda (ex.: Recife, PE) na aba Metadados.</p>':'<p class="f__h">Cidade, nunca coordenadas. A cidade é lida no aparelho.</p>')
+   +(real?'':seg('uf','Estado',[['sigla','Sigla'],['nome','Nome'],['oculto','Oculto']],l.loc.uf,'loc.uf'))
+   +(real?'':seg('pais','País',[['oculto','Oculto'],['nome','Nome'],['cod','Código']],l.loc.pais,'loc.pais'))
    +seg('sep','Separador',[[', ','Vírgula'],['·','Ponto'],['–','Traço'],['/','Barra'],[' - ','Hífen']],l.loc.sep,'loc.sep')
-   +seg('ordem','Ordem',[['cidade','Cidade, Estado'],['estado','Estado, Cidade']],l.loc.ordem,'loc.ordem')
+   +(real?'':seg('ordem','Ordem',[['cidade','Cidade, Estado'],['estado','Estado, Cidade']],l.loc.ordem,'loc.ordem'))
    +seletor('loc')
    +sld('loc.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')+cores('loc',l.loc.cor)+'</section>';
   h+='<section class="mod" aria-labelledby="lm4"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm4">Linhas</h3>' /* D-113 */

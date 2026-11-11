@@ -41,7 +41,6 @@ function mudou(s){var c=JSON.parse(JSON.stringify(s)),d=novo();delete c.meta;del
 /*FIM MOTOR*/
 
 var $=function(i){return document.getElementById(i)},tm;
-if(window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){document.title='Polar Life · '+p.nome+' · Quadro';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome}});
 function toast(m,undo){clearTimeout(tm);$('toast-t').textContent=m;$('toast-undo').hidden=!undo;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function nf(n,d){return (Math.round(n*(d?10:1))/(d?10:1)).toString().replace('.',',')}
 function p2(n){return(n<10?'0':'')+n}
@@ -50,6 +49,8 @@ var N=24,ST=[{}],cur=3,UI={grade:'nenhuma',inteira:false};
 function lerLista(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');if(Array.isArray(a)&&a.length>=1&&a.length<=400&&a.every(function(x){return x>=1&&x<=400&&x%1===0}))return a}catch(e){}return null}
 var LISTA_REAL=lerLista(),DEMO=!(LISTA_REAL&&window.PLTEXTO&&PLTEXTO.ehReal());   /* 44: ajustes de exemplo só no projeto demo */
 var LISTA0=LISTA_REAL||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
+var NOME='Viagem · Serra 2026';   /* nome do projeto: no exemplo, o nome de exemplo (DOC-04 §6) */
+if(!DEMO&&window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){NOME=p.nome;ST[0].nome=p.nome;document.title='Polar Life · '+p.nome+' · Quadro';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome;guardarLista()}});
 function lerQuadro(){                                              /* estado completo guardado ao sair para as Folhas (D-085) */
   try{var o=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
     if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'})){
@@ -65,7 +66,9 @@ else{LISTA0.forEach(function(sr){var e=novo();e.src=sr;
 N=ST.length-1;
 SRCMAP=function(n){return ST[n]&&ST[n].src||n};
 /* Metadados da foto real ficam no aparelho; GPS só sinaliza existência (BR-06). */
-if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src)})).then(function(a){a.forEach(function(r,i){if(r){ST[i+1].meta=r.meta||{};if(r.w&&r.h){VERT[ST[i+1].src]=r.h>r.w?1:0;REAL_DIM[ST[i+1].src]={w:r.w,h:r.h}}}});if(window.PLLEG)PLLEG.render();render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
+if(!DEMO&&window.PLFOTOS)Promise.all(ST.slice(1).map(function(e){return PLFOTOS.ler(e.src).catch(function(){return null})})).then(function(a){a.forEach(function(r,i){if(!r)return;var e=ST[i+1],m=e.meta;
+  if(!m||(!m.ds&&!m.cs)){var iso=(r.meta&&r.meta.iso||'').slice(0,16);e.meta={iso:iso,ds:iso?'exif':'none',dh:0,c:'',cs:'none',o:'Do aparelho',conv:false}}   /* não sobrescreve o que a pessoa editou */
+  if(r.w&&r.h){VERT[e.src]=r.h>r.w?1:0;REAL_DIM[e.src]={w:r.w,h:r.h}}});if(window.PLLEG)PLLEG.render();render();faixa();guardarLista()});   /* qualidade e miniaturas com os pixels reais */
 function src(n){return SRCMAP(n)}
 function guardarLista(){try{var s=ST.map(function(e,i){if(!i)return e;var o=copia(e);o.ex=0;o.ey=0;return o});   /* o elástico é do gesto: some quando a foto é guardada (MT-02) */
   sessionStorage.setItem('pl-fotos',JSON.stringify(ST.slice(1).map(function(e){return e.src})));sessionStorage.setItem('pl-quadro',JSON.stringify(s));sessionStorage.setItem('pl-ppi',JSON.stringify(ST.slice(1).map(function(e,i){return ppi(i+1,e)})));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
@@ -93,13 +96,44 @@ function cena(n,vin){
   return o+'</svg>'
 }
 function estilo(n,s){
-  var a=nat(n),k=base(n,s)*s.z/100;
-  return 'width:'+a.w*k*100+'%;height:'+a.h*k*jq()*100+'%;left:'+(50+(s.px+(s.ex||0))*100)+'%;top:'+(50+(s.py+(s.ey||0))*100)+'%;transform:translate(-50%,-50%) rotate('+s.ang+'deg) scaleX('+(s.flip?-1:1)+') rotate('+s.rot+'deg)'
+  return PLFOTOTELA.estilo(nat(n),s,jq())   /* MT-02: o recorte da tela é o mesmo do PDF (PLFOTOTELA) */
+}
+/* ---------- foto na tela: a real em projeto real, a cena de exemplo no exemplo ---------- */
+var PEDIU={};                              /* src → pedido em andamento (evita pedir duas vezes) */
+function pedirCheia(n,sr){
+  if(PEDIU[sr])return;PEDIU[sr]=1;
+  PLFOTOTELA.url(sr).then(function(u){
+    PEDIU[sr]=0;
+    if(!u||!PLFOTOTELA.tem(sr,false))return;   /* a URL pode ter sido revogada no caminho */
+    if(ST[n]&&src(n)===sr){keyMain='';pintaMain()}
+  })
+}
+function pedirMini(n,sr){
+  var k='m'+sr;if(PEDIU[k])return;PEDIU[k]=1;
+  PLFOTOTELA.mini(sr,n===cur).then(function(u){
+    PEDIU[k]=0;
+    if(!u)return;
+    if(ST[n]&&src(n)===sr)thumb(n)
+  })
+}
+function midia(n,vin,mini,encaixe,podePedir){
+  if(DEMO)return cena(n,vin);
+  var sr=src(n),u=PLFOTOTELA.tem(sr,mini);
+  if(!u&&!mini)u=PLFOTOTELA.tem(sr,true);   /* a janela espera a cheia; enquanto isso, a mini se existir */
+  if(u){
+    if(!mini&&!PLFOTOTELA.tem(sr,false))pedirCheia(n,sr);
+    return PLFOTOTELA.html(u,vin,encaixe)
+  }
+  if(podePedir!==false&&!PLFOTOTELA.falhou(sr)){
+    if(!mini)pedirCheia(n,sr);   /* a janela pede a foto cheia; a mini entra como reserva */
+    pedirMini(n,sr)
+  }
+  return ''
 }
 var keyMain='';
 function pintaMain(){
-  var s=S(),key=cur+'|'+s.adj.vinheta;
-  if(key!==keyMain){keyMain=key;var c=cena(cur,s.adj.vinheta);$('clip').innerHTML='<div class="ph">'+c+'</div>';$('ghost').innerHTML='<div class="ph">'+c+'</div>'}
+  var s=S(),m=midia(cur,s.adj.vinheta,false),key=cur+'|'+s.adj.vinheta+'|'+m;   /* a URL em uso entra na chave */
+  if(key!==keyMain){keyMain=key;$('clip').innerHTML='<div class="ph">'+m+'</div>';$('ghost').innerHTML='<div class="ph">'+m+'</div>';var cmp=$('cmp');if(cmp)cmp.innerHTML='<div class="ph">'+m+'</div><i class="win__cut"></i>'}
   var st=estilo(cur,s);[].forEach.call(document.querySelectorAll('#clip .ph,#ghost .ph,#cmp .ph'),function(e){e.setAttribute('style',st)});
   filtro(s.adj);if(window.PLFLT)PLFLT.aplicar(s)
 }
@@ -201,25 +235,46 @@ function qualidade(){
 }
 function thumb(i){
   var b=$('faixa').children[i-1].firstChild,s=ST[i],t=b.querySelector('.tq');
-  t.innerHTML='<div class="ph" style="'+estilo(i,s)+';filter:none">'+cena(i,0)+'</div>';
+  t.innerHTML='<div class="ph" style="'+estilo(i,s)+';filter:none">'+midia(i,0,true,null,PERTO[i]||i===cur)+'</div>';
   b.classList.toggle('th--alert',nivel(ppi(i,s))!=='excelente');
   var nv=nivel(ppi(i,s));
   b.setAttribute('aria-label','Foto '+p2(i)+' de '+N+(mudou(s)?', ajustada':'')+(nv!=='boa'?', '+ROT[nv].toLowerCase():'')+(window.PLLOTE&&PLLOTE.sel(i)?', selecionada':''));
   if(i===cur)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')
 }
+var PERTO={},OBS=null;                   /* miniaturas pedidas só perto da área visível (200 fotos não travam) */
+function observar(){
+  var ol=$('faixa');
+  if(!window.IntersectionObserver){      /* sem observador: todas, em ordem a partir da atual */
+    for(var i=cur;i<=N;i++){PERTO[i]=1;pedirMini(i)}
+    for(i=1;i<cur;i++){PERTO[i]=1;pedirMini(i)}
+    return
+  }
+  if(OBS)OBS.disconnect();
+  OBS=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var i=+e.target.getAttribute('data-i');
+      OBS.unobserve(e.target);
+      PERTO[i]=1;pedirMini(i)
+    })
+  },{root:ol,rootMargin:'200px'});
+  [].forEach.call(ol.children,function(li){var b=li.firstChild;if(b)OBS.observe(b)})
+}
 function faixa(){
   var ol=$('faixa');ol.innerHTML='';
   for(var i=1;i<=N;i++){
     var li=document.createElement('li'),b=document.createElement('button');
-    b.type='button';b.className='th';b.innerHTML='<span class="tq"></span><span class="th__n mono">#'+p2(i)+'</span>';
+    b.type='button';b.className='th';b.setAttribute('data-i',i);
+    b.innerHTML='<span class="tq"></span><span class="th__n mono">#'+p2(i)+'</span>';
     (function(k){b.onclick=function(){ir(k)}})(i);
     li.appendChild(b);ol.appendChild(li)
   }
   for(i=1;i<=N;i++)thumb(i)
+  observar()
 }
 function ir(n){
   if(n<1||n>N||n===cur)return;
-  var a=cur;cur=n;dbl=null;try{history.replaceState(null,'','#foto-'+n)}catch(e){}
+  var a=cur;cur=n;dbl=null;PERTO[n]=1;try{history.replaceState(null,'','#foto-'+n)}catch(e){}
   thumb(a);render();var c=document.querySelector('.th[aria-current]');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',inline:'nearest'})
 }
 
@@ -235,9 +290,11 @@ function commit(k){
   lastK=k;lastT=now;render()
 }
 function assin(){return ST.slice(1).map(function(e){return e.src}).join(',')}
+function manterFotos(){try{PLFOTOTELA.manter(ST.slice(1).map(function(e){return e.src}))}catch(e){}}
 function aplicarHist(j){
   var antes=assin();hi=j;ST=JSON.parse(hist[hi]);N=ST.length-1;if(cur>N)cur=N;lastK='';keyMain='';
   if(assin()!==antes){faixa();if(window.PLLOTE)PLLOTE.limpar();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}}
+  manterFotos();
   guardarLista();render();for(var i=1;i<=N;i++)thumb(i)}
 function desfazer(){if(hi>0){aplicarHist(hi-1);toast('Alteração desfeita')}}
 function refazer(){if(hi<hist.length-1){aplicarHist(hi+1);toast('Alteração refeita')}}
@@ -246,7 +303,7 @@ $('toast-undo').onclick=function(){desfazer()};
 
 
 /* ---------- estrutura do lote: Duplicar e Remover (FN-09) · entram no histórico ---------- */
-function reindexar(novoST,atual){ST=novoST;N=ST.length-1;cur=Math.max(1,Math.min(N,atual));faixa();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}if(window.PLLOTE)PLLOTE.limpar();commit()}
+function reindexar(novoST,atual){ST=novoST;N=ST.length-1;cur=Math.max(1,Math.min(N,atual));PERTO={};faixa();try{history.replaceState(null,'','#foto-'+cur)}catch(e){}if(window.PLLOTE)PLLOTE.limpar();manterFotos();commit()}
 function limiteFotos(){ /* D-027: o teto de fotos vem do plano (PLCONTA), nunca copiado em código */
   var P=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
   return P&&P.fotosPorProjeto?P.fotosPorProjeto:24
@@ -471,7 +528,7 @@ function render(){
   $('nb').hidden=!mudou(s);
   $('fprev').disabled=cur<=1;$('fnext').disabled=cur>=N;
   $('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;
-  document.title='Polar Life · Viagem · Serra 2026 · Quadro · Foto '+p2(cur);
+  document.title='Polar Life · '+NOME+' · Quadro · Foto '+p2(cur);
   pintaMain();pintaGrade();nv=qualidade();sincronizar();lote();if(window.PLLEG)PLLEG.render();if(window.PLFLT)PLFLT.render();if(window.PLMET)PLMET.render();if(window.PLLOTE)PLLOTE.render();
   if($('faixa').children.length===N)thumb(cur)
 }
@@ -500,7 +557,7 @@ $('insp-toggle').onclick=function(){var sh=insp.classList.toggle('is-shut');cont
 function modo(){if(mt.matches){insp.classList.remove('is-shut');content.classList.add('has-insp');$('insp-toggle').setAttribute('aria-expanded','true')}else{content.classList.remove('has-insp');insp.classList.remove('is-shut')}}
 mt.addListener?mt.addListener(modo):mt.addEventListener('change',modo);modo();snap(0);
 
-window.PLQ={sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
+window.PLQ={sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,midia:midia,real:!DEMO,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
 Object.defineProperty(window.PLQ,'N',{get:function(){return N}});
 /* ---------- partida ---------- */
 construir();faixa();

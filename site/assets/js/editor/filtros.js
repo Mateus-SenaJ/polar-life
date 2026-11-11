@@ -2,30 +2,9 @@
    12 filtros = matriz de cor 4×5 (mesma conta na tela e no export, DOC-08). Estado por foto em ST[n].flt; favoritos em ST[0].fav. */
 (function(){
 var Q=window.PLQ;if(!Q)return;
+var FT=window.PLFOTOTELA;if(!FT)return;
 var $=function(i){return document.getElementById(i)};
-var ID=[1,0,0,0,0, 0,1,0,0,0, 0,0,1,0,0, 0,0,0,1,0];
-function mat(sat,con,br,rgb,off){ /* saturação → contraste → brilho → tom por canal */
-  var lr=.2126,lg=.7152,lb=.0722,s=sat,rows=[[lr*(1-s)+s,lg*(1-s),lb*(1-s)],[lr*(1-s),lg*(1-s)+s,lb*(1-s)],[lr*(1-s),lg*(1-s),lb*(1-s)+s]],o=[];
-  rgb=rgb||[1,1,1];off=off||0;
-  for(var c=0;c<3;c++){var k=con*rgb[c];o=o.concat([rows[c][0]*k,rows[c][1]*k,rows[c][2]*k,0,.5*(1-con)*rgb[c]+br+off])}
-  return o.concat([0,0,0,1,0])
-}
-var FILTROS=[
- {id:'original',n:'Original',m:ID},
- {id:'pb',n:'P&B',m:mat(0,1.05,0)},
- {id:'noir',n:'Noir',m:mat(0,1.5,-.05)},
- {id:'retro',n:'Retrô',m:mat(.8,.95,0,[1.08,1,.88],.02)},
- {id:'antiga',n:'Foto Antiga',m:mat(.45,.9,0,[1.1,1,.8],.04)},
- {id:'praia',n:'Praia',m:mat(1.2,1.05,0,[.97,1.03,1.08])},
- {id:'pastel',n:'Pastel',m:mat(.7,.8,.1)},
- {id:'polaroid',n:'Polaroid Clássico',m:mat(.9,.9,0,[1.05,1.02,.95],.03)},
- {id:'instantanea',n:'Instantânea',m:mat(1.15,1.15,0,[1.03,1,.97])},
- {id:'verao',n:'Verão',m:mat(1.2,1.05,0,[1.08,1.02,.9])},
- {id:'desbotado',n:'Desbotado',m:mat(.6,.8,.08)},
- {id:'cinema',n:'Cinema',m:mat(.85,1.2,-.03,[.95,1,1.08])}
-];
-function por(id){return FILTROS.filter(function(f){return f.id===id})[0]||FILTROS[0]}
-function lerp(m,t){return m.map(function(v,i){return+(ID[i]+(v-ID[i])*t).toFixed(4)})}
+var FILTROS=FT.FILTROS,por=FT.por,lerp=FT.lerp;   /* filtros: fonte única em PLFOTOTELA (MT-02) */
 var UI={fav:false,cmp:false,orig:false},SUG={},tileKey='';
 function S0(){var s=Q.ST()[0];if(!s.fav)s.fav=[];return s}
 function F(){var s=Q.S();if(!s.flt)s.flt={id:'original',int:100};return s.flt}
@@ -41,26 +20,40 @@ function aplicar(s){
 }
 
 /* «Sugerido para esta foto»: histograma simples no aparelho (luz média e cor média), sem aleatoriedade */
+function medir(img,cb){
+  var c=document.createElement('canvas');c.width=c.height=40;var x=c.getContext('2d');x.drawImage(img,0,0,40,40);
+  var d=x.getImageData(0,0,40,40).data,L=0,Sa=0,k=d.length/4;
+  for(var i=0;i<d.length;i+=4){var r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b);L+=.2126*r+.7152*g+.0722*b;Sa+=mx?(mx-mn)/mx:0}
+  L/=k;Sa/=k;
+  SUG[img.__n]=L<.38?'cinema':Sa<.12?'noir':L>.62?'pastel':Sa>.35?'polaroid':'retro';cb(SUG[img.__n])
+}
 function sugerir(n,cb){
   if(SUG[n]){cb(SUG[n]);return}
+  if(Q.real){                          /* projeto real: a miniatura da foto de verdade (não a cena de exemplo) */
+    FT.mini(Q.src(n),n===Q.cur()).then(function(u){
+      if(!u){cb('');return}
+      var img=new Image();img.__n=n;
+      img.onload=function(){try{medir(img,cb)}catch(e){cb('')}};
+      img.onerror=function(){cb('')};
+      img.src=u
+    });
+    return
+  }
   try{
     var svg=Q.cena(n,0).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" '),img=new Image();
-    img.onload=function(){
-      var c=document.createElement('canvas');c.width=c.height=40;var x=c.getContext('2d');x.drawImage(img,0,0,40,40);
-      var d=x.getImageData(0,0,40,40).data,L=0,Sa=0,k=d.length/4;
-      for(var i=0;i<d.length;i+=4){var r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b);L+=.2126*r+.7152*g+.0722*b;Sa+=mx?(mx-mn)/mx:0}
-      L/=k;Sa/=k;
-      SUG[n]=L<.38?'cinema':Sa<.12?'noir':L>.62?'pastel':Sa>.35?'polaroid':'retro';cb(SUG[n])
-    };
+    img.__n=n;
+    img.onload=function(){try{medir(img,cb)}catch(e){cb('')}};
     img.onerror=function(){};img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)
-  }catch(e){}
+  }catch(e){cb('')}
 }
 
 /* grade de 12 */
 function grade(){
-  var n=Q.cur(),f=F(),fav=S0().fav,sug=SUG[n]||'',key=[n,f.id,fav.join(),UI.fav,sug].join('|');
+  var n=Q.cur(),f=F(),fav=S0().fav,sug=SUG[n]||'';
+  var u=Q.real?FT.tem(Q.src(n),true):'';
+  var key=[n,f.id,fav.join(),UI.fav,sug,u].join('|');
   if(key===tileKey)return;tileKey=key;
-  var mini=Q.cena(n,0).replace('preserveAspectRatio="none"','preserveAspectRatio="xMidYMid slice"'),h='';
+  var mini=Q.real?Q.midia(n,0,true,'cover'):Q.cena(n,0).replace('preserveAspectRatio="none"','preserveAspectRatio="xMidYMid slice"'),h='';
   FILTROS.filter(function(x){return!UI.fav||fav.indexOf(x.id)>=0||x.id===f.id}).forEach(function(x){
     var on=x.id===f.id,fv=fav.indexOf(x.id)>=0;
     h+='<li class="ft"><button type="button" class="ft__b" role="radio" aria-checked="'+on+'" data-f="'+x.id+'"><span class="ft__ph" style="filter:url(#tf-'+x.id+')">'+mini+'</span><span class="ft__n">'+x.n+'</span>'+(x.id===sug?'<span class="ft__s rotulo">Sugerido</span>':'')+'</button>'
