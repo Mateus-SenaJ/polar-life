@@ -356,7 +356,7 @@ var ACT={
   espelhar:function(){var s=S();s.flip=!s.flip;commit('espelhar')},
   inteira:function(){UI.inteira=!UI.inteira;sincronizar()},
   centralizar:function(){var s=S();s.px=s.py=0;dbl=null;commit('centralizar')},
-  rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta;dbl=null;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;commit('rfoto');toast('Recorte da foto restaurado',true)},
+  rfoto:function(){var s=S(),a=s.adj,fl=s.flt,mt=s.meta,pdx=s.pad,plx=s.pl;dbl=null;ST[cur]=novo();ST[cur].adj=a;ST[cur].flt=fl;if(mt)ST[cur].meta=mt;if(pdx)ST[cur].pad=pdx;if(plx)ST[cur].pl=plx;commit('rfoto');toast('Recorte da foto restaurado',true)},
   reduzir:function(){
     var s=S(),mx=zmaxPara(cur,s,240),z=Math.max(zmin(s,cur),Math.min(s.z,mx));s.z=z;commit('reduzir');
     toast('Zoom em '+S().z+'% · '+ROT[nivel(ppi(cur,S()))],true)

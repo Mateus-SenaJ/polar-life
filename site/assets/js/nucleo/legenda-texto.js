@@ -98,6 +98,23 @@ function migrar(leg){
   delete leg.dx;                     /* o alinhamento assume a posição horizontal (FN-07) */
   return leg
 }
+/* ---------- D-139 · padrão avançado de 2 linhas (fonte única: tela, Folhas e PDF · MT-02) ----------
+   leg.pad = {on,l:[{t,pt},{t,pt}]} no projeto; ST[n].pad (mesmo formato) é a exceção da foto; ST[n].pl = [{v,m},{v,m}] são os
+   textos de cada linha (m = digitado à mão). Tipos: loc · data · pt (ponto turístico) · txt (texto livre) · nenhum.
+   comPadrao devolve uma cópia da legenda em que a linha 1 ocupa o lugar da «data» e a linha 2 o do «local»,
+   em linhas separadas, com o corpo de cada linha; _dt e _lc trazem os textos finais. Sem padrão ligado, devolve a própria legenda. */
+var PAD_TIPOS=['loc','data','pt','txt','nenhum'],PAD_PT=[7,8,10,12];
+function padNovo(){return{on:false,l:[{t:'loc',pt:8},{t:'data',pt:8}]}}
+function padLinha(l){var t=l&&PAD_TIPOS.indexOf(l.t)>=0?l.t:'nenhum',pt=l&&PAD_PT.indexOf(l.pt)>=0?l.pt:8;return{t:t,pt:pt}}
+function padTxt(l,p){return l.t==='nenhum'||!p||typeof p.v!=='string'?'':p.v}
+function comPadrao(leg,f){
+  if(!leg||!leg.pad||!leg.pad.on||!leg.data||!leg.loc)return leg;
+  var pd=f&&f.pad&&f.pad.l?f.pad:leg.pad,a=padLinha(pd.l&&pd.l[0]),b=padLinha(pd.l&&pd.l[1]),pl=(f&&f.pl)||[],c=copia(leg);
+  c.meta='linhas';c.ordem='data-loc';c.data.on=true;c.loc.on=true;c.data.pt=a.pt;c.loc.pt=b.pt;
+  if(c.preset==='calendario'||c.preset==='pin')c.preset='simples';
+  c._pad=true;c._dt=padTxt(a,pl[0]);c._lc=padTxt(b,pl[1]);
+  return c
+}
 /* ---------- medição na tela: métricas por fonte (1 medida por combinação; LG-04) ---------- */
 var cacheM={},ctxT=null;
 function medTela(est){
@@ -153,5 +170,5 @@ function linhas(leg,fr,medir,opts){
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

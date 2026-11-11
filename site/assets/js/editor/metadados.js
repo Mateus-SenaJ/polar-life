@@ -33,7 +33,7 @@ function montar(){
   h+='<section class="mod" aria-labelledby="md-h1"><h3 class="mod__h rotulo rotulo--m" id="md-h1">Esta foto</h3><dl class="rd" id="md-rd"></dl><div class="rd__s" id="md-selos"></div></section>';
   h+='<section class="mod" aria-labelledby="md-h2"><h3 class="mod__h rotulo rotulo--m" id="md-h2">Editar</h3>';
   h+='<div class="f" data-k="d"><div class="f__top"><label class="f__l" for="md-d">Data</label><button type="button" class="lk" data-clr="d">Sem data</button></div><div class="num num--l"><input id="md-d" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
-  h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
+  h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off" list="md-c-l"><datalist id="md-c-l"></datalist></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<div class="f"><div class="f__top"><label class="f__l" for="md-o">Origem</label></div><div class="num num--l"><select id="md-o">'+ORIG.map(function(o){return'<option>'+o+'</option>'}).join('')+'</select></div></div>';
   h+='<p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Vale só para esta foto. Se a cidade ficar vazia, a legenda de local some.</span></p></section>';
   h+='<section class="mod" aria-labelledby="md-h3"><h3 class="mod__h rotulo rotulo--m" id="md-h3">Corrigir várias de uma vez</h3>';
@@ -49,7 +49,10 @@ function montar(){
     if(t.id==='md-c'){m=cp(n);m.c=t.value.trim();m.cs=m.c?'manual':'none';err=null;grava(n,m,'md:c');return}
     if(t.id==='md-o'){m=cp(n);m.o=t.value;grava(n,m,'md:o');return}
     if(t.id==='md-h'){var v=t.value.trim().replace('−','-');if(!/^[+-]?\d+$/.test(v)||Math.abs(+v)>48){err={k:'h',m:'Use um número inteiro entre −48 e 48.'};hv=0}else{err=null;hv=+v}render()}});
-  p.addEventListener('input',function(e){if(e.target.id==='md-h'){var v=e.target.value.trim().replace('−','-');if(/^[+-]?\d+$/.test(v)&&Math.abs(+v)<=48){hv=+v;err=null}prev()}});
+  p.addEventListener('input',function(e){
+    if(e.target.id==='md-c'&&window.PLLOCAIS){var s0=Q.ST()[0].leg,dl=$('md-c-l');   /* D-139: «Cidade - UF» enquanto digita; desligado em «Sugestões de legendas» */
+      if(!(s0&&(s0.sug===false||s0.original)))PLLOCAIS.buscar(e.target.value,8).then(function(r){dl.innerHTML=r.map(function(x){return'<option value="'+PLLOCAIS.rotulo(x)+'"></option>'}).join('')});else dl.innerHTML=''}
+    if(e.target.id==='md-h'){var v=e.target.value.trim().replace('−','-');if(/^[+-]?\d+$/.test(v)&&Math.abs(+v)<=48){hv=+v;err=null}prev()}});
   p.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var n=Q.cur(),m;
     if(b.getAttribute('data-clr')==='d'){m=cp(n);m.iso='';m.ds='none';m.dh=0;err=null;grava(n,m,'md:d')}
     if(b.getAttribute('data-clr')==='c'){m=cp(n);m.c='';m.cs='none';err=null;grava(n,m,'md:c')}

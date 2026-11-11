@@ -97,7 +97,7 @@ function projeto(){
   if(pocket){fr={w:66,h:99,jh:79,lado:3,topo:3,rad:.4,ori:'v'};if(!leg)leg=LT.legPocket(LT.LEG0)}
   var fotos=lista.map(function(e,k){
     var src=e.src;
-    return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,
+    return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,pad:e.pad||null,pl:e.pl||null,
       modo:e.modo||'preencher',z:e.z==null?100:e.z,ang:e.ang||0,px:e.px||0,py:e.py||0,rot:e.rot||0,flip:!!e.flip,
       adj:Object.assign({},ADJ0,e.adj||{}),flt:Object.assign({id:'original',int:100},e.flt||{})}
   });
@@ -181,13 +181,14 @@ function layoutLegenda(f,fr,leg,s){
   var preset=leg?leg.preset:'simples',DF=LT.dadosFoto(f),capTxt,capEst,metaSegs=[],legOu,sepEst,dataTxt,locTxt;
   /* MT-01/MT-02: tudo em µm dentro desta função; fr e constantes entram em mm. */
   var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2);
+  if(leg)leg=LT.comPadrao(leg,f);   /* D-139: padrão de 2 linhas (mesma função da tela e das Folhas) */
   if(leg&&leg.original){return []} /* D-135: só a foto e a moldura (sem apagar nada) */
   if(leg){
     legOu=leg;
     capTxt=leg.txt.on?LT.caixaLG(f.leg,leg.txt.caixa):'';
     capEst=estiloObj(leg.txt);capEst.esp=leg.txt.esp||0;
     var dataEst=estiloObj(leg.data),locEst=estiloObj(leg.loc);dataEst.esp=.02;locEst.esp=.02;
-    dataTxt=leg.data.on&&DF.d?LT.FMTD[leg.data.fmt||0](DF.d):'';locTxt=leg.loc.on&&DF.c?LT.localLG(leg.loc,DF.c):'';
+    dataTxt=leg._pad?leg._dt:(leg.data.on&&DF.d?LT.FMTD[leg.data.fmt||0](DF.d):'');locTxt=leg._pad?leg._lc:(leg.loc.on&&DF.c?LT.localLG(leg.loc,DF.c):'');
     sepEst={fam:'IBM Plex Mono',peso:400,it:false,pt:Math.max(dataEst.pt,locEst.pt),cor:'#000000',esp:.02,contorno:false};
     var segD={k:'data',txt:dataTxt,est:dataEst,box:preset==='calendario'},segL={k:'loc',txt:locTxt,est:locEst,box:false};
     metaSegs=((leg.ordem||'data-loc')==='loc-data'?[segL,segD]:[segD,segL]).filter(function(sg){return sg.txt})

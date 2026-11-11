@@ -56,7 +56,7 @@ function checar(v){
 
 /* ---------- desenho na polaroid ---------- */
 function pintar(){
-  var l=L(),pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
+  var l=LT.comPadrao(L(),Q.S()),pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
   var orig=!!l.original,al=l.al||'esq';
   top.hidden=orig;band.hidden=orig;
   [].slice.call(pq.querySelectorAll('.lg-xl')).forEach(function(n){n.parentNode.removeChild(n)}); /* sai antes: o .lg-lc do fluxo continua achável */
@@ -71,7 +71,7 @@ function pintar(){
   if(!l.txt)return;
   var cor=function(k){return COR[l[k].cor]||'#000'};
   var M=Q.meta?Q.meta(Q.cur()):{data:DATA,cidade:LOCAL.cidade,iso:'2026-07-14T08:00'};
-  var dt=l.data.on&&M.data?FMT[l.data.fmt][1](M.data):'',lc=l.loc.on&&M.cidade?localTxt(l.loc,M.cidade):'';
+  var dt=l._pad?l._dt:(l.data.on&&M.data?FMT[l.data.fmt][1](M.data):''),lc=l._pad?l._lc:(l.loc.on&&M.cidade?localTxt(l.loc,M.cidade):'');   /* D-139: padrão de 2 linhas */
   var txt=l.txt.on?caixa(T(),l.txt.caixa):'';
   var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=l.medida==='letras'&&!!(dt||lc);
   var capHTML=txt?'<span class="lg-txt" id="lg-txt" style="font-family:'+fam(l.txt.font)+';font-style:'+(fonte(l.txt.font).it?'italic':'normal')+';font-weight:'+fonte(l.txt.font).w+';--pt:'+l.txt.pt+';letter-spacing:'+l.txt.esp+'em;color:'+cor('txt')+'"></span>':'';
@@ -157,12 +157,96 @@ function seletor(k){
   }
   return h+'</div>'
 }
-function sw(k,rot,on){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'" aria-labelledby="s-'+k+'"><span></span></button></div>'}
+function sw(k,rot,on,off){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'"'+(off?' aria-disabled="true"':'')+' aria-labelledby="s-'+k+'"><span></span></button></div>'}
+/* ---------- D-139 · Avançado: padrão de 2 linhas, sugestões e exceção por foto ---------- */
+var TIPOS=[['loc','Localização'],['data','Data'],['pt','Ponto turístico'],['txt','Texto livre'],['nenhum','Nenhum']],TAMS=[[7,'P'],[8,'M'],[10,'G'],[12,'GG']];
+var GPS={};
+function sugOn(){return L().sug!==false&&!L().original}
+function padAlvo(){return Q.S().pad||L().pad||LT.padNovo()}
+function tipoNome(t){return TIPOS.filter(function(x){return x[0]===t})[0][1]}
+function avancado(l,dis){
+  var on=!!(l.pad&&l.pad.on),h='<section class="mod mod--av" aria-labelledby="lmav"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lmav">Avançado</h3>'
+   +'<button type="button" class="btn2 btn2--sm" id="lg-av-t" aria-expanded="'+(!!UI.aberto.av)+'" aria-controls="lg-av">'+(UI.aberto.av?'Recolher':'Mostrar opções avançadas')+'</button>'
+   +'<div id="lg-av"'+(UI.aberto.av?'':' hidden')+'>'
+   +sw('padon','Padrão de 2 linhas',on)
+   +'<p class="f__h">Cada linha mostra localização («Itacaré - BA»), data («23/11/26»), ponto turístico, texto livre ou nada.</p>';
+  if(on){
+    var pd=padAlvo();
+    for(var i=0;i<2;i++){
+      var ln=LT.padLinha(pd.l[i]);
+      h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Linha '+(i+1)+'</label></div>'
+       +'<div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
+       +'<div class="seg" role="radiogroup" aria-label="Tamanho da linha '+(i+1)+'">'+TAMS.map(function(t){return'<label class="seg__o"><input type="radio" name="pad-p-'+i+'" value="'+t[0]+'" data-padp="'+i+'"'+(t[0]===ln.pt?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div>'
+       +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da linha '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div>'
+       +'<button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
+    }
+    h+='<label class="chk"><input type="checkbox" id="pad-own"'+(Q.S().pad?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Padrão próprio para esta foto</strong><span class="f__h">As outras fotos não mudam.</span></span></label>'
+     +'<button type="button" class="btn2" id="pad-todas">Aplicar a todas</button>'
+     +'<p class="f__h">Textos que você escreveu à mão nunca são trocados ao reaplicar.</p>'
+  }
+  return h+'</div></section>'
+}
+function sincPad(){
+  var l=L(),on=!!(l.pad&&l.pad.on);if(!on||!$('pl-in-0'))return;
+  var pd=padAlvo(),pl=Q.S().pl||[];
+  for(var i=0;i<2;i++){
+    var ln=LT.padLinha(pd.l[i]),p=pl[i]||{v:'',m:false},inp=$('pl-in-'+i),b=document.querySelector('[data-restaurar="'+i+'"]');
+    $('pad-t-'+i).value=ln.t;
+    [].forEach.call(document.querySelectorAll('input[name="pad-p-'+i+'"]'),function(r){r.checked=+r.value===ln.pt});
+    inp.disabled=ln.t==='nenhum';if(document.activeElement!==inp)inp.value=ln.t==='nenhum'?'':p.v;
+    b.hidden=!(sugOn()&&p.m&&(ln.t==='loc'||ln.t==='data'||ln.t==='pt'))
+  }
+  $('pad-own').checked=!!Q.S().pad
+}
+function gpsDe(n){
+  var k=Q.src(n);if(!Q.real||!window.PLFOTOS)return Promise.resolve(null);
+  if(GPS[k]!==undefined)return Promise.resolve(GPS[k]);
+  return PLFOTOS.ler(k).then(function(r){var m=r&&r.meta;return(GPS[k]=m&&m.lat!=null&&m.lon!=null?{lat:m.lat,lon:m.lon}:null)},function(){return null})
+}
+function sugestao(n,t){
+  var M=Q.meta(n),PL=window.PLLOCAIS;
+  if(t==='data')return Promise.resolve(M.data?LT.FMTD[3](M.data):'');
+  if(!PL)return Promise.resolve('');
+  if(t==='loc'){
+    var c=(M.cidade||'').trim();
+    if(c)return PL.buscar(c,40).then(function(r){var q=PL.norm(c.replace(/\s*[-,\/]\s*[A-Za-z]{2}$/,'')),ex=r.filter(function(x){return PL.norm(x.cidade)===q});return ex.length===1?PL.rotulo(ex[0]):c});
+    return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return!r?'':r.cidade?PL.rotulo(r):r.pais||''})})
+  }
+  if(t==='pt')return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return r&&r.uf?PL.pontosProximos(g.lat,g.lon,r.uf,2).then(function(p){return p.length?p[0].nome:''}):''})});
+  return Promise.resolve('')
+}
+/* preenche as linhas ainda não digitadas à mão (m=false); com «Sugestões de legendas» desligado não mexe em nada */
+function preencher(ns,so){
+  var S=Q.ST(),pad=L().pad;
+  if(!sugOn()||!pad||!pad.on)return Promise.resolve();
+  return Promise.all(ns.map(function(n){
+    var e=S[n],pd=e.pad||pad;
+    return Promise.all([0,1].map(function(i){
+      if(so!=null&&so!==i)return null;
+      var tp=LT.padLinha(pd.l[i]).t,p=e.pl&&e.pl[i];
+      if(p&&p.m)return null;
+      return(tp==='loc'||tp==='data'||tp==='pt'?sugestao(n,tp):Promise.resolve('')).then(function(v){return[i,v]})
+    })).then(function(rs){rs.forEach(function(r){if(!r)return;e.pl=e.pl||[{v:'',m:false},{v:'',m:false}];e.pl[r[0]]={v:r[1],m:false}})})
+  }))
+}
+function todasFotos(){var a=[],j;for(j=1;j<=Q.N;j++)a.push(j);return a}
+function afetadas(){var S=Q.ST(),a=[],j;if(Q.S().pad)return[Q.cur()];for(j=1;j<=Q.N;j++)if(!S[j].pad)a.push(j);return a}
+function depois(p,k){p.then(function(){Q.commit(k);sincPad()})}
+function acaoPad(e){
+  var t=e.target,l=L();
+  if(t.hasAttribute('data-padt')){var i=+t.getAttribute('data-padt'),pd=padAlvo();pd.l[i].t=t.value;
+    Q.commit('lg:padt');depois(preencher(afetadas(),i),'lg:padt2');return true}
+  if(t.hasAttribute('data-padp')){padAlvo().l[+t.getAttribute('data-padp')].pt=+t.value;Q.commit('lg:padp');return true}
+  if(t.id==='pad-own'){var e1=Q.S();if(t.checked)e1.pad=copia({on:true,l:L().pad.l});else delete e1.pad;Q.commit('lg:padown');montar();depois(preencher([Q.cur()]),'lg:padown2');return true}
+  return false
+}
 function montar(){
   var l=L(),h='',dis=l.original?' aria-disabled="true"':'',real=LT.ehReal();   /* D-135: com a Polaroid original as outras seções ficam apagadas */
   /* 1 · Polaroid original (D-135): primeiro controle do painel */
   h+='<section class="mod mod--orig" aria-labelledby="lm0"><h3 class="mod__h rotulo rotulo--m" id="lm0">Legendas</h3>'
    +sw('original','Sem legendas',!!l.original)
+   +sw('sug','Sugestões de legendas',l.sug!==false,!!l.original)
+   +'<p class="f__h" id="lg-sug-est">'+(l.original?'Não se aplica com «Sem legendas» ligado.':l.sug!==false?'Ligado · cidade, data e ponto vêm sugeridos da foto e você pode editar.':'Desligado · você escreve tudo; nada é preenchido sozinho.')+'</p>'
    +'<p class="f__h" id="lg-orig-est">'+(l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis')+'</p>'
    +(l.original?'<div class="msg msg--warn lg__aviso"><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>Desligue «Sem legendas» para editar.</p></div></div>':'')
    +'</section>';
@@ -183,6 +267,7 @@ function montar(){
    +seg('caixa','Caixa',[['normal','Normal'],['maiusc','Maiúsc.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
    +sld('txt.esp','Espaçamento','em',-0.05,0.3,0.01,2,'De −0,05 a 0,3 em.')
    +cores('txt',l.txt.cor)+'</section>';
+  var hs=h;
   h+='<section class="mod" aria-labelledby="lm2"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm2">Data</h3>'+sw('data.on','Mostrar data',l.data.on)
    +'<div class="f"><div class="f__top"><span class="f__l" id="l-fmt">Formato</span>'+rst('data.fmt')+'</div><div class="fmts" role="radiogroup" aria-labelledby="l-fmt">'+FMT.map(function(f,i){return'<label class="preset preset--s"><input type="radio" name="fmt" value="'+i+'"'+(l.data.fmt===i?' checked':'')+'><span>'+f[1](DATA)+'</span></label>'}).join('')+'</div><p class="f__h">Origem: data da foto. Sem data, a legenda não mostra data.</p></div>'
    +seletor('data')
@@ -200,6 +285,8 @@ function montar(){
    +seg('lordem','Ordem',[['data-loc','Data primeiro'],['loc-data','Local primeiro']],val('ordem'),'ordem')
    +seg('lmedida','Medir espaços por',[['caixa','Caixa do texto'],['letras','Topo das letras']],val('medida'),'medida','Com «topo das letras», a primeira maiúscula fica a 4 mm da foto e a segunda linha, 2 mm abaixo da base da primeira.')
    +'</section>';
+  if(l.pad&&l.pad.on)h=hs;                /* D-139: o padrão de 2 linhas assume Data, Local e Linhas (sem controle repetido) */
+  h+=avancado(l,dis);
   h+='</div>';
   h+='<div id="lg-fora" class="msg msg--warn" hidden><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>A legenda passa da área segura e bloqueia a impressão. Reduza o tamanho, encurte o texto ou use «Ajustar para caber».</p><div class="qmsg__act"><button type="button" class="btn2 btn2--sm" data-lfit>Ajustar para caber</button></div></div></div>';
   h+='<div class="pe"><button type="button" class="btn2 btn2--lg pe__b" id="lg-rtudo">Resetar legendas</button><button type="button" class="btn2 btn2--lg pe__b" id="lg-apply">Aplicar legendas</button></div>';
@@ -215,7 +302,7 @@ function sincronizar(){
     f.querySelector('[data-lreset]').hidden=v===defv(k)
   });
   [].forEach.call(document.querySelectorAll('[data-lreset]'),function(b){var k=b.getAttribute('data-lreset');if(b.closest('[data-lk]'))return;b.hidden=JSON.stringify(getv(l,k))===JSON.stringify(defv(k))});
-  [].forEach.call(document.querySelectorAll('[data-sw]'),function(b){b.setAttribute('aria-checked',getp(l,b.getAttribute('data-sw')))});
+  [].forEach.call(document.querySelectorAll('[data-sw]'),function(b){var k=b.getAttribute('data-sw');b.setAttribute('aria-checked',k==='sug'?l.sug!==false:k==='padon'?!!(l.pad&&l.pad.on):getp(l,k));if(k==='sug')b.setAttribute('aria-disabled',l.original?'true':'false')});
   [].forEach.call(document.querySelectorAll('input[data-k]'),function(i){i.checked=String(getv(l,i.getAttribute('data-k')))===i.value});
   [].forEach.call(document.querySelectorAll('input[name=preset]'),function(i){i.checked=i.value===l.preset});
   [].forEach.call(document.querySelectorAll('input[name=fmt]'),function(i){i.checked=+i.value===l.data.fmt});
@@ -223,6 +310,8 @@ function sincronizar(){
   var inp=$('lg-in');if(inp&&document.activeElement!==inp)inp.value=T();
   $('lg-cnt').textContent=(inp?inp.value.length:0)+'/80';
   var oe=$('lg-orig-est');if(oe)oe.textContent=l.original?'Ligado · só a foto e a moldura. Desligue para editar os textos.':'Desligado · textos e stickers visíveis';
+  var se=$('lg-sug-est');if(se)se.textContent=l.original?'Não se aplica com «Sem legendas» ligado.':l.sug!==false?'Ligado · cidade, data e ponto vêm sugeridos da foto e você pode editar.':'Desligado · você escreve tudo; nada é preenchido sozinho.';
+  sincPad();
   $('lg-fora').hidden=!fora()
 }
 function render(){
@@ -258,10 +347,14 @@ P.addEventListener('input',function(e){
   if(t.hasAttribute('data-n')){k=t.getAttribute('data-n');var r=$('r-'+k),v2=parseFloat(t.value.replace(',','.')),f2=t.closest('.f');
     if(isNaN(v2)||v2<+r.min||v2>+r.max){f2.classList.add('is-err');$('h-'+k).textContent='✕ Use um valor de '+r.min.replace('.',',')+' a '+r.max.replace('.',',')+'.';return}
     f2.classList.remove('is-err');mudar(k,v2);return}
+  if(t.id==='pl-in-0'||t.id==='pl-in-1'){var ii=+t.id.slice(-1),e2=Q.S();e2.pl=e2.pl||[{v:'',m:false},{v:'',m:false}];e2.pl[ii]={v:t.value,m:true};Q.commit('lg:pl');  /* digitou: vira manual */
+    var dl=$('pl-dl-'+ii);if(dl&&sugOn()&&window.PLLOCAIS&&LT.padLinha(padAlvo().l[ii]).t==='loc')PLLOCAIS.buscar(t.value,8).then(function(r){dl.innerHTML=r.map(function(x){return'<option value="'+PLLOCAIS.rotulo(x)+'"></option>'}).join('')});
+    var rb=document.querySelector('[data-restaurar="'+ii+'"]');if(rb)rb.hidden=!sugOn()||LT.padLinha(padAlvo().l[ii]).t==='txt';return}
   if(t.id==='fbusca'){UI.busca=t.value;var pos=t.selectionStart;montar();var n=$('fbusca');n.focus();n.setSelectionRange(pos,pos);return}
 });
 P.addEventListener('change',function(e){
   var t=e.target;
+  if(acaoPad(e))return;
   if(t.name==='preset'){preset(t.value);return}
   if(t.name==='fmt'){mudar('data.fmt',+t.value);return}
   if(t.hasAttribute('data-chk')){mudar(t.getAttribute('data-chk'),t.checked);return}
@@ -274,6 +367,11 @@ P.addEventListener('change',function(e){
 P.addEventListener('focusout',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-n')){e.target.closest('.f').classList.remove('is-err');sincronizar()}});
 P.addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-sw')&&b.getAttribute('data-sw')==='sug'){if(L().original)return;var Ls=L();if(Ls.sug===false)delete Ls.sug;else Ls.sug=false;Q.commit('lg:sug');montar();return}
+  if(b.hasAttribute('data-sw')&&b.getAttribute('data-sw')==='padon'){var Lp=L();if(!Lp.pad)Lp.pad=LT.padNovo();Lp.pad.on=!Lp.pad.on;UI.aberto.av=true;Q.commit('lg:padon');montar();if(Lp.pad.on)depois(preencher(todasFotos()),'lg:padon2');return}
+  if(b.id==='lg-av-t'){UI.aberto.av=!UI.aberto.av;montar();return}
+  if(b.hasAttribute('data-restaurar')){var ri=+b.getAttribute('data-restaurar'),er=Q.S();if(er.pl&&er.pl[ri])er.pl[ri]={v:'',m:false};Q.commit('lg:restaurar');depois(preencher([Q.cur()],ri),'lg:restaurar2');return}
+  if(b.id==='pad-todas'){var Lt=L(),alvo=padAlvo(),S3=Q.ST(),j3;Lt.pad={on:true,l:copia(alvo.l)};for(j3=1;j3<=Q.N;j3++)delete S3[j3].pad;Q.commit('lg:padtodas');montar();depois(preencher(todasFotos()),'lg:padtodas2');Q.toast('Padrão aplicado a todas as fotos',true);return}
   if(b.hasAttribute('data-sw')){var k=b.getAttribute('data-sw');mudar(k,!getp(L(),k));if(k==='original')montar();return}
   if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';montar();return}
   if(b.hasAttribute('data-fcat')){UI.cat=b.getAttribute('data-fcat');montar();return}
