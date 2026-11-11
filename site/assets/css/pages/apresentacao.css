@@ -42,12 +42,17 @@ a{color:inherit}
 .hero__arte{position:relative;display:flex;align-items:center;justify-content:center;margin-top:48px}
 .cam{width:420px;max-width:100%}
 .cam-svg{display:block;width:100%;height:100%}
-.hero__pol{position:absolute;width:112px;height:auto}
+/* as polaroids pousadas são molduras em HTML: borda branca, faixa inferior larga e sombra de papel */
+.hero__pol{position:absolute;width:112px;height:auto;margin:0;padding:10px 10px 30px;background:var(--white);border-radius:3px;box-shadow:var(--shadow-polaroid)}
+.hero__pol img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover}
 .hero__pol--praia{left:0;bottom:0;transform:rotate(-5deg);box-shadow:var(--shadow-polaroid)}
 .hero__pol--viagem{right:0;top:0;transform:rotate(4deg);box-shadow:var(--shadow-lifted);z-index:2}
 
 /* ===== 3 · faixa preta (componente faixa-escura · DS-17) ===== */
 /* o layout da faixa fixa (colunas 1–5 e 6–12) está em css/ui/faixa-escura.css */
+/* o banner virou SVG embutido (dentro de um <img> uma foto não carrega): o `object-fit`
+   do componente não vale para SVG embutido, então o quadro vem do CSS abaixo */
+.faixa__img--svg{display:block;width:100%;height:auto;aspect-ratio:12/5;align-self:center;max-height:500px}
 
 /* ===== 4 · Como fica na mesa (mesa + A1) ===== */
 .mesa-sec{padding-top:96px;padding-bottom:96px}
