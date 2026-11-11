@@ -20,7 +20,7 @@ var PAPERS=[
  {id:'10x15',name:'10 × 15 cm',w:100,h:150}
 ];
 var BYSIZE=['10x15','A5','13x18','A4','A3'];
-var S={fmt:'classico',fw:88,fh:107,ww:76,wh:76,paper:'A4',pori:'portrait',pw:210,ph:297,rot:true,margin:10,gap:4};
+var S={fmt:'classico',fw:88,fh:107,ww:76,wh:76,paper:'A4',pori:'portrait',pw:210,ph:297,rot:true,margin:3,gap:0};
 
 function fmtById(id){for(var i=0;i<FORMATS.length;i++)if(FORMATS[i].id===id)return FORMATS[i]}
 function paperById(id){for(var i=0;i<PAPERS.length;i++)if(PAPERS[i].id===id)return PAPERS[i]}
@@ -251,7 +251,7 @@ $('err-fix').addEventListener('click',function(){S.paper=this.dataset.paper;upda
 $('uma').addEventListener('click',function(){toast('Este atalho ainda não está disponível.')});
 $('continuar').addEventListener('click',function(){
   if(this.disabled)return;
-  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
+  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
   if(S.fmt==='pocket'){try{sessionStorage.setItem('pl-fmt','pocket')}catch(e){}}   /* D-113: o Quadro aplica o padrão de legenda do Pocket */
   if(window.PLPROJETOS)PLPROJETOS.criar('Projeto de '+new Date().toLocaleDateString('pt-BR')).then(function(){location.href='../adicionar-fotos/'});
   else location.href='../adicionar-fotos/';
