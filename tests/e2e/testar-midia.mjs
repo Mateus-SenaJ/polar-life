@@ -111,8 +111,10 @@ try {
         });
         const fr = sobre.lado ? sobre.invade / sobre.largura : 0;                  // degradê do desktop: 6% aos 12% da largura, 45% aos 30%, cheio aos 48%
         const alfa = fr <= 0.12 ? fr / 0.12 * 0.06 : fr <= 0.3 ? 0.06 + (fr - 0.12) / 0.18 * 0.39 : Math.min(1, 0.45 + (fr - 0.3) / 0.18 * 0.55);
-        const borda = await p.evaluate(() => { const m = document.querySelector('.midia--hero').getBoundingClientRect(), f = document.querySelector('.faixa').getBoundingClientRect(); return { dir: Math.round(innerWidth - m.right), faixa: Math.round(f.top - m.bottom) }; });
-        borda.dir <= 0 && Math.abs(borda.faixa) <= 1 ? ok(`${rot}: o vídeo vai até a borda direita da tela e encosta na faixa preta (sem caixa solta)`) : ruim(`${rot}: sobra em volta do vídeo ${JSON.stringify(borda)}`);
+        /* desktop: encosta na faixa preta; abaixo de 1024 px (D-155) o vídeo vem primeiro e encosta no cabeçalho */
+        const borda = await p.evaluate(() => { const m = document.querySelector('.midia--hero').getBoundingClientRect(), f = document.querySelector('.faixa').getBoundingClientRect(), h = document.querySelector('.site-header').getBoundingClientRect(); return { dir: Math.round(innerWidth - m.right), esq: Math.round(m.left), faixa: Math.round(f.top - m.bottom), topo: Math.round(m.top - h.bottom), w: innerWidth }; });
+        const encosta = borda.w >= 1024 ? Math.abs(borda.faixa) <= 1 : Math.abs(borda.topo) <= 1 && borda.esq <= 0;
+        borda.dir <= 0 && encosta ? ok(`${rot}: o vídeo vai até as bordas da tela, sem caixa solta (${borda.w >= 1024 ? 'encosta na faixa preta' : 'logo abaixo do cabeçalho'})`) : ruim(`${rot}: sobra em volta do vídeo ${JSON.stringify(borda)}`);
         alfa <= 0.25 ? ok(`${rot}: o texto não fica sobre o vídeo (sobreposição ${sobre.invade} px, opacidade ≤ ${Math.round(alfa * 100)}%)`) : ruim(`${rot}: texto sobre o vídeo (${JSON.stringify(sobre)})`);
         const leg = await p.evaluate(() => ({
           hero: [...document.querySelectorAll('.hero__pol figcaption')].map(f => f.textContent.trim()),
@@ -259,7 +261,7 @@ try {
   /* só carrega quando entra na tela */
   {
     const { c, p, v } = await simular({ viewport: { width: 390, height: 160 } });
-    await p.goto(srv.url  /* D-154: na tela de entrar a mídia fica no topo, atrás da faixa; o teste usa o herói da apresentação (no celular, abaixo do texto) */, { waitUntil: 'networkidle' });
+    await p.goto(srv.url + 'como-funciona/' /* D-154/D-155: entrar e apresentação têm a mídia no topo; o vídeo da câmera de «Como funciona» fica abaixo da dobra */, { waitUntil: 'networkidle' });
     await p.waitForTimeout(700);
     const antes = pediuVideo(v).length, y = await p.evaluate(() => Math.round(document.querySelector('[data-midia]').getBoundingClientRect().top));
     antes === 0 && y > 360 ? ok(`carregamento sob demanda: com a mídia fora da tela (a ${y} px), nenhum vídeo é pedido`) : ruim(`carregamento sob demanda: ${antes} pedido(s) antes de rolar (mídia a ${y} px)`);
