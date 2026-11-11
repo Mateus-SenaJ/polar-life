@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='4a29406b0744';
+self.PL_VERSAO='597830d78e00';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -68,6 +68,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/nucleo/exif.js",
 "../assets/js/nucleo/fotos-locais.js",
 "../assets/js/nucleo/gerador.js",
+"../assets/js/nucleo/google.js",
 "../assets/js/nucleo/importar.js",
 "../assets/js/nucleo/legenda-texto.js",
 "../assets/js/nucleo/locais.js",
