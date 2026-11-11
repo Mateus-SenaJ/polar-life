@@ -54,10 +54,13 @@ function seo(h, s) {                                            // 35: SEO e sem
   if (!existsSync(join(SITE, SITECFG.og))) erros.push(`imagem de compartilhamento ausente: ${SITECFG.og} (npm run og)`);
 }
 const VENDOR = join(SITE, 'assets', 'vendor');
+// D-147: endereços de NAVEGAÇÃO (a pessoa vai ao Google e volta), não recursos carregados pela página (T6)
+const NAVEGACAO = { 'assets/js/nucleo/google.js': ['https://accounts.google.com/o/oauth2/v2/auth', 'https://accounts.google.com'] };
 for (const f of arquivos.filter(f => /\.(js|css)$/.test(f) && !f.startsWith(VENDOR))) {  // vendor: URLs só em comentários internos, sem requisição (T6)
   const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const nav = NAVEGACAO[rel(f).split('\\').join('/')] || [];
   for (const m of s.matchAll(/(?:url\(\s*['"]?|['"])(https?:\/\/[^'")\s]+)/g))
-    if (!/^http:\/\/www\.w3\.org\//.test(m[1])) erros.push(`${rel(f)}: recurso externo proibido (T6) → ${m[1]}`);
+    if (!/^http:\/\/www\.w3\.org\//.test(m[1]) && !nav.includes(m[1])) erros.push(`${rel(f)}: recurso externo proibido (T6) → ${m[1]}`);
 }
 
 // 30a: um mesmo window.PLxxx não pode ser definido por dois arquivos (colisão de módulos)

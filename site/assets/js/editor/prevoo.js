@@ -8,7 +8,7 @@ function pl(n,s,p){return n+' '+(n===1?s:p)}
 function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
 var COORD=/-?\d{1,3}[.,]\d{3,}\s*[,;]\s*-?\d{1,3}[.,]\d{3,}/,ARQ=/^(IMG|DSC|DSCN|PXL|MVIMG)[_-]?\d+|\.(jpe?g|png|heic|webp)$/i;
 var MB_FOLHA=1.5;                                   /* [HIPÓTESE] ~1,5 MB por folha a 300 PPI; o estimador real vem com o PDF (T-19) */
-var NAO_IMPRIMIVEL=5;                               /* [HIPÓTESE] margem mínima em mm; depende da impressora */
+var NAO_IMPRIMIVEL=window.PLFOLHAS?PLFOLHAS.MARGEM_MIN:3;                               /* D-150: padrão 3 mm; abaixo disso avisa (a área não imprimível depende da impressora) */
 function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}
   for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var disparo=null,confirmou=false,itens=null;
@@ -101,7 +101,7 @@ function abrir(origem){
     :'Nada impede a geração. Revise o resumo e gere o PDF.';
   $('pv-f').textContent=b&&!n?'—':String(n);
   $('pv-p').textContent=itens.por?pl(itens.por,'por folha','por folha')+' · '+itens.papel.n+' '+(itens.orient==='paisagem'?'paisagem':'retrato'):'—';
-  $('pv-a').textContent=itens.por?itens.aprov+'%':'—';
+  $('pv-a').textContent=itens.por&&itens.aprov!=null?itens.aprov+'%':'—';
   $('pv-l').innerHTML=lista('bl','i-x','Bloqueia',itens.bl)+lista('pe','i-warn','Pede confirmação',itens.pe)+lista('in','i-info','Informa',itens.inf);
   $('pv-ok').checked=false;
   $('pv-gt').textContent='Gerar PDF'+(n?' ('+pl(n,'folha','folhas')+')':'');

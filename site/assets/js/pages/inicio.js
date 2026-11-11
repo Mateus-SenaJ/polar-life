@@ -128,7 +128,7 @@ function metaProjeto(p){
   if(window.PLFOLHAS&&fotos){
     var s=copia(PLFOLHAS.PADRAO),est=p.estado||{},o=null;
     try{o=est['pl-folhas']?JSON.parse(est['pl-folhas']):null}catch(e){}
-    if(o)for(var k in o)s[k]=o[k];
+    if(o)for(var k in o)s[k]=o[k];else if(p.v!==2){s.margem=10;s.gap=4}   /* D-150: projeto antigo mantém 10/4 */
     var q=null;try{q=est['pl-quadro']?JSON.parse(est['pl-quadro']):null}catch(e){}
     var fr=(q&&q[0]&&q[0].fr)||null,geo=fr&&fr.w?{w:fr.w,h:fr.h,lado:fr.lado,topo:fr.topo,jh:fr.jh}:{w:88,h:107,lado:6,topo:6,jh:76};
     var c=PLFOLHAS.contar(s,geo,fotos,0);
@@ -288,7 +288,7 @@ function aplicar(id){
       sessionStorage.removeItem('pl-exportar');
     }catch(e){}
     var salvar=function(){
-      var est={},ch=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt'];
+      var est={},ch=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'];
       ch.forEach(function(k){var v=lerSess(k);if(v!==null)est[k]=v});
       P.salvarEstado(est).then(function(){location.href='../editor/quadro/'});
     };

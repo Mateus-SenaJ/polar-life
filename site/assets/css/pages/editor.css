@@ -277,3 +277,10 @@ figcaption[data-preset=bilhete] .pol__cap{border-style:dashed}
 figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:0 .4em;border:calc(.26 * var(--mm)) solid currentColor;border-radius:calc(.26 * var(--mm))}
 .aviso{position:relative;z-index:1;margin:8px auto 0;max-width:560px;padding:8px 12px;border-left:2px solid var(--black);background:var(--surface,#F8F9FA);font-size:12px;line-height:1.4}
 @media(max-width:1023px){.aviso{margin-top:6px}}
+/* Modo Colagem (D-150 a D-152): campos de cor, faixas e foto do fundo */
+.col-cor{display:flex;align-items:center;gap:8px}
+.col-cor input[type=color]{flex:none;width:44px;height:44px;padding:2px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);cursor:pointer}
+.col-cor input[type=text]{flex:1;min-width:0;min-height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);font:400 14px 'IBM Plex Mono',monospace;text-transform:uppercase}
+.mod input[type=range]{width:100%;min-height:44px;accent-color:var(--blue);cursor:pointer}
+.foto-mini[aria-pressed=true]{outline:2px solid var(--blue);outline-offset:1px}
+.pol--col{background:none}

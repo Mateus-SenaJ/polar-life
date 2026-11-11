@@ -225,6 +225,15 @@ function completarCadastro(d){
   var c=contaDe(email);c.nome=nome;c.provedor=origem;c.aceiteEm=agora();salvarConta(email,c);
   gravar('pl-conta',{email:email,nome:nome,provedor:origem,entrouEm:agora()});return {ok:true}
 }
+/* Volta de um provedor real (Google, D-147g): e-mail confirmado pelo provedor. Conta já aceita → entra direto;
+   conta nova → abre a sessão e pede «Seus dados» (nome + aceite), com o e-mail fixo. */
+function entrarComProvedor(d){
+  var email=String(d&&d.email||'').trim().toLowerCase(),prov=d&&d.provedor||'google',nome=String(d&&d.nome||'').replace(/\s+/g,' ').trim().slice(0,60);
+  if(!EMAIL_RE.test(email))return {erro:'email'};
+  var c=contaDe(email);
+  gravar('pl-conta',{email:email,nome:c.nome||nome,provedor:prov,entrouEm:agora()});
+  return c.aceiteEm||CONTAS_PADRAO[email]?{ok:true,nome:c.nome||nome}:{pendente:true,nome:nome}
+}
 function precisaCadastro(){var s=sessao();if(!s)return false;var c=contaDe(s.email);return !c.aceiteEm&&!CONTAS_PADRAO[s.email]}
 function cadastroPendente(){var sc=sessaoCodigo();if(sc)return !sc.email;return precisaCadastro()}   /* código conferido ou e-mail novo sem «Seus dados» */
 
@@ -383,7 +392,7 @@ function listarCodigos(){
 PLCONTA={
   modo:function(){return 'demo'},                             /* 'servidor' quando houver backend (DOC-12 §6) */
   provedores:function(){return [{id:'google',nome:'Google'},{id:'apple',nome:'Apple'}]},      /* D-144: Google e Apple, no segundo bloco */ /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
-  completarCadastro:completarCadastro,precisaCadastro:precisaCadastro,cadastroPendente:cadastroPendente,
+  completarCadastro:completarCadastro,entrarComProvedor:entrarComProvedor,precisaCadastro:precisaCadastro,cadastroPendente:cadastroPendente,
   temLocalStorage:temLocalStorage,
   sessao:sessao,sessaoCodigo:sessaoCodigo,temSessao:temSessao,
   pedirCodigo:pedirCodigo,confirmarCodigo:confirmarCodigo,entrarComo:entrarComo,sair:sair,
