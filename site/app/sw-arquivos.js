@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='7218576276a7';
+self.PL_VERSAO='78ea7f4105b0';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -36,7 +36,6 @@ self.PL_ARQUIVOS=[
 "../assets/css/ui/portao.css",
 "../assets/css/ui/pwa.css",
 "../assets/css/ui/qualidade.css",
-"../assets/css/ui/selo-teste.css",
 "../assets/fonts/cormorant-garamond-300-italico.woff2",
 "../assets/fonts/cormorant-garamond-300.woff2",
 "../assets/fonts/cormorant-garamond-400-italico.woff2",
@@ -72,6 +71,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/nucleo/gerador.js",
 "../assets/js/nucleo/google-fotos.js",
 "../assets/js/nucleo/google.js",
+"../assets/js/nucleo/icc.js",
 "../assets/js/nucleo/importar.js",
 "../assets/js/nucleo/legenda-texto.js",
 "../assets/js/nucleo/locais.js",
@@ -97,9 +97,11 @@ self.PL_ARQUIVOS=[
 "../assets/js/pages/quadro.js",
 "../assets/js/pages/resumo.js",
 "../assets/js/ui/banners.js",
+"../assets/js/ui/deslizar.js",
 "../assets/js/ui/esqueleto.js",
 "../assets/js/ui/foto-tela.js",
 "../assets/js/ui/guarda.js",
+"../assets/js/ui/mais.js",
 "../assets/js/ui/midia-arquivos.js",
 "../assets/js/ui/midia.js",
 "../assets/js/ui/movimento.js",

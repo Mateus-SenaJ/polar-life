@@ -71,7 +71,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p2.close(); await c2.close();
 }
 
-/* ===================== B · selo em todas as páginas de /app/ (brief §0.3) ===================== */
+/* ===================== B · sem a faixa «Ambiente de teste» (D-170: o dono pediu para retirar) ===================== */
 {
   const c = await contexto('pro@polarlife.test');
   const p = await c.newPage();
@@ -83,11 +83,11 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
     await p.goto(srv.url + 'app/' + pg, { waitUntil: 'domcontentloaded' });
     const selo = await p.evaluate(() => {
       const s = document.querySelector('.selo-teste');
-      return !!s && getComputedStyle(s).display !== 'none' && /Ambiente de teste/.test(s.textContent);
+      return !s && !/Ambiente de teste/.test(document.body.textContent.slice(0, 400));
     });
-    if (!selo) { tudo = false; ruim('selo ausente em /app/' + pg); }
+    if (!selo) { tudo = false; ruim('faixa «Ambiente de teste» ainda aparece em /app/' + pg); }
   }
-  if (tudo) ok(`selo «Ambiente de teste» nas ${paginas.length} páginas de /app/`);
+  if (tudo) ok(`sem a faixa «Ambiente de teste» nas ${paginas.length} páginas de /app/`);
   await p.close(); await c.close();
 
   /* um LED por tela (T8; Pro sem LED na Conta é regra do brief §3.2, pop-ups à parte) */

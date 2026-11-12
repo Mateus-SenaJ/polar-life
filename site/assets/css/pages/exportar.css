@@ -43,3 +43,8 @@
 #trava .btn2{margin-top:12px}
 @media(max-width:600px){.page{padding-top:20px}.card{padding:16px}.head h1{font-size:24px}.act{flex-direction:column-reverse}.act .btn2,.act .led-btn{width:100%}.opt{align-items:flex-start;flex-direction:column}.seg{width:100%}.seg label{flex:1}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* D-173/D-174: lista do aviso de impressão profissional; destaque breve do botão de gerar depois de escolher a qualidade */
+.lst{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px;line-height:1.5}
+.led-btn--chama{animation:led-chama 1.2s var(--ease,ease) 1}
+@keyframes led-chama{0%,100%{box-shadow:var(--shadow-subtle,none)}35%{box-shadow:0 0 0 6px rgb(253 118 26/.35)}}
+@media (prefers-reduced-motion:reduce){.led-btn--chama{animation:none}}

@@ -21,12 +21,13 @@ if(!ok){
 $('resumo').textContent=pl(P.n,'folha','folhas')+' · '+pl(P.fotos,'foto','fotos')+' · '+P.papel+' '+(P.orient==='paisagem'?'paisagem':'retrato');
 
 /* ---- estimador [HIPÓTESE]: MB por unidade ---- */
-var MB_ORIG=2.4,MB_LEVE=.7,MB_SOBRA=.05;              /* PDF: por foto (JPEG original ≈ 12 MP) e por folha */
+var MB_ORIG=2.4,MB_LEVE=.7,MB_SOBRA=.05,MB_FIEL=3.6;              /* PDF: por foto (JPEG original ≈ 12 MP) e por folha */
 var A4=210*297;
 function mb(f,o){
   var area=P.w*P.h,esc=(o.ppi/300)*(o.ppi/300);
   if(f==='pdf')return P.fotos*MB_ORIG+P.n*MB_SOBRA;
   if(f==='leve')return P.fotos*MB_LEVE+P.n*MB_SOBRA;
+  if(f==='grafica')return P.fotos*MB_FIEL+P.n*MB_SOBRA;               /* D-174: originais + perfis de cor */
   var un=f==='folhas'?area/A4:(88*107)/A4,n=f==='folhas'?P.n:P.fotos;     /* A4 a 300 PPI: PNG ≈ 9 MB, JPEG ≈ 1,8 MB */
   return n*un*esc*(o.tipo==='png'?9:1.8)*(o.zip?.97:1)
 }
@@ -35,15 +36,15 @@ function lerOpc(){
   var f=document.querySelector('input[name=fmt]:checked').value,img=f==='folhas'||f==='polaroids';
   return{f:f,img:img,tipo:document.querySelector('input[name=tipo]:checked').value,ppi:+document.querySelector('input[name=ppi]:checked').value,zip:$('zip').checked}
 }
-var ROT={pdf:'Gerar PDF',leve:'Gerar PDF leve',folhas:'Gerar imagens',polaroids:'Gerar imagens'};
+var ROT={pdf:'Gerar PDF',grafica:'Gerar PDF profissional',leve:'Gerar PDF leve',folhas:'Gerar imagens',polaroids:'Gerar imagens'};
 function atualiza(){
   var o=lerOpc(),m=mb(o.f,o),v=Math.max(1,Math.ceil(m/LIM));
-  $('opts').hidden=!o.img;$('aviso-100').hidden=o.img;
+  $('opts').hidden=!o.img;$('aviso-100').hidden=o.img||o.f==='grafica';$('aviso-pro').hidden=o.f!=='grafica';
   $('est-v').textContent='≈ '+fmt(m);
   var un=o.img&&!o.zip?(o.f==='folhas'?P.n:P.fotos):v;
   $('est-s').textContent=o.img&&!o.zip?pl(un,'arquivo','arquivos')+' separados.'
     :v===1?'1 arquivo.':pl(v,'volume','volumes')+' de até '+LIM+' MB, para caber no '+(cel?'celular':'computador')+'.';
-  var n=o.f==='folhas'||o.f==='pdf'||o.f==='leve'?P.n:P.fotos;
+  var n=o.f==='folhas'||o.f==='pdf'||o.f==='leve'||o.f==='grafica'?P.n:P.fotos;
   $('go-t').textContent=ROT[o.f]+' ('+(o.f==='polaroids'?pl(P.fotos,'polaroid','polaroids'):pl(P.n,'folha','folhas'))+')'
 }
 document.addEventListener('change',function(e){if(e.target.closest&&e.target.closest('.card')){atualiza();atualizaInfo()}});
@@ -52,7 +53,7 @@ document.addEventListener('change',function(e){if(e.target.closest&&e.target.clo
 function classeFolha(){return P.w*P.h>210*297?'grande':'padrao'} /* acima de A4 = folha grande */
 function atualizaInfo(){
   var o=lerOpc(),box=$('info-conta');
-  if(window.PLCONTA&&(o.f==='pdf'||o.f==='leve')&&PLCONTA.temSessao()){
+  if(window.PLCONTA&&(o.f==='pdf'||o.f==='leve'||o.f==='grafica')&&PLCONTA.temSessao()){
     var g=PLCONTA.direito(P.n,classeFolha()),t='';
     if(g.ok){
       var pl=PLCONTA.plano()||{},MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -73,7 +74,7 @@ function seguir(){
 }
 $('go').onclick=function(){
   var o=lerOpc();
-  if((o.f==='pdf'||o.f==='leve')&&window.PLPORTAO){       /* imagens: prévia simulada, sem portão (T7) */
+  if((o.f==='pdf'||o.f==='leve'||o.f==='grafica')&&window.PLPORTAO){       /* imagens: prévia simulada, sem portão (T7) */
     var classe=classeFolha();
     PLPORTAO.pedir(P.n,classe).then(function(r){
       if(r.ok)seguir();
@@ -82,5 +83,15 @@ $('go').onclick=function(){
     })
   }else seguir();
 };
+/* D-173: ao escolher a qualidade com toque ou clique, a tela desce até o botão de gerar (que fica bem abaixo) e o
+   destaca; pelo teclado (setas no grupo de opções) nada se move, para não tirar a pessoa do lugar. */
+$('fmts').addEventListener('click',function(e){
+  if(!e.detail||!e.target.closest||!e.target.closest('.fmt'))return;
+  setTimeout(function(){
+    var g=$('go'),r=g.getBoundingClientRect(),calmo=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(r.top<0||r.bottom>innerHeight-16)g.scrollIntoView({behavior:calmo?'auto':'smooth',block:'center'});
+    if(!calmo){g.classList.remove('led-btn--chama');void g.offsetWidth;g.classList.add('led-btn--chama')}
+  },80)
+});
 atualiza();atualizaInfo();
 })();

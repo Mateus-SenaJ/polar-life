@@ -8,7 +8,7 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 .btn2:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
 /* ---- layout: celular empilhado; desktop 50/50 (brief §1.2) ---- */
-.ent{display:block;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+.ent{display:block;min-height:100vh;min-height:100svh}
 .ent__l{background:var(--black)}
 /* a faixa preta fica em cima; abaixo, o vídeo do varal (D-145). O quadro tem proporção fixa (16:10) no celular
    e ocupa o resto da coluna no desktop: nada pula quando o vídeo chega. A mesa de polaroids é a reserva. */
@@ -118,7 +118,7 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 
 /* ---- desktop 1440: colunas 50/50 (brief §1.2) ---- */
 @media (min-width:1024px){
-  .ent{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+  .ent{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;min-height:100svh}
   .ent__l{display:flex;flex-direction:column;position:sticky;top:0;align-self:start;height:100vh;height:100svh}   /* a coluna da mídia acompanha a rolagem do formulário */
   .ent__faixa{flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-start;padding:64px}
   .ent__midia{flex:1 1 0;aspect-ratio:auto;min-height:0}
@@ -164,7 +164,7 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 .ent__titulo{margin-top:20px;font-size:32px}
 .ent__apoio{margin-top:16px;font-size:16px}
 @media (min-width:1024px){
-  .ent{min-height:0;height:calc(100vh - 32px);height:calc(100svh - 32px)}
+  .ent{min-height:0;height:100vh;height:100svh}
   .ent__l{position:relative;top:auto;align-self:stretch;height:auto}
   .ent__faixa{padding:56px 64px 200px}
   .ent__titulo{margin-top:28px;font-size:44px}
@@ -245,7 +245,7 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 }
 @media (max-width:1023px){
   body{background:var(--black)}
-  .ent{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+  .ent{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
   .ent__l{position:static;overflow:visible;isolation:auto;padding-bottom:0;flex:1 0 auto;display:flex;flex-direction:column;min-height:170px;background:transparent}
   .ent__midia{position:absolute;top:-110px;left:0;right:0;bottom:0;z-index:-1}
   .ent__midia .midia__video{object-position:80% 50%}

@@ -109,7 +109,7 @@ function entrarSenha(ev){
   ledBusy(b,true,'Entrando…');
   C.entrarComSenha(EMAIL,se).then(function(r){
     if(C.precisaCadastro&&C.precisaCadastro()){renderDados({origem:'email',email:r.email});return}
-    toast('Olá, '+String(r.nome||r.email).split(' ')[0]+'! · Ambiente de teste');
+    toast('Olá, '+String(r.nome||r.email).split(' ')[0]+'!');
     clearTimeout(tmIr);tmIr=setTimeout(irPara,900)
   },function(erro){
     ledBusy(b,false,'Entrar');
@@ -158,7 +158,7 @@ function renderCriar(email){
     var b=$('b-criar-conta'),nome=$('c-nome').value;
     ledBusy(b,true,'Criando…');
     C.criarConta({nome:nome,email:$('c-email').value,senha:$('c-senha').value,aceite:$('c-aceite').checked}).then(function(){
-      toast('Olá, '+nome.trim().split(' ')[0]+'! · Ambiente de teste');
+      toast('Olá, '+nome.trim().split(' ')[0]+'!');
       clearTimeout(tmIr);tmIr=setTimeout(irPara,900)
     },function(r){
       ledBusy(b,false,'Criar conta e entrar');
@@ -463,7 +463,7 @@ function renderDados(ctx){
       var d=document.createElement('div');d.innerHTML=er(msg);var p=d.firstChild;p.id='erro-d-'+alvo;
       g.insertBefore(p,$('ajuda-d-'+alvo));focar($(alvo==='aceite'?'d-aceite':'d-'+alvo));return
     }
-    toast('Olá, '+$('d-nome').value.trim().split(' ')[0]+'! · Ambiente de teste');
+    toast('Olá, '+$('d-nome').value.trim().split(' ')[0]+'!');
     clearTimeout(tmIr);tmIr=setTimeout(irPara,900)
   });
   focar(fixo?$('d-nome'):$('d-nome'))

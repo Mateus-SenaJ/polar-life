@@ -395,6 +395,23 @@ function limparJpeg(a){
   }
   var t=0,i;out.forEach(function(x){t+=x.length});var r=new Uint8Array(t),o=0;out.forEach(function(x){r.set(x,o);o+=x.length});return r
 }
+/* D-174: perfil ICC do original (segmentos APP2 «ICC_PROFILE», em ordem). Na impressão profissional ele vai junto da foto no PDF. */
+function iccDe(a){
+  var partes=[],p=2,m,n;
+  while(p+4<=a.length){
+    if(a[p]!==255){p++;continue}
+    m=a[p+1];if(m===255){p++;continue}
+    if(m===216||m===1||(m>=208&&m<=215)){p+=2;continue}
+    n=(a[p+2]<<8)+a[p+3];if(n<2||m===218)break;
+    if(m===226&&n>16&&a[p+4]===73&&a[p+5]===67&&a[p+6]===67&&a[p+7]===95)partes.push({s:a[p+16],d:a.subarray(p+18,p+2+n)});
+    p+=2+n
+  }
+  if(!partes.length)return null;
+  var vistos={};partes=partes.filter(function(x){if(vistos[x.s])return false;vistos[x.s]=1;return true});   /* só o primeiro perfil completo, se houver mais de um */
+  partes.sort(function(x,y){return x.s-y.s});
+  var t=0;partes.forEach(function(x){t+=x.d.length});var r=new Uint8Array(t),o=0;partes.forEach(function(x){r.set(x.d,o);o+=x.d.length});
+  return r.length>128&&r[36]===97&&r[37]===99&&r[38]===115&&r[39]===112?r:null      /* assinatura «acsp» */
+}
 var ORIG_MAX=700*1024*1024;                  /* teto de memória para originais lidos numa geração; acima disso reamostra */
 function elegivelOriginal(f,real){
   if(!real||!real.blob||!/^image\/jpe?g$/i.test(real.blob.type||''))return false;
@@ -420,20 +437,24 @@ function foto(proj,n,ppi,qualidade){
     var nat=real?ppiFoto(f.src,f,fr,real):0,alvo;
     if(ppi==='nativo')alvo=real?Math.max(326,Math.min(nat,1200)):326;
     else if(ppi==='alta')alvo=real?(nat>=300?Math.min(nat,600):Math.max(nat,72)):326;
+    else if(ppi==='fiel')alvo=real?Math.max(300,Math.min(nat,1200)):326;          /* D-174: impressão profissional */
     else alvo=ppi;
     var W=Math.round(j.jw/25.4*alvo),H=Math.round(j.jh/25.4*alvo);
     if(W<1||H<1)return Promise.reject({n:n,motivo:'Formato inválido'});
     var chave=[ppi,qualidade,W,H,JSON.stringify(f),real?real.w+'x'+real.h:'cena'].join('|');if(cacheFoto[chave])return Promise.resolve(cacheFoto[chave]);
     return rasterizar(f,fr,W,H,real,qualidade).then(function(r){r.dpi=Math.round(W/(j.jw/25.4));r.orig=null;cacheFoto[chave]=r;return r})}
   function gera(real){
-    if(ppi==='nativo'&&elegivelOriginal(f,real)&&(proj._origBytes||0)<ORIG_MAX){
+    if((ppi==='nativo'||ppi==='fiel')&&elegivelOriginal(f,real)&&(proj._origBytes||0)<ORIG_MAX){
       var cab=real.blob.slice(0,262144);
       return cab.arrayBuffer().then(function(ab){
         var info=lerJpeg(new Uint8Array(ab));
-        if(!info.jpeg||[1,3,6,8].indexOf(info.orient)<0||!info.srgb||(info.comps!==3&&info.comps!==1)||info.prec!==8)return raster(real);   /* outro perfil, orientação ou CMYK: o canvas converte */
+        var perfilOk=info.srgb||(ppi==='fiel'&&info.comps===3);   /* D-174: no modo fiel o perfil amplo vai junto em vez de ser convertido */
+        if(!info.jpeg||[1,3,6,8].indexOf(info.orient)<0||!perfilOk||(info.comps!==3&&info.comps!==1)||info.prec!==8)return raster(real);   /* outro perfil, orientação ou CMYK: o canvas converte */
         return real.blob.arrayBuffer().then(function(all){
-          var lim=limparJpeg(new Uint8Array(all));proj._origBytes=(proj._origBytes||0)+lim.length;
-          return{n:f.n,bytes:lim,wpx:real.w,hpx:real.h,dpi:ppiFoto(f.src,f,fr,real),orig:{src:f.src,m:matOrig(f,fr,real,info.orient),w:info.orient===6||info.orient===8?real.h:real.w,h:info.orient===6||info.orient===8?real.w:real.h,orient:info.orient}}
+          var cru=new Uint8Array(all),icc=ppi==='fiel'&&info.icc&&!info.srgb?iccDe(cru):null;
+          if(ppi==='fiel'&&info.icc&&!info.srgb&&!icc)return raster(real);                 /* perfil ilegível: o canvas converte para sRGB */
+          var lim=limparJpeg(cru);proj._origBytes=(proj._origBytes||0)+lim.length;
+          return{n:f.n,bytes:lim,icc:icc,wpx:real.w,hpx:real.h,dpi:ppiFoto(f.src,f,fr,real),orig:{src:f.src,m:matOrig(f,fr,real,info.orient),w:info.orient===6||info.orient===8?real.h:real.w,h:info.orient===6||info.orient===8?real.w:real.h,orient:info.orient}}
         })
       })
     }
@@ -574,11 +595,30 @@ function fotosUsadas(paginas,a,b){
   for(var i=a;i<b;i++)walk(paginas[i].itens);
   return arr
 }
+/* D-174: impressão profissional — cada foto leva o próprio perfil de cor (ICCBased): o original com o perfil da câmera
+   (Display P3, Adobe RGB) e o restante com sRGB; o documento declara sRGB como condição de saída (OutputIntent). */
+function somaIcc(u){for(var h=2166136261,i=0;i<u.length;i++){h^=u[i];h=Math.imul(h,16777619)}return (h>>>0).toString(16)+':'+u.length}
+function marcarCor(doc,img,G,icc){
+  if(!G)return Promise.resolve(img);
+  return img.embed().then(function(){
+    var x=doc.context.lookup(img.ref);if(!x||!x.dict)return img;
+    if(String(x.dict.get(PDF.PDFName.of('ColorSpace')))!=='/DeviceRGB')return img;     /* cinza ou CMYK: como está */
+    var cs=G.srgb;
+    if(icc){var k=somaIcc(icc);if(!G.perfis[k])G.perfis[k]=doc.context.obj([PDF.PDFName.of('ICCBased'),doc.context.register(doc.context.flateStream(icc,{N:3}))]);cs=G.perfis[k]}
+    x.dict.set(PDF.PDFName.of('ColorSpace'),cs);return img
+  })
+}
 function construirDoc(paginas,p,jpegs,a,b,avisos,sinal,escala){
   if(cancelado(sinal))return Promise.reject('abortado');
   return PDF.PDFDocument.create({updateMetadata:false}).then(function(doc){
     doc.registerFontkit(FK);
-    doc.catalog.set(PDF.PDFName.of('ViewerPreferences'),doc.context.obj({PrintScaling:PDF.PDFName.of('None')}));
+    doc.catalog.set(PDF.PDFName.of('ViewerPreferences'),doc.context.obj({PrintScaling:PDF.PDFName.of('None'),PickTrayByPDFSize:true}));   /* tamanho real, papel pelo tamanho da página */
+    var G=null;
+    if(p._graf&&window.PLICC){
+      var sref=doc.context.register(doc.context.flateStream(PLICC.srgb(),{N:3}));
+      G={srgb:doc.context.obj([PDF.PDFName.of('ICCBased'),sref]),perfis:{}};
+      doc.catalog.set(PDF.PDFName.of('OutputIntents'),doc.context.obj([doc.context.obj({Type:'OutputIntent',S:'GTS_PDFX',OutputConditionIdentifier:PDF.PDFString.of(PLICC.nome),Info:PDF.PDFString.of(PLICC.nome),DestOutputProfile:sref})]))
+    }
     var info=doc.getInfoDict();
     ['Producer','Creator','Title','Author','Subject','Keywords','CreationDate','ModDate'].forEach(function(k){info.delete(PDF.PDFName.of(k))});
     var ctx={doc:doc,photoCache:{},photoOrig:{},fontCache:{},fontNames:{},photoNames:{},sig:null,sigNames:{},avisos:avisos,fundoImg:null},jobs=[],origEmb={};
@@ -591,10 +631,10 @@ function construirDoc(paginas,p,jpegs,a,b,avisos,sinal,escala){
       jobs.push(doc.embedFont(bytes,{subset:true,customName:tag+'+'+nome}).then(function(font){ctx.fontCache[f.fam+'|'+f.peso+'|'+(f.it?1:0)]={font:font,key:f.fam+'|'+f.peso+'|'+(f.it?1:0)}}))
     });
     fotosUsadas(paginas,a,b).forEach(function(n){var r=jpegs[n];if(!r)return;
-      if(r.orig){var k=r.orig.src;if(!origEmb[k])origEmb[k]=doc.embedJpg(r.bytes);jobs.push(origEmb[k].then(function(img){ctx.photoCache[n]=img;ctx.photoOrig[n]=r.orig}));return}   /* mesma foto em várias polaroids: um objeto só */
-      jobs.push(doc.embedJpg(r.bytes).then(function(img){ctx.photoCache[n]=img}))});
-    if(jpegs.fundo&&paginas.slice(a,b).some(function(pg){return pg.itens.some(function(it){return it.t==='fundo'&&it.tipo==='foto'})}))jobs.push(doc.embedJpg(jpegs.fundo.bytes).then(function(img){ctx.fundoImg=img}));
-    if(p.s.assin&&cacheBytes[SIGURL])jobs.push(doc.embedPng(cacheBytes[SIGURL]).then(function(img){ctx.sig=img}).catch(function(){ctx.sig=null;registrarAviso(ctx.avisos,'AssinaturaIndisponivel',null,null)}));
+      if(r.orig){var k=r.orig.src;if(!origEmb[k])origEmb[k]=doc.embedJpg(r.bytes).then(function(img){return marcarCor(doc,img,G,r.icc||null)});jobs.push(origEmb[k].then(function(img){ctx.photoCache[n]=img;ctx.photoOrig[n]=r.orig}));return}   /* mesma foto em várias polaroids: um objeto só */
+      jobs.push(doc.embedJpg(r.bytes).then(function(img){return marcarCor(doc,img,G,null)}).then(function(img){ctx.photoCache[n]=img}))});
+    if(jpegs.fundo&&paginas.slice(a,b).some(function(pg){return pg.itens.some(function(it){return it.t==='fundo'&&it.tipo==='foto'})}))jobs.push(doc.embedJpg(jpegs.fundo.bytes).then(function(img){return marcarCor(doc,img,G,null)}).then(function(img){ctx.fundoImg=img}));
+    if(p.s.assin&&cacheBytes[SIGURL])jobs.push(doc.embedPng(cacheBytes[SIGURL]).then(function(img){return marcarCor(doc,img,G,null)}).then(function(img){ctx.sig=img}).catch(function(){ctx.sig=null;registrarAviso(ctx.avisos,'AssinaturaIndisponivel',null,null)}));
     return Promise.all(jobs).then(function(){
       for(var i=a;i<b;i++){
         if(cancelado(sinal))return Promise.reject('abortado');
@@ -638,8 +678,8 @@ function preparar(p,avisos){
 function pdf(proj,opcoes,cb){
   opcoes=opcoes||{};
   var plano=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null,pro=!!(plano&&plano.id==='pro');
-  var f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:(pro?'nativo':'alta'),q=f==='leve'?.72:(pro?.97:.95),lim=opcoes.lim==null?(pro?0:150):opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal,escala=opcoes.escala;
-  var p=JSON.parse(JSON.stringify(proj));
+  var graf=opcoes.f==='grafica',f=opcoes.f==='leve'?'leve':'pdf',ppi=f==='leve'?300:graf?'fiel':(pro?'nativo':'alta'),q=f==='leve'?.72:graf?.98:(pro?.97:.95),lim=opcoes.lim==null?(pro?0:150):opcoes.lim,sem=opcoes.sem||[],falhar=opcoes.falhar||[],sinal=opcoes.sinal,escala=opcoes.escala;
+  var p=JSON.parse(JSON.stringify(proj));p._graf=graf;
   if(sem.length)p.fotos=p.fotos.filter(function(x){return sem.indexOf(x.n)<0});
   var falhasSet={},falhas=[],avisos=[];falhar.forEach(function(n){falhasSet[n]=1});
   function abortado(){return sinal&&sinal.aborted}

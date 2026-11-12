@@ -293,17 +293,20 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 .tab{min-width:44px;padding:0 4px}
 .logo,.logo-h{flex:none}
 
-/* D-169: no editor o cabeçalho é fixo e cobria o selo «Ambiente de teste» (aparecia borrado atrás do vidro).
-   Com o selo visível, ele fica fixo no topo e todo o editor desce 32 px. */
-:root:has(.selo-teste:not([hidden])){--selo-h:32px}
-.selo-teste{position:relative;z-index:60}
-:root:has(.selo-teste:not([hidden])) .selo-teste{position:fixed;top:0;left:0;right:0}
-.eh{top:var(--selo-h,0px)}
-.rail{top:calc(var(--hh) + var(--selo-h,0px))}
-.content{padding-top:calc(var(--hh) + var(--selo-h,0px))}
-@media (max-width:1023.98px) and (min-width:768px){.insp{top:calc(var(--hh) + var(--selo-h,0px))}}
-@media (max-width:767.98px){
-  .modes{top:calc(var(--hh) + var(--selo-h,0px))}
-  .content{padding-top:calc(var(--hh) + 60px + var(--selo-h,0px))}
-  .insp{max-height:calc(100dvh - var(--hh) - var(--bar) - 16px - var(--selo-h,0px))}
-}
+/* D-171: no toque, o controle deslizante só se move com arrasto horizontal (PLDESLIZAR); o gesto vertical rola a tela */
+.desl-toque input[type=range]{pointer-events:none}
+.desl-toque :has(> input[type=range]){touch-action:pan-y}
+
+/* D-172: seta «mais ajustes» no título de cada seção; avançados ocultos até abrir. Ponto laranja = ajuste escondido alterado */
+.mod__h--mais{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mais{flex:none;position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-10px -10px -10px 0;border:0;border-radius:12px;background:none;color:var(--black);cursor:pointer}
+.mais:hover{background:var(--surface-subtle)}
+.mais .ico{width:20px;height:20px;transition:transform .2s var(--ease,ease)}
+.mais[aria-expanded="true"] .ico{transform:rotate(180deg)}
+.mais:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.mais__pt{position:absolute;top:9px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--orange);display:none}
+.mais--mudou .mais__pt{display:block}
+.mod:not(.mod--mais) > [data-av]{display:none}
+@media (prefers-reduced-motion:reduce){.mais .ico{transition:none}}
+/* D-172: com o Filtro recolhido, só 6 filtros à vista — o escolhido e o sugerido nunca somem */
+.mod--temmais:not(.mod--mais) .flt > li:nth-child(n+7):not(:has([aria-checked="true"])):not(:has(.ft__s)){display:none}

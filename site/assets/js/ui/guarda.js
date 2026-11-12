@@ -1,6 +1,6 @@
 /* PLGUARDA · D-123: todas as páginas de /app/ exigem sessão (conta ou código de impressão).
    Sem sessão → /app/entrar/ guardando o destino (?voltar=). A página de entrar é isenta.
-   Também esconde o selo «Ambiente de teste» quando PLCONTA.modo() === 'servidor'.
+   (O selo «Ambiente de teste» saiu na D-170; esconderSelo() fica sem efeito.)
    Roda síncrono no <head>, depois de nucleo/conta.js, antes de qualquer script de página.
    Obs.: os scripts das páginas de /app/ resolvem para a raiz do site (../assets), então
    a raiz de /app/ sai de location.pathname — funciona no GitHub Pages com subpath. */
