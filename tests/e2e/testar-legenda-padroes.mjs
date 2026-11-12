@@ -2,6 +2,7 @@
    JPEGs gerados por canvas com EXIF montado aqui (data e GPS): nenhuma foto pessoal. Tela = Folhas = PDF (MT-02). */
 import { chromium } from 'playwright';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 
 const srv = await servir(), nav = await chromium.launch({ headless: true });
 const falhas = [], errosPg = [];
@@ -68,6 +69,7 @@ async function pdfTxt(p) {
 
 try {
   const ctx = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
   await ctx.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   const p = await ctx.newPage();
   p.on('pageerror', e => errosPg.push(String(e)));
@@ -179,6 +181,7 @@ try {
 
   titulo('Projeto exemplo (ehReal falso) não quebra:');
   const ctx2 = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  await maisAbertos(ctx2);   /* D-172: ajustes avançados à vista */
   await ctx2.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   const p2 = await ctx2.newPage();
   p2.on('pageerror', e => errosPg.push(String(e)));

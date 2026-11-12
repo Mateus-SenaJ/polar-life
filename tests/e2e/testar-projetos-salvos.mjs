@@ -1,3 +1,4 @@
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* 44 · Projetos salvos no aparelho, datas reais das fotos (EXIF) e privacidade (T5, BR-06).
    JPEGs gerados por canvas no navegador, com um bloco EXIF montado aqui (sem fotos pessoais). */
 import { chromium } from 'playwright';
@@ -41,6 +42,7 @@ async function escolher(p, lista) {
 try {
   /* ---- unidade: o leitor EXIF dentro do navegador ---- */
   const p = await ctx.newPage(); p.on('pageerror', e => errosPg.push(String(e)));
+  await p.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
   await p.goto(srv.url + 'app/novo-projeto/');
   await p.evaluate(() => { localStorage.removeItem('pl-projeto-atual'); sessionStorage.clear(); });
   await p.evaluate(() => PLPROJETOS.criar('Viagem de teste'));
@@ -70,6 +72,7 @@ try {
 
   /* ---- reabrir: T-01 lista e abre o projeto com as mesmas fotos ---- */
   const p2 = await ctx.newPage(); p2.on('pageerror', e => errosPg.push(String(e)));
+  await p2.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
   await p2.goto(srv.url + 'app/');
   await p2.locator('.card').first().waitFor({ timeout: 10000 });
   const cartao = await p2.locator('.card').first().innerText();

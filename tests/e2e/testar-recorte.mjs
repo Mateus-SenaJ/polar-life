@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 // Teste do recorte no Modo Quadro (T-08 · FN-04, FN-12): arrastar 1:1, roda ancorada no cursor, pinça,
 // duplo clique/toque, teclado em mm, histórico por gesto e cobertura da janela (sem fundo branco).
 // Uso: npm run testar:recorte  (Chromium do Playwright)
@@ -12,6 +13,7 @@ const perto = (a, b, e) => Math.abs(a - b) <= e;
 const srv = await servir();
 const nav = await chromium.launch();
 const page = await nav.newPage({ viewport: { width: 1440, height: 900 } });
+await page.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
 await page.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // guarda de /app/ exige conta (D-123)
 page.setDefaultTimeout(30000);
 const errosPg = [];

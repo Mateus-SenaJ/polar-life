@@ -1,3 +1,4 @@
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* 44 · Contagem real das fotos ponta a ponta (bug «sempre aparecem 24 fotos»).
    Gera JPEGs de teste por canvas no próprio navegador — não usa as fotos pessoais do dono (T5).
    Confere: processando, resumo (contagem + orientação + folhas) e Quadro usam a seleção real;
@@ -7,6 +8,7 @@ import { servir } from '../helpers/servidor.mjs';
 
 const srv = await servir(), base = srv.url, nav = await chromium.launch({ headless: true });
 const page = await nav.newPage();
+await page.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
 const falhas = [];
 function ok(v, m) { console.log((v ? '✔ ' : '✘ ') + m); if (!v) falhas.push(m); }
 

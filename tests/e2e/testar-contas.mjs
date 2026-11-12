@@ -7,6 +7,7 @@ import { mkdir, writeFile, rm, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 
 const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.push(m); console.log('  ✘ ' + m); };
 const srv = await servir();
@@ -27,6 +28,7 @@ const mascara = cod => cod.slice(0, 2) + '-' + cod.slice(2, 6) + '-' + cod.slice
 /* contexto com sessão (e pré-voo opcional) já prontos */
 async function contexto(email, nFolhas) {
   const c = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  await maisAbertos(c);   /* D-172: ajustes avançados à vista */
   /* D-167: com o ID do Google publicado o botão vai ao Google de verdade (coberto em testar-google);
      aqui o fluxo de demonstração continua coberto servindo o google.js sem ID */
   const g = (await readFile(new URL('../../site/assets/js/nucleo/google.js', import.meta.url), 'utf8')).replace(/var CLIENT_ID='[^']*';/, "var CLIENT_ID='';");
@@ -562,6 +564,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
 /* ===================== J · movimento reduzido (checklist §8.9) ===================== */
 {
   const c = await nav.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
+  await maisAbertos(c);   /* D-172: ajustes avançados à vista */
   const p = await c.newPage();
   await p.goto(srv.url + 'app/entrar/');
   const quieto = await p.evaluate(() => {

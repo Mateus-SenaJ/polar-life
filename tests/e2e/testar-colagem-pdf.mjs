@@ -7,6 +7,7 @@ import { readFile, readdir, mkdir, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 
 const falhas = [];
 const ok = (c, m) => { console.log((c ? '✔ ' : '✘ ') + m); if (!c) falhas.push(m); };
@@ -25,6 +26,7 @@ const erros = [];
 
 async function novaPagina(conta = 'pro@polarlife.test') {
   const ctx = await nav.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block', acceptDownloads: true });
+  await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
   await ctx.addInitScript(c => localStorage.setItem('pl-conta', JSON.stringify({ email: c, entrouEm: Date.now() })), conta);
   const p = await ctx.newPage(); p.setDefaultTimeout(240000); p.on('pageerror', e => erros.push(String(e)));
   return p;

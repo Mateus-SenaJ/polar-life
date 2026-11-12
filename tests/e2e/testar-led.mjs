@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { maisAbertos } from '../helpers/mais.mjs';
 // P-LED (DOC-01 §11 · D-112 · D-115): o LED v4 é o mesmo em todas as páginas — botão 52/44, peso 500,
 // raio 12, anel em movimento, faixa de luz no hover, desabilitado tracejado preto, barra carregando,
 // pop-up nível 3 e barra de progresso. Também confere a paleta T2 dentro dos componentes LED.
@@ -165,6 +166,7 @@ try {
 
   /* Movimento reduzido */
   const ctx = await nav.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
+  await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
   const rm = await ctx.newPage();
   await rm.addInitScript(sessao);
   await rm.goto(srv.url + 'app/novo-projeto/', { waitUntil: 'networkidle' });

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 // Teste do formato Retro Pocket e da legenda em duas linhas (etapa 34, D-113): T-02 → Quadro (T-12) → T-07 → PDF.
 // Uso: npm run testar:pocket  (Chromium do Playwright + pdfjs-dist)
 import { chromium } from 'playwright';
@@ -49,6 +50,7 @@ const pdfjsUrl = `http://127.0.0.1:${srvPdfjs.address().port}/`;
 
 const nav = await chromium.launch();
 const page = await nav.newPage();
+await page.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
 await page.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // guarda de /app/ exige conta (D-123)
 page.setDefaultTimeout(240000);
 const errosPg = [];

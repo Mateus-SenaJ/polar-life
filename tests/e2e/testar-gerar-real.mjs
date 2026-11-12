@@ -1,3 +1,4 @@
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* T-20/21/22: PDF local, progresso, download e ponte IndexedDB (DOC-08 §6). */
 import { mkdir, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -8,6 +9,7 @@ import { servir } from '../helpers/servidor.mjs';
 
 const saida = new URL('../saida/', import.meta.url), srv = await servir(), nav = await chromium.launch({ headless: true });
 const page = await nav.newPage({ acceptDownloads: true });
+await page.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
 const falhas = [];
 function ok(v, m) { console.log((v ? '✔ ' : '✘ ') + m); if (!v) falhas.push(m); }
 await page.addInitScript(() => {

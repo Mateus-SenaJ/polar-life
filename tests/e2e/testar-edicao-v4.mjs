@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* D-148/D-149 · edição v4: Metadados sai, Configurações avançadas, fontes novas com Itálico/Negrito reais, Excluir foto, pan 1:1.
    Tela = Folhas = PDF (MT-02). JPEGs gerados por canvas (nenhuma foto pessoal). Uso: node tests/e2e/testar-edicao-v4.mjs */
 import { chromium } from 'playwright';
@@ -13,6 +14,7 @@ const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.
 
 async function novaPagina() {
   const p = await nav.newPage();
+  await p.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
   await p.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   p.on('pageerror', e => errosPg.push(String(e)));
   p.setDefaultTimeout(30000);
