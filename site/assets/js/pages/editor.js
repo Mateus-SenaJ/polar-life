@@ -404,7 +404,7 @@ function quadro(){try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'nul
 function salvarQuadro(q){q[0]=q[0]||{};q[0].leg=LG;q[0].fr=FR;q[0].nome=REAL_ED?NOME:null;EST_Q=q;try{sessionStorage.setItem('pl-quadro',JSON.stringify(q));sessionStorage.removeItem('pl-fmt');   /* D-159: a moldura já está no projeto */if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 function escopo(){var n=alvo().length;$('scope-t').textContent='Alterando: '+(ESCOPO==='folha'?'Esta folha':'Todas as fotos')+' · '+n;var a=$('escopo-ajuda');if(a)a.textContent=ESCOPO==='folha'?'Somente as '+n+' fotos desta folha.':'Todas as '+n+' fotos do projeto.'}
 /* ---------- aba Colagem (D-150 a D-152) ---------- */
-function modoColagem(ligar){return function(e){if(e)e.preventDefault();if(colOn()===ligar)return;colSet(function(c){c.ativo=ligar},'modo');abasDoModo()}}
+function modoColagem(ligar){return function(e){if(e)e.preventDefault();if(colOn()===ligar)return;colSet(function(c){c.ativo=ligar},'modo');abasDoModo();if(window.PLSESSAO&&PLSESSAO.salvarJa)PLSESSAO.salvarJa()}}   /* D-176: o modo é salvo na hora */
 ['rail-folhas','modes-folhas'].forEach(function(i){$(i).onclick=modoColagem(false)});['rail-colagem','modes-colagem'].forEach(function(i){$(i).onclick=modoColagem(true)});
 if(location.hash==='#colagem')setTimeout(function(){modoColagem(true)();try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}},0);   /* D-161: «Colagem» no Quadro abre as Folhas já no modo Colagem */
 function colSet(fn,k){C=PLCOLAGEM.norm(C);fn(C);C=PLCOLAGEM.norm(C);commit(k||'colagem')}
