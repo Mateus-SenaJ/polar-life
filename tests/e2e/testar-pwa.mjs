@@ -46,7 +46,7 @@ const novaFoto = () => { const c = document.createElement('canvas'); c.width = 4
 try {
   // 1. manifesto
   const mf = JSON.parse(readFileSync(SITE + 'app/manifest.webmanifest', 'utf8'));
-  ok(mf.name === 'PolarLive' && mf.short_name === 'PolarLive' && mf.lang === 'pt-BR' && mf.dir === 'ltr', 'manifesto: nome, short_name, lang e dir');
+  ok(mf.name === 'PolarLife' && mf.short_name === 'PolarLife' && mf.lang === 'pt-BR' && mf.dir === 'ltr', 'manifesto: nome, short_name, lang e dir');
   ok(mf.start_url === './inicio/' && mf.scope === './' && mf.display === 'standalone' && mf.orientation === 'any', 'manifesto: start_url, scope, display e orientation');
   ok(mf.background_color === '#FFFFFF' && mf.theme_color === '#FFFFFF' && !!mf.description, 'manifesto: cores e descrição');
   ok(['photo', 'design', 'productivity'].every(c => (mf.categories || []).includes(c)), 'manifesto: categorias');
@@ -127,7 +127,7 @@ try {
   await home.evaluate(async () => { window.__marca = 1; await (await navigator.serviceWorker.getRegistration()).update(); });
   await home.waitForSelector('#pwa-aviso button', { timeout: 15000 });
   const txt = await home.textContent('#pwa-aviso');
-  ok(/Há uma versão nova do PolarLive\./.test(txt) && /Atualizar/.test(txt), 'aviso de versão nova com botão «Atualizar»');
+  ok(/Há uma versão nova do PolarLife\./.test(txt) && /Atualizar/.test(txt), 'aviso de versão nova com botão «Atualizar»');
   await home.waitForTimeout(800);
   ok(await home.evaluate(() => window.__marca === 1), 'não recarrega sozinho');
   await Promise.all([home.waitForEvent('load', { timeout: 15000 }), home.click('#pwa-aviso button')]);
@@ -142,7 +142,7 @@ try {
   const evento = r => { window.__prompts = window.__prompts || 0; const e = new Event('beforeinstallprompt', { cancelable: true }); e.prompt = () => { window.__prompts++; return Promise.resolve(); }; e.userChoice = Promise.resolve({ outcome: r }); window.dispatchEvent(e); };
   await inst.evaluate(evento, 'accepted');
   const b = inst.locator('#pwa-instalar');
-  ok(await b.isVisible() && /Instalar o PolarLive/.test(await b.textContent()), 'botão «Instalar o PolarLive» aparece com o evento');
+  ok(await b.isVisible() && /Instalar o PolarLife/.test(await b.textContent()), 'botão «Instalar o PolarLife» aparece com o evento');
   ok(await b.evaluate(x => x.classList.contains('btn2') && !x.classList.contains('led-btn') && !x.closest('.led-btn')), 'botão Instalar é secundário (btn2), não LED (T8)');
   ok((await b.boundingBox()).height >= 44, 'alvo do botão Instalar ≥ 44 px (T3)');
   ok(await inst.evaluate(() => document.querySelectorAll('.led-btn').length === 1   /* D-177: a tela central tem um só LED («Polaroids para imprimir») */ && !document.querySelector('#pwa-barra .led-btn')), 'T-01 não ganhou botão LED');

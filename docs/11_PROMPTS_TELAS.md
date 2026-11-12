@@ -1,6 +1,6 @@
 ---
 id: DOC-11
-titulo: PolarLive · Bloco mestre, prompts por etapa e checklist anti-desvio
+titulo: PolarLife · Bloco mestre, prompts por etapa e checklist anti-desvio
 edicao: 2
 data: 2026-11-07
 status: vigente
@@ -14,7 +14,7 @@ depende_de: [DOC-01, DOC-02, DOC-04, DOC-05, DOC-06, DOC-07]
 ## 1. Bloco Mestre (colar no início de TODO prompt)
 
 ```
-PAPEL: Você é designer de produto sênior do PolarLive, um editor web local-first para criar
+PAPEL: Você é designer de produto sênior do PolarLife, um editor web local-first para criar
 polaroids, imprimi-las em folhas e compartilhá-las como colagens e lembranças.
 
 FONTES DE VERDADE (anexas): DOC-01 design, DOC-02 tipografia, DOC-04 telas, e os HTMLs E1

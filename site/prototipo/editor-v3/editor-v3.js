@@ -79,7 +79,7 @@ var P={
     var temas=[];STK.forEach(function(s){if(temas.indexOf(s[2])<0)temas.push(s[2])});
     temas.forEach(function(t){h+='<h3 class="mod__h" style="margin-top:8px">'+t+'</h3><div class="grade">'+STK.filter(function(s){return s[2]===t}).map(function(s){return'<button type="button" data-add="sticker|'+s[0]+'" aria-label="'+s[1]+'" title="'+s[1]+'" style="color:var(--black)"><svg><use href="#st-'+s[0]+'"/></svg></button>'}).join('')+'</div>'});
     h+='<h3 class="mod__h" style="margin-top:14px">Emojis <small class="f__h" style="display:inline">· fonte do aparelho</small></h3><div class="grade">'+EMO.map(function(e){return'<button type="button" data-add="emoji|'+e+'" aria-label="Emoji '+e+'">'+e+'</button>'}).join('')+'</div>';
-    h+='<p class="f__h" style="margin-top:12px">Stickers são desenhos do PolarLive e saem em vetor no PDF. Emojis usam a fonte deste aparelho e saem como imagem nítida (600 PPI).</p></section></div>';
+    h+='<p class="f__h" style="margin-top:12px">Stickers são desenhos do PolarLife e saem em vetor no PDF. Emojis usam a fonte deste aparelho e saem como imagem nítida (600 PPI).</p></section></div>';
     return{h:h,ft:'<button type="button" class="btn2">Aplicar às demais · 23</button>'}
   },
   recorte:function(){

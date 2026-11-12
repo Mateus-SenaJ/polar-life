@@ -1,4 +1,4 @@
-Bibliotecas de terceiros usadas apenas localmente pelo PolarLive.
+Bibliotecas de terceiros usadas apenas localmente pelo PolarLife.
 
 pdf-lib
 https://pdf-lib.js.org/

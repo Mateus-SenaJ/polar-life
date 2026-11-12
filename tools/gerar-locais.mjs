@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SAIDA = join(RAIZ, 'site', 'assets', 'dados', 'locais');
-const UA = { 'User-Agent': 'PolarLiveBuild/1.0' };
+const UA = { 'User-Agent': 'PolarLifeBuild/1.0' };
 const BASE = 'https://raw.githubusercontent.com/kelvins/municipios-brasileiros/main/json/';
 const NE = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson';
 const r3 = (n) => Math.round(n * 1000) / 1000;

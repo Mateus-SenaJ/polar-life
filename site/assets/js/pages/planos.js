@@ -35,7 +35,7 @@ function render(){
    '<ul class="pln__ul">'+
    '<li>'+ico(I.check)+esc(L.gratis.folhasMes)+' folha'+(L.gratis.folhasMes>1?'s':'')+' grátis por mês</li>'+
    '<li>'+ico(I.check)+'Até '+esc(L.gratis.fotos)+' fotos por projeto</li>'+
-   '<li>'+ico(I.check)+'Assinatura PolarLive sempre ligada</li>'+
+   '<li>'+ico(I.check)+'Assinatura PolarLife sempre ligada</li>'+
    '</ul></div></label>';
 
   /* Folha avulsa */
@@ -46,7 +46,7 @@ function render(){
    '<ul class="pln__ul">'+
    '<li>'+ico(I.check)+C.moeda(L.avulsa.precoPadrao)+' a folha padrão · '+C.moeda(L.avulsa.precoGrande)+' a grande</li>'+
    '<li>'+ico(I.check)+'Até '+esc(L.avulsa.fotos)+' fotos por projeto</li>'+
-   '<li>'+ico(I.check)+'Assinatura PolarLive sempre ligada</li>'+
+   '<li>'+ico(I.check)+'Assinatura PolarLife sempre ligada</li>'+
    '</ul>'+
    '<div class="pln__compra">'+
    '<div class="pln__q"><span class="pln__q-l">Quantas folhas</span>'+
@@ -68,7 +68,7 @@ function render(){
    '<ul class="pln__ul">'+
    '<li>'+ico(I.check)+'Folhas à vontade, uso razoável de '+esc(L.pro.usoRazoavel)+' por mês</li>'+
    '<li>'+ico(I.check)+'Até '+esc(L.pro.fotos)+' fotos por projeto</li>'+
-   '<li>'+ico(I.check)+'Pode desligar a assinatura PolarLive</li>'+
+   '<li>'+ico(I.check)+'Pode desligar a assinatura PolarLife</li>'+
    '<li>'+ico(I.check)+'Arrependimento em 7 dias</li>'+
    '</ul></div></label>';
 
@@ -122,7 +122,7 @@ $('f-planos').addEventListener('submit',function(ev){
   if(s==='avulsa'){PLPORTAO.pagamento(QTD,CLASSE,false,depoisCompra);return}
   /* Grátis: confirmar rebaixamento (brief §3.7) */
   pop('Mudar para o Grátis?',
-    '<p>Você continua com as folhas já compradas. O que muda: 1 folha grátis por mês e a assinatura PolarLive sempre ligada.</p>',
+    '<p>Você continua com as folhas já compradas. O que muda: 1 folha grátis por mês e a assinatura PolarLife sempre ligada.</p>',
     [{led:true,txt:'Continuar no plano atual',cb:function(){fecharDlg()}},
      {txt:'Mudar para o Grátis',cb:function(){C.rebaixarGratis();fecharDlg();toast('Plano mudado para o Grátis.');render()}}])
 });

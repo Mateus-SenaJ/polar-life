@@ -86,11 +86,11 @@ function render(){
     else if(pl.usadasMes>=av)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Você usou '+pl.usadasMes+' das '+pl.usoRazoavel+' folhas do uso razoável deste mês.</p></div>';
     /* assinatura: Pro pode desligar (D-119 / DOC-03 §2) */
     if(pl.canceladoEm){
-      h+='<p class="cc__meta">A assinatura PolarLive volta a aparecer quando o plano virar Grátis.</p>'+
+      h+='<p class="cc__meta">A assinatura PolarLife volta a aparecer quando o plano virar Grátis.</p>'+
         '<div class="cc__act"><button type="button" class="btn2" id="b-reativar">'+ico(I.check)+'Reativar o Pro</button></div>'
     }else{
       var ligada=!pl.assinaturaDesligada;
-      h+='<div class="sw-row"><div><p class="cc__meta" id="assin-l">'+(ligada?'Desligar':'Ligar')+' a assinatura PolarLive</p><p class="help">Muda o padrão de novos projetos. Os projetos atuais não mudam.</p></div>'+
+      h+='<div class="sw-row"><div><p class="cc__meta" id="assin-l">'+(ligada?'Desligar':'Ligar')+' a assinatura PolarLife</p><p class="help">Muda o padrão de novos projetos. Os projetos atuais não mudam.</p></div>'+
         '<button type="button" class="sw" id="assin" role="switch" aria-checked="'+(ligada?'true':'false')+'" aria-labelledby="assin-l"><span></span></button></div>'+
         '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-cancelar">'+ico(I.lixeira)+'Cancelar assinatura</button></div>'
     }
@@ -98,14 +98,14 @@ function render(){
     h+='<p class="cc__plano">Folha avulsa</p>'+
       '<ul class="cc__folhas"><li>'+esc(pl.folhasCompradas.padrao)+' folhas padrão · '+esc(pl.folhasCompradas.grande)+' folhas grandes</li>'+
       '<li>Até '+esc(pl.fotosPorProjeto)+' fotos por projeto</li>'+
-      '<li>Assinatura PolarLive nas polaroids: sempre ligada</li></ul>'+
+      '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>'+
       '<div class="cc__act"><a class="led-btn" id="b-planos" href="planos/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Ver folhas e planos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>'
   }else{ /* grátis */
     var resta=Math.max(0,(pl.folhasMes||1)-pl.usadasMes);
     h+='<p class="cc__plano">Grátis · '+C.moeda(0)+'</p>'+
       '<ul class="cc__folhas"><li>'+resta+' de '+esc(pl.folhasMes||1)+' folha'+((pl.folhasMes||1)>1?'s':'')+' grátis disponível'+((pl.folhasMes||1)>1?'is':'')+' em '+MESES[new Date().getMonth()]+' · Renova em '+esc(pl.renovaEm||'')+'</li>'+
       '<li>Até '+esc(pl.fotosPorProjeto)+' fotos por projeto</li>'+
-      '<li>Assinatura PolarLive nas polaroids: sempre ligada</li></ul>';
+      '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>';
     if(resta===0)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Sua folha grátis deste mês já foi usada.</p></div>';
     h+='<div class="cc__act"><a class="led-btn" id="b-planos" href="planos/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Ver folhas e planos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>'
   }
@@ -154,7 +154,7 @@ function renderCodigo(sc,cx){
     '<p class="cc__plano">'+esc(pc.nome)+'</p>'+
     '<ul class="cc__folhas"><li>'+(sc.usadoEm?'0':sc.folhas)+' de '+sc.folhas+' folhas do pacote</li>'+
     '<li>Até '+sc.fotos+' fotos por projeto</li>'+
-    '<li>Assinatura PolarLive nas polaroids: sempre ligada</li></ul>'+
+    '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>'+
     (sc.usadoEm?'<div class="info">'+ico(I.info)+'<p>Para imprimir de novo, compre outro código de impressão ou entre com e-mail.</p></div>':'')+
     '</section>';
   cx.innerHTML=h;
@@ -175,7 +175,7 @@ function ligar(){
     var dias=pl.renovaTs?Math.max(0,Math.ceil((pl.renovaTs-Date.now())/86400000)):30;
     var extra=dias>23?'<p>Como você assinou há menos de 7 dias, o valor é devolvido por inteiro.</p>':''; /* [VALIDAR com advogado] */
     pop('Cancelar o Pro?',
-      '<p>Você continua com o Pro até '+ate+'. Depois, a conta volta ao plano Grátis e a assinatura PolarLive volta a aparecer nas polaroids.</p>'+extra,
+      '<p>Você continua com o Pro até '+ate+'. Depois, a conta volta ao plano Grátis e a assinatura PolarLife volta a aparecer nas polaroids.</p>'+extra,
       [{led:true,txt:'Manter o Pro',cb:function(){fecharPop(false)}},
        {txt:'Cancelar assinatura',ic:ico(I.lixeira),cb:function(){C.cancelarPro();fecharPop(false);toast('Assinatura cancelada. Você continua com o Pro até '+ate+'.');render()}}])
   });
@@ -187,9 +187,9 @@ function ligar(){
   if(b=$('assin'))b.addEventListener('click',function(){
     var ligada=this.getAttribute('aria-checked')==='true'?false:true;
     this.setAttribute('aria-checked',ligada?'true':'false');
-    var l=$('assin-l');if(l)l.textContent=(ligada?'Desligar':'Ligar')+' a assinatura PolarLive';
+    var l=$('assin-l');if(l)l.textContent=(ligada?'Desligar':'Ligar')+' a assinatura PolarLife';
     C.trocarAssinatura(!ligada); /* preferência de novos projetos (brief §3.2) */
-    toast(ligada?'Novos projetos nascem com a assinatura PolarLive.':'Novos projetos nascem sem assinatura.')
+    toast(ligada?'Novos projetos nascem com a assinatura PolarLife.':'Novos projetos nascem sem assinatura.')
   });
   if(b=$('b-exportar'))b.addEventListener('click',function(){
     var blob=C.exportarDados();

@@ -1,4 +1,4 @@
-/* PolarLive · entrar com Google (D-147g). Fluxo OpenID Connect por redirecionamento (response_type=id_token):
+/* PolarLife · entrar com Google (D-147g). Fluxo OpenID Connect por redirecionamento (response_type=id_token):
    a página vai a accounts.google.com e volta com o id_token no fragmento (#). Nenhum script, fonte ou iframe do Google
    é carregado (T6) e nada sai deste aparelho além da ida ao Google, que a própria pessoa escolhe (T5).
    Sem ID de cliente configurado, o botão continua no modo demonstração (T7: não fingir que o Google foi acessado). */

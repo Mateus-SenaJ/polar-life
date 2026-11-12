@@ -5,7 +5,7 @@ context: |
   All artifacts must be written in pt-BR.
   Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
-  Projeto: PolarLive — editor web local-first de polaroids para imprimir em casa.
+  Projeto: PolarLife — editor web local-first de polaroids para imprimir em casa.
   Pilha: site estático em site/ (HTML, CSS, JS ES5 em IIFE expondo window.PLxxx; sem build, sem módulos),
   publicado no GitHub Pages e no Vercel. PDF com pdf-lib + fontkit em site/assets/vendor/. Testes em Node 22
   com Playwright (tests/unit, tests/e2e) e tests/helpers/servidor.mjs. Não há Python na máquina.

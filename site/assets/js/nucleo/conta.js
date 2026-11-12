@@ -26,8 +26,17 @@ var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto
 var DIA=86400000,PLCONTA;
 
 function ler(k,p){try{var v=localStorage.getItem(k);return v?JSON.parse(v):p}catch(e){return p}}
-function gravar(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
-function apagar(k){try{localStorage.removeItem(k)}catch(e){}}
+/* D-193: os projetos são da conta. Quando muda quem está usando (entrar com outra conta, sair, código de impressão), o projeto
+   aberto é fechado nesta aba e as fotos de trabalho saem do aparelho; os projetos continuam guardados, cada um com a sua conta. */
+var SESSAO_K={'pl-conta':1,'pl-codigo-sessao':1};
+function donoSessao(){var c=ler('pl-conta',null),s=ler('pl-codigo-sessao',null);return c&&c.email?'conta:'+String(c.email).trim().toLowerCase():s&&s.hash?'codigo:'+s.hash:''}
+function fecharProjeto(){
+  try{localStorage.removeItem('pl-projeto-atual')}catch(e){}
+  try{for(var i=sessionStorage.length-1;i>=0;i--){var k=sessionStorage.key(i);if(/^pl-/.test(k))sessionStorage.removeItem(k)}}catch(e){}
+  try{var r=indexedDB.open('polar-life');r.onsuccess=function(){var d=r.result;if(!d.objectStoreNames.contains('fotos')){d.close();return}var t=d.transaction('fotos','readwrite');t.objectStore('fotos').clear();t.oncomplete=t.onerror=function(){d.close()}}}catch(e){}
+}
+function gravar(k,v){var antes=SESSAO_K[k]?donoSessao():null;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){return false}if(antes!==null&&antes!==donoSessao())fecharProjeto();return true}
+function apagar(k){var antes=SESSAO_K[k]?donoSessao():null;try{localStorage.removeItem(k)}catch(e){}if(antes!==null&&antes!==donoSessao())fecharProjeto()}
 function agora(){return Date.now()}
 function agoraBR(){try{return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}))}catch(e){return new Date()}}
 function chaveMes(){var d=agoraBR();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)}
@@ -337,7 +346,7 @@ function excluirConta(){
   apagar('pl-conta');return true}
 function exportarDados(){
   var s=sessao();if(!s)return null;
-  var c=contaDe(s.email),d={produto:'PolarLive',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],geradoEm:new Date().toISOString()};
+  var c=contaDe(s.email),d={produto:'PolarLife',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],geradoEm:new Date().toISOString()};
   return new Blob([JSON.stringify(d,null,2)],{type:'application/json'})}
 
 /* ---------- admin (T-33) ---------- */

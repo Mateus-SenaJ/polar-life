@@ -1,10 +1,10 @@
 ---
 id: DOC-12
-titulo: PolarLive · Orquestrador de Agentes, Engenharia de Prompt e Protocolos de Desenvolvimento
+titulo: PolarLife · Orquestrador de Agentes, Engenharia de Prompt e Protocolos de Desenvolvimento
 edicao: 2
 data: 2026-11-07
 status: vigente (meta-documento; lê primeiro e reconcilia os demais)
-depende_de: [DOC-00 a DOC-11, polar_life_inspetor_legendas_fotogr_ficas_e4b.html, polar_life_biblioteca_can_nica_de_componentes_do_editor_e1_definitivo.html, polar-led.css, Logo_tipografia_lateral.png, logo_oficial_PolarLive.png, Logo_favicon_PolarLive.png, logo_tipografia_PolarLife.png, Screenshot_20261106_150659_Figma.jpg, Screenshot_20261106_150718_Figma.jpg]
+depende_de: [DOC-00 a DOC-11, polar_life_inspetor_legendas_fotogr_ficas_e4b.html, polar_life_biblioteca_can_nica_de_componentes_do_editor_e1_definitivo.html, polar-led.css, Logo_tipografia_lateral.png, logo_oficial_PolarLife.png, Logo_favicon_PolarLife.png, logo_tipografia_PolarLife.png, Screenshot_20261106_150659_Figma.jpg, Screenshot_20261106_150718_Figma.jpg]
 publico: [IA de design, IA de frontend, IA de backend, humanos]
 prioridade_html: layout, composição, anatomia de componente, densidade, hierarquia visual (exceto as Travas do §1.3)
 prioridade_md: tipografia (DOC-02), tokens e regras (DOC-01), negócio (DOC-03), contratos funcionais (DOC-05, DOC-08)
@@ -51,7 +51,7 @@ Anexe **sempre** este DOC-12 e o DOC-00. Depois, só o que a tarefa cruza:
 | Pré-voo, exportação (T-18 a T-21) | + DOC-03 §6, DOC-05, DOC-08 §3 a §6 |
 | Botão, pop-up, caixa de decisão ou barra de carregamento (LED) | DOC-01 §3 e §11, **`polar-led.css`**, o HTML E1 |
 | Página de apresentação, Como funciona e login (T-25, T-28, T-29) | DOC-01 §12 e §13, DOC-02 (EXC-4, EXC-5), DOC-07 CN-07, `Screenshot_20261106_150659_Figma.jpg`, `Screenshot_20261106_150718_Figma.jpg`, `polar-led.css`, os 4 logos |
-| Qualquer tela com logo, assinatura, favicon ou estado vazio | DOC-01 §13 e os 4 logos: `Logo_tipografia_lateral.png`, `logo_oficial_PolarLive.png`, `Logo_favicon_PolarLive.png`, `logo_tipografia_PolarLife.png` |
+| Qualquer tela com logo, assinatura, favicon ou estado vazio | DOC-01 §13 e os 4 logos: `Logo_tipografia_lateral.png`, `logo_oficial_PolarLife.png`, `Logo_favicon_PolarLife.png`, `logo_tipografia_PolarLife.png` |
 | Código de frontend | DOC-01, DOC-02, DOC-05, DOC-08 §2, **os dois HTMLs**, `polar-led.css`, os logos usados |
 | Backend | DOC-03, DOC-08, DOC-09, DOC-07 |
 | Textos legais, cookies, banner | DOC-09, DOC-03, DOC-07 |
@@ -63,7 +63,7 @@ Anexe **sempre** este DOC-12 e o DOC-00. Depois, só o que a tarefa cruza:
 
 ### 1.1 O que este documento é
 
-É o **ponto único de entrada** do pacote PolarLive. Não substitui os MDs: ele os **convoca**. Cada MD é um **agente especialista** com autoridade restrita ao seu domínio. O orquestrador faz quatro coisas:
+É o **ponto único de entrada** do pacote PolarLife. Não substitui os MDs: ele os **convoca**. Cada MD é um **agente especialista** com autoridade restrita ao seu domínio. O orquestrador faz quatro coisas:
 
 1. **Roteia** a pergunta certa para o agente certo.
 2. **Resolve** conflitos entre agentes e entre agentes e HTML com regra explícita (§1.3, §3).
@@ -210,7 +210,7 @@ Esta tabela **substitui** a do DOC-00 §2 para resolver conflitos. Origem da mud
 **Prompt de invocação:**
 
 ```
-AGENTE-HTML. Você representa o layout canônico do PolarLive, definido nos dois HTMLs anexos:
+AGENTE-HTML. Você representa o layout canônico do PolarLife, definido nos dois HTMLs anexos:
 · polar_life_inspetor_legendas_fotogr_ficas_e4b.html  (E4b: layout de tela do editor, 1440)
 · polar_life_biblioteca_can_nica_de_componentes_do_editor_e1_definitivo.html  (E1: componentes)
 
@@ -247,7 +247,7 @@ ENTREGUE (AGENT_REPLY): diagrama ASCII ou lista hierárquica da região + propor
 **Prompt de invocação:**
 
 ```
-AGENTE-DS. Você representa o DOC-01 (Sistema de design) do PolarLive.
+AGENTE-DS. Você representa o DOC-01 (Sistema de design) do PolarLife.
 
 Responda SOMENTE sobre: DS-01 a DS-17; as 4 cores (#FFFFFF, #000000, #006194, #FD761A) +
 exceção #F8F9FA; bordas pretas a 4% ou 8%; sombras (subtle, card, floating, polaroid, lifted);
@@ -255,7 +255,7 @@ raios (card 14, botão e campos 12, sm 8, full 999); LED (nível 1 = 1 px, níve
 nível 3 = 2,5 px) e onde ele NUNCA entra; estados (seleção e foco = anel azul 2 px; toggle e
 checkbox ligados = azul; erro = borda preta 2 px + ✕; sucesso = borda preta 1 px + ✓ azul;
 atenção = ícone laranja + texto); alvo mínimo 44; grade de 8 px; componentes canônicos (§5);
-layouts de tablet 834 e celular 390 (§4.2, §4.3); correções de produção (§9); receita do LED a partir do polar-led.css, com os 6 ajustes (§11); páginas de apresentação e login a partir das duas capturas do Figma (§12); mapa de logos pelo nome exato do arquivo (§13: Logo_tipografia_lateral.png, logo_oficial_PolarLive.png, Logo_favicon_PolarLive.png, logo_tipografia_PolarLife.png).
+layouts de tablet 834 e celular 390 (§4.2, §4.3); correções de produção (§9); receita do LED a partir do polar-led.css, com os 6 ajustes (§11); páginas de apresentação e login a partir das duas capturas do Figma (§12); mapa de logos pelo nome exato do arquivo (§13: Logo_tipografia_lateral.png, logo_oficial_PolarLife.png, Logo_favicon_PolarLife.png, logo_tipografia_PolarLife.png).
 
 Se a pergunta for sobre layout desktop, diga: «delegue ao Agente-HTML».
 Se for sobre tipografia, diga: «delegue ao Agente-TP».
@@ -279,7 +279,7 @@ de CSS/token pronto para colar. Nunca invente cinzas fora da paleta.
 **Prompt de invocação:**
 
 ```
-AGENTE-TP. Você representa o DOC-02 (Tipografia) do PolarLive.
+AGENTE-TP. Você representa o DOC-02 (Tipografia) do PolarLife.
 
 Responda SOMENTE sobre: TP-01 a TP-08; allow-list (Inter, Cormorant Garamond, IBM Plex Mono);
 pesos (Inter 300–500, Cormorant 300–500, Plex Mono 300–400; PROIBIDO 600 e 700 em qualquer
@@ -667,7 +667,7 @@ O orquestrador funciona **sem** patches; eles só levam para dentro dos MDs o qu
 | **PT-09** | DOC-05 FN-07 | Opcional: nota «a cor da inscrição nunca é branca» |
 | **PT-10** | DOC-01 | **Aplicado nesta edição (2.1):** §0, DS-15 a DS-17, §4 e §5 com medidas, §11 LED, §12 páginas, §13 logos. Substitui o arquivo da edição 2 |
 | **PT-11** | DOC-02 TP-03 e §3 (EXC-4, EXC-5) | «Pode destacar **uma palavra**» passa a «uma palavra ou expressão curta de até 2 palavras» (D-070). Acrescentar: na faixa escura (DS-17) o destaque é branco ou laranja, nunca azul |
-| **PT-12** | DOC-04 T-25, T-28, T-01 | T-25 e T-28 passam a citar DOC-01 §12; T-01 (vazia) e T-31 citam `logo_oficial_PolarLive.png`; T-25 ganha estado «código enviado» |
+| **PT-12** | DOC-04 T-25, T-28, T-01 | T-25 e T-28 passam a citar DOC-01 §12; T-01 (vazia) e T-31 citam `logo_oficial_PolarLife.png`; T-25 ganha estado «código enviado» |
 | **PT-13** | DOC-10 | Registrar D-066 a D-071 (§3.5), C-59 a C-64 e P27 a P31; ampliar P11 (cores dos logos × tokens) e fechar P12 com os 6 ajustes do DOC-01 §11.7 |
 | **PT-14** | DOC-00 §1 e §3 | Acrescentar ao mapa os arquivos `polar-led.css`, os 4 logos e as 2 capturas, com os nomes exatos do DOC-01 §0; DOC-01 passa a «edição 2.1» |
 
@@ -695,7 +695,7 @@ O orquestrador funciona **sem** patches; eles só levam para dentro dos MDs o qu
 | Pendência | Item |
 | --- | --- |
 | **P27** | Confirmar que a barra inferior «Início · Editor · Referências» das capturas é moldura do protótipo e não entra no produto |
-| **P28** | Exportar `Logo_favicon_PolarLive.png` (4372×3904, não quadrado) em versões quadradas: 512, 192, 180, 48, 32, 16 |
+| **P28** | Exportar `Logo_favicon_PolarLife.png` (4372×3904, não quadrado) em versões quadradas: 512, 192, 180, 48, 32, 16 |
 | **P29** | Versão branca ou monocromática do logo horizontal, para fundos escuros ou coloridos (hoje o logo só vale sobre branco) |
 | **P30** | Versões vetoriais (SVG) dos 4 logos |
 | **P31** | Foto de capa do hero e do login (licença, J4) e microcopy do formulário de login |
@@ -726,7 +726,7 @@ O orquestrador funciona **sem** patches; eles só levam para dentro dos MDs o qu
 
 ```
 <papel>
-Você é o ORQUESTRADOR de desenvolvimento do PolarLive, um editor web local-first para criar
+Você é o ORQUESTRADOR de desenvolvimento do PolarLife, um editor web local-first para criar
 polaroids, imprimi-las em folhas e compartilhá-las como colagens e lembranças. Você NÃO inventa
 regra, design nem código por conta própria. Você ROTEIA perguntas a agentes especialistas (os
 arquivos anexos), CONCILIA conflitos entre eles e ENTREGA com rastro de regras.
@@ -736,8 +736,8 @@ arquivos anexos), CONCILIA conflitos entre eles e ENTREGA com rastro de regras.
 Anexos (leia só o necessário à tarefa; o pacote por tarefa está em DOC-12 §0.4):
 · DOC-12 (este documento): hierarquia, tabela de divergências DV-01 a DV-47, protocolos.
 · DOC-00 a DOC-11: os agentes. · Os dois HTMLs: base prioritária do design.
-· polar-led.css: mecânica do LED (DOC-01 §11). · Logo_tipografia_lateral.png, logo_oficial_PolarLive.png,
-  Logo_favicon_PolarLive.png, logo_tipografia_PolarLife.png: logos, no lugar definido no DOC-01 §13.
+· polar-led.css: mecânica do LED (DOC-01 §11). · Logo_tipografia_lateral.png, logo_oficial_PolarLife.png,
+  Logo_favicon_PolarLife.png, logo_tipografia_PolarLife.png: logos, no lugar definido no DOC-01 §13.
 · Screenshot_20261106_150659_Figma.jpg (apresentação) e Screenshot_20261106_150718_Figma.jpg (login): DOC-01 §12.
 Se um anexo necessário não estiver presente, diga qual e peça. Não responda de memória.
 </fontes>
@@ -1065,7 +1065,7 @@ Antes de declarar pronto:
 
 ## 6. Protocolo de backend
 
-> **Regra de ouro:** o backend do PolarLive **não guarda foto, miniatura, legenda, ajuste nem coordenada.** Nunca. Isso é `BR-01` e `LG-01`. Ele existe para **conta, plano, créditos, recibos e direito de uso** (DOC-03 §8). Tudo o mais é local (DOC-08).
+> **Regra de ouro:** o backend do PolarLife **não guarda foto, miniatura, legenda, ajuste nem coordenada.** Nunca. Isso é `BR-01` e `LG-01`. Ele existe para **conta, plano, créditos, recibos e direito de uso** (DOC-03 §8). Tudo o mais é local (DOC-08).
 
 ### 6.0 Quando existe backend
 
@@ -1377,6 +1377,6 @@ DELETE /account                      → exclusão (aviso: créditos se perdem)
 | Arquivo | Uso |
 | --- | --- |
 | `Logo_tipografia_lateral.png` | Cabeçalhos e **assinatura** |
-| `logo_oficial_PolarLive.png` | Estados vazios, rodapé, abertura |
-| `Logo_favicon_PolarLive.png` | Favicon, trilho recolhido |
+| `logo_oficial_PolarLife.png` | Estados vazios, rodapé, abertura |
+| `Logo_favicon_PolarLife.png` | Favicon, trilho recolhido |
 | `logo_tipografia_PolarLife.png` | Só em composição com o emblema |

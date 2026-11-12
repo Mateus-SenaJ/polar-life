@@ -659,7 +659,7 @@ function construirVolumes(L,p,jpegs,lim,avisos,sinal,escala){
       return[{a:a,b:b,bytes:bytes}]
     })
   }
-  return faixa(0,L.paginas.length).then(function(fs){return fs.map(function(x,i){return{nome:fs.length===1?'PolarLive.pdf':'PolarLive-'+pad(i+1,3)+'.pdf',bytes:x.bytes}})})
+  return faixa(0,L.paginas.length).then(function(fs){return fs.map(function(x,i){return{nome:fs.length===1?'PolarLife.pdf':'PolarLife-'+pad(i+1,3)+'.pdf',bytes:x.bytes}})})
 }
 function preparar(p,avisos){
   var jobs=[],vistos={};

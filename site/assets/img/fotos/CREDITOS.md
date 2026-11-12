@@ -50,13 +50,13 @@ Fotos do StockSnap (licença CC0, stocksnap.io/license), encontradas pelo Openve
 
 ## Câmera e vídeos (gerados por IA)
 
-Imagens geradas por inteligência artificial (Google Flow) especialmente para o PolarLive. Nenhuma pessoa real identificável aparece nelas: os rostos nas polaroids e na foto da câmera são sintéticos. A câmera não tem marca.
+Imagens geradas por inteligência artificial (Google Flow) especialmente para o PolarLife. Nenhuma pessoa real identificável aparece nelas: os rostos nas polaroids e na foto da câmera são sintéticos. A câmera não tem marca.
 
 | Arquivo | O que mostra | Origem |
 |---|---|---|
-| camera-perfil.png | Câmera instantânea retrô, sem marca, com uma foto saindo pela lateral | Gerada por IA (Google Flow) para o PolarLive; fundo removido |
-| ../../video/camera-foto.mp4 · .webm · -poster.jpg | A mesma câmera soltando a foto | Gerado por IA (Google Flow) para o PolarLive |
-| ../../video/mesa-polaroids.mp4 · .webm · -poster.jpg (e a versão -vertical) | Mãos trocando o celular por polaroids sobre uma mesa | Gerado por IA (Google Flow) para o PolarLive |
-| ../../video/varal-polaroids.mp4 · .webm · -poster.jpg | Varal de luzinhas com polaroids numa parede | Gerado por IA (Google Flow) para o PolarLive |
+| camera-perfil.png | Câmera instantânea retrô, sem marca, com uma foto saindo pela lateral | Gerada por IA (Google Flow) para o PolarLife; fundo removido |
+| ../../video/camera-foto.mp4 · .webm · -poster.jpg | A mesma câmera soltando a foto | Gerado por IA (Google Flow) para o PolarLife |
+| ../../video/mesa-polaroids.mp4 · .webm · -poster.jpg (e a versão -vertical) | Mãos trocando o celular por polaroids sobre uma mesa | Gerado por IA (Google Flow) para o PolarLife |
+| ../../video/varal-polaroids.mp4 · .webm · -poster.jpg | Varal de luzinhas com polaroids numa parede | Gerado por IA (Google Flow) para o PolarLife |
 
-> Recortes feitos pelo PolarLive: `cidade.jpg` mostra só os prédios e a baía (sem a estátua do morro). Licenças conferidas na API do Commons em 2026-11-11: todas CC0.
+> Recortes feitos pelo PolarLife: `cidade.jpg` mostra só os prédios e a baía (sem a estátua do morro). Licenças conferidas na API do Commons em 2026-11-11: todas CC0.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // D-191 · Vitrine com fotos reais. As imagens das sugestões (tela de Projetos), dos modelos e das colagens para as redes
-// (Início) e dos banners do Início são feitas pelo próprio PolarLive: moldura, fonte, legenda, filtro e colagem de verdade,
+// (Início) e dos banners do Início são feitas pelo próprio PolarLife: moldura, fonte, legenda, filtro e colagem de verdade,
 // com as fotos CC0 de site/assets/img/fotos (créditos em CREDITOS.md; pessoas só de costas, em silhueta ou de longe).
 // Uso (precisa do Chromium do Playwright): npm run vitrine  → site/assets/img/vitrine/*.jpg
 import { chromium } from 'playwright';

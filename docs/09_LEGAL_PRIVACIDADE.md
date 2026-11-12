@@ -1,6 +1,6 @@
 ---
 id: DOC-09
-titulo: PolarLive · Privacidade, termos e cookies (texto-base)
+titulo: PolarLife · Privacidade, termos e cookies (texto-base)
 edicao: 2
 data: 2026-11-07
 status: rascunho para revisão jurídica
@@ -31,7 +31,7 @@ Razão social [RAZÃO SOCIAL] · CNPJ [CNPJ] · Endereço [ENDEREÇO] · Encarre
 
 ## 3. Resumo em linguagem simples (topo da Privacidade)
 
-- Suas fotos ficam **no seu aparelho**. O PolarLive não as recebe, não as guarda e não as vê.
+- Suas fotos ficam **no seu aparelho**. O PolarLife não as recebe, não as guarda e não as vê.
 - A **localização** da foto, quando existe, é lida no aparelho só para sugerir a cidade. Coordenadas nunca são impressas nem enviadas.
 - O arquivo que você gera (PDF, imagem, lembrança) **não leva** os dados escondidos da foto original.
 - Usamos só armazenamento **técnico**. Não usamos cookies de publicidade.
@@ -69,7 +69,7 @@ Não coletamos na 1.0: nome, e-mail, telefone, contatos, conteúdo das fotos.
 
 ## 6. Termos de Uso (pontos)
 
-Serviço (processamento local) · aceitação e idade · conteúdo é do usuário · uso aceitável `[DETALHAR]` · **Impressão:** resultado depende da impressora, do papel e do visualizador; os selos de qualidade são orientações · **Assinatura PolarLive** no canto inferior esquerdo; desligar é do Pro na 2.0 · **Lembranças e colagens** levam a assinatura quando ligada · marca e fontes (licenças próprias `[VALIDAR cada fonte do catálogo]`) · disponibilidade e limitação de responsabilidade `[REDIGIR com advogado, CDC]` · **Planos (2.0):** preços finais `[PENDENTE]`, cancelamento em 2 toques, arrependimento de 7 dias `[VALIDAR]`, uso razoável, nota fiscal e reembolso `[VALIDAR]` · lei brasileira e foro [FORO].
+Serviço (processamento local) · aceitação e idade · conteúdo é do usuário · uso aceitável `[DETALHAR]` · **Impressão:** resultado depende da impressora, do papel e do visualizador; os selos de qualidade são orientações · **Assinatura PolarLife** no canto inferior esquerdo; desligar é do Pro na 2.0 · **Lembranças e colagens** levam a assinatura quando ligada · marca e fontes (licenças próprias `[VALIDAR cada fonte do catálogo]`) · disponibilidade e limitação de responsabilidade `[REDIGIR com advogado, CDC]` · **Planos (2.0):** preços finais `[PENDENTE]`, cancelamento em 2 toques, arrependimento de 7 dias `[VALIDAR]`, uso razoável, nota fiscal e reembolso `[VALIDAR]` · lei brasileira e foro [FORO].
 
 ## 7. Cookies e armazenamento
 
@@ -94,7 +94,7 @@ Serviço (processamento local) · aceitação e idade · conteúdo é do usuári
 | Local | «Cidade, nunca coordenadas.» |
 | Metadados | «O arquivo gerado não leva os metadados originais da foto.» |
 | Backup | «Você alterou este projeto. Salve um backup `.polarlife` antes de fechar?» |
-| Compartilhar | «Você escolhe para onde a imagem vai. O PolarLive não recebe nada.» |
+| Compartilhar | «Você escolhe para onde a imagem vai. O PolarLife não recebe nada.» |
 
 ## 9. Telas legais (visual)
 

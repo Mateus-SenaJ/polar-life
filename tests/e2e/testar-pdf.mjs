@@ -331,7 +331,7 @@ try {
 
   console.log('PDF padrão:');
   const r1 = await gerar({ f: 'pdf' });
-  ok(r1.ok && r1.arquivos.length === 1 && r1.arquivos[0].nome === 'PolarLive.pdf', 'gera PolarLive.pdf');
+  ok(r1.ok && r1.arquivos.length === 1 && r1.arquivos[0].nome === 'PolarLife.pdf', 'gera PolarLife.pdf');
   ok(r1.ok && r1.avisos.length === 0, 'sem avisos de encodeText' + (r1.avisos.length ? ': ' + JSON.stringify(r1.avisos.slice(0, 2)) : ''));
   const b1 = b64ToBytes(r1.arquivos[0].b64), doc1 = await PDFDocument.load(b1, { updateMetadata: false });
   ok(doc1.getPageCount() === 6, '24 fotos em A4 = 6 páginas (' + doc1.getPageCount() + ')');
@@ -521,9 +521,9 @@ try {
   if (rv.ok) for (const a of rv.arquivos) {
     const d = await PDFDocument.load(b64ToBytes(a.b64), { updateMetadata: false });
     paginasVol += d.getPageCount();
-    nomesVol = nomesVol && /^PolarLive-\d{3}\.pdf$/.test(a.nome);
+    nomesVol = nomesVol && /^PolarLife-\d{3}\.pdf$/.test(a.nome);
   }
-  ok(rv.ok && rv.arquivos.length > 1 && nomesVol && paginasVol === 6, 'lim 0,3 MB → ' + (rv.ok ? rv.arquivos.length : 0) + ' arquivos PolarLive-001… e 6 páginas no total');
+  ok(rv.ok && rv.arquivos.length > 1 && nomesVol && paginasVol === 6, 'lim 0,3 MB → ' + (rv.ok ? rv.arquivos.length : 0) + ' arquivos PolarLife-001… e 6 páginas no total');
 
   console.log('Cancelar:');
   await carregarEditor({});

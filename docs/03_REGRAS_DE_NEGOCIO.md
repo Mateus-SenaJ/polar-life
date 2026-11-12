@@ -1,6 +1,6 @@
 ---
 id: DOC-03
-titulo: PolarLive · Regras de negócio
+titulo: PolarLife · Regras de negócio
 edicao: 2
 data: 2026-11-07
 status: vigente
@@ -20,7 +20,7 @@ nota: planos e preços são HIPÓTESES; backend de pagamentos fica fora (§8)
 | BR-02 | **Originais intactos.** Ajustes e filtros são instruções; só na exportação o quadro é renderizado |
 | BR-03 | **O que se vê é o que sai.** Tela, preview e PDF usam a mesma display list (DOC-08) |
 | BR-04 | **Moldura sempre branca.** Sem escolha de cor de moldura |
-| BR-05 | **Assinatura PolarLive** (logo horizontal, canto inferior esquerdo da faixa inferior) ligada por padrão; desligar é benefício do Pro (2.0) |
+| BR-05 | **Assinatura PolarLife** (logo horizontal, canto inferior esquerdo da faixa inferior) ligada por padrão; desligar é benefício do Pro (2.0) |
 | BR-06 | Nada impresso sobre a foto (numeração, código, coordenadas) |
 | BR-07 | O arquivo exportado **não leva** EXIF, GPS, XMP nem IPTC |
 | BR-08 | Editar e ver o preview **nunca** exigem conta nem pagamento |
@@ -36,7 +36,7 @@ nota: planos e preços são HIPÓTESES; backend de pagamentos fica fora (§8)
 | Editar, preview, calibrar | Ilimitado | Ilimitado | Ilimitado |
 | Folhas exportadas | 1 por mês | As compradas | Ilimitadas, uso razoável (100/mês) |
 | Fotos por projeto | até 24 | até 24 | até 200 |
-| Assinatura PolarLive | Ligada, sem opção | Ligada | Pode desligar |
+| Assinatura PolarLife | Ligada, sem opção | Ligada | Pode desligar |
 | Modelos | De fábrica | De fábrica | Extras `[PENDENTE]` |
 | Fontes de legenda, filtros, colagens, lembranças | **Todos** | **Todos** | **Todos** |
 | Perfil «Gráfica» e TIFF | Todos os planos, consomem folhas | | |
@@ -86,7 +86,7 @@ Arrependimento: reembolso integral em 7 dias corridos da contratação do Pro `[
 | ▲ Com ressalvas | 120–179 | «Reduzir recorte» ou «Trocar foto» |
 | ✕ Ruim | < 120 | Sugerir outra foto ou formato menor |
 
-Faixas são do PolarLive; o mercado sustenta só o alvo de ~300 PPI `[VALIDAR com impressões]`.
+Faixas são do PolarLife; o mercado sustenta só o alvo de ~300 PPI `[VALIDAR com impressões]`.
 
 **BR-13 · Pré-voo classificado**
 

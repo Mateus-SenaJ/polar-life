@@ -449,7 +449,7 @@ function renderDados(ctx){
     '<label class="cx-ac__l"><input type="checkbox" id="d-aceite"><span>Li e aceito os <a href="../../legal/#termos">Termos</a> e a <a href="../../legal/#privacidade">Privacidade</a>.</span></label>'+
     '<p class="help" id="ajuda-d-aceite"></p>'+
     '</div>'+
-    '<button type="submit" class="led-btn led-btn--block" id="b-dados"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Entrar no PolarLive</span></button>'+
+    '<button type="submit" class="led-btn led-btn--block" id="b-dados"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Entrar no PolarLife</span></button>'+
     '</form>'+
     '<button type="button" class="cx-trocar" id="b-voltar-dados">Voltar</button>';
   $('b-voltar-dados').addEventListener('click',function(){if(ctx.origem==='codigo'&&C.sairCodigo)C.sairCodigo();if(ctx.origem==='email'&&C.sair)C.sair();renderEmail(EMAIL)});

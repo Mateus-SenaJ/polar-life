@@ -1,6 +1,6 @@
 ---
 id: DOC-04
-titulo: PolarLive · Fluxos e inventário de telas
+titulo: PolarLife · Fluxos e inventário de telas
 edicao: 2
 data: 2026-11-07
 status: vigente

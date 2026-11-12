@@ -117,7 +117,7 @@ Caminhos citados aqui são os da época (antes de `tools/`, `tests/` e das pasta
 - **Onde:** `/app/editor/compartilhar/` (`compartilhar.html`, `css/pages/compartilhar.css` sobre `processando.css` e `gerar.css`, `js/pages/compartilhar.js`). O «Compartilhar» do concluído (T-20) leva até ela; a T-20 passa a gravar `pl-arquivos` (nomes e tamanhos) com a chave do projeto.
 - **Fluxo (DOC-06 §8):** o arquivo é preparado **antes** do clique; o botão só diz «Compartilhar» quando `navigator.canShare({files})` confirma (e há HTTPS). `navigator.share` roda dentro do clique. `AbortError` (a pessoa cancelou) não mostra nada. Qualquer outro erro troca o botão para «Baixar» com o aviso «Não foi possível abrir o menu de compartilhar».
 - **Sem suporte:** botão «Baixar PDF», «Baixar ZIP», «Baixar imagem» ou «Baixar imagens», com aviso (ícone + texto). Depois de baixar, aparece a instrução do destino (PDF: app de impressão ou mensagens; imagem: «escolha a imagem na galeria»), com foco.
-- **Conteúdo:** lista dos arquivos com nomes neutros (BR-11), tabela «Para onde o arquivo vai» (celular com menu, computador, Instagram sem integração) e a frase do DOC-09: «Você escolhe para onde o arquivo vai. O PolarLive não recebe nada.»
+- **Conteúdo:** lista dos arquivos com nomes neutros (BR-11), tabela «Para onde o arquivo vai» (celular com menu, computador, Instagram sem integração) e a frase do DOC-09: «Você escolhe para onde o arquivo vai. O PolarLife não recebe nada.»
 - **Trava:** sem arquivo gerado, ou com o projeto alterado depois de gerar, mostra a trava com o caminho de volta (Exportar ou Revisar impressão).
 - **Estados de revisão por hash:** `#estado-sem-suporte`, `#estado-erro`, `#estado-baixado`.
 - **Design:** um só LED por tela. No celular os botões têm 44 px ou mais de altura (corrigido: abaixo de 600 px o `gerar.css` colapsava botões sem altura definida).
@@ -161,7 +161,7 @@ Caminhos citados aqui são os da época (antes de `tools/`, `tests/` e das pasta
 - **Onde:** `/app/editor/gerar/` (`gerar.html`, `css/pages/gerar.css` sobre a base de `processando.css`, `js/pages/gerar.js`). O LED «Gerar …» da Exportar leva até ela e grava `mb`, `v` e `lim` em `pl-exportar`.
 - **Gerando:** barra determinada com «Folha 1 de 6» (ou «Polaroid 1 de 24»), porcentagem, frase do que está sendo feito e aviso de que nada sobe para servidor. A região `aria-live` anuncia cada folha. **Cancelar** abre «Parar a geração?» (Continuar gerando é o LED, foco inicial; Esc também continua).
 - **Recuperação (DOC-08 §6):** «N fotos não puderam ser lidas», cada foto com ✕ e o motivo, e as 4 opções: **Tentar de novo** (LED; a foto «transitória» volta, a outra continua), **Trocar foto** (abre o Quadro na foto), **Gerar sem elas** (repagina com menos fotos, reinicia e avisa em faixa laranja) e **Cancelar**.
-- **Concluído (DS-06):** borda preta 1 px + ✓ azul + «Concluído · 1 arquivo · 58 MB», lista de arquivos com nomes neutros (`PolarLive.pdf`, `Folha-01.png`…), Baixar (ou «Baixar todos»), Baixar novamente, Imprimir agora (só desktop e só PDF) e Compartilhar. **Não existe «Abrir pasta».**
+- **Concluído (DS-06):** borda preta 1 px + ✓ azul + «Concluído · 1 arquivo · 58 MB», lista de arquivos com nomes neutros (`PolarLife.pdf`, `Folha-01.png`…), Baixar (ou «Baixar todos»), Baixar novamente, Imprimir agora (só desktop e só PDF) e Compartilhar. **Não existe «Abrir pasta».**
 - **Estados de revisão por hash:** `#estado-gerando` (parada na folha 3), `#estado-falha` e `#estado-concluido`.
 - **Teste:** `npm run testar:gerar` (Chromium, 21 conferências) e todos os demais passam. Visual conferido por captura a 1440 e 390.
 
@@ -462,5 +462,5 @@ Caminhos citados aqui são os da época (antes de `tools/`, `tests/` e das pasta
 - **Links entre telas:** os protótipos apontavam para URLs de artefatos do Claude; foram trocados por rotas relativas. Mapeamento inferido pelo contexto de cada link: T-01 → T-02 → T-03 → T-04, «Cancelar» e «Voltar» voltam um passo, logo → Home ou Apresentação. `[VALIDAR]` o destino do botão «Continuar» da T-03 (assumido T-04).
 - **CSS:** `fonts.css`, `tokens.css` e `led.css` agora são compartilhados (eram copiados em cada página). O que sobrou fica em `css/pages/<tela>.css`, sem alteração visual.
 - **Imagens e fontes** que estavam em base64 viraram arquivos. Os 3 logos usam os nomes oficiais do DOC-01 §13.
-- **Favicon:** foi adicionado `Logo_favicon_PolarLive.png` (108×96, não quadrado) até resolver o P28.
+- **Favicon:** foi adicionado `Logo_favicon_PolarLife.png` (108×96, não quadrado) até resolver o P28.
 

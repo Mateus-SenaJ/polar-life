@@ -40,12 +40,12 @@ $('imprimir').onclick=function(){
 /* ---- passo 1: página de teste (régua de 100 mm no tamanho real) ---- */
 function paginaTeste(){
   var t='';for(var i=0;i<=10;i++)t+='<i class="th" style="left:'+(i*10)+'mm"></i><i class="tv" style="top:'+(i*10)+'mm"></i>';
-  return'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>PolarLive · página de teste</title><style>'
+  return'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>PolarLife · página de teste</title><style>'
    +'@page{size:'+W+'mm '+H+'mm;margin:0}html,body{margin:0;padding:0;background:#fff;color:#000;font:12px/1.4 Arial,sans-serif}'
    +'.p{position:relative;width:'+W+'mm;height:'+H+'mm;overflow:hidden}.t{position:absolute;left:20mm;top:14mm;width:'+(W-40)+'mm}.t b{font-size:15px}'
    +'.h{position:absolute;left:20mm;top:60mm;width:100mm;height:0;border-top:.4mm solid #000}.v{position:absolute;left:20mm;top:80mm;width:0;height:100mm;border-left:.4mm solid #000}'
    +'.h i,.v i{position:absolute;display:block;background:#000}.th{top:0;width:.2mm;height:3mm;margin-top:-3mm}.tv{left:0;height:.2mm;width:3mm}'
-   +'.l{position:absolute;font-size:11px}</style></head><body><div class="p"><div class="t"><b>PolarLive · página de teste</b><br>Imprima em <b>Tamanho real (100%)</b>, margens <b>Nenhuma</b>. Meça os dois traços com uma régua; cada um deve ter 100 mm.</div>'
+   +'.l{position:absolute;font-size:11px}</style></head><body><div class="p"><div class="t"><b>PolarLife · página de teste</b><br>Imprima em <b>Tamanho real (100%)</b>, margens <b>Nenhuma</b>. Meça os dois traços com uma régua; cada um deve ter 100 mm.</div>'
    +'<div class="h">'+t.replace(/<i class="tv"[^>]*><\/i>/g,'')+'</div><div class="l" style="left:20mm;top:64mm">Traço horizontal · 100 mm</div>'
    +'<div class="v">'+t.replace(/<i class="th"[^>]*><\/i>/g,'')+'</div><div class="l" style="left:26mm;top:84mm">Traço vertical · 100 mm</div></div></body></html>'
 }

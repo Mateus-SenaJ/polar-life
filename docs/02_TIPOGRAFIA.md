@@ -1,6 +1,6 @@
 ---
 id: DOC-02
-titulo: PolarLive · Tipografia (leve e elegante, com 5 zonas de exceção)
+titulo: PolarLife · Tipografia (leve e elegante, com 5 zonas de exceção)
 edicao: 2
 data: 2026-11-07
 status: vigente

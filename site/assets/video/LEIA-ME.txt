@@ -1,4 +1,4 @@
-Vídeos realistas do PolarLive (D-140). Nomes definitivos e prompts: docs/prompts-flow.md.
+Vídeos realistas do PolarLife (D-140). Nomes definitivos e prompts: docs/prompts-flow.md.
 Depois de salvar um arquivo aqui: npm run midia && npm run sw.
-Créditos: os vídeos mesa-polaroids, varal-polaroids e camera-foto foram gerados por IA (Google Flow) para o PolarLive,
+Créditos: os vídeos mesa-polaroids, varal-polaroids e camera-foto foram gerados por IA (Google Flow) para o PolarLife,
 sem pessoas reais identificáveis. Registro completo em ../img/fotos/CREDITOS.md.

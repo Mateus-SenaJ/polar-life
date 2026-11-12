@@ -1,6 +1,6 @@
 ---
 id: DOC-06
-titulo: PolarLive · Colagens, sugestões, lembranças e compartilhamento
+titulo: PolarLife · Colagens, sugestões, lembranças e compartilhamento
 edicao: 2
 data: 2026-11-07
 status: vigente [RECOMENDADO: entra na 1.1; adesivos e colagem livre avançada na 2.0]

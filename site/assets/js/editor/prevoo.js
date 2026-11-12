@@ -45,7 +45,7 @@ function analisar(){
   var n=R.erro?0:R.sheets.length,ant=null;try{ant=+sessionStorage.getItem('pl-prevoo-folhas')||null}catch(e){}
   inf.push('Tamanho estimado: cerca de '+nf(Math.max(1,n)*MB_FOLHA)+' MB em 1 arquivo.');
   if(ant&&ant!==n&&n)inf.push(pl(ant,'folha','folhas')+' → '+pl(n,'folha','folhas')+' desde a última revisão.');
-  inf.push(D.assin?'A assinatura PolarLive está ligada.':'A assinatura PolarLive está desligada.');
+  inf.push(D.assin?'A assinatura PolarLife está ligada.':'A assinatura PolarLife está desligada.');
   return{bl:bl,pe:pe,inf:inf,n:n,por:R.erro?0:R.g.n,papel:window.PLFOLHAS.papel(D),aprov:R.erro?0:C.aprov(R),orient:D.orient}
 }
 
