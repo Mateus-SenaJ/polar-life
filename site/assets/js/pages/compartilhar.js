@@ -11,7 +11,7 @@ function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(s
   for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var estado=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 var A=null;try{A=JSON.parse(sessionStorage.getItem('pl-arquivos')||'null')}catch(e){}
-if(!A&&estado)A={k:chave(),L:[{n:'Polar-Life.pdf',mb:9}]};
+if(!A&&estado)A={k:chave(),L:[{n:'PolarLive.pdf',mb:9}]};
 if(!A||!A.L||!A.L.length||A.k!==chave()){
   $('corpo').hidden=true;$('trava').hidden=false;$('sub').textContent='';
   if(A&&A.k!==chave()){$('trava').querySelector('strong').textContent='O projeto mudou depois de gerar o arquivo.';$('trava').querySelector('p').textContent='Gere de novo para compartilhar a versão atual.';$('trava-a').href='../#revisar';$('trava-a').textContent='Revisar impressão'}

@@ -1,6 +1,6 @@
 ---
 id: DOC-00
-titulo: Polar Life · Índice, protocolo de leitura e glossário
+titulo: PolarLive · Índice, protocolo de leitura e glossário
 edicao: 2
 data: 2026-11-07
 status: vigente
@@ -8,9 +8,9 @@ substitui: [Guia_Mestre_v1_2, Patches_Guia_v1_5_Fluxos, Auditoria_e_Patches_Guia
 publico: [IA de design, IA de código, humanos]
 ---
 
-# Polar Life · Edição 2 da documentação
+# PolarLive · Edição 2 da documentação
 
-> **TL;DR para IA.** Polar Life é um editor web, local-first, para criar polaroids, imprimi-las em folhas e compartilhá-las como colagens e lembranças. As fotos **nunca** saem do aparelho. O visual é um «estúdio fotográfico tátil branco» com 4 cores e tipografia **leve e elegante**. Fontes expressivas só aparecem nas 5 zonas de exceção (DOC-02). Leia o que é **FIXO**, explore o que é **GUIADO**, crie livremente no que é **LIVRE**.
+> **TL;DR para IA.** PolarLive é um editor web, local-first, para criar polaroids, imprimi-las em folhas e compartilhá-las como colagens e lembranças. As fotos **nunca** saem do aparelho. O visual é um «estúdio fotográfico tátil branco» com 4 cores e tipografia **leve e elegante**. Fontes expressivas só aparecem nas 5 zonas de exceção (DOC-02). Leia o que é **FIXO**, explore o que é **GUIADO**, crie livremente no que é **LIVRE**.
 
 ## 1. Mapa dos documentos
 

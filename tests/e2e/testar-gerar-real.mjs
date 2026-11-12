@@ -39,7 +39,7 @@ try {
   await page.locator('iframe[aria-hidden=true]').waitFor({ timeout: 10000 }); ok(true, 'impressão cria iframe do PDF local');
   await page.goto(srv.url + 'app/editor/compartilhar/'); await page.getByRole('button', { name: 'Compartilhar' }).click();
   const compartilhado = await page.evaluate(() => ({ n: window.__share && window.__share.files.length, nome: window.__share && window.__share.files[0].name, tamanho: window.__share && window.__share.files[0].size }));
-  ok(compartilhado.n === 1 && compartilhado.nome === 'Polar-Life.pdf' && compartilhado.tamanho > 1000, 'compartilhar recebe o arquivo real guardado');
+  ok(compartilhado.n === 1 && compartilhado.nome === 'PolarLive.pdf' && compartilhado.tamanho > 1000, 'compartilhar recebe o arquivo real guardado');
   /* Fotos pessoais nunca entram no repositório: o navegador as lê diretamente da pasta local. */
   try {
     const fotos = process.env.PL_FOTOS || fileURLToPath(new URL('../../.local/fotos-de-teste/', import.meta.url));   // pasta ignorada pelo git (T5)

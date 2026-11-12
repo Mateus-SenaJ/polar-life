@@ -54,7 +54,7 @@ function lerLista(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'nu
 var LISTA_REAL=lerLista(),DEMO=!(LISTA_REAL&&window.PLTEXTO&&PLTEXTO.ehReal());   /* 44: ajustes de exemplo só no projeto demo */
 var LISTA0=LISTA_REAL||(function(){var a=[];for(var i=1;i<=24;i++)a.push(i);return a})();
 var NOME='Viagem · Serra 2026';   /* nome do projeto: no exemplo, o nome de exemplo (DOC-04 §6) */
-if(!DEMO&&window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){NOME=p.nome;ST[0].nome=p.nome;document.title='Polar Life · '+p.nome+' · Quadro';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome;guardarLista()}});
+if(!DEMO&&window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p){NOME=p.nome;ST[0].nome=p.nome;document.title='PolarLive · '+p.nome+' · Quadro';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome;guardarLista()}});
 function lerQuadro(){                                              /* estado completo guardado ao sair para as Folhas (D-085) */
   try{var o=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');
     if(Array.isArray(o)&&o.length>=2&&o.length<=401&&o[0]&&typeof o[0]==='object'&&o.slice(1).every(function(e){return e&&e.src>=1&&e.src<=400&&e.src%1===0&&e.adj&&e.flt&&typeof e.z==='number'})){
@@ -615,7 +615,7 @@ function render(){
   $('fprev').disabled=cur<=1;$('fnext').disabled=cur>=N;
   [].forEach.call(document.querySelectorAll('[data-act=excluir]'),function(b){b.disabled=N<=1;b.title=N<=1?'O projeto precisa de ao menos 1 foto':'Excluir esta foto do projeto'});
   $('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;
-  document.title='Polar Life · '+NOME+' · Quadro · Foto '+p2(cur);
+  document.title='PolarLive · '+NOME+' · Quadro · Foto '+p2(cur);
   pintaMain();pintaGrade();nv=qualidade();sincronizar();lote();if(window.PLLEG)PLLEG.render();if(window.PLFLT)PLFLT.render();if(window.PLMET)PLMET.render();if(window.PLLOTE)PLLOTE.render();
   if($('faixa').children.length===N)thumb(cur)
 }

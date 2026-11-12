@@ -99,7 +99,7 @@ for (const [fam, w, it] of LISTA) {
 }
 
 // Licenças (OFL 1.1 ou Apache 2.0), lidas do repositório oficial google/fonts.
-let lic = 'Licenças das fontes autohospedadas do Polar Life (subconjunto latino + pt-BR).\n' +
+let lic = 'Licenças das fontes autohospedadas do PolarLive (subconjunto latino + pt-BR).\n' +
   'Fonte original: Google Fonts (https://fonts.google.com) e repositório google/fonts.\n';
 for (const fam of [...new Set([...LISTA.map(f => f[0]), ...GH.map(f => f[0])])]) {
   const d = fam.toLowerCase().replace(/ /g, '');

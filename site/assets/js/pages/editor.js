@@ -2,7 +2,7 @@
 (function(){
 var $=function(i){return document.getElementById(i)},tm;
 var NOME='Viagem · Serra 2026';   /* nome do projeto: no exemplo, o nome de exemplo (DOC-04 §6) */
-if(window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p&&window.PLTEXTO&&PLTEXTO.ehReal()){NOME=p.nome;document.title='Polar Life · '+p.nome+' · Folhas';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome;
+if(window.PLPROJETOS&&PLPROJETOS.atual())PLPROJETOS.listar().then(function(a){var p=a.filter(function(x){return x.id===PLPROJETOS.atual()})[0];if(p&&window.PLTEXTO&&PLTEXTO.ehReal()){NOME=p.nome;document.title='PolarLive · '+p.nome+' · Folhas';var e=document.querySelector('.eh__name');if(e)e.textContent=p.nome;
   try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'null');if(Array.isArray(q)&&q.length){q[0]=q[0]||{};q[0].nome=p.nome;sessionStorage.setItem('pl-quadro',JSON.stringify(q))}}catch(x){}
   render()}});
 function toast(m,undo){clearTimeout(tm);$('toast-t').textContent=m;$('toast-undo').hidden=!undo;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
@@ -260,7 +260,7 @@ function render(){
   /* assinatura × plano (D-123): desabilitada com o motivo, nunca só por cor (T3) */
   var assinFixa=!!(PLN&&!PLN.assinaturaPodeDesligar);
   $('assin').setAttribute('aria-disabled',assinFixa);
-  $('assin-h').firstChild.textContent=assinFixa?'Desligar a assinatura Polar Life é do Pro. Logo no canto inferior esquerdo de cada moldura.':'Logo no canto inferior esquerdo de cada moldura.';
+  $('assin-h').firstChild.textContent=assinFixa?'Desligar a assinatura PolarLive é do Pro. Logo no canto inferior esquerdo de cada moldura.':'Logo no canto inferior esquerdo de cada moldura.';
   /* guias × contorno (FN-02) */
   $('contorno').setAttribute('aria-disabled',D.guias);$('contorno-h').hidden=!D.guias;
   [].forEach.call(document.querySelectorAll('[data-k=compr] .seg,[data-k=cor] .seg'),function(s){s.classList.toggle('is-off',!D.guias);[].forEach.call(s.querySelectorAll('input'),function(i){i.disabled=!D.guias})});

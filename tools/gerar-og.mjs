@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Imagem de compartilhamento (Open Graph, 1200 × 630) do Polar Life. Só a paleta (T2), fontes locais (T6),
+// Imagem de compartilhamento (Open Graph, 1200 × 630) do PolarLive. Só a paleta (T2), fontes locais (T6),
 // logo oficial sem esticar (DS-15), sem fotos de terceiros (P31/J4). Uso: npm run og
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
@@ -40,6 +40,6 @@ mkdirSync(SITE + 'assets/img/og', { recursive: true });
 const nav = await chromium.launch(), p = await nav.newPage({ viewport: { width: 1200, height: 630 } });
 await p.goto(base + 'robots.txt'); await p.setContent(html, { waitUntil: 'networkidle' });
 await p.evaluate(async () => { await document.fonts.load("500 62px 'Inter'"); await document.fonts.load("500 78px 'Caveat'"); await document.fonts.load("400 30px 'Caveat'"); await document.fonts.ready; });
-await p.screenshot({ path: SITE + 'assets/img/og/polar-life-og.png' });
+await p.screenshot({ path: SITE + 'assets/img/og/polarlive-og.png' });
 await nav.close(); srv.fechar();
-console.log('✔ site/assets/img/og/polar-life-og.png (1200 × 630)');
+console.log('✔ site/assets/img/og/polarlive-og.png (1200 × 630)');

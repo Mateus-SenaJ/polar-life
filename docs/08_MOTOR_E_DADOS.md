@@ -1,6 +1,6 @@
 ---
 id: DOC-08
-titulo: Polar Life · Motor, contratos de dados e saídas
+titulo: PolarLive · Motor, contratos de dados e saídas
 edicao: 2
 data: 2026-11-07
 status: vigente

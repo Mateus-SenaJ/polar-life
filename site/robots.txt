@@ -1,4 +1,4 @@
-# Polar Life
+# PolarLive
 # No GitHub Pages em subcaminho os buscadores só leem o robots.txt da raiz do domínio;
 # quem protege /app/ é o <meta name="robots" content="noindex"> de cada página (o verificar confere).
 User-agent: *

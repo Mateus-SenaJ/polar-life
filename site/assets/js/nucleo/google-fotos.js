@@ -1,4 +1,4 @@
-/* Polar Life · Google Fotos pelo seletor oficial (Google Photos Picker API, D-168).
+/* PolarLive · Google Fotos pelo seletor oficial (Google Photos Picker API, D-168).
    A pessoa escolhe as fotos numa janela do próprio Google; só as escolhidas são baixadas, direto para este
    aparelho (T5). Nenhum script do Google é carregado (T6): são chamadas REST com o token de 1 h que a tela de
    entrar guardou nesta aba (sessionStorage «pl-gfotos»). O token nunca vai para o projeto, o backup ou o PDF. */

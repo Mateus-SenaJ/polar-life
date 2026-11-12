@@ -22,7 +22,7 @@ function avisar(){ouvintes.forEach(function(f){try{f()}catch(e){}})}
 function aviso(reg){
   if(document.getElementById('pwa-aviso')||!reg.waiting)return;
   var d=document.createElement('div');d.className='pwa-aviso led-box led-box--1';d.id='pwa-aviso';d.setAttribute('role','status');d.setAttribute('aria-live','polite');
-  d.innerHTML='<span>Há uma versão nova do Polar Life.</span><button type="button">Atualizar</button>';
+  d.innerHTML='<span>Há uma versão nova do PolarLive.</span><button type="button">Atualizar</button>';
   d.querySelector('button').onclick=function(){recarregar=true;reg.waiting.postMessage({tipo:'pular'})};
   document.body.appendChild(d)
 }

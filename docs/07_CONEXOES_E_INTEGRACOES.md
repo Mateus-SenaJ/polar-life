@@ -1,6 +1,6 @@
 ---
 id: DOC-07
-titulo: Polar Life · Conexões e integrações (Google Fotos, Apple, Instagram e outros)
+titulo: PolarLive · Conexões e integrações (Google Fotos, Apple, Instagram e outros)
 edicao: 2
 data: 2026-11-07
 status: vigente
@@ -16,7 +16,7 @@ fatos_verificados_em: 2026-11-07 (segundo os documentos de origem; reconfirmar a
 
 | ID | Regra |
 | --- | --- |
-| CN-01 | A foto vai **da origem direto ao navegador**. Nenhum servidor do Polar Life toca nela (BR-01) |
+| CN-01 | A foto vai **da origem direto ao navegador**. Nenhum servidor do PolarLive toca nela (BR-01) |
 | CN-02 | O usuário **escolhe** as fotos no seletor oficial do serviço. O app nunca lista a biblioteca inteira |
 | CN-03 | **Instagram e Facebook: sem integração por API** (D-002). O app oferece caminho guiado de entrada e de saída (§4) |
 | CN-04 | Endereços temporários de fotos (ex.: `baseUrl` do Google) **nunca são persistidos** |
@@ -69,7 +69,7 @@ Texto fixo no topo: «Suas fotos continuam no seu aparelho. Você escolhe o que 
 
 **Apple / iCloud.** Mensagem: «No iPhone ou iPad, toque em **Do aparelho** e escolha **Biblioteca de Fotos**. As fotos do iCloud que já aparecem na galeria funcionam.» Aviso de HEIC: «Convertendo para JPEG no aparelho» (selo «Convertida»).
 
-**Google Fotos (2.0).** Aviso antes: «Você escolhe as fotos no Google. O Polar Life só recebe as selecionadas.» Fotos do Google chegam **sem localização**: «Escolha a cidade à mão» (FN-07).
+**Google Fotos (2.0).** Aviso antes: «Você escolhe as fotos no Google. O PolarLive só recebe as selecionadas.» Fotos do Google chegam **sem localização**: «Escolha a cidade à mão» (FN-07).
 
 ## 5. Verificação de conexão (T-24)
 
@@ -125,7 +125,7 @@ Fatos verificados: o usuário escolhe no seletor; endereço de mídia vale 60 mi
 | Topo da Central | «Suas fotos continuam no seu aparelho. Você escolhe o que trazer.» |
 | Instagram | «O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha **Do aparelho**.» |
 | Apple | «No iPhone, escolha **Biblioteca de Fotos** no seletor.» |
-| Google | «Você escolhe as fotos no Google. O Polar Life só recebe as selecionadas.» |
+| Google | «Você escolhe as fotos no Google. O PolarLive só recebe as selecionadas.» |
 | Sem localização | «Fotos do Google Fotos não trazem a localização. Escolha a cidade.» |
 | Compartilhar | «Baixe a imagem e escolha-a na galeria do aplicativo.» |
 

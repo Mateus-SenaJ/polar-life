@@ -17,7 +17,7 @@ for (const p of cfg.paginas) {
   const titulo = (html.match(/<title>([^<]*)<\/title>/) || [])[1], desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1];
   if (!titulo || !desc) throw new Error(`${p.arquivo}: falta <title> ou description`);
   const url = cfg.url + p.rota, prof = p.arquivo.split('/').length - 1, rel = '../'.repeat(prof), img = cfg.url + cfg.og;
-  const tituloOg = titulo.replace(/^Polar Life · /, '');                 // o site_name já diz «Polar Life»
+  const tituloOg = titulo.replace(/^PolarLive · /, '');                 // o site_name já diz «PolarLive»
   const linhas = [
     INI,
     `<link rel="canonical" href="${url}">`,
@@ -53,7 +53,7 @@ for (const p of cfg.paginas) {
 const hoje = new Date().toISOString().slice(0, 10);
 const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   cfg.paginas.map(p => `  <url><loc>${cfg.url + p.rota}</loc><priority>${p.prioridade}</priority></url>`).join('\n') + '\n</urlset>\n';
-const robots = `# Polar Life\n# No GitHub Pages em subcaminho os buscadores só leem o robots.txt da raiz do domínio;\n# quem protege /app/ é o <meta name="robots" content="noindex"> de cada página (o verificar confere).\nUser-agent: *\nDisallow: /app/\n\nSitemap: ${cfg.url}sitemap.xml\n`;
+const robots = `# PolarLive\n# No GitHub Pages em subcaminho os buscadores só leem o robots.txt da raiz do domínio;\n# quem protege /app/ é o <meta name="robots" content="noindex"> de cada página (o verificar confere).\nUser-agent: *\nDisallow: /app/\n\nSitemap: ${cfg.url}sitemap.xml\n`;
 for (const [arq, txt] of [['sitemap.xml', sitemap], ['robots.txt', robots]]) {
   let atual = ''; try { atual = readFileSync(SITE + arq, 'utf8'); } catch { }
   if (atual !== txt) { difere++; if (!checar) writeFileSync(SITE + arq, txt); }

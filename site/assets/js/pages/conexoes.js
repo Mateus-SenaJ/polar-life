@@ -41,7 +41,7 @@ $('scrim').addEventListener('click',fecha);
 
 /* T-23 · «Ver como fazer» (DOC-07 §4): 3 passos curtos, ícone neutro, sem marca de terceiro */
 var GUIA={
- rede:['Como trazer fotos do Instagram e do Facebook','<p class="resumo">Estas plataformas não permitem importar por aqui. O caminho que funciona:</p><ol class="pas"><li>Salve a foto no aparelho pelo próprio aplicativo.</li><li>Volte ao Polar Life e escolha <strong>Do aparelho</strong>.</li><li>Opcional: se você baixou o arquivo de dados da conta, o ZIP poderá ser importado em versão futura.</li></ol>'],
+ rede:['Como trazer fotos do Instagram e do Facebook','<p class="resumo">Estas plataformas não permitem importar por aqui. O caminho que funciona:</p><ol class="pas"><li>Salve a foto no aparelho pelo próprio aplicativo.</li><li>Volte ao PolarLive e escolha <strong>Do aparelho</strong>.</li><li>Opcional: se você baixou o arquivo de dados da conta, o ZIP poderá ser importado em versão futura.</li></ol>'],
  apple:['Como trazer fotos do iCloud','<ol class="pas"><li>No iPhone ou iPad, toque em <strong>Do aparelho</strong>.</li><li>Escolha <strong>Biblioteca de Fotos</strong> no seletor.</li><li>As fotos do iCloud que já aparecem na galeria funcionam. As HEIC são convertidas no aparelho (selo «Convertida»).</li></ol>']};
 /* T-24 · linhas de verificação (DOC-07 §5), em ordem fixa; nenhuma toca em foto */
 function espaco(){if(!(navigator.storage&&navigator.storage.estimate))return Promise.resolve(['atencao','Seu navegador não informa o espaço livre.']);

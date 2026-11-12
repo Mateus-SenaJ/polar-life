@@ -1,4 +1,4 @@
-# Prompts para o Google Flow (Veo / Imagen) · mídia realista do Polar Life
+# Prompts para o Google Flow (Veo / Imagen) · mídia realista do PolarLive
 
 Decisões: D-140 a D-145. O site já está pronto para receber estes arquivos: enquanto eles não existem, cada lugar mostra a
 reserva (poster local, desenho da câmera, fotos CC0). **Você só precisa gerar, baixar e salvar com o nome certo**; conversão,

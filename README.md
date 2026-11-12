@@ -1,4 +1,4 @@
-# Polar Life
+# PolarLive
 
 Editor web **local-first** para criar polaroids, imprimi-las em folhas e compartilhá-las. As fotos nunca saem do aparelho (BR-01).
 

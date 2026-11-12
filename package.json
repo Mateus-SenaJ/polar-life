@@ -3,7 +3,7 @@
   "version": "0.11.0",
   "private": true,
   "type": "module",
-  "description": "Polar Life · editor web local-first de polaroids. Telas T-01 a T-14, T-18 a T-24, T-31 e T-28 a T-30.",
+  "description": "PolarLive · editor web local-first de polaroids. Telas T-01 a T-14, T-18 a T-24, T-31 e T-28 a T-30.",
   "scripts": {
     "serve": "npx --yes serve site",
     "verificar": "node tools/verificar.mjs && node tools/seo.mjs --checar",

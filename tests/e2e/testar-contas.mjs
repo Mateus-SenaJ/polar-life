@@ -504,7 +504,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   const nome = dl.suggestedFilename();
   await dl.saveAs(join(saida, nome));
   const dados = JSON.parse(await readFile(join(saida, nome), 'utf8'));
-  /^polarlife-conta-\d{8}\.json$/.test(nome) && dados.produto === 'Polar Life' && dados.conta.email === 'gratis@polarlife.test'
+  /^polarlife-conta-\d{8}\.json$/.test(nome) && dados.produto === 'PolarLive' && dados.conta.email === 'gratis@polarlife.test'
     ? ok('conta: exportar dados baixa JSON com a conta') : ruim('exportar dados: ' + nome);
   await p.close(); await c.close();
 
@@ -513,7 +513,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   const p2 = await c2.newPage();
   await p2.goto(srv.url + 'app/conta/');
   const corpo2 = await p2.locator('#corpo').textContent();
-  /uso razoável/.test(corpo2) && /Desligar a assinatura Polar Life/.test(corpo2)
+  /uso razoável/.test(corpo2) && /Desligar a assinatura PolarLive/.test(corpo2)
     ? ok('conta Pro: uso razoável + interruptor da assinatura') : ruim('conta Pro: ' + corpo2.slice(0, 80));
   await p2.locator('#b-cancelar').click();
   await p2.locator('#dialog:not([hidden])').waitFor({ timeout: 5000 });

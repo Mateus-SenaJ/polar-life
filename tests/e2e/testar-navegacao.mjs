@@ -121,7 +121,7 @@ try {
   const ed = async pg => pg.evaluate(() => ({ titulo: document.title, status: document.getElementById('status').textContent, pols: document.querySelectorAll('#sheet .pol').length,
     prop: (() => { const b = document.querySelector('#sheet .pol').getBoundingClientRect(); return Math.min(b.width, b.height) / Math.max(b.width, b.height); })() }));
   let e = await ed(p);
-  confere(/^Polar Life · Projeto de /.test(e.titulo) && !/Serra 2026/.test(e.titulo), 'editor abre o projeto real (não o exemplo)', e.titulo);
+  confere(/^PolarLive · Projeto de /.test(e.titulo) && !/Serra 2026/.test(e.titulo), 'editor abre o projeto real (não o exemplo)', e.titulo);
   confere(/^A5 /.test(e.status) && Math.abs(e.prop - 54 / 86) < .02, 'editor: papel A5 e moldura Instax Mini 54 × 86 chegaram da tela «Novo projeto» (D-159)', e.status + ' · proporção ' + e.prop.toFixed(3));
   await p.reload(); await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0, null, { timeout: 10000 });
   const e2 = await ed(p);

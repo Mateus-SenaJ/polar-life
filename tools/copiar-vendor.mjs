@@ -27,7 +27,7 @@ async function main() {
   const pdfLib = await readFile(join(RAIZ, 'node_modules/pdf-lib/LICENSE.md'), 'utf8');
   const fontkitPkg = JSON.parse(await readFile(join(RAIZ, 'node_modules/@pdf-lib/fontkit/package.json'), 'utf8'));
   const licencas = [
-    'Bibliotecas de terceiros usadas apenas localmente pelo Polar Life.',
+    'Bibliotecas de terceiros usadas apenas localmente pelo PolarLive.',
     '',
     'pdf-lib',
     'https://pdf-lib.js.org/',

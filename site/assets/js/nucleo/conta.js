@@ -337,7 +337,7 @@ function excluirConta(){
   apagar('pl-conta');return true}
 function exportarDados(){
   var s=sessao();if(!s)return null;
-  var c=contaDe(s.email),d={produto:'Polar Life',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],geradoEm:new Date().toISOString()};
+  var c=contaDe(s.email),d={produto:'PolarLive',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],geradoEm:new Date().toISOString()};
   return new Blob([JSON.stringify(d,null,2)],{type:'application/json'})}
 
 /* ---------- admin (T-33) ---------- */

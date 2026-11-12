@@ -1,6 +1,6 @@
 ---
 id: DOC-05
-titulo: Polar Life · Funcionalidades do editor
+titulo: PolarLive · Funcionalidades do editor
 edicao: 2
 data: 2026-11-07
 status: vigente
@@ -36,7 +36,7 @@ depende_de: [DOC-01, DOC-02, DOC-03]
 | Comprimento das guias | segmentado | Linha contínua · Marcas de canto | Contínua |
 | Cor da guia | segmentado | Preto · Azul · Laranja | Preto |
 | Rodapé da folha | interruptor | on/off | off |
-| Assinatura Polar Life | interruptor | on/off | on (no grátis, desabilitado com rótulo «Pro», 2.0) |
+| Assinatura PolarLive | interruptor | on/off | on (no grátis, desabilitado com rótulo «Pro», 2.0) |
 
 Painel de resultado: «4 por folha · 6 folhas · aproveitamento 78%».
 

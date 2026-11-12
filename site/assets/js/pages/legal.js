@@ -1,6 +1,6 @@
 /* T-30 · legal · comportamento da página */
 (function(){
-var views=['privacidade','termos','cookies'],base='Polar Life · ';
+var views=['privacidade','termos','cookies'],base='PolarLive · ';
 function route(){
   var h=location.hash.slice(1); if(views.indexOf(h)<0)h='privacidade';
   views.forEach(function(v){

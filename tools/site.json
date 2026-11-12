@@ -1,8 +1,8 @@
 {
   "url": "https://mateus-senaj.github.io/polar-life/",
-  "nome": "Polar Life",
+  "nome": "PolarLive",
   "locale": "pt_BR",
-  "og": "assets/img/og/polar-life-og.png",
+  "og": "assets/img/og/polarlive-og.png",
   "ogAlt": "Polaroids ilustradas ao lado da frase «Algumas memórias merecem sair da tela.»",
   "paginas": [
     { "arquivo": "index.html", "rota": "", "prioridade": "1.0" },

@@ -1,4 +1,4 @@
-# Polar Life · instruções para agentes de código
+# PolarLive · instruções para agentes de código
 
 Editor web **local-first** de polaroids. Site estático em `site/` (HTML, CSS e JS sem build), publicado no GitHub Pages.
 Leia `README.md`, `STATUS.md` (seção da última etapa) e `PROXIMOS_PASSOS.md` antes de mudar algo.

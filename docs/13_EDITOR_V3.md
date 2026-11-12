@@ -363,7 +363,7 @@ Emojis: painel «Emojis» com busca por nome em pt-BR (lista estática de ~200 e
 | 7.7 | T2 (só 4 cores + #F8F9FA) aplicada a tudo | **Esclarecer** que T2 rege a **interface**; **conteúdo** da pessoa (foto, emoji colorido) não é limitado. Stickers monocromáticos usam só a paleta (preto/azul/laranja/branco); «Confete» usa as 3 cores | Emojis são coloridos por natureza; D-130 já abriu exceção pontual | Nenhum para a marca: o app continua nas 4 cores |
 | 7.8 | FN-04 «Grade de composição» como campo da aba Ajustes | Vai para a BF do recorte («Grade ▾») | É um auxílio de tela, não um ajuste da foto | Nenhum |
 | 7.9 | DOC-05 FN-07: formato de data como 13 botões | Caixa de seleção com a data da foto em cada opção | FN-00: 5+ opções → seleção | Nenhum |
-| 7.10 | Tablet/desktop: cabeçalho com «Polar Life Studio» + nome + chip + 2 botões + avatar | Barra superior mais curta: nome do projeto e «Salvo neste dispositivo» viram um só grupo; «Polar Life Studio» sai (T7: não é um produto separado) | Espaço para a barra de contexto | Nenhum |
+| 7.10 | Tablet/desktop: cabeçalho com «PolarLive Studio» + nome + chip + 2 botões + avatar | Barra superior mais curta: nome do projeto e «Salvo neste dispositivo» viram um só grupo; «PolarLive Studio» sai (T7: não é um produto separado) | Espaço para a barra de contexto | Nenhum |
 
 ---
 
