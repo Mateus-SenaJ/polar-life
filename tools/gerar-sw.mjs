@@ -40,7 +40,7 @@ lista.add(join(APP, 'manifest.webmanifest'));
 for (const f of ['inter-400.ttf']) lista.add(join(SITE, 'assets', 'fonts', 'pdf', f));  // PDF offline com a fonte padrão
 lista.add(join(SITE, 'assets', 'img', 'icones', 'icone-192.png')); lista.add(join(SITE, 'assets', 'img', 'icones', 'icone-512.png'));
 
-const arquivos = [...lista].filter(p => existsSync(p)).map(norm).map(p => p.endsWith('index.html') ? p.slice(0, -10) || './' : p).sort();
+const arquivos = [...lista].filter(p => existsSync(p) && (!/[\\/]assets[\\/]/.test(p) || /\.(css|js|png|svg|woff2?|ttf)$/.test(p)))   /* D-169: mesmas extensões que o sw.js aceita (fotos .jpg nunca vão ao cache) */.map(norm).map(p => p.endsWith('index.html') ? p.slice(0, -10) || './' : p).sort();
 const hash = createHash('sha256');
 for (const a of arquivos) {
   const p = join(APP, a === './' ? 'index.html' : a.endsWith('/') ? a + 'index.html' : a);

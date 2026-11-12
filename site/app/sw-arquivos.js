@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='ae12d976ea6b';
+self.PL_VERSAO='7218576276a7';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -55,7 +55,6 @@ self.PL_ARQUIVOS=[
 "../assets/img/icones/icone-512.png",
 "../assets/img/ilustracoes/banner-colagem.svg",
 "../assets/img/ilustracoes/banner-design.svg",
-"../assets/img/ilustracoes/banner-imprimir.jpg",
 "../assets/img/logos/Logo_favicon_PolarLife.png",
 "../assets/img/logos/Logo_tipografia_lateral.png",
 "../assets/img/logos/logo_oficial_PolarLife.png",
