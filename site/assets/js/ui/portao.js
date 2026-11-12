@@ -94,16 +94,20 @@ function semConta(){
 function semFolhas(g){
   var C=window.PLCONTA,pl=C.plano()||{},n=PEND.nFolhas,faltam=g.faltam||n;
   if(pl.id==='gratis'){
-    titulo('Sua folha grátis foi usada');
-    corpo('<p>Este arquivo tem '+n+' folhas. Compre as folhas de que precisa ou assine o Pro.</p>');
+    /* D-163: o título só diz que a folha grátis foi usada quando ela foi; senão, diz quantas faltam (T7) */
+    var usou=(pl.usadasMes||0)>0||faltam>=n,qt=usou?n:faltam,gm=pl.folhasMes===undefined?1:pl.folhasMes;
+    titulo(usou?'Sua folha grátis foi usada':'Este arquivo tem '+n+' folhas');
+    corpo(usou?'<p>Este arquivo tem '+n+' folhas. Compre as folhas de que precisa ou assine o Pro.</p>'
+      :'<p>O plano Grátis inclui '+gm+(gm===1?' folha':' folhas')+' por mês. Compre '+(qt===1?'a folha que falta':'as '+qt+' que faltam')+' ou assine o Pro.</p>');
     acoes([
-      {led:true,txt:'Comprar '+n+' folhas',cb:function(){pagamento(n,false)}},
+      {led:true,txt:'Comprar '+qt+(qt===1?' folha':' folhas'),cb:function(){pagamento(qt,false)}},
       {txt:'Assinar o Pro',cls:'pp-pro',cb:function(){pagamento(0,true)}},
       {txt:'Voltar',cls:'pp-terc',cb:function(){fechar({ok:false,motivo:'semFolhas'})}}
     ])
   }else if(pl.codigo){
-    titulo('Seu código já foi usado');
-    corpo('<p>Para gerar este arquivo, use outro código de impressão ou entre com sua conta.</p>');
+    titulo(g.codigoUsado?'Seu código já foi usado':'O código não cobre este arquivo');   /* D-163 */
+    corpo(g.codigoUsado?'<p>Para gerar este arquivo, use outro código de impressão ou entre com sua conta.</p>'
+      :'<p>Este arquivo tem '+n+' folhas e o seu código vale para '+(n-faltam)+'. Tire algumas fotos do projeto, use outro código ou entre com sua conta.</p>');
     acoes([
       {led:true,txt:'Entrar com outro código',cb:function(){
         var r=raizApp();fechar({ok:false,motivo:'semFolhas'});

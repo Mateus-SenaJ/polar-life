@@ -95,8 +95,9 @@ function projeto(){
     if(!(Array.isArray(l)&&l.length>=1&&l.length<=400&&l.every(function(x){return x>=1&&x<=400&&x%1===0}))){l=[];for(var i=1;i<=24;i++)l.push(i)}   /* sem lista: projeto de exemplo (DOC-04 §6) */
     l.forEach(function(sr){var e=novo(sr);if(!real&&sr===3){e.adj.realces=-20;e.adj.sombras=25;e.adj.vinheta=15}if(!real&&sr===12)e.z=233;lista.push(e)})
   }
-  var pocket=!q&&(function(){try{return sessionStorage.getItem('pl-fmt')==='pocket'}catch(e){return false}})(); /* D-113: saiu do T-02 sem passar pelo Quadro */
-  if(pocket){fr={w:66,h:99,jh:79,lado:3,topo:3,rad:.4,ori:'v'};if(!leg)leg=LT.legPocket(LT.LEG0)}
+  var f1=!q&&window.PLFOLHAS&&PLFOLHAS.formatoInicial?PLFOLHAS.formatoInicial():null,pocket=!!f1&&f1.fmt==='pocket'; /* D-159/D-113: saiu do T-02 sem gravar a moldura */
+  if(f1)fr={w:f1.w,h:f1.h,jh:f1.jh,lado:f1.lado,topo:f1.topo,rad:f1.rad,ori:'v'};
+  if(pocket&&!leg)leg=LT.legPocket(LT.LEG0);
   if(!leg&&real)leg=LT.legInicial();   /* D-149: projeto real sem legenda salva = Localização · Data */
   var fotos=lista.map(function(e,k){
     var src=e.src;

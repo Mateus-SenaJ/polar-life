@@ -4,6 +4,7 @@ var $=function(i){return document.getElementById(i)};
 var tm,opener,picked=[],salvando=Promise.resolve();
 /* 44: com um projeto aberto, as fotos já escolhidas ficam e as novas recebem ids depois do maior */
 var JA=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');return Array.isArray(a)&&window.PLPROJETOS&&PLPROJETOS.atual()?a:[]}catch(e){return []}})();
+var PROJ0=window.PLPROJETOS?PLPROJETOS.atual():'';
 var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
 
@@ -128,7 +129,8 @@ function firmarSelecao(){
       ['pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
     }else{
       sessionStorage.setItem('pl-fotos',JSON.stringify(novos));
-      ['pl-quadro','pl-folhas','pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
+      ['pl-quadro','pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
+      if(!PROJ0)sessionStorage.removeItem('pl-folhas');   /* D-159: projeto vindo de «Novo projeto» mantém o papel escolhido lá */
     }
   }catch(e){}
 }

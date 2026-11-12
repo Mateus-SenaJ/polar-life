@@ -205,11 +205,11 @@ document.addEventListener('keydown',function(e){                  /* R gira a mo
 window.PLMOL={aplicar:aplicar,render:render,regua:regua,cota:cota,ligada:ligada};
 aplicar();
 /* projeto novo que veio de «Retro Pocket» (T-02 grava pl-fmt · D-113): aplica a moldura e o padrão de legenda de uma vez */
-var pf=null;try{pf=sessionStorage.getItem('pl-fmt')}catch(e){}
-if(pf==='pocket'){try{sessionStorage.removeItem('pl-fmt')}catch(e){}
+var pf=window.PLFOLHAS&&PLFOLHAS.formatoInicial?PLFOLHAS.formatoInicial():null;   /* D-159: vale para todos os formatos da T-02 */
+if(pf){try{sessionStorage.removeItem('pl-fmt')}catch(e){}
   var sp=Q.ST()[0];
-  if(!sp.fr||sp.fr.fmt!=='pocket'){
-    if(window.PLLEG)PLLEG.padraoPocket();
-    grava({fmt:'pocket',w:66,h:99,jh:79,lado:3,topo:3,rad:.4,man:false,lock:true,ori:'v'},'mo:fmt')}}
+  if(!sp.fr||sp.fr.fmt!==pf.fmt){
+    if(pf.fmt==='pocket'&&window.PLLEG)PLLEG.padraoPocket();
+    grava(pf,'mo:fmt')}}
 render();Q.render()
 })();

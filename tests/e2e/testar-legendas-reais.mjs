@@ -170,6 +170,7 @@ try {
   p2.setDefaultTimeout(30000);
   await p2.goto(srv.url + 'app/adicionar-fotos/');
   await p2.waitForFunction(() => !!window.PLFOTOS && !!window.PLPROJETOS);
+  await p2.waitForFunction(() => window.PLPROJETOS && PLPROJETOS.sincronizado());   // D-157: a aba nova recarrega o projeto atual sozinha
   await p2.evaluate(async id => { sessionStorage.clear(); localStorage.removeItem('pl-projeto-atual'); await PLPROJETOS.abrir(id) }, pr.id);
   await p2.goto(srv.url + 'app/editor/quadro/#foto-1');
   await p2.waitForFunction(() => window.PLQ && PLQ.ST()[1] && PLQ.ST()[1].meta);

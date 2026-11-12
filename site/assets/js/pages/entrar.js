@@ -22,7 +22,7 @@ function lerVoltar(){
   return null
 }
 /* D-118: depois de entrar, a pessoa cai no Início (a lista de projetos fica em «Projetos») */
-function irPara(){var d=voltar||(G?G.raiz()+'inicio/':'../inicio/');if(d)location.href=d}
+function irPara(){var d=voltar||(G?G.raiz()+'inicio/':'../inicio/');if(d)location.replace(d)}   /* D-162: «Voltar» depois de entrar não devolve à tela de entrar */
 
 function led(btn,txt){var c=btn.querySelector('.btn-content');if(c)c.textContent=txt}
 function focar(el){ /* foco sem arrastar a rolagem ao carregar (Chromium) */

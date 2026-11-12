@@ -33,7 +33,11 @@ function paginar(s,fr,fotos){                                     /* mesma conta
   });
   return{p:p,sheets:sheets,erro:false,g:g0}
 }
-window.PLFOLHAS={MARGEM_MIN:3,PAPEIS:PAPEIS,PADRAO:PADRAO,papel:papel,grade:grade,melhor:melhor,contar:contar,paginar:paginar,
+/* D-159: formato escolhido em «Novo projeto» (pl-fmt), até o projeto gravar a moldura em pl-quadro. Mesmas medidas do FMT de molduras.js (D-108, D-113). */
+var FORMATOS={classico:{w:88,h:107,jh:76,lado:6,topo:6},mini:{w:60,h:73,jh:48,lado:6,topo:6},pocket:{w:66,h:99,jh:79,lado:3,topo:3},imini:{w:54,h:86,jh:62,lado:4,topo:5},isq:{w:72,h:86,jh:62,lado:5,topo:5},iwide:{w:108,h:86,jh:62,lado:4.5,topo:5}};
+function formatoInicial(){var v=null;try{v=sessionStorage.getItem('pl-fmt')}catch(e){}var f=v&&v!=='classico'&&FORMATOS.hasOwnProperty(v)?FORMATOS[v]:null;
+  return f?{fmt:v,w:f.w,h:f.h,jh:f.jh,lado:f.lado,topo:f.topo,rad:.4,man:false,lock:true,ori:'v'}:null}
+window.PLFOLHAS={FORMATOS:FORMATOS,formatoInicial:formatoInicial,MARGEM_MIN:3,PAPEIS:PAPEIS,PADRAO:PADRAO,papel:papel,grade:grade,melhor:melhor,contar:contar,paginar:paginar,
   ler:function(){                                   /* 30a: orientação da T-06 e, por cima, o que o editor salvou */
     var d=Object.assign({},PADRAO);
     try{if(sessionStorage.getItem('pl-orientacao')==='separar')d.separar=true}catch(e){}

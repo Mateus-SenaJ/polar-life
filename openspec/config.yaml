@@ -13,7 +13,7 @@ context: |
   #F8F9FA, exceção #D7263D só no ponto de qualidade D-130; acessibilidade com ícone + texto e alvos ≥ 44 px;
   nada sobre a foto; tudo no aparelho; nenhum recurso de terceiros; sem jargão ou promessa falsa; um único
   botão LED principal por tela).
-  Decisões: docs/10_LOG_DECISOES.md (D-001…D-137). Arquitetura do editor v3: docs/13_EDITOR_V3.md.
+  Decisões: docs/10_LOG_DECISOES.md (D-001…D-164). Arquitetura do editor v3: docs/13_EDITOR_V3.md.
   Fonte única tela = PDF (MT-02): toda medida visual sai de PLTEXTO/PLFOLHAS/PLGERADOR, em µm inteiros (MT-01).
   Projeto real × exemplo: PLTEXTO.ehReal(); fotos no IndexedDB com chave Number(src) (não mudar).
   Fotos pessoais do dono só podem ser LIDAS por testes; nunca copiadas para o repositório.

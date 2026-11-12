@@ -252,9 +252,18 @@ $('uma').addEventListener('click',function(){toast('Este atalho ainda não está
 $('continuar').addEventListener('click',function(){
   if(this.disabled)return;
   try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
-  if(S.fmt==='pocket'){try{sessionStorage.setItem('pl-fmt','pocket')}catch(e){}}   /* D-113: o Quadro aplica o padrão de legenda do Pocket */
-  if(window.PLPROJETOS)PLPROJETOS.criar('Projeto de '+new Date().toLocaleDateString('pt-BR')).then(function(){location.href='../adicionar-fotos/'});
-  else location.href='../adicionar-fotos/';
+  /* D-159: o que a pessoa escolheu aqui chega ao editor e ao PDF: formato (pl-fmt; D-113 no Pocket) e papel (pl-folhas) */
+  var idf={mini:'mini',pocket:'pocket',imini:'imini',isquare:'isq',iwide:'iwide'}[S.fmt];
+  var fo={papel:S.paper,orient:S.pori==='portrait'?'retrato':'paisagem'};
+  if(S.paper==='custom'){fo.w=Math.min(S.pw,S.ph);fo.h=Math.max(S.pw,S.ph)}
+  try{if(idf)sessionStorage.setItem('pl-fmt',idf);
+    if(fo.papel!=='A4'||fo.orient!=='retrato')sessionStorage.setItem('pl-folhas',JSON.stringify(fo))}catch(e){}
+  var P=window.PLPROJETOS,ir=function(){location.href='../adicionar-fotos/'};
+  if(!P){ir();return}
+  /* D-158: voltar e continuar de novo reaproveita o projeto ainda sem fotos, em vez de criar outro */
+  P.listar().then(function(l){var a=P.atual(),p=null;l.forEach(function(x){if(x.id===a)p=x});
+    if(p&&!p.fotos&&!p.exemplo&&!(p.estado&&p.estado['pl-fotos'])&&P.sincronizado())return P.salvarEstado();
+    return P.criar('Projeto de '+new Date().toLocaleDateString('pt-BR'))}).then(ir,ir);
 });
 
 /* Estados pelo endereço, para revisão: #personalizado, #nao-cabe */
@@ -266,5 +275,12 @@ function init(){
   update();
 }
 buildCards();buildFields();init();
+/* D-159: ao voltar para esta tela o navegador devolve as escolhas ao formulário sem avisar o script; o estado passa a seguir o que está na tela */
+window.addEventListener('pageshow',function(){setTimeout(function(){
+  var r=document.querySelector('input[name=fmt]:checked'),p=$('paper'),po=document.querySelector('input[name=pori]:checked'),mudou=false;
+  if(r&&r.value!==S.fmt){if(r.value==='custom')S.fmt='custom';else setFactory(r.value);mudou=true}
+  if(p&&p.value&&p.value!==S.paper){S.paper=p.value;mudou=true}
+  if(po&&po.value!==S.pori){S.pori=po.value;mudou=true}
+  if(mudou)update()},0)});
 window.addEventListener('hashchange',init);
 })();

@@ -310,7 +310,7 @@ function eventos(){
     var b=e.target.closest?e.target.closest('[data-abrir]'):null;
     if(!b)return;
     var id=b.getAttribute('data-abrir');
-    P.abrir(id).then(function(){location.href='../editor/'});
+    P.abrir(id).then(function(p){location.href=p&&!p.fotos&&!p.exemplo?'../adicionar-fotos/':'../editor/'});   /* D-158 */
   });
 }
 

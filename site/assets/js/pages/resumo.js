@@ -15,6 +15,11 @@ var D=REAL
 var undoN=null,byDate=false;
 function plural(n,s,p){return n+' '+(n===1?s:p)}
 function sheets(){return Math.ceil(D.total/D.perSheet)}
+/* D-159: em projeto real, a previsão usa o formato e o papel escolhidos (mesma conta do editor, MT-02) */
+var PREV={papel:'A4',fmt:'Clássico 88 × 107 mm'};
+if(REAL&&window.PLFOLHAS){(function(){var s=PLFOLHAS.ler(),f=PLFOLHAS.formatoInicial()||PLFOLHAS.FORMATOS.classico,g=PLFOLHAS.melhor(s,PLFOLHAS.papel(s),f);
+  var NOMES={mini:'Mini quadrado',pocket:'Retro Pocket',imini:'Instax Mini',isq:'Instax Square',iwide:'Instax Wide'};
+  if(g.n>0)D.perSheet=g.n;PREV.papel=PLFOLHAS.papel(s).n;PREV.fmt=(NOMES[f.fmt]||'Clássico')+' '+String(f.w).replace('.',',')+' × '+String(f.h).replace('.',',')+' mm'})()}
 function cell(l,v,s){return '<div><dt class="rotulo">'+l+'</dt><dd>'+v+(s?'<span>'+s+'</span>':'')+'</dd></div>'}
 /* Lê as dimensões reais do IndexedDB e conta horizontais × verticais (sem EXIF ainda). */
 function medirReais(){
@@ -34,7 +39,7 @@ function paint(){
     cell('Fotos',D.total,'')+
     cell('Orientação',D.land+' horizontais','e '+D.port+' verticais')+
     dateCell+localCell+qualCell+
-    cell('Folhas previstas',sheets()+' A4',D.perSheet+' por folha · Clássico 88 × 107 mm');
+    cell('Folhas previstas',sheets()+' '+PREV.papel,D.perSheet+' por folha · '+PREV.fmt);
   $('q-txt').textContent=D.real?'O ponto de qualidade em cada polaroid mostra se a foto vai sair nítida no tamanho escolhido.':'Foto 12 com resolução de 140 PPI. Reduza o zoom ou escolha um formato menor depois, no editor.';
   var nd=$('nd-note');nd.hidden=!D.nodate;
   if(D.nodate)$('nd-txt').textContent=plural(D.nodate,'foto está sem data','fotos estão sem data')+'. Ao ordenar por data, elas ficam no fim do grupo.';

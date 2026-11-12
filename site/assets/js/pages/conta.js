@@ -61,7 +61,7 @@ document.addEventListener('keydown',function(e){
 function render(){
   var sc=C.sessaoCodigo(),cx=$('corpo');
   if(sc){renderCodigo(sc,cx);return}
-  var s=C.sessao();if(!s){location.replace(G?G.urlEntrar('conta'):'entrar/');return}
+  var s=C.sessao();if(!s){location.replace(G?G.urlEntrar(location.pathname):'../entrar/');return}
   var pl=C.plano()||{},id=pl.id;
   var h='';
 

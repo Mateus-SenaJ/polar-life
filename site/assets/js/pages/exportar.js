@@ -14,7 +14,7 @@ var LIM=cel?60:150;$('est-lim').textContent=LIM;
 
 if(!ok){
   $('corpo').hidden=true;$('trava').hidden=false;
-  $('trava-d').textContent=P?'O projeto mudou depois da última revisão. Revise de novo para gerar um arquivo certo.':'O pré-voo confere se tudo cabe e se as legendas estão na área segura. Ele vem antes de exportar.';
+  $('trava-d').textContent=P?'O projeto mudou depois da última revisão. Revise de novo para gerar um arquivo certo.':'A revisão confere se tudo cabe e se as legendas estão na área segura. Ela vem antes de exportar.';
   $('resumo').textContent='Falta revisar a impressão.';
   return
 }

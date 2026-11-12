@@ -186,8 +186,8 @@ strong{font-weight:500}
 .chk input:checked+.chk__b .ico{opacity:1}
 .chk input:focus-visible+.chk__b{outline:2px solid var(--blue);outline-offset:3px}
 .chk strong{display:block;font-size:12px;margin-bottom:4px}
-.pe{display:flex;gap:12px;padding-top:12px}
-.pe__b{flex:1}
+.pe{display:flex;flex-wrap:wrap;gap:12px;padding-top:12px}   /* D-164: os dois botões quebram de linha quando o painel é estreito */
+.pe__b{flex:1 1 auto}
 
 .msg{display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;font-size:14px;line-height:1.5}
 .msg .ico{margin-top:1px;color:var(--blue)}
@@ -284,3 +284,5 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 .mod input[type=range]{width:100%;min-height:44px;accent-color:var(--blue);cursor:pointer}
 .foto-mini[aria-pressed=true]{outline:2px solid var(--blue);outline-offset:1px}
 .pol--col{background:none}
+/* D-164: de 1024 a 1199 px o cabeçalho do editor não cabe inteiro: saem o rótulo do estúdio e o selo «Salvo» (o nome do projeto e as ações ficam) */
+@media (min-width:1024px) and (max-width:1199px){.eh__studio,.eh__div:not(.eh__div--r),.eh__proj .chip{display:none}}
