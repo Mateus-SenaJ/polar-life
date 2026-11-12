@@ -5,7 +5,7 @@
 (function(){
 'use strict';
 /* ID público do cliente OAuth (Google Cloud → APIs e serviços → Credenciais). Não é segredo. */
-var CLIENT_ID='';
+var CLIENT_ID='393241385100-mi0hngc1gcgr416vktf18tiaf7karel5.apps.googleusercontent.com';
 var AUTH='https://accounts.google.com/o/oauth2/v2/auth',CHAVE='pl-google-pedido';
 
 function aleatorio(){var b=new Uint8Array(16);window.crypto.getRandomValues(b);return Array.prototype.map.call(b,function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}

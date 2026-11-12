@@ -9,7 +9,9 @@ const ok = (m) => console.log('  ✔ ' + m);
 const ruim = (m) => { falhas++; console.log('  ✘ ' + m); };
 const ID = '123-teste.apps.googleusercontent.com';
 const fonte = await readFile(new URL('../../site/assets/js/nucleo/google.js', import.meta.url), 'utf8');
-const comId = fonte.replace("var CLIENT_ID='';", "var CLIENT_ID='" + ID + "';");
+const comId = fonte.replace(/var CLIENT_ID='[^']*';/, "var CLIENT_ID='" + ID + "';");
+const semId = fonte.replace(/var CLIENT_ID='[^']*';/, "var CLIENT_ID='';");
+const real = (fonte.match(/var CLIENT_ID='([^']*)';/) || [])[1] || '';
 if (comId === fonte) { console.log('✘ não achei CLIENT_ID em google.js'); process.exit(1); }
 
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
@@ -19,9 +21,12 @@ const srv = await servir();
 const nav = await chromium.launch();
 const U = srv.url + 'app/entrar/';
 try {
+  /* 0) ID publicado: formato de ID de cliente web do Google (D-167) */
+  /^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/.test(real) ? ok('ID do cliente Google configurado') : ruim('ID do cliente ausente ou inválido: ' + real);
   /* 1) sem ID configurado: continua demonstração (T7) */
   {
     const p = await nav.newPage();
+    await p.route('**/assets/js/nucleo/google.js', (r) => r.fulfill({ contentType: 'application/javascript', body: semId }));
     await p.goto(U);
     await p.getByText('Continuar com Google').click();
     await p.locator('#f-dados').waitFor({ timeout: 5000 });
