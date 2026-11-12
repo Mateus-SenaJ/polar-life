@@ -91,7 +91,7 @@ try {
     r.simulacoes === 2 ? ok(`${rot}: os 2 banners de simulação estão na faixa`) : ruim(`${rot}: ${r.simulacoes} banners de simulação`);
     r.loops.length > 0 && r.loops.every(d => parseFloat(d) <= 6)
       ? ok(`${rot}: o loop da simulação dura no máximo 6 s`) : ruim(`${rot}: loop fora do limite (${r.loops.join(',')})`);
-    r.titulo.includes('histórias') && r.expressao.includes('histórias') ? ok(`${rot}: o título do banner tem a expressão em destaque`) : ruim(`${rot}: título fora do esperado (${r.titulo})`);
+    r.titulo.includes('daqui a dez') && r.expressao.includes('anos?')   /* D-169: frase própria do Início */ ? ok(`${rot}: o título do banner tem a expressão em destaque`) : ruim(`${rot}: título fora do esperado (${r.titulo})`);
     r.modelos === 8 ? ok(`${rot}: 8 cartões de modelo`) : ruim(`${rot}: ${r.modelos} cartões de modelo`);
     r.nomes.includes('Praia 🌊') ? ok(`${rot}: o nome do modelo traz o emoji`) : ruim(`${rot}: nomes sem emoji (${r.nomes.join(' | ')})`);
     r.botoes === 8 ? ok(`${rot}: cada modelo tem o botão «Usar este modelo» (sem emoji)`) : ruim(`${rot}: ${r.botoes} botões de modelo`);
