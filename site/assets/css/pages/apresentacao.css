@@ -187,3 +187,19 @@ a{color:inherit}
   .hero__lead{font-size:21px;max-width:36ch}
   .hero__cta .led-btn{min-width:380px;--btn-h:60px;font-size:17px}
 }
+
+/* D-180: «Criar minhas polaroids» já na primeira tela, sem rolar, do celular pequeno (375 × 667) ao notebook baixo (1280 × 720):
+   apoio mais curto, espaços menores entre os textos e, no celular, o vídeo cede altura quando a tela é curta (nunca menos de 200 px) */
+.hero__title{margin-top:14px}
+.hero__lead{margin-top:16px;line-height:1.5}
+.hero__cta{margin-top:24px}
+.hero__more{margin-top:24px}
+@media (max-width:599px){
+  .midia--hero{aspect-ratio:auto;height:max(200px,min(80vw,calc(100svh - 455px)))}
+}
+@media (min-width:1024px){
+  .hero__title{font-size:clamp(64px,min(6.4vw,10.5svh),96px)}
+}
+@media (min-width:1920px){
+  .hero__title{font-size:clamp(96px,min(5.4vw,11svh),140px)}
+}

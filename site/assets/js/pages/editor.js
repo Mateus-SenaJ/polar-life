@@ -482,7 +482,8 @@ function painelExtra(id){
   [].forEach.call($('painel-extra').querySelectorAll('[data-abrir]'),function(b){b.onclick=function(){location.href='quadro/#foto-'+b.getAttribute('data-abrir')}})
 }
 function aba(t){ABA=t.id;tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});var papel=t.id==='tab-papel';$('p-papel').hidden=!papel;$('p-outra').hidden=papel;$('p-outra').setAttribute('aria-labelledby',t.id);if(!papel)painelExtra(t.id)}
-tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;for(var n=0;tabs[j].hidden&&n<tabs.length;n++)j=(j+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
+tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;var j=(i+d+tabs.length)%tabs.length;for(var n=0;tabs[j].hidden&&n<tabs.length;n++)j=(j+d+tabs.length)%tabs.length;   /* D-183: ← na primeira aba volta para a última */
+tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
 /* D-176: no modo Colagem a aba «Papel» (das Folhas) dá lugar à aba «Colagem»; nas Folhas, o contrário */
 function abasDoModo(){var co=colOn(),tp=$('tab-papel'),tc=$('tab-colagem');if(!tp||!tc)return;tp.hidden=co;tc.hidden=!co;
   if(co&&ABA!=='tab-colagem'&&(ABA==='tab-papel'||!ABA||colOn()))aba(tc);else if(!co&&ABA==='tab-colagem')aba(tp)}

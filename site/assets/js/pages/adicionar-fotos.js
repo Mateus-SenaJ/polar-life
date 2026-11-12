@@ -1,65 +1,14 @@
 /* T-03 · adicionar-fotos · comportamento da página */
 (function(){
 var $=function(i){return document.getElementById(i)};
-var tm,opener,picked=[],salvando=Promise.resolve();
+var tm,picked=[],salvando=Promise.resolve();
 /* 44: com um projeto aberto, as fotos já escolhidas ficam e as novas recebem ids depois do maior */
 var JA=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');return Array.isArray(a)&&window.PLPROJETOS&&PLPROJETOS.atual()?a:[]}catch(e){return []}})();
 var PROJ0=window.PLPROJETOS?PLPROJETOS.atual():'';
 var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},Math.max(4000,m.length*60))}   /* aviso longo fica mais tempo para ler */
 
-/* ===== Selos de estado: ícone + texto, nunca só cor (CN-05, DS-06) ===== */
-var I={
- ok:'<svg class="ico okc" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
- clock:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
- info:'<svg class="ico okc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg>',
- warn:'<svg class="ico warn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>',
- err:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
-};
-var STATES={
- disponivel:{i:'ok',t:'Pronto para usar',a:[['Escolher fotos','secondary','pick']]},
- conectado:{i:'ok',t:'Conectado',a:[['Testar conexão','secondary','na'],['Desconectar','link','na']]},
- verificando:{i:'clock',t:'Verificando…',bar:1,a:[['Cancelar','secondary','na']]},
- reautorizar:{i:'warn',t:'Precisa entrar de novo',a:[['Reautorizar','secondary','na']]},
- embreve:{i:'clock',t:'Em breve',a:[],planb:1},
- indisponivel:{i:'info',t:'Esta plataforma não permite importar por aqui',a:[['Ver como fazer','secondary','howto']],planb:1},
- erro:{i:'err',t:'Não foi possível verificar agora',a:[['Tentar de novo','secondary','na']],planb:1}
-};
-var ICONS={
- phone:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',
- pics:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="1.5"/><path d="M21 16l-5-5-8 8"/>',
- share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',
- cloud:'<path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 9.5a4.25 4.25 0 0 1 0 8.5z"/>'
-};
-var state=(location.hash.match(/^#estado-(\w+)$/)||[])[1];
-if(!STATES[state])state='embreve';
-var SERVICES=[
- {id:'apple',name:'Galeria do iPhone ou iPad',icon:'phone',state:'disponivel',help:'No iPhone, escolha Biblioteca de Fotos no seletor. As fotos do iCloud que já aparecem na galeria funcionam.'},
- {id:'google',name:'Google Fotos',icon:'pics',state:state,help:'Você escolhe as fotos no Google. O Polar Life só recebe as selecionadas.'},
- {id:'insta',name:'Instagram e Facebook',icon:'share',state:'indisponivel',help:'O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho.'},
- {id:'drive',name:'Drive, Dropbox e OneDrive',icon:'cloud',state:'embreve',help:'Escolha as fotos no lugar onde elas estão guardadas.'}
-];
-function card(s){
-  var st=STATES[s.state];
-  var h='<article class="svc" aria-labelledby="n-'+s.id+'"><div class="svc__top"><span class="svc__ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[s.icon]+'</svg></span><h3 id="n-'+s.id+'">'+s.name+'</h3></div>';
-  h+='<span class="stt">'+I[st.i]+st.t+'</span>';
-  if(st.bar)h+='<div class="led-progress led-progress--thin" role="progressbar" aria-label="Verificando"><span class="led-progress__glow"></span><span class="led-progress__track"><span class="led-progress__fill"></span></span></div>';
-  h+='<p>'+s.help+'</p><div class="svc__act">';
-  st.a.forEach(function(a){
-    h+='<button type="button" class="'+(a[1]==='link'?'link':'btn2')+'" data-act="'+a[2]+'" data-svc="'+s.id+'">'+a[0]+'</button>';
-  });
-  if(st.planb)h+='<button type="button" class="link" data-act="pick">Escolher do aparelho</button>'; /* CN-08: plano B sempre visível */
-  return h+'</div></article>';
-}
-$('grid').innerHTML=SERVICES.map(card).join('');
-$('grid').addEventListener('click',function(e){
-  var b=e.target.closest('button');if(!b)return;
-  var a=b.dataset.act;
-  if(a==='pick'){$('f-device').click()}
-  else if(a==='howto'){opener=b;$('scrim').hidden=false;$('dialog').hidden=false;$('dlg-close').focus()}
-  else toast('Ainda não está disponível.');
-});
-
+/* D-181: «Outros lugares» saiu; toda forma nova de trazer fotos entra na caixa «Escolha suas fotos» (aparelho, câmera, Google Fotos). */
 /* D-132: a leitura detalhada é delegada a PLIMPORTAR; aqui só aceita a escolha. */
 var EXT=/\.(jpe?g|png|webp|avif|heic|heif|tif?f|dng|cr2|cr3|nef|arw|raf|orf|rw2|zip)$/i,MIME=/^image\/(jpeg|png|webp|avif|heic|heif|tiff)$/i;
 function accepted(f){return EXT.test(f.name)||MIME.test(f.type)}
@@ -152,21 +101,11 @@ drop.addEventListener('drop',function(e){e.preventDefault();depth=0;drop.classLi
 window.addEventListener('dragover',function(e){e.preventDefault()});window.addEventListener('drop',function(e){e.preventDefault()});
 document.addEventListener('paste',function(e){var fs=e.clipboardData&&e.clipboardData.files;if(fs&&fs.length)receive(fs)});
 
-/* ===== Folha «Ver como fazer» (LED nível 3) ===== */
-function closeDlg(){$('scrim').hidden=true;$('dialog').hidden=true;if(opener)opener.focus()}
-$('dlg-close').onclick=closeDlg;$('scrim').onclick=closeDlg;
-$('dlg-pick').onclick=function(){closeDlg();$('f-device').click()};
-document.addEventListener('keydown',function(e){
-  if($('dialog').hidden)return;
-  if(e.key==='Escape')closeDlg();
-  if(e.key==='Tab'){var a=$('dlg-close'),z=$('dlg-pick');
-    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
-});
 /* D-168: Google Fotos pelo seletor oficial. Sem acesso nesta aba → pede a permissão (volta aqui com #google-fotos);
    com acesso → abre o seletor do Google numa janela e as fotos escolhidas entram como as do aparelho. */
 (function(){
   var b=$('btn-gfotos');if(!b)return;
-  if(!(window.PLGOOGLE&&PLGOOGLE.ativo()&&window.PLGFOTOS&&window.fetch)){b.hidden=true;return}
+  if(!(window.PLGOOGLE&&PLGOOGLE.ativo()&&window.PLGFOTOS&&window.fetch)){b.hidden=true;var hc=document.querySelector(".pick__con");if(hc)hc.hidden=true;return}   /* sem Google, sem a ajuda do Google */
   var ocupado=false;
   function rotulo(t){b.lastChild.nodeValue=t}
   b.addEventListener('click',function(){

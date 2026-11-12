@@ -194,8 +194,6 @@
 <div class="insp__in">
 <h2 class="insp__h">Inspetor</h2>
 <div class="tabs" role="tablist" aria-label="Abas do inspetor">
-<button type="button" role="tab" class="tab rotulo" id="tab-papel" aria-selected="false" aria-controls="p-papel" tabindex="-1">Papel</button>
-<button type="button" role="tab" class="tab rotulo" id="tab-fotos" aria-selected="false" aria-controls="p-outra" tabindex="-1">Fotos</button>
 <button type="button" role="tab" class="tab rotulo is-on" id="tab-ajustes" aria-selected="true" aria-controls="p-ajustes">Ajustes</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-legendas" aria-selected="false" aria-controls="p-legendas" tabindex="-1">Legendas</button>
 <button type="button" role="tab" class="tab rotulo" id="tab-molduras" aria-selected="false" aria-controls="p-molduras" tabindex="-1">Molduras</button>
@@ -219,6 +217,7 @@
 <button type="button" class="btn2" data-flt="cmp" aria-pressed="false"><svg class="ico sm" style="color:var(--blue)"><use href="#i-flip"/></svg>Comparar</button>
 <button type="button" class="btn2" id="flt-orig" aria-pressed="false"><svg class="ico sm" style="color:var(--blue)"><use href="#i-eye"/></svg>Ver original</button></div>
 <p class="f__h">Comparar divide a foto: original à esquerda, com filtro à direita. Segure «Ver original» para ver a foto sem filtro nem ajustes.</p>
+<button type="button" class="btn2 btn2--sm mod__apl" data-apl="flt"><svg class="ico sm"><use href="#i-copy"/></svg><span>Usar este filtro nas demais</span></button>
 </section>
 
 <section class="mod" aria-labelledby="m1">
@@ -227,7 +226,7 @@
 <div class="seg" role="radiogroup" aria-labelledby="modo-l">
 <label class="seg__o"><input type="radio" name="modo" value="preencher" data-modo><span>Preencher</span></label>
 <label class="seg__o"><input type="radio" name="modo" value="encaixar" data-modo><span>Encaixar</span></label></div>
-<p class="f__h" id="modo-h"></p></div>
+<p class="f__h" id="modo-h"></p><button type="button" class="btn2 btn2--sm mod__apl" data-apl="modo"><svg class="ico sm"><use href="#i-copy"/></svg><span>Usar este modo nas demais</span></button></div>
 <div data-sl="zoom"></div>
 <div data-sl="ang"></div>
 <div class="row2">
@@ -250,16 +249,18 @@
 <section class="mod" aria-labelledby="m2">
 <h3 class="mod__h rotulo rotulo--m" id="m2">Luz e cor</h3>
 <div data-sl="brilho"></div><div data-sl="contraste"></div><div data-sl="saturacao"></div><div data-sl="temp"></div>
+<button type="button" class="btn2 btn2--sm mod__apl" data-apl="luz"><svg class="ico sm"><use href="#i-copy"/></svg><span>Aplicar luz e cor às demais</span></button>
 </section>
 
 <section class="mod" aria-labelledby="m3">
 <h3 class="mod__h rotulo rotulo--m" id="m3">Detalhe</h3>
 <div data-sl="realces"></div><div data-sl="sombras"></div><div data-sl="nitidez"></div><div data-sl="vinheta"></div>
+<button type="button" class="btn2 btn2--sm mod__apl" data-apl="det"><svg class="ico sm"><use href="#i-copy"/></svg><span>Aplicar detalhe às demais</span></button>
 </section>
 
 <div class="prot">
-<label class="chk"><input type="checkbox" id="replicar"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong id="replicar-t">Replicar para as demais 23 fotos</strong><span class="f__h">Copia os ajustes de imagem desta foto. O recorte de cada foto não muda.</span></span></label>
-<label class="chk chk--2"><input type="checkbox" id="subst"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Substituir ajustes individuais</strong><span class="f__h" id="subst-h">Desmarcada, as fotos com ajuste próprio ficam como estão.</span></span></label>
+<p class="f__h prot__h" id="apply-h">«Aplicar às demais» copia o filtro e os ajustes de luz, cor e detalhe desta foto. O recorte de cada foto não muda.</p>
+<label class="chk"><input type="checkbox" id="subst"><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Substituir ajustes individuais</strong><span class="f__h" id="subst-h">Desmarcada, as fotos com ajuste próprio ficam como estão.</span></span></label>
 </div>
 
 <div class="pe">
@@ -270,15 +271,8 @@
 
 <div id="p-legendas" role="tabpanel" aria-labelledby="tab-legendas" class="panel" hidden></div>
 
-<div id="p-papel" role="tabpanel" aria-labelledby="tab-papel" class="panel" hidden>
-<div class="msg"><svg class="ico"><use href="#i-info"/></svg><div class="msg__body"><p>As definições de papel valem para o projeto todo. Ajuste-as no modo Folhas.</p><div class="qmsg__act"><a class="btn2 btn2--sm" href="../">Abrir modo Folhas</a></div></div></div>
-</div>
-
 <div id="p-molduras" role="tabpanel" aria-labelledby="tab-molduras" class="panel" hidden></div>
 
-<div id="p-outra" role="tabpanel" class="panel" hidden>
-<div class="msg"><svg class="ico"><use href="#i-info"/></svg><p>Esta aba ainda não está disponível.</p></div>
-</div>
 </div>
 </aside>
 </div>

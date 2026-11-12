@@ -32,12 +32,15 @@ function daFoto(m){return m&&m.lugar&&window.PLTEXTO?PLTEXTO.lugarTxt(m.lugar,Q.
 
 function refaz(ns){if(window.PLLEG&&PLLEG.refazer)PLLEG.refazer(ns)}   /* D-148: as linhas sugeridas seguem a data e a cidade */
 function grava(n,m,k){Q.ST()[n].meta=m;Q.commit(k)}
+/* D-182: fotos (fora a aberta) sem cidade digitada e sem local lido do GPS, e que não foram marcadas «Sem local» */
+function semLocal(n){var r=[],i,m;for(i=1;i<=Q.N;i++){if(i===n)continue;m=M(i);if(!m.c&&m.cs!=='sem'&&!m.lugar)r.push(i)}return r}
 /* marcação da seção (D-148): entra em Legendas › Avançado, sem repetir nada que o painel já tem */
 function html(){
   var h='<div class="f md-sec" data-md="1"><div class="f__top"><span class="f__l">Data e cidade desta foto</span></div>'
    +'<p class="f__h" id="md-info" role="status"></p></div>';
   h+='<div class="f" data-k="d"><div class="f__top"><label class="f__l" for="md-d">Data</label><button type="button" class="lk" data-clr="d">Sem data</button></div><div class="num num--l"><input id="md-d" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off" list="md-c-l"><datalist id="md-c-l"></datalist></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
+  h+='<button type="button" class="btn2 btn2--sm mod__apl" id="md-c-todas" hidden><svg class="ico sm"><use href="#i-copy"/></svg><span></span></button>';   /* D-182 */
   h+='<p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Vale só para esta foto. Em branco, vale o local lido da foto; «Sem local» tira a cidade e o ponto. Coordenadas nunca aparecem e o arquivo gerado não leva os metadados originais.</span></p>';
   h+='<div class="f" data-k="h"><div class="f__top"><label class="f__l" for="md-h">Somar ou subtrair horas às datas</label></div><div class="num"><input id="md-h" inputmode="numeric" autocomplete="off" value="0"><span class="num__u mono">h</span></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<p class="f__h" id="md-prev" role="status"></p>';
@@ -63,6 +66,7 @@ function render(){
   var bh=P.querySelector('[data-k="h"]'),eh=err&&err.k==='h';
   bh.classList.toggle('is-err',!!eh);bh.querySelector('p').hidden=!eh;if(eh)bh.querySelector('p').lastChild.textContent=err.m;
   if(document.activeElement!==$('md-h')&&!eh)$('md-h').value=String(hv);
+  var sl=semLocal(n),bt=$('md-c-todas');bt.hidden=!(m.c&&m.cs!=='sem'&&sl.length);if(!bt.hidden)bt.lastChild.textContent='Usar «'+m.c+'» nas fotos sem local · '+sl.length;
   P.querySelector('[data-clr="d"]').hidden=!m.iso;
   var gf=daFoto(m),bc=P.querySelector('[data-clr="c"]'),sem=m.cs==='sem';   /* D-178: «Sem local» ↔ «Usar o local da foto» */
   bc.textContent=sem?'Usar o local da foto':'Sem local';bc.hidden=sem?!gf:!(m.c||gf);
@@ -83,6 +87,7 @@ P0.addEventListener('input',function(e){
 P0.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var n=Q.cur(),m;
   if(b.getAttribute('data-clr')==='d'){m=cp(n);m.iso='';m.ds='none';m.dh=0;err=null;grava(n,m,'md:d');refaz([n])}
   if(b.getAttribute('data-clr')==='c'){m=cp(n);var volta=m.cs==='sem';m.c='';m.cs=volta?'none':'sem';err=null;grava(n,m,'md:c');refaz([n])}
+  if(b.id==='md-c-todas'){var c0=M(n).c,L2=semLocal(n);L2.forEach(function(i){var m2=cp(i);m2.c=c0;m2.cs='manual';Q.ST()[i].meta=m2});Q.commit('md:c-todas');refaz(L2);Q.toast('Cidade aplicada a '+L2.length+(L2.length===1?' foto':' fotos'),true);return}
   if(b.id==='md-apl'&&hv){var q=0,i,L=alvos();for(var j=0;j<L.length;j++){i=L[j];m=cp(i);if(m.iso){m.iso=desloca(m.iso,hv);m.dh+=hv;Q.ST()[i].meta=m;q++}}
     var t=(hv>0?'+':'−')+Math.abs(hv)+' h';hv=0;Q.commit('md:shift');refaz(L);Q.toast('Datas corrigidas em '+t+' · '+q+' fotos · Desfazer',true)}});
 window.PLMET={render:render,html:html};

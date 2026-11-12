@@ -48,9 +48,9 @@ function paint(){
   $('det-t').textContent='Ver todos os arquivos ('+N+')';
   if(!finished){
     var shown=Math.min(cur+1,N);
-    $('lbl').textContent='Convertendo '+shown+' de '+N;
+    $('lbl').textContent=(REAL?'Preparando ':'Convertendo ')+shown+' de '+N;   /* D-183: foto real não passa por conversão aqui (T7) */
     $('pct').textContent=pct+'% concluído';
-    $('prog').setAttribute('aria-valuetext','Convertendo '+shown+' de '+N);
+    $('prog').setAttribute('aria-valuetext',(REAL?'Preparando ':'Convertendo ')+shown+' de '+N);
   }else{
     $('lbl').textContent='Concluído · '+c.ok+' de '+N+' fotos preparadas';
     $('pct').textContent='';
@@ -109,7 +109,21 @@ if(hash==='#processando'){jump(2);paint()}   /* parado em «Convertendo 3 de 24�
 else if(hash==='#concluido'||hash==='#erro'){
   for(var i=0;i<N;i++){var ff=FILES[i];if(FAIL[i+1]&&hash==='#erro'){ff.st='fail';ff.why=FAIL[i+1].why}else ff.st='ok'}
   cur=N;finish();
-}else{paint();timer=setInterval(step,320);step()}
+}else if(REAL){paint();verificarReal()}
+else{paint();timer=setInterval(step,320);step()}
+
+/* D-183: com fotos de verdade, a barra acompanha a leitura real de cada foto já guardada no aparelho (dimensões no IndexedDB),
+   em vez de uma animação de conversão de 0,3 s por foto. Foto que não está mais lá aparece como «não suportada», com o motivo. */
+function verificarReal(){
+  var i=0;
+  function prox(){
+    if(i>=N){finish();return}
+    cur=i;FILES[i].st='work';paint();
+    var p=window.PLFOTOS?PLFOTOS.ler(REAL[i]).catch(function(){return null}):Promise.resolve({w:1,h:1});
+    p.then(function(r){var f=FILES[i];if(r&&r.w&&r.h)f.st='ok';else{f.st='fail';f.why='A foto não está mais neste aparelho. Volte e escolha de novo.'}i++;setTimeout(prox,30)})
+  }
+  prox()
+}
 
 /* Tentar de novo e Trocar foto, por arquivo */
 var swapIdx=-1,swapBtn=null;

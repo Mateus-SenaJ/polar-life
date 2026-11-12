@@ -37,6 +37,10 @@ function ppi(n,s){return Math.round(1/(base(n,s)*s.z/100)/FR.jw*25.4)}   /* BR-1
 function nivel(p){return typeof window!=='undefined'&&window.PLQUALIDADE?PLQUALIDADE.nivel(p):p>=300?'excelente':p>=150?'boa':'borrada'}   /* D-130: fonte única em PLQUALIDADE */
 function zmaxPara(n,s,alvo){return Math.floor((1/base(n,s))/(alvo*FR.jw/25.4)*100)}
 function ajustou(s){return JSON.stringify(s.adj)!==JSON.stringify(ADJ0)||(s.flt&&s.flt.id!=='original')}
+/* D-182: «ajuste individual» = feito na própria foto (ind = true). O que chegou por «Aplicar» (ind = false) não protege a foto;
+   projeto antigo, sem a marca, continua protegido como antes */
+function individual(s){return ajustou(s)&&s.ind!==false}
+var ADJK={brilho:1,contraste:1,saturacao:1,temp:1,realces:1,sombras:1,nitidez:1,vinheta:1,fint:1,flt:1};
 function mudou(s){var c=JSON.parse(JSON.stringify(s)),d=novo();delete c.meta;delete c.src;delete c.ex;delete c.ey;delete d.ex;delete d.ey;return JSON.stringify(c)!==JSON.stringify(d)}   /* metadados e elástico não contam como ajuste */
 /*FIM MOTOR*/
 
@@ -286,6 +290,7 @@ function ir(n){
 /* ---------- histórico (FN-00c) ---------- */
 var hist=[JSON.stringify(ST)],hi=0,lastK='',lastT=0;
 function commit(k){
+  if(k&&ADJK[k])S().ind=true;   /* D-182: mexeu nesta foto */
   acertar(cur,S());
   render();
   var s=JSON.stringify(ST),now=Date.now();
@@ -369,21 +374,35 @@ $('th-menu-dup').onclick=function(){var i=menuI;fechaMenu();var k=duplicar([i]);
 $('th-menu-del').onclick=function(){var i=menuI;fechaMenu();excluirFoto(i)};
 
 /* ---------- lote (FN-09) ---------- */
-function outrosIndividuais(){var c=0,a=window.PLLOTE?PLLOTE.conj():null;for(var i=1;i<=N;i++)if(i!==cur&&(!a||a.indexOf(i)>=0)&&ajustou(ST[i]))c++;return c}
+function outrosIndividuais(){var c=0,a=window.PLLOTE?PLLOTE.conj():null;for(var i=1;i<=N;i++)if(i!==cur&&(!a||a.indexOf(i)>=0)&&individual(ST[i]))c++;return c}
+/* D-182: «Aplicar às demais» é um toque só (sem o «Replicar» antes). Os ajustes mexem sempre na foto aberta; o escopo
+   (Modificar escopo) escolhe para onde o «Aplicar» leva. Cada parte (filtro, modo do recorte, luz e cor, detalhe) tem o seu
+   «… nas demais», que copia só aquela parte. */
 function lote(){
-  var on=$('replicar').checked,ind=outrosIndividuais(),sub=$('subst').checked,P=window.PLLOTE,nT=P?P.conj().length:N-1;
+  var ind=outrosIndividuais(),sub=$('subst').checked,P=window.PLLOTE,nT=P?P.conj().length:N-1,on=!!(P&&P.alvos().length),q=nT+(nT===1?' foto':' fotos');
   if(ABA==='tab-legendas'){$('scope').classList.remove('is-lote');$('scope-tag').hidden=true;$('scope-t').textContent='Alterando: texto só desta foto · Foto '+p2(cur)+' · estilo em todas as '+N;return}
   $('scope').classList.toggle('is-lote',on);$('scope-tag').hidden=!on;
-  $('scope-t').textContent=P?P.texto():on?'Alterando: Todas as fotos · '+N:'Alterando: só esta foto · Foto '+p2(cur);
-  $('replicar-t').textContent='Replicar para as demais '+nT+(nT===1?' foto':' fotos');
-  $('apply').disabled=!on||nT===0;$('apply-t').textContent='Aplicar às demais · '+nT+(nT===1?' foto':' fotos');
+  $('scope-t').textContent=P?P.texto():'Alterando: só esta foto · Foto '+p2(cur);
+  $('apply').disabled=nT===0;$('apply-t').textContent='Aplicar às demais · '+q;
+  [].forEach.call(document.querySelectorAll('[data-apl]'),function(b){var t=b.lastChild;t.textContent=t.textContent.replace(/ · \d+ fotos?$/,'')+' · '+q;b.disabled=nT===0});
   $('subst-h').textContent=ind&&!sub?(ind===1?'1 foto tem ajuste individual e será mantida.':ind+' fotos têm ajuste individual e serão mantidas.'):'Desmarcada, as fotos com ajuste próprio ficam como estão.'
 }
-$('replicar').onchange=lote;$('subst').onchange=lote;
+$('subst').onchange=lote;
+var APL={flt:['Filtro',function(d,s){d.flt=copia(s.flt)}],
+  modo:['Modo do recorte',function(d,s){d.modo=s.modo;d.z=100;d.px=d.py=0}],
+  luz:['Luz e cor',function(d,s){['brilho','contraste','saturacao','temp'].forEach(function(k){d.adj[k]=s.adj[k]})}],
+  det:['Detalhe',function(d,s){['realces','sombras','nitidez','vinheta'].forEach(function(k){d.adj[k]=s.adj[k]})}]};
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-apl]');if(!b||b.disabled)return;
+  var a=APL[b.getAttribute('data-apl')],s=S(),al=window.PLLOTE?PLLOTE.conj():null,n=0,i;if(!a)return;
+  for(i=1;i<=N;i++){if(i===cur||(al&&al.indexOf(i)<0))continue;var antes=ajustou(ST[i]);a[1](ST[i],s);if(!antes)ST[i].ind=false;n++}
+  commit('apl:'+b.getAttribute('data-apl'));for(i=1;i<=N;i++)thumb(i);
+  toast(a[0]+' aplicado a '+n+(n===1?' foto':' fotos'),true)
+});
 $('apply').onclick=function(){
   if($('apply').disabled)return;
   var sub=$('subst').checked,a=S().adj,n=0,keep=0,al=window.PLLOTE?PLLOTE.conj():null;
-  for(var i=1;i<=N;i++){if(i===cur||(al&&al.indexOf(i)<0))continue;if(ajustou(ST[i])&&!sub){keep++;continue}ST[i].adj=copia(a);ST[i].flt=copia(S().flt);n++}
+  for(var i=1;i<=N;i++){if(i===cur||(al&&al.indexOf(i)<0))continue;if(individual(ST[i])&&!sub){keep++;continue}ST[i].adj=copia(a);ST[i].flt=copia(S().flt);ST[i].ind=false;n++}
   commit('lote');for(i=1;i<=N;i++)thumb(i);
   if(window.PLLOTE)PLLOTE.aviso(keep);
   toast('Ajustes aplicados a '+n+(n===1?' foto':' fotos')+(keep?' · '+keep+(keep===1?' foi mantida':' foram mantidas'):''),true)
@@ -606,11 +625,10 @@ var ABA='tab-ajustes',tabs=[].slice.call(document.querySelectorAll('.tab'));
 function aba(t){
   tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});
   var id=t.id,esc=$('scope');ABA=id;
-  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-papel').hidden=id!=='tab-papel';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';
-  $('p-outra').hidden=['tab-ajustes','tab-papel','tab-legendas','tab-molduras'].indexOf(id)>=0;$('p-outra').setAttribute('aria-labelledby',id);
+  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';   /* D-183: Papel e Fotos saíram do Quadro (eram só um aviso; o papel fica nas Folhas) */
   esc.hidden=id!=='tab-ajustes'&&id!=='tab-legendas';lote();if(window.PLLEG)PLLEG.render();if(window.PLMOL)PLMOL.render()
 }
-tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
+tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;var j=(i+d+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}   /* D-183: ← na primeira aba volta para a última */});
 
 /* tablet: inspetor deslizante · celular: painel inferior com 25%, 50% e 85% (como na T-07) */
 var insp=$('insp'),content=$('main'),SN=[25,50,85],sn=0,mt=window.matchMedia('(min-width:768px) and (max-width:1023.98px)');
@@ -627,7 +645,7 @@ mt.addListener?mt.addListener(modo):mt.addEventListener('change',modo);modo();sn
 
 /* D-149: preencher as linhas sugeridas ao abrir não vira passo de Desfazer */
 function rebase(){if(hi===0&&hist.length===1){hist[0]=JSON.stringify(ST);render()}else commit('lg:auto')}   /* sem gravar: só o próximo gesto grava (evita sobrescrever o estado salvo) */
-window.PLQ={rebase:rebase,sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,midia:midia,real:!DEMO,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
+window.PLQ={rebase:rebase,sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou,individual:individual,nat:nat,vert:function(n){return!!VERT[src(n)]},src:src,duplicar:duplicar,remover:remover,FR:FR,dim:dimensionar,render:render,cena:cena,midia:midia,real:!DEMO,acertar:acertar,ST:function(){return ST},S:S,cur:function(){return cur},commit:commit,toast:toast,p2:p2,pw:function(){return $('pq')}};
 Object.defineProperty(window.PLQ,'N',{get:function(){return N}});
 /* ---------- partida ---------- */
 construir();faixa();

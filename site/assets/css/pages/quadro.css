@@ -136,3 +136,6 @@
 @media (max-width:360px){.cbar{gap:2px}.cbar .seg__o span{padding:0 10px}}
 .ft__n{font-size:12px}
 @media (max-width:340px){.cbar{flex-wrap:wrap;justify-content:center;row-gap:4px}}
+/* D-182: «… nas demais» no fim de cada parte dos Ajustes: copia só aquela parte para as outras fotos do escopo */
+.mod__apl{align-self:flex-start;min-height:44px;margin-top:12px;max-width:100%;white-space:normal;text-align:left}
+.prot__h{margin:0}

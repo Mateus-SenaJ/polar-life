@@ -35,16 +35,14 @@
 <div class="head">
 <h1>Adicionar fotos</h1>
 <p>Suas fotos continuam no seu aparelho. Você escolhe o que trazer.</p>
-<p><a class="btn2" href="../conexoes/"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Verificar conexão</a></p>
 </div>
 
 <section class="pick" aria-labelledby="h-aparelho">
 <div class="drop" id="drop">
 <svg class="ico drop__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>
-<h2 class="sec" id="h-aparelho">Do seu aparelho</h2>
-<span class="stt"><svg class="ico okc" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Pronto para usar</span>
+<h2 class="sec" id="h-aparelho">Escolha suas fotos</h2>
 <p class="only-pointer">Arraste as fotos até aqui, cole ou escolha pelos botões.</p>
-<p class="small" id="fmts">JPEG, PNG, WebP e HEIC. Fotos HEIC são convertidas para JPEG no aparelho.</p>
+<p class="small" id="fmts">JPEG, PNG, WebP, RAW e pastas .zip. HEIC abre no iPhone e no Safari.</p>
 <div class="drop__act">
 <button type="button" class="led-btn led-btn--light" id="btn-device"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content" id="btn-device-t">Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
 <button type="button" class="btn2" id="btn-camera"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Usar a câmera</button>
@@ -54,28 +52,11 @@
 <input type="file" id="f-camera" accept="image/*" capture="environment" hidden>
 </div>
 <div class="got" id="got" aria-live="polite" hidden></div>
+<p class="pick__con"><a class="link" href="../conexoes/">O Google Fotos não abre? Verificar conexões</a></p>   <!-- D-181: ajuda secundária, abaixo das origens -->
 </section>
 
-<section class="sec-wrap" aria-labelledby="h-outros">
-<h2 class="sec" id="h-outros">Outros lugares</h2>
-<p>Se as fotos estão em outro lugar, veja o caminho de cada um.</p>
-<div class="grid" id="grid"></div>
-</section>
 </main>
 
-<div class="scrim led-scrim" id="scrim" hidden></div>
-<div class="dialog led-dialog led-box led-box--3" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t" hidden>
-<h2 class="led-dialog__title" id="dlg-t">Trazer fotos do Instagram ou do Facebook</h2>
-<p>O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha <strong>Do aparelho</strong>.</p>
-<ol class="steps">
-<li>Salve a foto no aparelho pelo próprio aplicativo.</li>
-<li>Volte aqui e escolha <strong>Do aparelho</strong>.</li>
-</ol>
-<div class="dialog__act led-dialog__actions">
-<button type="button" class="btn2 btn2--lg" id="dlg-close">Fechar</button>
-<button type="button" class="btn2 btn2--lg" id="dlg-pick">Escolher do aparelho</button>
-</div>
-</div>
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
 
 <script src="../../assets/js/nucleo/exif.js" defer></script>

@@ -14,11 +14,11 @@ function conj(e){                                            /* destinos do esco
   return r}
 function alvos(){return esc==='esta'?[]:conj(esc)}
 function n(k,s,p){return k+' '+(k===1?s:p)}
-function texto(){var c=Q.cur(),a=alvos().length+1;
-  if(esc==='esta')return'Alterando: só esta foto · Foto '+Q.p2(c);
-  if(esc==='sel')return'Alterando: '+n(a,'foto selecionada','fotos selecionadas');
-  if(esc==='folha')return'Alterando: esta folha · Folha '+fo(c)+' · '+a+' fotos';
-  return'Alterando: Todas as fotos · '+Q.N}
+function texto(){var c=Q.cur(),a=alvos().length,b='Alterando: só esta foto · Foto '+Q.p2(c);   /* D-182: os ajustes mexem só na foto aberta; o escopo diz para onde «Aplicar» leva (T7) */
+  if(esc==='esta')return b;
+  if(esc==='sel')return b+' · «Aplicar» vai para '+n(a,'selecionada','selecionadas');
+  if(esc==='folha')return b+' · «Aplicar» vai para a Folha '+fo(c)+' ('+n(a,'foto','fotos')+')';
+  return b+' · «Aplicar» vai para as outras '+a}
 function dif(id){                                            /* fotos do escopo cujo valor de «id» difere da foto aberta (FN-00a) */
   if(esc==='esta')return[];var al=alvos(),S=Q.ST(),c=Q.S();
   return al.filter(function(i){var f=S[i].flt,g=c.flt;
@@ -59,7 +59,6 @@ function montar(){
   $('est-colar').onclick=colar;
   $('est-dup').onclick=function(){var k=Q.duplicar(alvoEst());if(k){aviso(0);Q.toast(k===1?'1 foto duplicada · Desfazer':k+' fotos duplicadas · Desfazer',true)}};
   $('est-rem').onclick=function(){if(!$('est-rem').disabled)confirmar(alvoEst())};
-  $('replicar').addEventListener('change',function(){set(this.checked?ult:'esta')});
   $('faixa').addEventListener('click',function(e){
     var t=e.target.closest&&e.target.closest('.th');if(!t)return;
     var i=[].indexOf.call($('faixa').children,t.parentNode)+1,k,a,z;
@@ -105,11 +104,11 @@ function fecharDlg(semFoco){
   if(semFoco!==true&&dlgV&&dlgV.focus)dlgV.focus()}
 function alvoEst(){var m=sel();return m.length?m:[Q.cur()]}   /* Duplicar e Remover agem nas marcadas; sem marcação, na foto aberta */
 function limpar(){SEL={};anc=0;if($('faixa').children.length===Q.N)marcaTudo();if($('scope-box'))refresh()}
-function set(e){esc=e;if(e!=='esta')ult=e;$('replicar').checked=e!=='esta';aviso(0);Q.lote();render()}
+function set(e){esc=e;if(e!=='esta')ult=e;aviso(0);Q.lote();render()}   /* D-182: sem o «Replicar»; o escopo só escolhe para onde o «Aplicar» leva */
 function refresh(){aviso(0);render();Q.lote()}
 function colar(){
   if(!clip)return;var c=Q.cur(),sub=$('subst').checked,q=0,keep=0,L=[c].concat(alvos()),S=Q.ST();
-  L.forEach(function(i){if(i!==c&&Q.ajustou(S[i])&&!sub){keep++;return}S[i].adj=JSON.parse(JSON.stringify(clip.adj));S[i].flt=JSON.parse(JSON.stringify(clip.flt));q++});
+  L.forEach(function(i){if(i!==c&&(Q.individual||Q.ajustou)(S[i])&&!sub){keep++;return}S[i].adj=JSON.parse(JSON.stringify(clip.adj));S[i].flt=JSON.parse(JSON.stringify(clip.flt));if(i!==c)S[i].ind=false;q++});   /* D-182 */
   Q.commit('lote:colar');marcaTudo();aviso(keep);
   Q.toast('Estilo colado em '+n(q,'foto','fotos')+(keep?' · '+keep+(keep===1?' foi mantida':' foram mantidas'):''),true)}
 

@@ -37,7 +37,6 @@ h2.sec{margin:0;font-size:22px;font-weight:300;line-height:1.2}
 
 .stt{display:inline-flex;align-items:flex-start;gap:8px;padding:6px 12px;background:var(--surface-subtle);border-radius:12px;font-size:12px;font-weight:500;line-height:1.4;text-align:left}
 .stt .ico{width:16px;height:16px;margin-top:1px;stroke-width:2}
-.svc .stt{align-self:flex-start}
 .stt .warn{color:var(--orange)}
 .stt .okc{color:var(--blue)}
 
@@ -52,20 +51,8 @@ h2.sec{margin:0;font-size:22px;font-weight:300;line-height:1.2}
 .msg--err{border:2px solid var(--black)}
 .msg--err .ico{stroke-width:2}
 
-.sec-wrap{margin-top:40px}
-.sec-wrap>p{margin:8px 0 0;font-size:14px;line-height:1.5}
-.grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}
-.svc{display:flex;flex-direction:column;gap:12px;min-width:0;padding:20px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card)}
-.svc__top{display:flex;align-items:center;gap:12px}
-.svc__ico{flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--surface-subtle);border-radius:12px}
-.svc h3{margin:0;font-size:16px;font-weight:500;line-height:1.3}
-.svc>p{margin:0;font-size:14px;line-height:1.5}
-.svc__act{display:flex;flex-wrap:wrap;align-items:center;gap:0 16px;margin-top:auto;padding-top:4px}
-.svc__act .btn2{margin-right:0}
-
-.steps{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:s}
-.steps li{display:flex;gap:12px;align-items:flex-start;font-size:16px;line-height:1.5}
-.steps li::before{counter-increment:s;content:counter(s);flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--surface-subtle);font-size:13px;font-weight:500}
+/* D-181: «Outros lugares» e o diálogo do Instagram saíram (cartões .svc, grade e passos); «Verificar conexões» virou ajuda abaixo da caixa */
+.pick__con{margin:12px 0 0;text-align:center;font-size:14px}
 
 @media (hover:none),(pointer:coarse){.only-pointer{display:none}}
 @media (min-width:768px){
@@ -76,9 +63,6 @@ h2.sec{margin:0;font-size:22px;font-weight:300;line-height:1.2}
   .drop__act{flex-direction:row;justify-content:center;max-width:none}
   .drop__act .led-btn{width:auto;min-width:240px}
   .drop__act .btn2{min-width:200px}
-  .grid{grid-template-columns:1fr 1fr}
 }
-.dialog p{margin:12px 0 0;font-size:16px;line-height:1.6}
-.dialog__act{flex-wrap:wrap}
 .toast{position:fixed;z-index:950;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;max-width:calc(100vw - 32px);padding:12px 16px;font-size:14px;font-weight:500}
 @media (prefers-reduced-motion:reduce){.drop{transition:none}}
