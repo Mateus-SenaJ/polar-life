@@ -27,6 +27,10 @@ const mascara = cod => cod.slice(0, 2) + '-' + cod.slice(2, 6) + '-' + cod.slice
 /* contexto com sessão (e pré-voo opcional) já prontos */
 async function contexto(email, nFolhas) {
   const c = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  /* D-167: com o ID do Google publicado o botão vai ao Google de verdade (coberto em testar-google);
+     aqui o fluxo de demonstração continua coberto servindo o google.js sem ID */
+  const g = (await readFile(new URL('../../site/assets/js/nucleo/google.js', import.meta.url), 'utf8')).replace(/var CLIENT_ID='[^']*';/, "var CLIENT_ID='';");
+  await c.route('**/assets/js/nucleo/google.js', (r) => r.fulfill({ contentType: 'application/javascript', body: g }));
   if (email) await c.addInitScript(SESSAO(email));
   if (nFolhas) await c.addInitScript(PREVOO(nFolhas));
   return c;
