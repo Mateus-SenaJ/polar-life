@@ -181,3 +181,9 @@ a{color:inherit}
 @media (min-width:1024px){
   .midia--hero .midia__video,.midia--hero .midia__poster{scale:1.14;transform-origin:62% 100%}
 }
+/* D-169: em telas muito grandes (≥ 1920 px) o herói acompanha a escala: título, apoio e botão maiores */
+@media (min-width:1920px){
+  .hero__title{font-size:clamp(96px,5.4vw,140px)}
+  .hero__lead{font-size:21px;max-width:36ch}
+  .hero__cta .led-btn{min-width:380px;--btn-h:60px;font-size:17px}
+}

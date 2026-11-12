@@ -56,3 +56,4 @@
   .plns__act .led-btn{width:100%;max-width:420px}
 }
 @media (prefers-reduced-motion:reduce){.pln__c,.seg span{transition:none}}
+.pln__seu{font-size:12px}   /* D-169: selo legível */

@@ -132,3 +132,7 @@
 .thmenu__t{padding:4px 8px}
 .thmenu .btn2{justify-content:flex-start;box-shadow:none}
 .btn2:disabled{opacity:.4;cursor:not-allowed}
+/* D-169: barra da foto cabe em 320 px; nomes dos filtros legíveis (≥ 12 px) */
+@media (max-width:360px){.cbar{gap:2px}.cbar .seg__o span{padding:0 10px}}
+.ft__n{font-size:12px}
+@media (max-width:340px){.cbar{flex-wrap:wrap;justify-content:center;row-gap:4px}}

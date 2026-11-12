@@ -286,3 +286,24 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 .pol--col{background:none}
 /* D-164: de 1024 a 1199 px o cabeçalho do editor não cabe inteiro: saem o rótulo do estúdio e o selo «Salvo» (o nome do projeto e as ações ficam) */
 @media (min-width:1024px) and (max-width:1199px){.eh__studio,.eh__div:not(.eh__div--r),.eh__proj .chip{display:none}}
+
+/* D-169 usabilidade: as 6 abas do inspetor quebram em duas linhas em vez de esconder «Molduras» numa rolagem
+   lateral; cada aba tem alvo ≥ 44 px; o logo do cabeçalho não encolhe (não distorce entre 768 e 820 px) */
+.tabs{flex-wrap:wrap;column-gap:16px;overflow-x:visible}
+.tab{min-width:44px;padding:0 4px}
+.logo,.logo-h{flex:none}
+
+/* D-169: no editor o cabeçalho é fixo e cobria o selo «Ambiente de teste» (aparecia borrado atrás do vidro).
+   Com o selo visível, ele fica fixo no topo e todo o editor desce 32 px. */
+:root:has(.selo-teste:not([hidden])){--selo-h:32px}
+.selo-teste{position:relative;z-index:60}
+:root:has(.selo-teste:not([hidden])) .selo-teste{position:fixed;top:0;left:0;right:0}
+.eh{top:var(--selo-h,0px)}
+.rail{top:calc(var(--hh) + var(--selo-h,0px))}
+.content{padding-top:calc(var(--hh) + var(--selo-h,0px))}
+@media (max-width:1023.98px) and (min-width:768px){.insp{top:calc(var(--hh) + var(--selo-h,0px))}}
+@media (max-width:767.98px){
+  .modes{top:calc(var(--hh) + var(--selo-h,0px))}
+  .content{padding-top:calc(var(--hh) + 60px + var(--selo-h,0px))}
+  .insp{max-height:calc(100dvh - var(--hh) - var(--bar) - 16px - var(--selo-h,0px))}
+}

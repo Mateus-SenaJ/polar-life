@@ -132,3 +132,7 @@
   .faixa__tit{max-width:none}
   .faixa__apoio{max-width:46ch}
 }
+/* D-169: em telas estreitas o «Pausar» fica só com o ícone (o rótulo continua para leitor de tela) e não sai da faixa */
+@media (max-width:400px){.faixa__pausa{padding:0 10px}.faixa__pausa span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}
+@media (max-width:400px){.faixa__pausa{min-width:44px;justify-content:center;padding:0}.faixa__ctrl{flex-wrap:wrap;row-gap:0}}
+@media (max-width:440px){.faixa__ctrl{flex-wrap:wrap;gap:8px}.faixa__pausa{min-width:44px}}

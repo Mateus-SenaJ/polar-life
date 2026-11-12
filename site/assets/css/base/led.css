@@ -327,3 +327,5 @@
 }
 /* D-155: botão LED feito com <a> não herda o sublinhado padrão de link (o texto é rótulo de botão) */
 a.led-btn,a.led-btn:hover,a.led-btn:focus-visible,a.led-btn .btn-content{text-decoration:none}
+/* D-169: o LED pequeno também tem alvo de 44 px (T3) */
+.led-btn--sm { --btn-h: 44px; }

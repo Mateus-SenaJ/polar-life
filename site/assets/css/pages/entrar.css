@@ -307,3 +307,4 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
   .ent__midia .midia__video{object-position:62% 50%}
   .ent__midia::after{background:linear-gradient(180deg,rgb(0 0 0/0) 55%,rgb(0 0 0/.7) 80%,#000 100%)}
 }
+@media (max-width:1023px){.ent__kick{font-size:12px}}   /* D-169: rótulo legível no celular */

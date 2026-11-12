@@ -92,3 +92,5 @@ body{margin:0;background:var(--surface-subtle);min-height:100vh;color:var(--blac
   .dialog__act .btn2,.dialog__act .led-btn{width:auto}
 }
 @media (prefers-reduced-motion:reduce){.sw span,.sw span::after{transition:none}}
+/* D-169: em 320–400 px o cabeçalho (logo + Conta + Conexões) cabe sem rolagem lateral */
+@media (max-width:400px){.hnav{gap:6px}.hnav .btn2{padding:0 10px}.logo-h{height:26px;width:auto}}

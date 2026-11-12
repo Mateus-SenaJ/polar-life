@@ -26,3 +26,9 @@
 .pas li::before{counter-increment:p;content:counter(p);flex:none;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--black);border-radius:50%;font-size:14px;font-weight:500}
 .resumo{margin:16px 0 0;font-size:16px;line-height:1.6}
 @media(max-width:600px){.cx__acoes .btn2,.dialog__act .btn2{flex:1 1 100%;min-height:48px}.act--top .led-btn{width:100%}}
+/* D-169: os cartões nunca passam da largura da tela (320 px): coluna elástica e botões que quebram linha */
+.cards{grid-template-columns:minmax(0,1fr)}
+.cx{min-width:0}
+.cx__acoes .btn2{white-space:normal;text-align:center;line-height:1.25}
+.cx__top{flex-wrap:wrap;min-width:0}.cx__nome{min-width:0;overflow-wrap:anywhere}
+.sel{width:auto;max-width:100%;justify-self:start;white-space:normal;line-height:1.35;padding-top:4px;padding-bottom:4px}   /* D-169: o selo longo quebra linha em 320 px */
