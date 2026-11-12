@@ -2,6 +2,7 @@
    JPEGs gerados por canvas dentro do navegador, com um bloco EXIF montado aqui: nenhuma foto pessoal. */
 import { chromium } from 'playwright';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -14,6 +15,7 @@ function titulo(t) { console.log('\n' + t); }
 
 async function ctxNovo() {
   const c = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  await maisAbertos(c);   /* D-172: ajustes avançados à vista */
   await c.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   return c;
 }

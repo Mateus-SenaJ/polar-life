@@ -1,3 +1,4 @@
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* 50 · Qualidade em palavras e ponto na moldura (D-130), margens sem mudar a polaroid, sugestão de orientação e
    navegação entre folhas (D-133), Pro na resolução nativa (D-131). Fotos geradas por canvas (sem fotos pessoais). */
 import { chromium } from 'playwright';
@@ -12,6 +13,7 @@ const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.
 
 try {
   const p = await ctx.newPage(); p.on('pageerror', e => errosPg.push(String(e)));
+  await p.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
   await p.goto(srv.url + 'app/adicionar-fotos/');
   await p.evaluate(async () => {                           // projeto real com 3 fotos de tamanhos conhecidos
     localStorage.removeItem('pl-projeto-atual'); sessionStorage.clear();

@@ -2,6 +2,7 @@
    JPEGs gerados por canvas dentro do navegador: nenhuma foto pessoal entra no teste. */
 import { chromium } from 'playwright';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -21,6 +22,7 @@ const AJ0 = { brilho: 0, contraste: 0, saturacao: 0, temp: 0, realces: 0, sombra
 
 async function ctxNovo(vp) {
   const c = await nav.newContext({ viewport: vp || { width: 1440, height: 900 } });
+  await maisAbertos(c);   /* D-172: ajustes avançados à vista */
   await c.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   return c;
 }

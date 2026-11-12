@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { maisAbertos } from '../helpers/mais.mjs';
 /* Navegação e fluxos (openspec «auditoria-navegacao-fluxos» · spec navegacao · D-157 a D-164).
    1) Rastreia todas as rotas, sem sessão e com conta: nenhuma página com erro de script, recurso 404 ou link interno quebrado;
       sem sessão, toda rota de /app/ vai para «Entrar» guardando o destino (D-123); no máximo um LED visível por tela (T8).
@@ -29,6 +30,7 @@ function vigiar(p, v) {
 }
 async function contexto(email, larg = 1440, alt = 900) {
   const ctx = await nav.newContext({ viewport: { width: larg, height: alt }, serviceWorkers: 'block' });
+  await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
   if (email) await ctx.addInitScript(SESSAO(email));
   return ctx;
 }

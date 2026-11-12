@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 /* D-135/D-136 · «Polaroid original» e o alinhamento Esquerda · Centro · Direita:
    o mesmo texto na tela (Quadro e Folhas) e no PDF (MT-02) · migração dos projetos antigos.
    Uso: node tests/e2e/testar-texto-alinhado.mjs  (Chromium do Playwright + pdfjs-dist) */
@@ -26,6 +27,7 @@ const pdfjsUrl = `http://127.0.0.1:${srvPdfjs.address().port}/`;
 
 const nav = await chromium.launch();
 const page = await nav.newPage();
+await page.addInitScript(abrirTudo, SECOES);   /* D-172: ajustes avançados à vista */
 await page.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // guarda de /app/ exige conta (D-123)
 page.setDefaultTimeout(240000);
 const errosPg = [];

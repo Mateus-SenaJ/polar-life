@@ -8,6 +8,7 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 
 const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.push(m); console.log('  ✘ ' + m); };
 const saida = fileURLToPath(new URL('../saida/inicio/', import.meta.url));
@@ -27,6 +28,7 @@ const bannerAtivo = p => p.evaluate(() => {
 });
 async function contexto(email, opts = {}) {
   const c = await nav.newContext({ viewport: { width: 1440, height: 900 }, ...opts });
+  await maisAbertos(c);   /* D-172: ajustes avançados à vista */
   if (email) await c.addInitScript(SESSAO(email));
   return c;
 }

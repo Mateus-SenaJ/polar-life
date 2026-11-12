@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { abrirTudo, SECOES } from '../helpers/mais.mjs';
 // Teste do motor do gerador de PDF (T-30a): display list, fontes, imagens, volumes e renderização.
 // Uso: npm run testar:pdf  (Chromium do Playwright + pdfjs-dist)
 import { chromium } from 'playwright';
@@ -28,6 +29,7 @@ const pdfjsUrl = `http://127.0.0.1:${srvPdfjs.address().port}/`;
 
 const nav = await chromium.launch();
 const page = await (await nav.newContext({ serviceWorkers: 'block' })).newPage(); // sem SW: o teste intercepta a rede com page.route (o SW do editor serviria do cache)
+await page.addInitScript(abrirTudo, SECOES);   /* D-172 */
 await page.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() }))); // sessão de teste: a guarda de /app/ exige conta (D-123)
 page.setDefaultTimeout(240000);
 const errosPg = [];

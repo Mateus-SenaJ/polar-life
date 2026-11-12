@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { inflateSync } from 'node:zlib';
 import { PDFDocument, PDFName, PDFRawStream, PDFArray } from 'pdf-lib';
 import { servir } from '../helpers/servidor.mjs';
+import { maisAbertos } from '../helpers/mais.mjs';
 
 let falhas = 0;
 const ok = (m) => console.log('  ✔ ' + m);
@@ -46,6 +47,7 @@ async function ler(b64) {
 }
 try {
   const ctx = await nav.newContext({ viewport: { width: 1280, height: 900 } });
+  await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
   await ctx.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
   const p = await ctx.newPage(); const erros = []; p.on('pageerror', (e) => erros.push(e.message));
   await p.goto(srv.url + 'app/adicionar-fotos/');

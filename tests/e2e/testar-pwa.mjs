@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { maisAbertos } from '../helpers/mais.mjs';
 /* 36 · PWA do editor: manifesto, service worker só em /app/, offline, cache sem dados do usuário (T5),
    aviso de versão nova, instalar (botão secundário, T8), dica do iPhone, armazenamento e CSP do vercel.json.
    Uso: npm run testar:pwa */
@@ -34,6 +35,7 @@ await new Promise(r => prox.listen(0, '127.0.0.1', r));
 const URL0 = `http://127.0.0.1:${prox.address().port}/`;
 const nav = await chromium.launch();
 const ctx = await nav.newContext();
+await maisAbertos(ctx);   /* D-172: ajustes avançados à vista */
 const CONTA = () => { try { localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })); } catch (e) { /* about:blank */ } };
 await ctx.addInitScript(CONTA);
 const violacoes = [], erros = [];
@@ -174,6 +176,7 @@ try {
 
   // 9. dica do iPhone (Safari): fechável e lembrada
   const ic = await nav.newContext({ ...devices['iPhone 13'] });
+  await maisAbertos(ic);   /* D-172: ajustes avançados à vista */
   await ic.addInitScript(CONTA);
   const ip = await ic.newPage(); vigiar(ip);
   await ip.goto(URL0 + 'app/', { waitUntil: 'load' });
