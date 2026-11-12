@@ -48,12 +48,29 @@
 <div class="esq-sk__card"><i></i><div class="esq-sk__lin"><i></i><i></i></div></div>
 <p class="esq-sk__msg"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p>
 </div>
-<div class="top" id="top">
-<h1>Seus projetos</h1>
-<button type="button" class="led-btn led-btn--light" id="novo1"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Novo projeto<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+<section class="hub" aria-labelledby="t-hub">
+<h1 class="hub__t" id="t-hub">O que vamos criar hoje?</h1>
+<div class="sugs" role="region" aria-label="Sugestões para começar" tabindex="0">
+<ul class="sugs__l" id="sugs">
+<li><button type="button" class="sug" data-sug="viagem"><img class="sug__img" src="../assets/img/fotos/viagem.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Polaroids da viagem</strong><small>Clássica · para imprimir e recortar</small></span></button></li>
+<li><button type="button" class="sug" data-sug="coracao"><img class="sug__img" src="../assets/img/fotos/praia.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Coração de verão</strong><small>Colagem em formato de coração</small></span></button></li>
+<li><button type="button" class="sug" data-sug="aniversario"><img class="sug__img" src="../assets/img/fotos/aniversario.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Festa de aniversário</strong><small>Mini quadrada · para presentear</small></span></button></li>
+<li><button type="button" class="sug" data-sug="varal"><img class="sug__img" src="../assets/video/varal-polaroids-poster.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Varal de memórias</strong><small>Colagem em tira, para pendurar</small></span></button></li>
+<li><button type="button" class="sug" data-sug="casal"><img class="sug__img" src="../assets/img/fotos/casal.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Nós dois</strong><small>Retro Pocket · cabe na carteira</small></span></button></li>
+<li><button type="button" class="sug" data-sug="mesa"><img class="sug__img" src="../assets/video/mesa-polaroids-poster.jpg" alt="" width="400" height="240" loading="eager" decoding="async"><span class="sug__txt"><strong>Mesa de recordações</strong><small>Colagem espalhada sobre uma foto</small></span></button></li>
+</ul>
 </div>
+<div class="criar" role="group" aria-label="Criar um projeto">
+<button type="button" class="led-btn led-btn--light criar__led" id="novo1"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Polaroids para imprimir<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+<button type="button" class="criar__b" id="criar-colagem"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="9" height="11" rx="1" transform="rotate(-6 7.5 10.5)"/><rect x="12" y="8" width="9" height="11" rx="1" transform="rotate(6 16.5 13.5)"/></svg>Colagem</button>
+<a class="criar__b" href="inicio/#t-modelos" id="criar-modelo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Usar um modelo</a>
+<button type="button" class="criar__b" id="criar-backup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Abrir backup</button>
+</div>
+</section>
 
-<section id="lista" aria-label="Projetos">
+<section class="projs" aria-labelledby="t-projs">
+<div class="top" id="top"><h2 class="projs__t" id="t-projs">Seus projetos</h2></div>
+<div id="lista">
 <ul class="grid" style="list-style:none;padding:0">
 <li class="card" id="card1">
   <div class="card__row">
@@ -72,13 +89,8 @@
   </div>
 </li>
 </ul>
-</section>
-
-<section class="empty" id="vazio" aria-labelledby="t-vazio" hidden>
-<img class="logo-v" src="../assets/img/logos/logo_oficial_PolarLife.png" width="111" height="96" alt="Polar Life">
-<h1 id="t-vazio">Nenhum projeto ainda</h1>
-<p>Escolha algumas fotos e crie a sua primeira polaroid. Seus projetos ficam salvos neste aparelho.</p>
-<button type="button" class="led-btn led-btn--light" id="novo2"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Novo projeto<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button>
+</div>
+<p class="projs__vazio" id="vazio" hidden>Nenhum projeto ainda. Escolha uma sugestão ou crie um projeto acima: ele fica salvo neste aparelho.</p>
 </section>
 
 <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Processamento 100% local. Suas fotos não sobem para nenhum servidor.</p></div>

@@ -80,3 +80,38 @@ strong{font-weight:500}
 @media (max-width:600px){.app-header .in{padding:0 16px}.app-header .btn2{padding:0 12px;min-width:44px}.app-header .hd-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}
 /* capa do projeto: a 1ª foto, recortada no quadrado do avatar */
 .avatar--foto{object-fit:cover;border-radius:6px;background:var(--surface-subtle)}
+
+/* ===== D-177 · Projetos como tela central: sugestões com foto real no topo, opções de criar logo abaixo (sem rolar) e,
+   rolando, os projetos. Carrossel com rolagem por toque/teclado e encaixe; nada escrito sobre as fotos (T4). ===== */
+.page{padding-top:20px}
+.hub__t{margin:0;font-family:var(--font-serif);font-weight:400;font-size:26px;line-height:1.2}
+.sugs{margin:14px -24px 0;padding:4px 24px 10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:24px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sugs::-webkit-scrollbar{display:none}
+.sugs:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:14px}
+.sugs__l{display:flex;gap:12px;margin:0;padding:0;list-style:none}
+.sugs__l li{flex:none;scroll-snap-align:start}
+.sug{display:flex;flex-direction:column;width:204px;padding:0;border:0;border-radius:14px;overflow:hidden;background:var(--white);box-shadow:var(--shadow-card);text-align:left;color:var(--black);cursor:pointer;transition:transform 200ms var(--ease),box-shadow 200ms var(--ease)}
+.sug:hover{transform:translateY(-2px);box-shadow:var(--shadow-card),0 10px 24px rgb(0 0 0/.08)}
+.sug:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.sug__img{display:block;width:100%;height:112px;object-fit:cover}
+.sug__txt{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px}
+.sug__txt strong{font-size:15px;font-weight:500;line-height:1.3}
+.sug__txt small{font-size:13px;line-height:1.4}
+.criar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.criar__led{grid-column:1/-1;width:100%}
+.criar__b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;padding:8px 6px;border:1px solid var(--outline-subtle);border-radius:12px;background:var(--white);box-shadow:var(--shadow-subtle);font:500 13px/1.25 var(--font,'Inter'),system-ui,sans-serif;color:var(--black);text-align:center;text-decoration:none;cursor:pointer}
+.criar__b:hover{background:var(--surface-subtle)}
+.projs{margin-top:32px}
+.projs__t{margin:0;font-family:var(--font-serif);font-weight:400;font-size:22px;line-height:1.2}
+.projs .grid{margin-top:16px}
+.projs__vazio{margin:12px 0 0;padding:16px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card);font-size:14px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.sug{transition:none}.sug:hover{transform:none}}
+@media (min-width:768px){
+  .page{padding-top:28px}
+  .hub__t{font-size:30px}
+  .sug{width:236px}.sug__img{height:136px}
+  .criar{grid-template-columns:1.5fr 1fr 1fr 1fr;align-items:stretch}
+  .criar__led{grid-column:auto;height:auto;min-height:64px}
+  .criar__b{flex-direction:row;gap:8px;font-size:14px}
+}
+@media (min-width:1120px){.sugs{margin-left:0;margin-right:0;padding-left:0;padding-right:0;scroll-padding-left:0}}

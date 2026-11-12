@@ -31,7 +31,7 @@ try {
     await PLPROJETOS.salvarEstado();
   }, { nomes, dados });
   const abrir = async () => { await p.goto(srv.url + 'app/editor/', { waitUntil: 'networkidle' }); await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0 && !!window.PLEDITOR); await p.waitForTimeout(250); };
-  const foto = () => p.evaluate(() => { const c = PLEDITOR.ctx(); return { folhas: sessionStorage.getItem('pl-folhas'), n: c.R.sheets.length, cel: JSON.stringify(c.R.sheets.map((s) => s.cells.map((x) => [x.x, x.y, x.w, x.h]))), guias: document.querySelectorAll('#sheet .guides').length, papel: c.R.p.n }; });
+  const foto = () => p.evaluate(() => { const c = PLEDITOR.ctx(); return { folhas: JSON.stringify(PLFOLHAS.lerFolhas()), n: c.R.sheets.length, cel: JSON.stringify(c.R.sheets.map((s) => s.cells.map((x) => [x.x, x.y, x.w, x.h]))), guias: document.querySelectorAll('#sheet .guides').length, papel: c.R.p.n }; });
   await abrir();
   const antes = await foto();
   antes.guias > 0 && /"margem":7/.test(antes.folhas) ? ok(`Folhas: ${antes.n} folha(s) ${antes.papel}, margem 7 mm, com guias de corte`) : ruim('estado inicial: ' + JSON.stringify(antes));
@@ -48,7 +48,7 @@ try {
   await p.click('#col-todas'); await p.waitForTimeout(150);
   await p.click('[data-col-foto="2"]'); await p.waitForTimeout(150);
   await p.click('[data-col-foto="4"]'); await p.waitForTimeout(150);
-  const col = await p.evaluate(() => { const c = PLEDITOR.ctx(); return { w: c.R.p.w, h: c.R.p.h, fotos: [].concat(...c.R.sheets.map((s) => s.cells.map((x) => x.f.src))), guias: document.querySelectorAll('#sheet .guides').length, salvo: JSON.parse(sessionStorage.getItem('pl-colagem')), folhas: sessionStorage.getItem('pl-folhas') }; });
+  const col = await p.evaluate(() => { const c = PLEDITOR.ctx(); return { w: c.R.p.w, h: c.R.p.h, fotos: [].concat(...c.R.sheets.map((s) => s.cells.map((x) => x.f.src))), guias: document.querySelectorAll('#sheet .guides').length, salvo: JSON.parse(sessionStorage.getItem('pl-colagem')), folhas: JSON.stringify(PLFOLHAS.lerFolhas()) }; });
   col.w === 300 && col.h === 200 ? ok('a colagem tem papel próprio: 20 × 30 cm em paisagem (300 × 200 mm)') : ruim('papel da colagem: ' + col.w + '×' + col.h);
   col.fotos.join() === '1,3,5,6' ? ok('só as fotos escolhidas entram na colagem (1, 3, 5 e 6)') : ruim('fotos na colagem: ' + col.fotos.join());
   col.guias === 0 && col.salvo.ativo && col.salvo.peca === '20x30' ? ok('colagem sem guias de corte, salva em pl-colagem') : ruim('colagem: ' + JSON.stringify({ g: col.guias, s: col.salvo }));
