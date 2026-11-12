@@ -110,8 +110,9 @@ strong{font-weight:500}
   .page{padding-top:28px}
   .hub__t{font-size:30px}
   .sug{width:236px}.sug__img{height:136px}
-  .criar{grid-template-columns:1.5fr 1fr 1fr 1fr;align-items:stretch}
-  .criar__led{grid-column:auto;height:auto;min-height:64px}
-  .criar__b{flex-direction:row;gap:8px;font-size:14px}
+  .criar{grid-template-columns:1.5fr 1fr 1fr 1fr}
+  .criar{align-items:center}
+  .criar__led{grid-column:auto}                                   /* LED sempre com 52 px (P-LED) */
+  .criar__b{flex-direction:row;gap:8px;min-height:52px;font-size:14px}
 }
 @media (min-width:1120px){.sugs{margin-left:0;margin-right:0;padding-left:0;padding-right:0;scroll-padding-left:0}}
