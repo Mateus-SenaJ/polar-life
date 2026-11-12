@@ -33,7 +33,7 @@ svg.ico.sm{width:16px;height:16px}
 .btn2[aria-pressed=true]{background:var(--black);color:var(--white);border-color:var(--black)}
 .btn2[aria-pressed=true] .ico{color:var(--white)}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--black);color:var(--white);display:inline-flex;align-items:center;justify-content:center}
-.top .led-btn{--btn-h:42px}
+.top .led-btn{--btn-h:44px}   /* D-169: alvo de 44 px */
 
 /* trilho */
 .rail{grid-row:2;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:10px 6px;border-right:1px solid var(--outline-subtle);background:var(--white);overflow:auto}

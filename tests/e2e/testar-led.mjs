@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// P-LED (DOC-01 §11 · D-112 · D-115): o LED v4 é o mesmo em todas as páginas — botão 52/42, peso 500,
+// P-LED (DOC-01 §11 · D-112 · D-115): o LED v4 é o mesmo em todas as páginas — botão 52/44, peso 500,
 // raio 12, anel em movimento, faixa de luz no hover, desabilitado tracejado preto, barra carregando,
 // pop-up nível 3 e barra de progresso. Também confere a paleta T2 dentro dos componentes LED.
 // Uso: npm run testar:led  (Chromium do Playwright)
@@ -79,7 +79,7 @@ try {
       }
       if (b.ocupado) continue;
       if (b.peso !== '500') problemas.push(`botão ${b.i} com peso ${b.peso}`);
-      const alvo = b.sm ? 42 : 52;
+      const alvo = b.sm ? 44 : 52;   /* D-169: o LED pequeno passou a 44 px (alvo de toque, T3) */
       if (Math.abs(b.altura - alvo) > .5) problemas.push(`botão ${b.i} com ${b.altura}px (esperado ${alvo})`);
       if (b.raio !== '12px') problemas.push(`botão ${b.i} com raio ${b.raio}`);
       if (b.animacao === 'none') problemas.push(`botão ${b.i} sem anel animado`);
