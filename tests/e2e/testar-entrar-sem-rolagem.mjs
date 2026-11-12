@@ -8,11 +8,11 @@ const ruim = (m) => { falhas++; console.log('  ✘ ' + m); };
 const srv = await servir();
 const nav = await chromium.launch();
 try {
-  for (const [w, h] of [[1920, 1080], [1440, 900], [1366, 768], [1280, 720]]) {
+  for (const [w, h] of [[1920, 1080], [1440, 900], [1366, 768], [1280, 720], [412, 915], [390, 844]]) {
     const p = await nav.newPage({ viewport: { width: w, height: h } });
     await p.goto(srv.url + 'app/entrar/', { waitUntil: 'networkidle' });
     const m = await p.evaluate(() => {
-      const r = document.querySelector('.ent__r'), cx = document.getElementById('caixa'), head = document.querySelector('.ent__head');
+      const r = document.querySelector('.ent__r'), cx = document.getElementById('caixa'), head = innerWidth < 1024 ? document.querySelector('.ent__faixa .ent__titulo') : document.querySelector('.ent__head');
       return { doc: document.documentElement.scrollHeight, col: r.scrollHeight - r.clientHeight,
         cxTopo: cx.getBoundingClientRect().top, headBase: head.getBoundingClientRect().bottom, cxBase: cx.getBoundingClientRect().bottom };
     });
@@ -25,7 +25,7 @@ try {
   const g = await p.evaluate(() => {
     const f = document.querySelector('.ent__faixa'), md = document.querySelector('.ent__midia');
     const fr = f.getBoundingClientRect(), mr = md.getBoundingClientRect();
-    return { bg: getComputedStyle(f).backgroundImage, sobre: mr.top <= fr.top + 1 && mr.bottom >= fr.bottom };
+    return { bg: getComputedStyle(f).backgroundImage, sobre: mr.top < fr.bottom && mr.bottom > fr.bottom /* D-165: o vídeo começa sob a parte de baixo da faixa */ };
   });
   /linear-gradient/.test(g.bg) && /rgba\(0, 0, 0, 0\)/.test(g.bg) && g.sobre
     ? ok('faixa preta em degradê até transparente, por cima do vídeo') : ruim('transição da faixa: ' + JSON.stringify(g));

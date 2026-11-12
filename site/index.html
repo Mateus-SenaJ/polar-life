@@ -182,12 +182,12 @@
       <article class="faixa__slide is-active">
         <div class="faixa__txt">
           <p class="faixa__kick"><i aria-hidden="true"></i>Não deixe para depois</p>
-          <h2 class="faixa__tit" id="t-faixa">Seu rolo de câmera está cheio de histórias.</h2>
+          <h2 class="faixa__tit" id="t-faixa">Tem foto boa demais para ficar só no celular.</h2>
           <p class="faixa__apoio">Escolha algumas hoje. Um dia, segurar essas fotos vai significar ainda mais.</p>
           <a class="faixa__link" href="app/inicio/">Começar agora<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
         <!-- o banner virou SVG embutido: dentro de um <img> uma foto não carrega (design §4) -->
-        <svg class="faixa__img faixa__img--svg mov-parallax" data-midia-cam viewBox="0 0 1200 500" preserveAspectRatio="xMaxYMid slice" focusable="false" aria-hidden="true">
+        <svg class="faixa__img faixa__img--svg mov-parallax" data-mov="entra" data-midia-cam viewBox="0 0 1200 500" preserveAspectRatio="xMaxYMid slice" focusable="false" aria-hidden="true">
           <defs>
             <filter id="bimp-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
               <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity=".06" result="bimp-s1"/>
@@ -305,7 +305,7 @@
           </g>
           <circle cx="1120" cy="60" r="7" fill="#FD761A"/>
           <!-- câmera realista (D-142) -->
-          <image data-midia-camera="perfil" data-midia-base="assets/" x="400" y="66" width="420" height="328.65" preserveAspectRatio="xMidYMid meet" display="none"/>
+          <image class="faixa-cam" data-midia-camera="perfil" data-midia-base="assets/" x="400" y="66" width="420" height="328.65" preserveAspectRatio="xMidYMid meet" display="none"/>
         </svg>
       </article>
     </div>

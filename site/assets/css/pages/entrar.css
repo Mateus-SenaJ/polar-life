@@ -234,3 +234,76 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
   .ent__foot .logo-v{padding:8px;background:var(--white);border-radius:12px}
   .ent__foot .legal a{color:var(--white)}
 }
+
+/* ---- D-165: entrar harmonizado. Desktop: o vídeo começa mais abaixo, mostrando as polaroids da parede sob a
+   faixa. Celular (< 1024 px): uma tela só — o varal é o fundo da página inteira; o preto forte fica atrás do
+   título, some no meio (as polaroids aparecem) e volta a escurecer atrás da caixa, que fica embaixo. O logo vira
+   uma etiqueta discreta no canto do topo; os prefixos «Entrar como»/«Continuar com» somem no celular. ---- */
+@media (min-width:1024px){
+  .ent__midia{top:150px}
+  .ent__midia .midia__video{object-position:78% 40%}
+}
+@media (max-width:1023px){
+  body{background:var(--black)}
+  .ent{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;min-height:calc(100vh - 32px);min-height:calc(100svh - 32px)}
+  .ent__l{position:static;overflow:visible;isolation:auto;padding-bottom:0;flex:1 0 auto;display:flex;flex-direction:column;min-height:170px;background:transparent}
+  .ent__midia{position:absolute;top:-110px;left:0;right:0;bottom:0;z-index:-1}
+  .ent__midia .midia__video{object-position:80% 50%}
+  .ent__midia::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgb(0 0 0/0) 45%,rgb(0 0 0/.6) 64%,#000 84%);pointer-events:none}
+  .ent__faixa{padding:18px 20px 64px;background:linear-gradient(180deg,#000 0,#000 58%,rgb(0 0 0/.55) 80%,rgb(0 0 0/0) 100%)}
+  .ent__kick{font-size:11px;padding-right:120px}
+  .ent__titulo{margin-top:12px;font-size:27px;line-height:1.08}
+  .ent__apoio{margin-top:10px;font-size:14px;line-height:1.45}
+  .ent__r{position:static;background:transparent;padding:0 16px 16px;flex:0 0 auto}
+  .ent__head{position:absolute;top:10px;right:16px;z-index:2;height:auto;padding:0;border:0}
+  .ent__head .logo{min-height:44px;padding:0 10px;background:var(--white);border-radius:10px;box-shadow:0 4px 16px rgb(0 0 0/.35)}
+  .ent__head .logo-h{height:24px}
+  .ent__caixa{margin:0;padding:16px}
+  .ent__nota,.ent__foot{display:none}
+  .cx-t{font-size:20px}
+  .fld,.fld--first{margin-top:10px}
+  .fld .txt{margin-top:4px}
+  #ajuda-senha{display:none}
+  .cx-esq{margin:0}
+  .led-btn--block{margin-top:2px}
+  .cx-criar{height:44px;margin-top:8px}
+  .cx-div{margin:8px 0}
+  .cx-prov{grid-template-columns:1fr 1fr;gap:8px;margin-top:0}
+  .cx-prov__b{height:44px;padding:0 8px;gap:8px;white-space:nowrap}
+  .cx-pre{display:none}
+  .cx-cod,.cx-links{display:inline-flex;align-items:center;width:49%;margin:6px 0 0;vertical-align:middle}
+  .cx-cod{justify-content:flex-start}.cx-cod__b{padding-left:0;font-size:13px}
+  .cx-links{justify-content:flex-end;gap:4px;font-size:12px}
+  .cx-links a{display:inline-flex;align-items:center;min-height:44px}
+  .cx-links + .cx-div{margin:4px 0 8px}.cx-links + .cx-div span{display:none}
+  .cx-testes__t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .cx-testes__p{display:none}
+  .cx-testes__lista{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:0}
+  .cx-testes__lista .btn2{height:44px;padding:0 4px;justify-content:center;font-size:12px;line-height:1.15;text-align:center}
+  .cx-testes__lista .ico,.cx-testes__nome .mono{display:none}
+  .cx-testes__nome{align-items:center;text-align:center}
+}
+@media (min-width:1024px){.cx-testes__nome{display:block}.cx-testes__nome .cx-pre{display:inline}}
+@media (max-width:1023px){
+  .ent__faixa{padding:22px 20px 40px}
+  .ent__titulo{margin-top:26px}
+  .ent__l{min-height:0}
+}
+/* celular de altura comum (até ~900 px): o apoio sai para as polaroids da parede aparecerem entre o título e a caixa */
+@media (max-width:1023px) and (max-height:900px){.ent__apoio{display:none}}
+/* celular baixo (iPhone SE): divisória «ou» e espaços menores */
+@media (max-width:1023px) and (max-height:700px){
+  .ent__faixa{padding:20px 20px 28px}
+  .ent__titulo{margin-top:24px;font-size:24px}
+  .cx-esq + .led-btn--block{margin-top:0}
+  .ent__caixa > .cx-div:first-of-type{margin:4px 0}
+  .ent__caixa > .cx-div:first-of-type span{display:none}
+  .fld,.fld--first{margin-top:6px}
+  .cx-t{font-size:18px}
+}
+@media (max-width:1023px){
+  /* o vídeo cobre só o alto da tela: menos ampliado, mostra várias polaroids na faixa entre o título e a caixa */
+  .ent__midia{top:40px;bottom:auto;height:46vh;height:46svh}
+  .ent__midia .midia__video{object-position:62% 50%}
+  .ent__midia::after{background:linear-gradient(180deg,rgb(0 0 0/0) 55%,rgb(0 0 0/.7) 80%,#000 100%)}
+}

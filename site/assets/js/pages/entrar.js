@@ -71,7 +71,7 @@ function renderEmail(manter){
     '</form>'+
     '<button type="button" class="btn2 cx-criar" id="b-criar"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Criar nova conta</button>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
-    '<div class="cx-prov" role="group" aria-label="Entrar com Google ou Apple">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span>Continuar com '+pv.nome+'</span></button>'}).join('')+'</div>'+
+    '<div class="cx-prov" role="group" aria-label="Entrar com Google ou Apple">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span><span class="cx-pre">Continuar com </span>'+pv.nome+'</span></button>'}).join('')+'</div>'+
     '<p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>'+
     '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a> · <a href="../../legal/#cookies">Cookies</a></p>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
@@ -79,10 +79,10 @@ function renderEmail(manter){
     '<h3 class="cx-testes__t" id="t-testes">Contas de teste</h3>'+
     '<p class="cx-testes__p">Entre com um toque para ver cada plano.</p>'+
     '<ul class="cx-testes__lista">'+
-    '<li><button type="button" class="btn2" data-perfil="admin"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg><span class="cx-testes__nome">Entrar como Admin<span class="mono">admin@polarlife.test · Pro + painel</span></span></button></li>'+
-    '<li><button type="button" class="btn2" data-perfil="gratis"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="cx-testes__nome">Entrar como Grátis<span class="mono">gratis@polarlife.test · 1 folha por mês</span></span></button></li>'+
-    '<li><button type="button" class="btn2" data-perfil="avulsa"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 4v16"/></svg><span class="cx-testes__nome">Entrar como Folha avulsa<span class="mono">folha@polarlife.test · 3 folhas compradas</span></span></button></li>'+
-    '<li><button type="button" class="btn2" data-perfil="pro"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span class="cx-testes__nome">Entrar como Pro<span class="mono">pro@polarlife.test · uso razoável</span></span></button></li>'+
+    '<li><button type="button" class="btn2" data-perfil="admin"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg><span class="cx-testes__nome"><span class="cx-pre">Entrar como </span>Admin<span class="mono">admin@polarlife.test · Pro + painel</span></span></button></li>'+
+    '<li><button type="button" class="btn2" data-perfil="gratis"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="cx-testes__nome"><span class="cx-pre">Entrar como </span>Grátis<span class="mono">gratis@polarlife.test · 1 folha por mês</span></span></button></li>'+
+    '<li><button type="button" class="btn2" data-perfil="avulsa"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 4v16"/></svg><span class="cx-testes__nome"><span class="cx-pre">Entrar como </span>Folha avulsa<span class="mono">folha@polarlife.test · 3 folhas compradas</span></span></button></li>'+
+    '<li><button type="button" class="btn2" data-perfil="pro"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span class="cx-testes__nome"><span class="cx-pre">Entrar como </span>Pro<span class="mono">pro@polarlife.test · uso razoável</span></span></button></li>'+
     '</ul></section>';
   $('f-email').addEventListener('submit',entrarSenha);
   $('b-esqueci').addEventListener('click',function(){renderEsqueci($('email').value.trim())});

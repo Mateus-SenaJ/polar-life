@@ -132,3 +132,52 @@ a{color:inherit}
     mask-image:linear-gradient(to top,transparent 0,rgba(0,0,0,.35) 10%,#000 26%)}
   .hero__copy .eyebrow{margin-top:0}
 }
+
+/* ---- D-166: faixa preta — a câmera entra girando de leve, «clica» (lampejo) e fica flutuando; as polaroids
+   chegam em seguida, uma de cada vez. Só quando a faixa aparece (PLMOV, data-mov="entra"); movimento reduzido:
+   estado final. Usa as propriedades translate/rotate, que se somam ao transform do SVG sem trocar a posição. */
+.faixa-cam,#bimp-p1,#bimp-p2{transform-box:fill-box;transform-origin:50% 60%}
+.mov-espera:not(.is-in) .faixa-cam,.mov-espera:not(.is-in) #bimp-p1,.mov-espera:not(.is-in) #bimp-p2{opacity:0}
+.is-in .faixa-cam{animation:fx-cam-entra 1100ms cubic-bezier(.2,.8,.2,1) both,fx-cam-clique 520ms ease-out 1150ms both,fx-cam-flutua 6s ease-in-out 1800ms infinite alternate}
+.is-in #bimp-p2{animation:fx-pol-chega 900ms cubic-bezier(.2,.8,.2,1) 1250ms both}
+.is-in #bimp-p1{animation:fx-pol-chega 900ms cubic-bezier(.2,.8,.2,1) 1500ms both}
+@keyframes fx-cam-entra{
+  0%{opacity:0;translate:-90px 40px;rotate:-14deg}
+  60%{opacity:1;translate:6px -6px;rotate:3deg}
+  100%{opacity:1;translate:0 0;rotate:0deg}
+}
+@keyframes fx-cam-clique{0%{filter:none}18%{filter:brightness(1.7)}100%{filter:none}}
+@keyframes fx-cam-flutua{from{translate:0 0;rotate:0deg}to{translate:0 -8px;rotate:-1.5deg}}
+@keyframes fx-pol-chega{
+  0%{opacity:0;translate:-120px 30px;rotate:-10deg}
+  100%{opacity:1;translate:0 0;rotate:0deg}
+}
+@media (prefers-reduced-motion:reduce){
+  .faixa-cam,#bimp-p1,#bimp-p2{animation:none!important;opacity:1!important}
+}
+
+/* ---- D-165: herói — a frase sobe aparecendo; o topo vazio do vídeo (mesa e xícara) fica escondido para a
+   frase subir e ser lida junto com o vídeo, no celular e na tela grande ---- */
+.hero__copy > *{animation:fx-sobe 800ms cubic-bezier(.2,.8,.2,1) both}
+.hero__copy > .eyebrow{animation-delay:80ms}
+.hero__title{animation-delay:180ms}
+.hero__title .hl{display:inline-block;animation:fx-sobe 800ms cubic-bezier(.2,.8,.2,1) 520ms both}
+.hero__lead{animation-delay:420ms}
+.hero__cta{animation-delay:560ms}
+.hero__more{animation-delay:680ms}
+@keyframes fx-sobe{from{opacity:0;translate:0 28px}to{opacity:1;translate:0 0}}
+@media (prefers-reduced-motion:reduce){.hero__copy > *,.hero__title .hl{animation:none}}
+@media (max-width:599px){
+  .midia--hero{aspect-ratio:5/4}
+  .midia--hero .midia__video,.midia--hero .midia__poster{object-position:50% 88%}
+  .hero__arte{margin-bottom:-28px}
+}
+@media (min-width:600px) and (max-width:1023px){
+  .midia--hero{aspect-ratio:2/1}
+  .midia--hero .midia__video,.midia--hero .midia__poster{object-position:50% 82%}
+  .hero__arte{margin-bottom:-28px}
+}
+@media (max-width:1023px){.hero__copy{position:relative;z-index:1}}
+@media (min-width:1024px){
+  .midia--hero .midia__video,.midia--hero .midia__poster{scale:1.14;transform-origin:62% 100%}
+}

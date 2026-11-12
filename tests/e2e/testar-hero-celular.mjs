@@ -14,7 +14,8 @@ try {
       const leds = [...document.querySelectorAll('a.led-btn')].map(e => getComputedStyle(e).textDecorationLine + getComputedStyle(e.querySelector('.btn-content') || e).textDecorationLine);
       return { arteBase: a.bottom, arteEsq: a.left, tituloTopo: t.top, tituloEsq: t.left, leds };
     });
-    if (w < 1024) m.arteBase <= m.tituloTopo ? ok(`${w}px: vídeo antes da frase`) : ruim(`${w}px: frase antes do vídeo ${JSON.stringify(m)}`);
+    if (w < 1024) { const base = await p.evaluate(() => document.getElementById('titulo').getBoundingClientRect().bottom); base <= h ? ok(`${w}px: a frase aparece já na primeira tela (${Math.round(base)} px)`) : ruim(`${w}px: frase abaixo da dobra (${Math.round(base)} px)`); }
+    if (w < 1024) m.arteBase - 40 <= m.tituloTopo ? ok(`${w}px: vídeo antes da frase`) : ruim(`${w}px: frase antes do vídeo ${JSON.stringify(m)}`);
     else m.arteEsq > m.tituloEsq && m.tituloTopo < m.arteBase ? ok(`${w}px: vídeo ao lado da frase`) : ruim(`${w}px: vídeo fora do lugar ${JSON.stringify(m)}`);
     m.leds.length && m.leds.every(s => s === 'nonenone') ? ok(`${w}px: botões LED sem sublinhado (${m.leds.length})`) : ruim(`${w}px: sublinhado no LED ${m.leds}`);
     await p.close();

@@ -60,6 +60,8 @@ function cenas(){
       observar(c,'is-out');
     }
   });
+  /* D-166: cenas que entram uma vez ao aparecer (câmera e polaroids da faixa preta); esperam escondidas até lá */
+  [].slice.call(document.querySelectorAll('[data-mov="entra"]')).forEach(function(c){c.classList.add('mov-espera');observar(c,'is-in')});
   var devs=[].slice.call(document.querySelectorAll('[data-mov="dev"]'));
   devs.forEach(function(d){observar(d,'is-dev')});
 }

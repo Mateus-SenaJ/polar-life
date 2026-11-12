@@ -69,10 +69,10 @@ try {
        nela; a mídia ocupa a coluna inteira por trás (corte central, sem distorção) */
     const col = await page.evaluate(() => {
       const l = document.querySelector('.ent__l').getBoundingClientRect(), f = document.querySelector('.ent__faixa').getBoundingClientRect(), m = document.querySelector('.ent__midia').getBoundingClientRect();
-      return { faixaNoTopo: Math.abs(f.top - l.top) <= 1, cobre: Math.abs(m.top - l.top) <= 1 && Math.abs(m.bottom - l.bottom) <= 1 && Math.abs(m.width - l.width) <= 1, alto: Math.round(m.height), faixa: Math.round(f.height) };
+      return { faixaNoTopo: Math.abs(f.top - l.top) <= 1, cobre: m.top < f.bottom && m.bottom > f.bottom && Math.abs(m.width - l.width) <= 1 && (innerWidth < 1024 || Math.abs(m.bottom - l.bottom) <= 1) /* D-165: o vídeo começa sob a faixa e vai até o fim da coluna (no celular, cobre o alto da tela) */, alto: Math.round(m.height), faixa: Math.round(f.height) };
     });
     col.faixaNoTopo ? ok(`${rotulo}: a faixa preta fica no topo`) : ruim(`${rotulo}: a faixa preta não está no topo (${JSON.stringify(col)})`);
-    col.cobre && col.alto > col.faixa ? ok(`${rotulo}: a mídia ocupa a coluna inteira por trás da faixa (${col.alto} px)`) : ruim(`${rotulo}: a mídia não cobre a coluna (${JSON.stringify(col)})`);
+    col.cobre ? ok(`${rotulo}: a mídia ocupa a coluna inteira por trás da faixa (${col.alto} px)`) : ruim(`${rotulo}: a mídia não cobre a coluna (${JSON.stringify(col)})`);
     const leg = await page.evaluate(() => ({
       legendas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-leg')].map(t => t.textContent),
       datas: [...document.querySelectorAll('.ent__mesa .mesa-p text.pol-data')].map(t => t.textContent),
