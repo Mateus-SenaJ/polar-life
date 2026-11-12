@@ -70,3 +70,22 @@
 @font-face{font-family:'Nunito';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/nunito-400.woff2) format('woff2')}
 @font-face{font-family:'Nunito';font-weight:700;font-style:italic;font-display:swap;src:url(../../fonts/nunito-700-italico.woff2) format('woff2')}
 @font-face{font-family:'Nunito';font-weight:700;font-style:normal;font-display:swap;src:url(../../fonts/nunito-700.woff2) format('woff2')}
+
+/* ---- D-179: caligráficas da família da letra das fotos do Retro Pocket (Fondamento Itálico = padrão do Pocket) ---- */
+@font-face{font-family:'Fondamento';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/fondamento-400.woff2) format('woff2')}
+@font-face{font-family:'Fondamento';font-weight:400;font-style:italic;font-display:swap;src:url(../../fonts/fondamento-400-italico.woff2) format('woff2')}
+@font-face{font-family:'Quintessential';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/quintessential-400.woff2) format('woff2')}
+@font-face{font-family:'Felipa';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/felipa-400.woff2) format('woff2')}
+@font-face{font-family:'Marck Script';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/marck-script-400.woff2) format('woff2')}
+@font-face{font-family:'Niconne';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/niconne-400.woff2) format('woff2')}
+@font-face{font-family:'Bilbo Swash Caps';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/bilbo-swash-caps-400.woff2) format('woff2')}
+@font-face{font-family:'Almendra';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/almendra-400.woff2) format('woff2')}
+@font-face{font-family:'Almendra';font-weight:700;font-style:normal;font-display:swap;src:url(../../fonts/almendra-700.woff2) format('woff2')}
+@font-face{font-family:'Almendra';font-weight:400;font-style:italic;font-display:swap;src:url(../../fonts/almendra-400-italico.woff2) format('woff2')}
+@font-face{font-family:'Almendra';font-weight:700;font-style:italic;font-display:swap;src:url(../../fonts/almendra-700-italico.woff2) format('woff2')}
+@font-face{font-family:'Courgette';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/courgette-400.woff2) format('woff2')}
+@font-face{font-family:'Oregano';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/oregano-400.woff2) format('woff2')}
+@font-face{font-family:'Oregano';font-weight:400;font-style:italic;font-display:swap;src:url(../../fonts/oregano-400-italico.woff2) format('woff2')}
+@font-face{font-family:'Merienda';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/merienda-400.woff2) format('woff2')}
+@font-face{font-family:'Merienda';font-weight:700;font-style:normal;font-display:swap;src:url(../../fonts/merienda-700.woff2) format('woff2')}
+@font-face{font-family:'Sofia';font-weight:400;font-style:normal;font-display:swap;src:url(../../fonts/sofia-400.woff2) format('woff2')}

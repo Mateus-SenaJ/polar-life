@@ -19,6 +19,10 @@ const CATALOGO = [ // [família, estilo, peso] · 24 fontes de legenda + as do s
   ['Cormorant Garamond', 'italic', 300], ['Cormorant Garamond', 'italic', 400], ['Cormorant Garamond', 'normal', 300], ['Cormorant Garamond', 'normal', 400],
   ['Playfair Display', 'italic', 400], ['EB Garamond'], ['Libre Baskerville'],
   ['Inter', 'normal', 300], ['Inter', 'normal', 400], ['Inter', 'normal', 500], ['IBM Plex Mono'],
+  // D-179: a letra das fotos do Retro Pocket (Fondamento Itálico) e as 10 caligráficas parecidas, com as variantes reais
+  ['Fondamento', 'italic', 400], ['Fondamento'], ['Quintessential'], ['Felipa'], ['Marck Script'], ['Niconne'], ['Bilbo Swash Caps'],
+  ['Almendra'], ['Almendra', 'normal', 700], ['Almendra', 'italic', 400], ['Almendra', 'italic', 700], ['Courgette'],
+  ['Oregano'], ['Oregano', 'italic', 400], ['Merienda'], ['Merienda', 'normal', 700], ['Sofia'],
 ];
 
 const srv = await servir();

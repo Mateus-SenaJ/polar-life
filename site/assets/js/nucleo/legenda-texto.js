@@ -30,6 +30,9 @@ var FONTES=[
  ['Dancing Script','cal'],['Satisfy','cal'],['Sacramento','cal'],['Allura','cal'],['Parisienne','cal'],
  ['Special Elite','dat'],['Courier Prime','dat'],['Cutive Mono','dat'],
  ['Indie Flower','man'],['Handlee','man'],['Amatic SC','man'],   /* D-148: novas manuscritas */
+ /* D-179: a letra das fotos do Retro Pocket (Lucida Calligraphy, proprietária) → Fondamento Itálico, a livre mais parecida, e 10 da mesma família */
+ ['Fondamento Itálico','cal','Fondamento',1],['Fondamento','cal'],['Quintessential','cal'],['Felipa','cal'],['Marck Script','cal'],['Niconne','cal'],
+ ['Bilbo Swash Caps','cal'],['Almendra','cal'],['Courgette','cal'],['Oregano','cal'],['Merienda','cal'],['Sofia','cal'],
  ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],['Lora','edi'],['Crimson Pro','edi'],
  ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400],['Nunito','lim'],['DM Sans','lim']
 ].map(function(f){return{n:f[0],c:f[1],fam:f[2]||f[0],it:!!f[3],w:f[4]||400,css:"'"+(f[2]||f[0])+"',"+FB[f[1]]}});
@@ -41,7 +44,7 @@ FONT_LG['IBM Plex Mono']=["'IBM Plex Mono',ui-monospace,monospace",0,400];
    a tela e o PDF só usam uma variante que existe; sem ela, o botão fica desabilitado e o resto cai na mais próxima. */
 var VAR={'Inter':['300','400','500'],'Cormorant Garamond':['300','400','500','700','300i','400i','700i'],'Caveat':['400','500','700'],'Kalam':['400','700'],
  'Courier Prime':['400','700','400i','700i'],'EB Garamond':['400','700','400i','700i'],'Libre Baskerville':['400','700','400i'],'Playfair Display':['400i'],
- 'Amatic SC':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
+ 'Amatic SC':['400','700'],'Fondamento':['400','400i'],'Almendra':['400','700','400i','700i'],'Oregano':['400','400i'],'Merienda':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
 function temVar(fam,w,i){return(VAR[fam]||['400']).indexOf(w+(i?'i':''))>=0}
 function variante(fam,w,i){                                    /* {w,i} existente mais próximo (mesmo itálico primeiro) */
   var l=(VAR[fam]||['400']).map(function(v){return{w:parseInt(v,10),i:/i$/.test(v)}}),r=null,d=1e9;
@@ -103,12 +106,14 @@ var LEG0={original:false,al:'esq',preset:'simples',dy:0,inc:0,
  data:{on:true,font:'IBM Plex Mono',pt:8,fmt:0,cor:'preto'},
  loc:{on:true,font:'IBM Plex Mono',pt:8,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
 function copia(o){return JSON.parse(JSON.stringify(o))}
+var POCKET_FONTE='Fondamento Itálico';   /* D-179: Lucida Calligraphy das fotos do Pocket → a livre mais parecida */
 function legPocket(b){ /* D-113: padrão do Retro Pocket — duas linhas (local e data) ancoradas ao topo das maiúsculas */
   var l=copia(b||LEG0);
   l.txt.on=false;l.meta='linhas';l.ordem='loc-data';l.medida='letras';
   if(ehReal()){l.pad=padNovo();delete l.ordem}   /* D-149: projeto real = Linha 1 Localização (em cima) e Linha 2 Data */
   l.loc.sep=' - ';l.loc.uf='sigla';l.loc.pais='oculto';l.loc.ocBR=true;
   l.data.fmt=3;
+  l.data.font=l.loc.font=POCKET_FONTE;                           /* D-179: a letra caligráfica das polaroids do Pocket */
   return l
 }
 /* D-136 · MT-02: alinhamento Esquerda · Centro · Direita dentro das margens laterais da foto.
@@ -185,9 +190,13 @@ function linhaTexto(leg,l,i,f){
   if(leg.sug===false)return'';
   var m=f&&(f.m||(f.meta&&apaDe(f.meta)));if(!m)return'';
   if(l.t==='data'){var a=String(m.iso||'').match(/^(\d+)-(\d+)-(\d+)/);return a?FMTD[av(leg).df](new Date(+a[1],+a[2]-1,+a[3])):''}
-  if(l.t==='loc')return m.c||'';
+  if(m.cs==='sem'&&(l.t==='loc'||l.t==='pt'))return'';           /* D-178: «Sem local» tira a cidade e o ponto */
+  if(l.t==='loc')return m.c||lugarTxt(m.lugar,leg);
+  if(l.t==='pt')return m.lugar&&m.lugar.ponto||'';
   return''
 }
+/* D-178: o lugar lido do GPS (PLFOTOS.lugar, guardado no registro da foto) no formato escolhido em Avançado */
+function lugarTxt(g,leg){return!g?'':g.cidade?fmtLocal(g,av(leg).lf):g.pais||''}
 function comAv(c){                                              /* D-148: espaçamento e caixa das linhas de data e local */
   if(!c||!c.data||!c.loc)return c;
   var a=av(c);c.data.esp=a.esp;c.loc.esp=a.esp;c._cx=a.cx;return c
@@ -270,5 +279,5 @@ function linhas(leg,fr,medir,opts){
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,cxMeta:cxMeta,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,lugarTxt:lugarTxt,cxMeta:cxMeta,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

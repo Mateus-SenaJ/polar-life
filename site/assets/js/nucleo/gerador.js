@@ -671,7 +671,9 @@ function preparar(p,avisos){
   else{add('Caveat',500,false);add('IBM Plex Mono',400,false)}
   if(p.s.rodape)add('IBM Plex Mono',400,false);
   if(p.real&&window.PLFOTOS)jobs.push(Promise.all(p.fotos.map(function(f){return PLFOTOS.ler(f.src).catch(function(){return null})})).then(function(rs){ /* 44 · MT-02: mesma orientação e data reais que a tela */
-    rs.forEach(function(r,i){if(!r)return;var f=p.fotos[i],iso=r.meta&&r.meta.iso||'';f.v=(r.h||0)>(r.w||0);if(!f.m)f.m={iso:iso,c:''};else if(!f.m.iso&&iso)f.m.iso=iso})}));
+    rs.forEach(function(r,i){if(!r)return;var f=p.fotos[i],iso=r.meta&&r.meta.iso||'';f.v=(r.h||0)>(r.w||0);if(!f.m)f.m={iso:iso,c:''};else if(!f.m.iso&&iso)f.m.iso=iso})
+    /* D-178: o mesmo lugar do GPS que a tela mostra (guardado na foto; calcula aqui só se ainda não existir e PLLOCAIS estiver na página) */
+    return PLFOTOS.lugar?Promise.all(p.fotos.map(function(f){return f.m&&!f.m.lugar?PLFOTOS.lugar(f.src).then(function(g){if(g)f.m.lugar=g}):null})):null}));
   if(p.s.assin)jobs.push(carregarBytes(SIGURL).catch(function(){registrarAviso(avisos,'AssinaturaIndisponivel',null,null);return null}));
   return Promise.all(jobs)
 }

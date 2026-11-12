@@ -6,7 +6,7 @@ var tm,opener,picked=[],salvando=Promise.resolve();
 var JA=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');return Array.isArray(a)&&window.PLPROJETOS&&PLPROJETOS.atual()?a:[]}catch(e){return []}})();
 var PROJ0=window.PLPROJETOS?PLPROJETOS.atual():'';
 var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
-function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},4000)}
+function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},Math.max(4000,m.length*60))}   /* aviso longo fica mais tempo para ler */
 
 /* ===== Selos de estado: ícone + texto, nunca só cor (CN-05, DS-06) ===== */
 var I={
@@ -177,7 +177,7 @@ document.addEventListener('keydown',function(e){
     PLGFOTOS.escolher(j,function(fase,n,t){if(fase==='baixando')rotulo('Trazendo as fotos…');if(fase==='progresso')rotulo('Trazendo '+n+' de '+t+'…')})
       .then(function(fs){
         if(fs.length)receive(fs);
-        toast(fs.length?(fs.length===1?'1 foto do Google Fotos':fs.length+' fotos do Google Fotos')+(fs.falhas?' · '+fs.falhas+' não vieram':'')+(fs.videos?' · vídeos ficam de fora':''):'Nenhuma foto escolhida.')
+        toast(fs.length?(fs.length===1?'1 foto do Google Fotos':fs.length+' fotos do Google Fotos')+(fs.falhas?' · '+fs.falhas+' não vieram':'')+(fs.videos?' · vídeos ficam de fora':'')+'. O Google não envia o local das fotos: digite a cidade nas Legendas.':'Nenhuma foto escolhida.')   /* D-178: o «=d» do Google tira a localização do EXIF */
       },function(e){
         var m={acesso:'O acesso ao Google Fotos expirou. Toque de novo para permitir.',tempo:'O tempo para escolher acabou. Tente de novo.'}[e&&e.erro]||'Não foi possível trazer as fotos do Google agora.';
         toast(m)

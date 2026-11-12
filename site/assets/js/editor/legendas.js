@@ -112,7 +112,9 @@ function pintar(){
       var dX=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="'+estXL(l.data,';line-height:0')+'"></time>':'';
       var lX=lc?'<span class="lg-lc" style="'+estXL(l.loc,';line-height:0')+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
       var sX=(dt&&lc)?'<span class="lg-sep" aria-hidden="true" style="'+estXL({font:'IBM Plex Mono',pt:Math.max(l.data.pt,l.loc.pt),cor:'preto'},';line-height:0')+'">'+LT.sepMeta(l)+'</span>':'';
-      var xl='<div class="lg-xl" style="top:calc(var(--pmm)*'+num((fr.cjh||0)+2.2)+');width:calc(var(--pmm)*'+num(fr.cjw||0)+');height:calc(var(--pmm)*'+num(figH)+')">';
+      /* D-179 · MT-02: o bloco é absoluto em relação à moldura inteira (canto externo), então leva o topo e a lateral da moldura;
+         sem isso a tela ficava 3 mm acima e à esquerda do PDF no Pocket */
+      var xl='<div class="lg-xl" style="top:calc(var(--pmm)*'+num(figTop)+');left:calc(var(--pmm)*'+num(fr.cl||0)+');width:calc(var(--pmm)*'+num(fr.cjw||0)+');height:calc(var(--pmm)*'+num(figH)+')">';
       LNS.forEach(function(ln){
         var dentro=ln.k==='data'?dX:ln.k==='loc'?lX:(ordem==='loc-data'?lX+sX+dX:dX+sX+lX);
         xl+='<div class="lg-l lg-l--x" style="top:calc(var(--pmm)*'+num(ln.top-figTop)+');'+estXL(ln.est,';line-height:'+ln.lh+'em')+'">'+dentro+'</div>'
@@ -181,7 +183,6 @@ function estiloTxt(l){
 function sw(k,rot,on,off){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'"'+(off?' aria-disabled="true"':'')+' aria-labelledby="s-'+k+'"><span></span></button></div>'}
 /* ---------- D-139 · Avançado: padrão de 2 linhas, sugestões e exceção por foto ---------- */
 var TIPOS=[['loc','Localização'],['data','Data'],['pt','Ponto turístico'],['txt','Texto livre'],['nenhum','Nenhum']],TAMS=[[7,'P'],[8,'M'],[10,'G'],[12,'GG']];
-var GPS={};
 function sugOn(){return L().sug!==false&&!L().original}
 function padAlvo(){return real()?(L().pad||LT.padNovo()):(Q.S().pad||L().pad||LT.padNovo())}
 function tipoNome(t){return TIPOS.filter(function(x){return x[0]===t})[0][1]}
@@ -232,21 +233,24 @@ function sincPad(){
   }
   if($('pad-own'))$('pad-own').checked=!!Q.S().pad
 }
-function gpsDe(n){
-  var k=Q.src(n);if(!Q.real||!window.PLFOTOS)return Promise.resolve(null);
-  if(GPS[k]!==undefined)return Promise.resolve(GPS[k]);
-  return PLFOTOS.ler(k).then(function(r){var m=r&&r.meta;return(GPS[k]=m&&m.lat!=null&&m.lon!=null?{lat:m.lat,lon:m.lon}:null)},function(){return null})
+/* D-178: o lugar do GPS vem de PLFOTOS.lugar (calculado uma vez e guardado na foto): Quadro, Folhas e PDF mostram o mesmo.
+   Fica também em ST[n].meta.lugar, para a seção «Data e cidade desta foto» saber que há um local lido da foto. */
+function lugarDe(n){
+  var e=Q.ST()[n],m=e&&e.meta,k=Q.src(n);
+  if(m&&m.lugar)return Promise.resolve(m.lugar);
+  if(!Q.real||!window.PLFOTOS||!PLFOTOS.lugar)return Promise.resolve(null);
+  return PLFOTOS.lugar(k).then(function(g){var e2=Q.ST()[n];if(g&&e2&&e2.src===k&&e2.meta&&!e2.meta.lugar)e2.meta.lugar=g;return g},function(){return null})
 }
 function sugestao(n,t){
   var M=Q.meta(n),PL=window.PLLOCAIS;
   if(t==='data')return Promise.resolve(M.data?LT.FMTD[LT.av(L()).df](M.data):'');
-  if(!PL)return Promise.resolve('');
+  if((t==='loc'||t==='pt')&&M.cs==='sem')return Promise.resolve('');   /* «Sem local» nesta foto */
   if(t==='loc'){
     var c=(M.cidade||'').trim();
-    if(c)return PL.buscar(c,40).then(function(r){var q=PL.norm(c.replace(/\s*[-,\/]\s*[A-Za-z]{2}$/,'')),ex=r.filter(function(x){return PL.norm(x.cidade)===q});return ex.length===1?LT.fmtLocal(ex[0],LT.av(L()).lf):c});
-    return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return!r?'':r.cidade?LT.fmtLocal(r,LT.av(L()).lf):r.pais||''})})
+    if(c)return!PL?Promise.resolve(c):PL.buscar(c,40).then(function(r){var q=PL.norm(c.replace(/\s*[-,\/]\s*[A-Za-z]{2}$/,'')),ex=r.filter(function(x){return PL.norm(x.cidade)===q});return ex.length===1?LT.fmtLocal(ex[0],LT.av(L()).lf):c});
+    return lugarDe(n).then(function(g){return LT.lugarTxt(g,L())})
   }
-  if(t==='pt')return gpsDe(n).then(function(g){return!g?'':PL.deCoordenadas(g.lat,g.lon).then(function(r){return r&&r.uf?PL.pontosProximos(g.lat,g.lon,r.uf,2).then(function(p){return p.length?p[0].nome:''}):''})});
+  if(t==='pt')return lugarDe(n).then(function(g){return g&&g.ponto||''});
   return Promise.resolve('')
 }
 /* preenche as linhas ainda não digitadas à mão (m=false); com «Sugestões de legendas» desligado não mexe em nada */
@@ -532,7 +536,7 @@ P.addEventListener('click',function(e){
   if(b.hasAttribute('data-usar')){Q.S().txt=UI.pend;$('lg-conf').hidden=true;$('lg-h').textContent='Até 80 caracteres.';Q.commit('lg:txt');return}
   if(b.hasAttribute('data-limpar')){Q.S().txt='';$('lg-in').value='';$('lg-conf').hidden=true;$('lg-h').textContent='Até 80 caracteres.';Q.commit('lg:txt');return}
   if(b.hasAttribute('data-lfit')){L().txt.fit=true;Q.commit('lg:fit');montar();return}
-  if(b.id==='lg-rtudo'){Q.ST()[0].leg=real()?LT.legInicial():copia(PADRAO);if(real())depois(preencher(todasFotos()),'lg:tudo2');Q.commit('lg:tudo');UI.sel=null;montar();Q.toast('Legendas voltaram ao padrão',true);return}
+  if(b.id==='lg-rtudo'){var fr0=Q.ST()[0].fr;Q.ST()[0].leg=fr0&&fr0.fmt==='pocket'?LT.legPocket(PADRAO):real()?LT.legInicial():copia(PADRAO);   /* D-179: no Pocket, o padrão é o do Pocket */if(real())depois(preencher(todasFotos()),'lg:tudo2');Q.commit('lg:tudo');UI.sel=null;montar();Q.toast('Legendas voltaram ao padrão',true);return}
   if(b.id==='lg-apply'&&real()){var pdA=L().pad,SA=Q.ST(),ca=0,cur=Q.S().pl||[];[0,1].forEach(function(i){if(pdA.l[i].t!=='txt'||!cur[i])return;for(var j=1;j<=Q.N;j++)if(j!==Q.cur()){SA[j].pl=SA[j].pl||[{v:'',m:false},{v:'',m:false}];SA[j].pl[i]={v:cur[i].v,m:true};ca++}});
     Q.commit('lg:aplicar');Q.toast(ca?'Texto aplicado às outras fotos':'Nenhuma linha de texto livre para aplicar',!!ca);return}
   if(b.id==='lg-apply'){var tx=Q.S().txt,S=Q.ST(),c=0;if(tx===null)tx=T();for(var j=1;j<=Q.N;j++){if(j!==Q.cur()){S[j].txt=tx;c++}}Q.commit('lg:aplicar');Q.toast('Texto aplicado às outras '+c+' fotos',true)}

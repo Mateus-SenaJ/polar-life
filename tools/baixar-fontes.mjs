@@ -43,6 +43,20 @@ const GH = [
     ['Nunito', 'nunito', i ? 'Nunito-Italic[wght].ttf' : 'Nunito[wght].ttf', w, i, { wght: w }],
     ['DM Sans', 'dmsans', i ? 'DMSans-Italic[opsz,wght].ttf' : 'DMSans[opsz,wght].ttf', w, i, { wght: w, opsz: 14 }],
   ]),
+  // D-179: a letra das polaroids do Retro Pocket é a Lucida Calligraphy (proprietária, sem licença para embutir no PDF).
+  // Fondamento Itálico é a livre mais parecida (padrão do Pocket); as outras 10 são caligráficas da mesma família visual.
+  ['Fondamento', 'fondamento', 'Fondamento-Regular.ttf', 400, 0], ['Fondamento', 'fondamento', 'Fondamento-Italic.ttf', 400, 1],
+  ['Quintessential', 'quintessential', 'Quintessential-Regular.ttf', 400, 0],
+  ['Felipa', 'felipa', 'Felipa-Regular.ttf', 400, 0],
+  ['Marck Script', 'marckscript', 'MarckScript-Regular.ttf', 400, 0],
+  ['Niconne', 'niconne', 'Niconne-Regular.ttf', 400, 0],
+  ['Bilbo Swash Caps', 'bilboswashcaps', 'BilboSwashCaps-Regular.ttf', 400, 0],
+  ['Almendra', 'almendra', 'Almendra-Regular.ttf', 400, 0], ['Almendra', 'almendra', 'Almendra-Bold.ttf', 700, 0],
+  ['Almendra', 'almendra', 'Almendra-Italic.ttf', 400, 1], ['Almendra', 'almendra', 'Almendra-BoldItalic.ttf', 700, 1],
+  ['Courgette', 'courgette', 'Courgette-Regular.ttf', 400, 0],
+  ['Oregano', 'oregano', 'Oregano-Regular.ttf', 400, 0], ['Oregano', 'oregano', 'Oregano-Italic.ttf', 400, 1],
+  ['Merienda', 'merienda', 'Merienda[wght].ttf', 400, 0, { wght: 400 }], ['Merienda', 'merienda', 'Merienda[wght].ttf', 700, 0, { wght: 700 }],
+  ['Sofia', 'sofia', 'Sofia-Regular.ttf', 400, 0],
 ];
 const WEB_PULA = new Set(['inter-400', 'inter-500']);           // o site segue com os .woff atuais
 
