@@ -145,7 +145,7 @@ try {
   ok(await b.isVisible() && /Instalar o Polar Life/.test(await b.textContent()), 'botão «Instalar o Polar Life» aparece com o evento');
   ok(await b.evaluate(x => x.classList.contains('btn2') && !x.classList.contains('led-btn') && !x.closest('.led-btn')), 'botão Instalar é secundário (btn2), não LED (T8)');
   ok((await b.boundingBox()).height >= 44, 'alvo do botão Instalar ≥ 44 px (T3)');
-  ok(await inst.evaluate(() => document.querySelectorAll('.led-btn').length === document.querySelectorAll('#pwa-barra .led-btn').length + 2 && !document.querySelector('#pwa-barra .led-btn')), 'T-01 não ganhou botão LED');
+  ok(await inst.evaluate(() => document.querySelectorAll('.led-btn').length === 1   /* D-177: a tela central tem um só LED («Polaroids para imprimir») */ && !document.querySelector('#pwa-barra .led-btn')), 'T-01 não ganhou botão LED');
   await b.click(); await inst.waitForTimeout(200);
   ok(await inst.evaluate(() => window.__prompts === 1 && document.getElementById('pwa-instalar').hidden), 'clicar chama o prompt e o botão some');
   await inst.evaluate(evento, 'dismissed');
