@@ -6,7 +6,7 @@ var $=function(i){return document.getElementById(i)},foco=null,cancelado=false,t
 var IC={ok:'<path d="M5 12l5 5 9-10"/>',relogio:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',falha:'<path d="M6 6l12 12M18 6L6 18"/>',atencao:'<path d="M12 4l9 16H3zM12 10v4M12 17h.01"/>',
  aparelho:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>',camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',nuvem:'<path d="M7 18a4 4 0 010-8 5 5 0 019.5 1A3.5 3.5 0 0116.5 18z"/>',share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7h14v-7"/>',rede:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11l7.6-4M8.2 13l7.6 4"/>'};
 function svg(k,c){return '<svg class="ico'+(c?' '+c:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</svg>'}
-var EST={disp:['ok','Pronto para usar'],em2:['relogio','Em breve (versão 2.0)'],em3:['relogio','Em breve (versão 3.0)'],ind:['info','Esta plataforma não permite importar por aqui'],erro:['falha','Não foi possível verificar agora']};
+var EST={disp:['ok','Pronto para usar'],ind:['info','Esta plataforma não permite importar por aqui'],erro:['falha','Não foi possível verificar agora']};
 var https=location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1';
 var temShare=typeof navigator.canShare==='function';
 var estado=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
@@ -16,17 +16,15 @@ var S=[
  {id:'apple',sec:'trazer',n:'Apple Fotos (iPhone e iPad)',ic:'aparelho',e:'disp',a:'No iPhone, escolha Biblioteca de Fotos no seletor. As fotos do iCloud que já aparecem na galeria funcionam.',t:'dev'},
  {id:'icloud',sec:'trazer',n:'iCloud Fotos (web)',ic:'nuvem',e:'ind',a:'Não há acesso por aqui. No iPhone ou iPad, toque em Do aparelho e escolha Biblioteca de Fotos.',g:'apple'},
  {id:'google',sec:'trazer',n:'Google Fotos',ic:'nuvem',e:'disp',a:'Você escolhe as fotos numa janela do próprio Google. Só as escolhidas vêm para este aparelho.'},
- {id:'nuvens',sec:'trazer',n:'Drive, Dropbox e OneDrive',ic:'nuvem',e:'em3',a:'Seletores oficiais de cada serviço, em versão futura.'},
  {id:'compartilhar',sec:'levar',n:'Compartilhar o arquivo',ic:'share',e:'disp',a:temShare?'Envie pelo menu do aparelho.':'Neste navegador o arquivo é baixado e você escolhe o aplicativo.',t:'saida'},
  {id:'instagram',sec:'levar',n:'Instagram',ic:'rede',e:'ind',a:'O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho. Para enviar, use Compartilhar ou baixe a imagem.',t:'rede',g:'rede'},
  {id:'facebook',sec:'levar',n:'Facebook',ic:'rede',e:'ind',a:'O Facebook não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho. Para enviar, use Compartilhar ou baixe a imagem.',t:'rede',g:'rede'}
 ];
-if(estado==='erro')S[6].e='erro';
+if(estado==='erro')porId('compartilhar').e='erro';
 function porId(i){return S.filter(function(s){return s.id===i})[0]}
 function card(s){var e=EST[s.e];
  var acoes=s.e==='disp'?(s.id==='compartilhar'?'':'<a class="btn2" href="../adicionar-fotos/">Escolher fotos</a>'):s.e==='erro'?'':s.g?'<button type="button" class="btn2" data-g="'+s.g+'">Ver como fazer</button>':'<a class="btn2" href="../adicionar-fotos/">Escolher do aparelho</a>';
  if(s.t)acoes+='<button type="button" class="btn2" data-t="'+s.id+'">'+(s.e==='erro'?'Tentar de novo':'Testar conexão')+'</button>';
- if(s.sec==='trazer'&&s.e==='em2')acoes+='<span class="mono" style="align-self:center">Avisar quando chegar: só com conta (2.0)</span>';
  return '<article class="cx" aria-labelledby="n-'+s.id+'"><div class="cx__top">'+svg(s.ic)+'<span class="cx__nome" id="n-'+s.id+'">'+s.n+'</span></div><span class="sel'+(s.e==='erro'?' sel--erro':'')+'">'+svg(e[0])+e[1]+'</span><p class="cx__ajuda">'+s.a+'</p><div class="cx__acoes">'+acoes+'</div></article>'}
 ['trazer','levar'].forEach(function(k){$(k).innerHTML=S.filter(function(s){return s.sec===k}).map(card).join('')});
 

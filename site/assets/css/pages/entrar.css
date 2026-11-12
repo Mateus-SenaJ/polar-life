@@ -308,3 +308,8 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
   .ent__midia::after{background:linear-gradient(180deg,rgb(0 0 0/0) 55%,rgb(0 0 0/.7) 80%,#000 100%)}
 }
 @media (max-width:1023px){.ent__kick{font-size:12px}}   /* D-169: rótulo legível no celular */
+
+/* D-194: contas de teste escondidas (só no aparelho do dono, com ?contas-de-teste) */
+html:not(.ver-testes) .cx-testes,html:not(.ver-testes) .cx-div--testes{display:none!important}
+/* D-194: só o Google no segundo bloco: o botão ocupa a linha toda */
+.cx-prov__b:only-child{grid-column:1/-1}

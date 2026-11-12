@@ -69,7 +69,7 @@ function render(){
   h+='<section class="cc" aria-labelledby="cc-voce"><h2 class="cc__t" id="cc-voce">Você</h2>'+
     '<div class="cc__row"><div class="cc__pilha"><p class="cc__email">'+esc(s.email)+'</p>'+
     '<p class="cc__meta">Entrou em '+dataLonga(s.entrouEm)+'</p></div>'+
-    '<span class="pill">Conta de teste · '+esc(pl.nome||'Grátis')+'</span></div>'+
+    '<span class="pill">'+esc(pl.nome||'Grátis')+'</span></div>'+
     '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-sair">'+ico(I.sair)+'Sair</button></div></section>';
 
   /* cartão Plano */
@@ -114,7 +114,7 @@ function render(){
   /* admin: cartão extra (§3.2) */
   if(id==='admin'){
     h+='<section class="cc" aria-labelledby="cc-admin"><h2 class="cc__t" id="cc-admin">Painel do admin</h2>'+
-      '<p class="cc__meta">Limites de plano e contas de teste.</p>'+
+      '<p class="cc__meta">Limites dos planos e contas deste aparelho.</p>'+
       '<div class="cc__act"><a class="btn2" href="../admin/">'+ico(I.panelle)+'Abrir painel</a></div></section>'
   }
 
@@ -181,7 +181,7 @@ function ligar(){
   });
   if(b=$('b-reativar'))b.addEventListener('click',function(){
     C.assinarPro('aprovado');
-    toast('Pro reativado · Ambiente de teste');
+    toast('Pro reativado');
     render()
   });
   if(b=$('assin'))b.addEventListener('click',function(){
@@ -201,10 +201,10 @@ function ligar(){
     toast('Dados exportados ('+n+')')
   });
   if(b=$('b-excluir'))b.addEventListener('click',function(){
-    pop('Excluir sua conta de teste?',
+    pop('Excluir sua conta?',
       '<p>Folhas, créditos e recibos desta conta serão apagados deste navegador. Seus projetos e fotos continuam no aparelho.</p>',
       [{led:true,txt:'Manter conta',cb:function(){fecharPop(false)}},
-       {txt:'Excluir conta',ic:ico(I.lixeira),cb:function(){C.excluirConta();fecharPop(false);toast('Conta de teste apagada deste navegador.');setTimeout(function(){location.href=G?G.raiz():'../'},700)}}])
+       {txt:'Excluir conta',ic:ico(I.lixeira),cb:function(){C.excluirConta();fecharPop(false);toast('Conta apagada deste navegador.');setTimeout(function(){location.href=G?G.raiz():'../'},700)}}])
   });
   var rs=[].slice.call(document.querySelectorAll('.btn3[data-rec]'));
   for(var i=0;i<rs.length;i++)rs[i].addEventListener('click',verRecibo)
@@ -214,7 +214,7 @@ function verRecibo(){
   if(!r)return;
   pop('Recibo',
     '<dl><dt>Número</dt><dd class="mono">'+esc(r.id)+'</dd><dt>Data</dt><dd>'+esc(r.data)+'</dd><dt>Descrição</dt><dd>'+esc(r.desc)+'</dd><dt>Valor</dt><dd class="mono">'+esc(r.valor)+'</dd></dl>'+
-    '<p>Recibo de teste. Em produção, o recibo chega por e-mail e pode ser baixado aqui.</p>',
+    '<p>Recibo de demonstração: nenhuma cobrança foi feita.</p>',
     [{txt:'Fechar',cb:function(){fecharPop(true)}}],true)
 }
 

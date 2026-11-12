@@ -4,6 +4,9 @@
    (e-mail + código de impressão PL-XXXX-XXXX).
    Toda via nova termina em «Seus dados» (nome, e-mail, aceite) antes de entrar.
    Um único LED por etapa (T8); estados de revisão via #estado-… (checklist §8.5). */
+/* D-194: as contas de teste não aparecem para ninguém. O dono liga num aparelho abrindo /app/entrar/?contas-de-teste (fica ligado
+   neste aparelho; ?contas-de-teste=0 desliga): é por elas que se entra como Admin. O CSS já nasce escondendo (sem piscar). */
+(function(){try{var m=location.search.match(/[?&]contas-de-teste(?:=([01]))?(?:&|$)/);if(m){if(m[1]==='0')localStorage.removeItem('pl-ver-contas-teste');else localStorage.setItem('pl-ver-contas-teste','1')}if(localStorage.getItem('pl-ver-contas-teste')==='1')document.documentElement.classList.add('ver-testes')}catch(e){}})();
 (function(){
 var $=function(i){return document.getElementById(i)};
 var C=window.PLCONTA,G=window.PLGUARDA;
@@ -71,10 +74,10 @@ function renderEmail(manter){
     '</form>'+
     '<button type="button" class="btn2 cx-criar" id="b-criar"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Criar nova conta</button>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
-    '<div class="cx-prov" role="group" aria-label="Entrar com Google ou Apple">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span><span class="cx-pre">Continuar com </span>'+pv.nome+'</span></button>'}).join('')+'</div>'+
+    '<div class="cx-prov" role="group" aria-label="Entrar com Google">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span><span class="cx-pre">Continuar com </span>'+pv.nome+'</span></button>'}).join('')+'</div>'+
     '<p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>'+
     '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a> · <a href="../../legal/#cookies">Cookies</a></p>'+
-    '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
+    '<div class="cx-div cx-div--testes" aria-hidden="true"><span>ou</span></div>'+
     '<section class="cx-testes" aria-labelledby="t-testes">'+
     '<h3 class="cx-testes__t" id="t-testes">Contas de teste</h3>'+
     '<p class="cx-testes__p">Entre com um toque para ver cada plano.</p>'+
@@ -248,7 +251,7 @@ function renderCodigo(r,email){
   cx.innerHTML=
     '<h2 class="cx-t">Confira o código</h2>'+
     '<p class="cx-lead">Digitamos para <strong>'+esc(email)+'</strong> · <button type="button" class="cx-retro" id="b-trocar-email">Trocar e-mail</button></p>'+
-    cxInfo('<strong>Ambiente de teste:</strong> seu código é <strong class="cod">'+cod+'</strong>. Nada foi enviado; em produção, ele chegaria por e-mail e valeria por 10 minutos.')+
+    cxInfo('Use este código para entrar: <strong class="cod">'+cod+'</strong>. Nada foi enviado; em produção, ele chegaria por e-mail e valeria por 10 minutos.')+
     '<form id="f-cod" class="cx-f" novalidate>'+
     '<div class="fld fld--first" id="g-cod">'+
     '<label class="lab" for="cod">Código de 6 dígitos</label>'+
@@ -327,7 +330,7 @@ function confirmar(ev){
   })
 }
 function sucesso(nome){
-  toast('Você entrou como '+nome+' · Ambiente de teste');
+  toast('Você entrou como '+nome);
   clearTimeout(tmIr);
   tmIr=setTimeout(irPara,900)
 }

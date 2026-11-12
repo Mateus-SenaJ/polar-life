@@ -191,7 +191,7 @@ function contas(){
   var sec=document.createElement('section');
   sec.className='adm-sec';
   sec.setAttribute('aria-labelledby','t-contas');
-  sec.innerHTML='<h2 class="adm-sec__t" id="t-contas">Contas de teste</h2><p class="adm-sec__p">Plano, folhas e uso do mês de cada conta. «Entrar como» troca a sessão deste navegador.</p>';
+  sec.innerHTML='<h2 class="adm-sec__t" id="t-contas">Contas deste aparelho</h2><p class="adm-sec__p">Plano, folhas e uso do mês de cada conta. «Entrar como» troca a sessão deste navegador.</p>';
   var cs=C.contasTeste();
 
   var tb=document.createElement('div');
@@ -268,7 +268,7 @@ function contas(){
       if(!c)return;
       C.sair();
       C.entrarComo(c.perfil==='admin'?'admin':c.perfil);
-      toast('Você entrou como '+c.nome+' · Ambiente de teste');
+      toast('Você entrou como '+c.nome);
       setTimeout(function(){location.href=G?G.raiz():'../'},800)
     })
   });
@@ -292,7 +292,7 @@ function codigos(){
     '<button type="button" class="btn2 btn2--lg" id="cod-gerar">Gerar códigos</button>'+
     '</div>'+
     '<div id="cod-res"></div>'+
-    '<div class="adm-cod__aviso">'+ico(I.atn)+'<span>Ambiente de teste: os códigos são gerados e guardados só neste navegador. Em produção, quem gera e valida é o servidor.</span></div>'+
+    '<div class="adm-cod__aviso">'+ico(I.atn)+'<span>Os códigos são gerados e guardados só neste navegador.</span></div>'+
     '<div id="cod-tabela"></div>';
 
   sec.querySelector('#cod-gerar').addEventListener('click',function(){
@@ -352,12 +352,13 @@ function codigos(){
 /* ---------- sem permissão (§4.2) ---------- */
 function renderSemPermissao(){
   $('pe').hidden=true;
-  $('corpo').innerHTML='<div class="adm-vazio"><h2>Só a conta Admin abre este painel.</h2>'+
-    '<p>As demais contas de teste continuam com a Conta, o portão de exportação e o editor.</p>'+
-    '<button type="button" class="btn2" id="b-como-admin">Entrar como Admin</button></div>';
-  $('b-como-admin').addEventListener('click',function(){
+  var verT=false;try{verT=localStorage.getItem('pl-ver-contas-teste')==='1'}catch(e){}   /* D-194: o atalho para a conta Admin só no aparelho do dono */
+  $('corpo').innerHTML='<div class="adm-vazio"><h2>Este painel é só da conta Admin.</h2>'+
+    '<p>Sua conta continua com o editor, a Conta e a exportação.</p>'+
+    (verT?'<button type="button" class="btn2" id="b-como-admin">Entrar como Admin</button>':'<a class="btn2" href="../inicio/">Voltar ao Início</a>')+'</div>';
+  if($('b-como-admin'))$('b-como-admin').addEventListener('click',function(){
     C.entrarComo('admin');
-    toast('Você entrou como Admin · Ambiente de teste');
+    toast('Você entrou como Admin');
     setTimeout(render,400)
   })
 }

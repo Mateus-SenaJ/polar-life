@@ -140,7 +140,7 @@ function pagamento(qtd,pro){
     '<label class="pp-pg__o"><input type="radio" name="pp-pg" value="pix"><span>Pix</span></label>'+
     '<label class="pp-pg__o"><input type="radio" name="pp-pg" value="boleto"><span>Boleto</span></label>'+
     '</fieldset>'+
-    '<div class="pp-sim">'+ico(I.info)+'<p><strong>Ambiente de teste:</strong> nenhum dado de pagamento é pedido. Escolha abaixo o que simular.</p></div>'+
+    '<div class="pp-sim">'+ico(I.info)+'<p><strong>Demonstração:</strong> nenhum dado de pagamento é pedido e nada é cobrado. Escolha abaixo o que simular.</p></div>'+
     '<div class="pp-sim-b"><button type="button" class="btn2 btn2--lg pp-sim__b" data-m="aprovado">Simular pagamento aprovado</button>'+
     '<button type="button" class="btn2 btn2--lg pp-sim__b" data-m="pendente">Simular Pix pendente</button>'+
     '<button type="button" class="btn2 btn2--lg pp-sim__b" data-m="recusado">Simular pagamento recusado</button></div>');
@@ -178,7 +178,7 @@ function depois(r){
   }else if(r.estado==='pendente'){
     titulo('Aguardando pagamento');
     corpo('<div class="pp-sim">'+ico(I.rel)+'<p>Aguardando pagamento. Seu projeto está salvo; você pode voltar depois.</p></div>'+
-      '<p class="pp-pix mono">código Pix de teste · 00000000-0000-0000-0000-000000000000</p>');
+      '<p class="pp-pix mono">código Pix de demonstração · 00000000-0000-0000-0000-000000000000</p>');
     acoes([
       {txt:'Simular confirmação',cb:function(){
         if(pg.pro)C.assinarPro('aprovado').then(depois);

@@ -8,12 +8,20 @@ var LAYOUTS=[
   {id:'mosaico',n:'Mosaico em tijolo',d:'Linhas encaixadas, cada uma deslocada meia polaroid.'},
   {id:'espalhadas',n:'Espalhadas',d:'Polaroids soltas, com leve rotação e sobreposição.'},
   {id:'tira',n:'Tira',d:'Faixas de polaroids lado a lado, como uma tira de fotos.'},
-  {id:'coracao',n:'Coração',d:'Polaroids menores formando um coração.'}
+  {id:'coracao',n:'Coração',d:'Polaroids menores formando um coração.',esc:true},
+  /* D-195: layouts das colagens para as redes (DOC-06 §4). As polaroids diminuem por igual para caber (como no Coração, D-153) */
+  {id:'mural',n:'Mural',d:'Grade com respiro entre as polaroids.',esc:true},
+  {id:'capa',n:'Capa e destaques',d:'Uma polaroid grande e as outras menores embaixo.',esc:true},
+  {id:'tempo',n:'Linha do tempo',d:'Uma polaroid de cada lado de um traço, na ordem das datas.',esc:true},
+  {id:'varal',n:'Varal',d:'Polaroids penduradas num fio, presas com pregadores.',esc:true},
+  {id:'cabine',n:'Tira vertical',d:'Polaroids empilhadas numa coluna, como na cabine de fotos.',esc:true}
 ];
 var PADRAO={ativo:false,layout:'espalhadas',fundo:{tipo:'foto',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40},peca:'A4',orient:'retrato',margem:3,fotos:null};
-/* D-176: a Colagem tem tamanho próprio, separado do papel das Folhas de polaroids */
-var PECAS={A4:{n:'A4',w:210,h:297},A3:{n:'A3',w:297,h:420},A5:{n:'A5',w:148,h:210},'13x18':{n:'13 × 18 cm',w:130,h:180},'10x15':{n:'10 × 15 cm',w:100,h:150},'20x30':{n:'20 × 30 cm',w:200,h:300},'20x20':{n:'20 × 20 cm',w:200,h:200}};
-var EPS=1e-6;
+/* D-176: a Colagem tem tamanho próprio, separado do papel das Folhas de polaroids.
+   D-195: tamanhos para as redes (DOC-06 §3): a imagem sai com os pixels de «rede», 4,5 px por mm (240 mm = 1080 px), sempre em pé */
+var PECAS={A4:{n:'A4',w:210,h:297},A3:{n:'A3',w:297,h:420},A5:{n:'A5',w:148,h:210},'13x18':{n:'13 × 18 cm',w:130,h:180},'10x15':{n:'10 × 15 cm',w:100,h:150},'20x30':{n:'20 × 30 cm',w:200,h:300},'20x20':{n:'20 × 20 cm',w:200,h:200},
+  r11:{n:'Quadrado 1:1',w:240,h:240,rede:{w:1080,h:1080}},r45:{n:'Retrato 4:5',w:240,h:300,rede:{w:1080,h:1350}},r916:{n:'Stories 9:16',w:240,h:1920/4.5,rede:{w:1080,h:1920}}};
+var EPS=1e-6,G=4,SMIN=.25;     /* G: respiro entre polaroids nos layouts das redes (mm); SMIN: menor escala aceita */
 function copia(o){return JSON.parse(JSON.stringify(o))}
 function num(v,min,max,d){v=parseFloat(v);return isNaN(v)?d:Math.max(min,Math.min(max,v))}
 function hex(v,d){return /^#[0-9a-f]{6}$/i.test(String(v||''))?String(v).toUpperCase():d}   /* a cor é conteúdo: qualquer #RRGGBB (DS-13) */
@@ -26,7 +34,7 @@ function norm(c){
   d.fundo.ang=Math.round(num(f.ang,0,360,d.fundo.ang))%360;
   d.fundo.foto=f.foto!=null&&f.foto%1===0&&f.foto>=1?+f.foto:null;
   d.fundo.px=num(f.px,0,100,50);d.fundo.py=num(f.py,0,100,50);d.fundo.suave=Math.round(num(f.suave,0,100,d.fundo.suave));
-  d.peca=PECAS.hasOwnProperty(o.peca)?o.peca:'A4';d.orient=o.orient==='paisagem'?'paisagem':'retrato';d.margem=num(o.margem,3,25,3);
+  d.peca=PECAS.hasOwnProperty(o.peca)?o.peca:'A4';d.orient=o.orient==='paisagem'&&!PECAS[d.peca].rede?'paisagem':'retrato';d.margem=num(o.margem,3,25,3);   /* D-195: imagem para as redes é sempre em pé */
   d.fotos=Array.isArray(o.fotos)?o.fotos.map(Number).filter(function(n,i,a){return n%1===0&&n>=1&&a.indexOf(n)===i}):null;   /* null = todas as fotos */
   return d
 }
@@ -173,15 +181,91 @@ coracao:{
     var s,o=[];
     for(s=.7;s>=.3-1e-9;s-=.02){o=this.monta(k,A,fw,fh,s);if(valido(o,k,fw,fh,A))return o}
     return o}
+},
+/* ---- D-195 · layouts das redes. A.smax: até quanto a polaroid pode crescer (2 nas imagens para as redes, 1 no papel) ---- */
+mural:{max:16,equilibrar:true,
+  pos:function(k,A,fw,fh){
+    var aw=A.x1-A.x0,ah=A.y1-A.y0,sm=A.smax||1,b=null,c,r,s;
+    for(c=1;c<=k;c++){r=Math.ceil(k/c);s=Math.min(sm,(aw-(c-1)*G)/(c*fw),(ah-(r-1)*G)/(r*fh));if(!b||s>b.s+1e-9)b={c:c,r:r,s:s}}
+    if(!b||b.s<SMIN)return[];
+    var W=fw*b.s,H=fh*b.s,cx=(A.x0+A.x1)/2,cy=(A.y0+A.y1)/2,tH=b.r*H+(b.r-1)*G,o=[],i;
+    for(i=0;i<k;i++){var l=Math.floor(i/b.c),j=i%b.c,n=l===b.r-1?k-b.c*(b.r-1):b.c,tW=n*W+(n-1)*G;
+      o.push({x:cx-tW/2+j*(W+G)+W/2-fw/2,y:cy-tH/2+l*(H+G)+H/2-fh/2,w:fw,h:fh,giro:false,rot:0,s:b.s})}
+    return o}
+},
+capa:{max:9,equilibrar:true,
+  pos:function(k,A,fw,fh){
+    var aw=A.x1-A.x0,ah=A.y1-A.y0,sm=A.smax||1,cx=(A.x0+A.x1)/2,cy=(A.y0+A.y1)/2,o=[],i;
+    if(k===1){var s1=Math.min(sm,aw/fw,ah/fh)*.97;return s1<SMIN?[]:[celula(cx,cy,fw,fh,0,A,s1)]}
+    var n=k-1,rs=n<=4?1:2,cs=Math.ceil(n/rs),ss=Math.min(1,(aw-(cs-1)*G)/(cs*fw)*.94,(ah*.36-(rs-1)*G)/(rs*fh)),hs=rs*fh*ss+(rs-1)*G;
+    var sb=Math.min(sm,aw/fw*.96,(ah-hs-2*G)/fh*.98);
+    if(sb<SMIN||ss<SMIN*.6)return[];
+    var hb=fh*sb,y0=cy-(hb+2*G+hs)/2;
+    o.push(celula(cx,y0+hb/2,fw,fh,-1,A,sb));                         /* a capa primeiro: as menores não ficam por baixo dela */
+    for(i=0;i<n;i++){var l=Math.floor(i/cs),j=i%cs,m=l===rs-1?n-cs*(rs-1):cs,W=fw*ss,tW=m*W+(m-1)*G;
+      o.push(celula(cx-tW/2+j*(W+G)+W/2,y0+hb+2*G+l*(fh*ss+G)+fh*ss/2,fw,fh,[-4,3,5,-2,4,-3,2,-5][i%8],A,ss))}
+    return o}
+},
+tempo:{max:12,equilibrar:true,data:true,
+  pos:function(k,A,fw,fh){
+    var aw=A.x1-A.x0,ah=A.y1-A.y0,sm=A.smax||1,cx=(A.x0+A.x1)/2,cy=(A.y0+A.y1)/2,g=2*G,o=[],i;
+    if(k===1){var s1=Math.min(sm,aw/fw,ah/fh)*.97;return s1<SMIN?[]:[celula(cx,cy,fw,fh,0,A,s1)]}
+    /* em zigue-zague: vizinhas de lados opostos do traço; as do mesmo lado não se encostam (2 passos ≥ altura + 1,5 mm) */
+    var s=Math.min(sm,(aw-g)/(2*fw)*.95,(ah-(k-1)*1.5)/(fh*(1+(k-1)/2))*.97);
+    if(s<SMIN)return[];
+    var W=fw*s,H=fh*s,st=Math.min((ah-H)/(k-1),H*.8),y0=cy-(H+(k-1)*st)/2;
+    for(i=0;i<k;i++)o.push(celula(cx+(i%2?1:-1)*(g/2+W/2),y0+i*st+H/2,fw,fh,i%2?3:-3,A,s));
+    return o}
+},
+varal:{max:8,equilibrar:true,
+  pos:function(k,A,fw,fh){
+    var aw=A.x1-A.x0,ah=A.y1-A.y0,sm=A.smax||1,b=null,t,n,s,FIO=6,SAG=4;
+    for(t=1;t<=k;t++){n=Math.ceil(k/t);s=Math.min(sm,(aw-(n+1)*G)/(n*fw)*.95,(ah-t*(FIO+SAG)-(t-1)*G)/(t*fh)*.97);if(!b||s>b.s+1e-9)b={t:t,s:s}}
+    if(!b||b.s<SMIN)return[];
+    var H=fh*b.s,rowH=FIO+SAG+H,y=(A.y0+A.y1)/2-(b.t*rowH+(b.t-1)*G)/2,o=[],fios=[],i=0;
+    dist(k,b.t).forEach(function(m,r){
+      var f={y:y+r*(rowH+G)+FIO,sag:SAG,x0:A.x0,x1:A.x1},j;fios.push(f);
+      for(j=0;j<m;j++){var x=A.x0+(j+.5)*aw/m;o.push(celula(x,yFio(f,x)-1.5+H/2,fw,fh,i%2?3:-3,A,b.s));i++}   /* o fio passa 1,5 mm abaixo da borda de cima, por trás da moldura */
+    });
+    o.fios=fios;return o}
+},
+cabine:{max:5,equilibrar:true,
+  pos:function(k,A,fw,fh){
+    var aw=A.x1-A.x0,ah=A.y1-A.y0,sm=A.smax||1,g=3,s=Math.min(sm,aw/fw*.98,(ah-(k-1)*g)/(k*fh)*.99);
+    if(s<SMIN)return[];
+    var H=fh*s,cx=(A.x0+A.x1)/2,y0=(A.y0+A.y1)/2-(k*H+(k-1)*g)/2,o=[],i;
+    for(i=0;i<k;i++)o.push({x:cx-fw/2,y:y0+i*(H+g)+H/2-fh/2,w:fw,h:fh,giro:false,rot:0,s:s});
+    return o}
 }};
+/* fio do varal: leve barriga no meio (parábola) */
+function yFio(f,x){var c=(f.x0+f.x1)/2,u=(x-c)/((f.x1-f.x0)/2);return f.y+f.sag*(1-u*u)}
+/* D-195: traços e pregadores da colagem (mm), na tela, no PDF e na imagem. «atras»: antes das polaroids; «frente»: depois.
+   Nada passa sobre a foto (T4): o fio corre por trás das molduras; o pregador fica só na borda branca de cima. */
+function decoDe(id,cells,A,fr){
+  var d=[];
+  if(id==='tempo'&&cells.length>1){
+    var cx=(A.x0+A.x1)/2,ys=cells.map(function(c){return c.y+c.h/2});
+    d.push({t:'linha',x1:cx,y1:Math.min.apply(null,ys),x2:cx,y2:Math.max.apply(null,ys),larg:.5,cor:'#000000',z:'atras'});
+    ys.forEach(function(y){d.push({t:'cheio',x:cx-1.4,y:y-1.4,w:2.8,h:2.8,cor:'#000000',z:'frente'})})
+  }
+  if(id==='varal'&&cells.fios){
+    cells.fios.forEach(function(f){var N=24,i,xa,xb;for(i=0;i<N;i++){xa=f.x0+(f.x1-f.x0)*i/N;xb=f.x0+(f.x1-f.x0)*(i+1)/N;d.push({t:'linha',x1:xa,y1:yFio(f,xa),x2:xb,y2:yFio(f,xb),larg:.45,cor:'#000000',z:'atras'})}});
+    cells.forEach(function(c){var s=c.s||1,a=(c.rot||0)*Math.PI/180,h=c.h*s/2,tx=c.x+c.w/2+h*Math.sin(a),ty=c.y+c.h/2-h*Math.cos(a),borda=Math.max(.8,((fr&&fr.topo)||6)*s-.4);
+      d.push({t:'cheio',x:tx-1.6,y:ty-3.2,w:3.2,h:3.2+Math.min(3,borda),cor:'#FD761A',z:'frente'})})
+  }
+  return d
+}
+/* Linha do tempo: na ordem das datas (as sem data vão no fim, na ordem do projeto) */
+function porData(f){return f.map(function(x,i){return{x:x,i:i,d:x&&x.m&&x.m.iso||''}}).sort(function(a,b){return a.d&&b.d?(a.d<b.d?-1:a.d>b.d?1:a.i-b.i):a.d?-1:b.d?1:a.i-b.i}).map(function(o){return o.x})}
 
 var MEMO={};
-function area(s,p){var m=s.margem;return{x0:m,y0:m,x1:p.w-m,y1:p.h-m}}
+function rede(s){var c=s&&s.colagem?norm(s.colagem):s&&s.peca?norm(s):null;return c&&PECAS[c.peca].rede||null}   /* aceita a config da folha ou a da colagem */
+function area(s,p){var m=s.margem;return{x0:m,y0:m,x1:p.w-m,y1:p.h-m,smax:rede(s)?2:1}}
 function papel(s){return window.PLFOLHAS.papel(s)}
 /* capacidade = maior k tal que todos os k' ≤ k têm posição válida (dentro da margem e com a regra de sobreposição) */
 function capDe(id,A,fw,fh){
-  var key=[id,fw,fh,A.x0,A.y0,A.x1,A.y1].join('|');if(MEMO[key]!=null)return MEMO[key];
-  var k=0,n;for(n=1;n<=KMAX;n++){var c=GR[id].pos(n,A,fw,fh);if(valido(c,n,fw,fh,A))k=n;else break}
+  var key=[id,fw,fh,A.x0,A.y0,A.x1,A.y1,A.smax||1].join('|');if(MEMO[key]!=null)return MEMO[key];
+  var k=0,n,mx=Math.min(KMAX,GR[id].max||KMAX);for(n=1;n<=mx;n++){var c=GR[id].pos(n,A,fw,fh);if(valido(c,n,fw,fh,A))k=n;else break}
   return MEMO[key]=k}
 function capacidade(s,fr){var c=norm(s.colagem),p=papel(s);return capDe(c.layout,area(s,p),fr.w,fr.h)}
 function contar(s,fr,total){var c0=norm(s.colagem);if(c0.fotos)total=Math.min(total,c0.fotos.length);var cap=capacidade(s,fr);return cap<1?{folhas:0,porFolha:0,naoCabe:true}:{folhas:total>0?Math.ceil(total/cap):0,porFolha:cap,naoCabe:false}}
@@ -189,11 +273,13 @@ function paginar(s,fr,fotos){
   var c=norm(s.colagem);fotos=escolhidas(c,fotos||[]);
   var p=papel(s),A=area(s,p),L=GR[c.layout],cap=capDe(c.layout,A,fr.w,fr.h);
   if(cap<1)return{p:p,sheets:[],erro:true,g:{n:0,c:0,r:0,fw:fr.w,fh:fr.h,giro:false,cap:0},colagem:true};
+  if(L.data)fotos=porData(fotos);
   var n=fotos.length,pg=n?Math.ceil(n/cap):0,sheets=[],k=0,ns=[],i;
-  if(L.equilibrar)ns=pg?dist(n,pg):[];else for(i=0;i<pg;i++)ns.push(Math.min(cap,n-i*cap));   /* coração: folhas equilibradas; os demais enchem uma folha antes da outra */
+  if(L.equilibrar)ns=pg?dist(n,pg):[];else for(i=0;i<pg;i++)ns.push(Math.min(cap,n-i*cap));   /* coração e os das redes: folhas equilibradas; os demais enchem uma folha antes da outra */
   ns.forEach(function(m){
-    var cells=L.pos(m,A,fr.w,fr.h).map(function(q,i){q.f=fotos[k+i];return q});k+=m;
-    sheets.push({cells:cells,grupo:'',per:cap,parcial:m<cap})
+    var raw=L.pos(m,A,fr.w,fr.h),dc=decoDe(c.layout,raw,A,fr),cells=raw.map(function(q,i){q.f=fotos[k+i];return q});k+=m;
+    var sh={cells:cells,grupo:'',per:cap,parcial:m<cap};if(dc.length)sh.deco=dc;
+    sheets.push(sh)
   });
   var maior=ns.reduce(function(t,m){return Math.max(t,m)},0);
   return{p:p,sheets:sheets,erro:false,g:{n:maior,c:maior,r:1,fw:fr.w,fh:fr.h,giro:false,cap:cap},colagem:true}
@@ -205,9 +291,25 @@ function escolhidas(c,fotos){if(!c.fotos)return fotos;return fotos.filter(functi
 /* D-176: a folha da Colagem sai da própria configuração, nunca do papel das Folhas (guias, rodapé e espaço não se aplicam) */
 function config(d,c){
   c=norm(c);var P=window.PLFOLHAS&&PLFOLHAS.PAPEIS||{},q=PECAS[c.peca];
-  var s={papel:P[c.peca]?c.peca:'custom',w:q.w,h:q.h,orient:c.orient,margem:c.margem,gap:0,girar:false,align:'center',separar:false,guias:false,contorno:false,compr:d&&d.compr||'continua',cor:d&&d.cor||'preto',rodape:false,assin:d?d.assin!==false:true};
+  var s={papel:P[c.peca]?c.peca:'custom',nome:q.n,w:q.w,h:q.h,orient:c.orient,margem:c.margem,gap:0,girar:false,align:'center',separar:false,guias:false,contorno:false,compr:d&&d.compr||'continua',cor:d&&d.cor||'preto',rodape:false,assin:d?d.assin!==false:true};
   s.colagem=Object.assign({},c,{ativo:true});return s
 }
+/* D-195 · «Colagens para as redes» (Início, DOC-06 §3/§4): cada modelo é uma configuração da Colagem; as fotos entram depois (D-188) */
+var MODELOS=[
+  {id:'mural',nome:'Mural do mês',frase:'Tudo o que cabe em nove quadros.',c:{peca:'r11',layout:'mural',margem:10,fundo:{tipo:'cor',cor:'#FFFFFF'}}},
+  {id:'mesa',nome:'Mesa espalhada',frase:'Do jeito que ficaram na mesa.',c:{peca:'r11',layout:'espalhadas',margem:8,fundo:{tipo:'foto',suave:45}}},
+  {id:'capa',nome:'Capa e destaques',frase:'Uma foto grande e as que vieram junto.',c:{peca:'r45',layout:'capa',margem:10,fundo:{tipo:'cor',cor:'#F8F9FA'}}},
+  {id:'tempo',nome:'Linha do tempo',frase:'O mês, na ordem em que aconteceu.',c:{peca:'r45',layout:'tempo',margem:10,fundo:{tipo:'cor',cor:'#FFFFFF'}}},
+  {id:'varal',nome:'Varal',frase:'Um varal para os dias de sol.',c:{peca:'r916',layout:'varal',margem:10,fundo:{tipo:'gradiente',cor:'#FFFFFF',cor2:'#F8F9FA',ang:180}}},
+  {id:'tira',nome:'Tira',frase:'Quatro fotos, uma história só.',c:{peca:'r916',layout:'cabine',margem:14,fundo:{tipo:'cor',cor:'#000000'}}}
+];
+/* aplica um modelo sobre a colagem atual (mantém a escolha de fotos) e liga o Modo Colagem */
+function comModelo(atual,id){
+  var m=MODELOS.filter(function(x){return x.id===id})[0];if(!m)return norm(atual);
+  var a=norm(atual),f=Object.assign({},PADRAO.fundo,m.c.fundo);
+  return norm(Object.assign({},a,m.c,{ativo:true,fundo:f,fotos:a.fotos}))
+}
 window.PLCOLAGEM={PECAS:PECAS,config:config,escolhidas:escolhidas,LAYOUTS:LAYOUTS,PADRAO:PADRAO,norm:norm,fotoDeFundo:fotoDeFundo,fundo:fundo,eixoGrad:eixoGrad,blurMm:blurMm,clareia:clareia,
-  capacidade:capacidade,contar:contar,paginar:paginar,dentro:dentro,cobertura:cobertura,JAN:JAN,LIM:LIM,ativa:function(s){return!!(s&&s.colagem&&s.colagem.ativo)}};
+  capacidade:capacidade,contar:contar,paginar:paginar,dentro:dentro,cobertura:cobertura,JAN:JAN,LIM:LIM,ativa:function(s){return!!(s&&s.colagem&&s.colagem.ativo)},
+  rede:rede,MODELOS:MODELOS,comModelo:comModelo};
 })();

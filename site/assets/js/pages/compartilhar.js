@@ -1,5 +1,5 @@
 /* T-22 · Compartilhar · DOC-06 §8 (prepararLembranca: arquivo pronto ANTES do clique; «Compartilhar» só com canShare({files}); senão «Baixar»)
-   O arquivo é um EXEMPLO (o gerador de PDF e de imagens ainda não existe); o mecanismo de Web Share e de download é o final.
+   Os arquivos são os que a T-20 acabou de gerar (PDF, imagens ou ZIP), guardados no aparelho com a chave do projeto.
    AbortError (a pessoa cancelou) não mostra nada; outro erro troca para «Baixar».
    Estados de revisão por hash: #estado-sem-suporte · #estado-erro · #estado-baixado */
 (function(){

@@ -27,7 +27,6 @@ publico: [IA de design, IA de código, humanos]
 | 08 | `08_MOTOR_E_DADOS.md` | Paginação, contratos de dados, PDF, pré-voo, stack | Implementação |
 | 09 | `09_LEGAL_PRIVACIDADE.md` | Privacidade, termos, cookies (texto-base) | Páginas legais |
 | 10 | `10_LOG_DECISOES.md` | Decisões, conflitos resolvidos, pendências | Auditar ou contestar |
-| 11 | `11_PROMPTS_TELAS.md` | Bloco mestre e prompts por etapa | Gerar telas com IA |
 
 **Referências visuais canônicas (HTML):** `polar_life_biblioteca_can_nica_de_componentes_do_editor_e1_definitivo.html` (componentes) e `polar_life_inspetor_legendas_fotogr_ficas_e4b.html` (layout do editor). Em conflito de **layout**, o HTML vence. Em conflito de **tipografia**, o DOC-02 vence (os HTMLs ainda usam Inter 700; veja DOC-01 §9).
 

@@ -16,11 +16,13 @@ import { servir, SITE } from '../helpers/servidor.mjs';
 const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.push(m); console.log('  ✘ ' + m); };
 const confere = (v, m, extra) => v ? ok(m) : ruim(m + (extra ? ' — ' + extra : ''));
 const srv = await servir(), nav = await chromium.launch({ headless: true });
+const _novoCtx = nav.newContext.bind(nav);
+nav.newContext = async (o) => { const c = await _novoCtx(o); await c.addInitScript(() => { try { localStorage.setItem('pl-ver-contas-teste', '1'); } catch (e) {} }); return c; };   /* D-194: contas de teste à vista só com a marca do aparelho */
 const rel = u => u.replace(srv.url, '/');
 const FOTOS = ['praia.jpg', 'montanha.jpg', 'cidade.jpg'].map(f => ({ name: f, mimeType: 'image/jpeg', buffer: readFileSync(join(SITE, 'assets/img/fotos', f)) }));   // fotos CC0 do site
 const ROTAS_APP = ['app/', 'app/inicio/', 'app/novo-projeto/', 'app/adicionar-fotos/', 'app/processando/', 'app/resumo/', 'app/orientacao/', 'app/estados/', 'app/editor/', 'app/editor/quadro/',
   'app/editor/gerar/', 'app/editor/imprimir/', 'app/editor/exportar/', 'app/editor/compartilhar/', 'app/conta/', 'app/conta/planos/', 'app/conexoes/', 'app/admin/'];
-const ROTAS = ['', 'como-funciona/', 'legal/', 'app/entrar/', ...ROTAS_APP, 'prototipo/editor-v3/'];
+const ROTAS = ['', 'como-funciona/', 'legal/', 'app/entrar/', ...ROTAS_APP];
 const SESSAO = email => `localStorage.setItem('pl-conta', JSON.stringify({ email: '${email}', entrouEm: Date.now() }))`;
 
 function vigiar(p, v) {

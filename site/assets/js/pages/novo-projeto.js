@@ -248,7 +248,6 @@ $('paper').addEventListener('change',function(){
   update();
 });
 $('err-fix').addEventListener('click',function(){S.paper=this.dataset.paper;update();$('paper').focus()});
-$('uma').addEventListener('click',function(){toast('Este atalho ainda não está disponível.')});
 $('continuar').addEventListener('click',function(){
   if(this.disabled)return;
   try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */

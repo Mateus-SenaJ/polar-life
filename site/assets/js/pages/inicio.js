@@ -52,14 +52,14 @@ var MODELOS=[
 /* ---------- as 6 colagens (brief §2.5 · DOC-06 §4) ---------- */
 var COLAGENS=[
  {formato:'Feed 1:1',px:'1080 × 1080',w:240,h:240,itens:[
-  {nome:'Mural do mês',frase:'Tudo o que cabe em nove quadros.',img:'rede-mural.jpg'},
-  {nome:'Mesa espalhada',frase:'Do jeito que ficaram na mesa.',img:'rede-mesa.jpg'}]},
+  {id:'mural',nome:'Mural do mês',frase:'Tudo o que cabe em nove quadros.',img:'rede-mural.jpg'},
+  {id:'mesa',nome:'Mesa espalhada',frase:'Do jeito que ficaram na mesa.',img:'rede-mesa.jpg'}]},
  {formato:'Retrato 4:5',px:'1080 × 1350',w:192,h:240,itens:[
-  {nome:'Capa e destaques',frase:'Uma foto grande e as que vieram junto.',img:'rede-capa.jpg'},
-  {nome:'Linha do tempo',frase:'O mês, na ordem em que aconteceu.',img:'rede-tempo.jpg'}]},
+  {id:'capa',nome:'Capa e destaques',frase:'Uma foto grande e as que vieram junto.',img:'rede-capa.jpg'},
+  {id:'tempo',nome:'Linha do tempo',frase:'O mês, na ordem em que aconteceu.',img:'rede-tempo.jpg'}]},
  {formato:'Stories 9:16',px:'1080 × 1920',w:135,h:240,itens:[
-  {nome:'Varal',frase:'Um varal para os dias de sol.',img:'rede-varal.jpg'},
-  {nome:'Tira',frase:'Quatro fotos, uma história só.',img:'rede-tira.jpg'}]}
+  {id:'varal',nome:'Varal',frase:'Um varal para os dias de sol.',img:'rede-varal.jpg'},
+  {id:'tira',nome:'Tira',frase:'Quatro fotos, uma história só.',img:'rede-tira.jpg'}]}
 ];
 
 /* ---------- utilidades ---------- */
@@ -208,7 +208,7 @@ function modelos(){
   }).join('');
 }
 
-/* ---------- 5 · as 6 colagens ---------- */
+/* ---------- 5 · as 6 colagens para as redes (D-195: cada uma abre o modelo na Colagem; PLCOLAGEM.MODELOS) ---------- */
 function colagens(){
   var c=$('colags');
   if(!c)return;
@@ -219,7 +219,7 @@ function colagens(){
         +'<p class="colag__frase">'+esc(it.frase)+'</p>'
         +'<p class="colag__nome">'+esc(it.nome)+'</p>'
         +'<p class="colag__px mono">'+esc(g.px)+'</p>'
-        +'<span class="selo-breve"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Em breve</span>'
+        +'<button type="button" class="btn2 colag__b" data-colagem="'+esc(it.id)+'" aria-label="Usar este modelo: '+esc(it.nome)+'">Usar este modelo</button>'
         +'</li>';
     }).join('');
     return '<section class="colag__g" aria-label="'+esc(g.formato)+'"><h3 class="colag__fmt">'+esc(g.formato)+'</h3><ul class="colag__lista">'+itens+'</ul></section>';
@@ -296,6 +296,30 @@ function aplicar(id){
   });
 }
 
+/* D-195: «Usar este modelo» de uma colagem para as redes. Com projeto aberto, a colagem dele muda de modelo e as fotos
+   continuam; sem projeto, nasce um projeto com o nome do modelo e as fotos entram depois (D-188). Abre nas Folhas, no Modo Colagem. */
+function aplicarColagem(id){
+  var m=window.PLCOLAGEM&&PLCOLAGEM.MODELOS.filter(function(x){return x.id===id})[0];if(!m)return;
+  var CH=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'],ir=function(){location.href='../editor/'};
+  function novo(){
+    var c=JSON.stringify(PLCOLAGEM.comModelo({},id));
+    try{CH.concat(['pl-prevoo','pl-exportar','pl-volta']).forEach(function(k){sessionStorage.removeItem(k)});sessionStorage.setItem('pl-fotos','[]');sessionStorage.setItem('pl-colagem',c)}catch(e){}
+    if(!P){ir();return}
+    P.criar(m.nome).then(ir,ir)
+  }
+  if(!P||!P.atual()){novo();return}
+  P.listar().then(function(l){
+    var atual=P.atual(),proj=l.filter(function(x){return x.id===atual})[0];
+    if(!proj){novo();return}
+    var est={};CH.forEach(function(k){var v=lerSess(k);if(v===null&&proj.estado&&typeof proj.estado[k]==='string')v=proj.estado[k];if(v!=null)est[k]=v});
+    var col=null;try{col=JSON.parse(est['pl-colagem']||'null')}catch(e){}
+    est['pl-colagem']=JSON.stringify(PLCOLAGEM.comModelo(col||{},id));
+    if(!est['pl-fotos']&&!est['pl-quadro'])est['pl-fotos']='[]';
+    try{Object.keys(est).forEach(function(k){sessionStorage.setItem(k,est[k])});sessionStorage.removeItem('pl-prevoo');sessionStorage.removeItem('pl-exportar')}catch(e){}
+    P.salvarEstado(est).then(ir,ir)
+  },novo)
+}
+
 /* ---------- eventos ---------- */
 function eventos(){
   var ul=$('modelos');
@@ -303,6 +327,11 @@ function eventos(){
     var b=e.target.closest?e.target.closest('[data-modelo]'):null;
     if(!b)return;
     aplicar(b.getAttribute('data-modelo'));
+  });
+  var cg=$('colags');
+  if(cg)cg.addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('[data-colagem]'):null;
+    if(b)aplicarColagem(b.getAttribute('data-colagem'));
   });
   var lista=$('projs');
   if(lista)lista.addEventListener('click',function(e){
@@ -320,5 +349,5 @@ modelos();
 colagens();
 projetos();
 eventos();
-window.PLINICIO={MODELOS:MODELOS,legDe:legDe,frDe:frDe};   /* D-191: tools/gerar-vitrine.mjs faz a prévia de cada modelo com o mesmo legDe/frDe do «Usar este modelo» */
+window.PLINICIO={MODELOS:MODELOS,COLAGENS:COLAGENS,legDe:legDe,frDe:frDe};   /* D-191: tools/gerar-vitrine.mjs faz a prévia de cada modelo com o mesmo legDe/frDe do «Usar este modelo» */
 })();

@@ -45,6 +45,7 @@
 <section class="card" id="corpo" aria-labelledby="fmt-t">
 <h2 class="sr" id="fmt-t">Formato do arquivo</h2>
 <div class="fmts" role="radiogroup" aria-label="Formato do arquivo" id="fmts">
+<label class="fmt" id="fmt-rede" hidden><input type="radio" name="fmt" value="rede" disabled><span class="fmt__c"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M16.5 7.5h.01"/></svg><span class="fmt__t"><strong>Imagem para as redes</strong><em class="tag rotulo">Não gasta folha</em><small>PNG ou JPEG no tamanho certo para compartilhar, sem dados de localização.</small></span></span></label>
 <label class="fmt"><input type="radio" name="fmt" value="pdf" checked><span class="fmt__c"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 13h5M10 17h5"/></svg><span class="fmt__t"><strong>PDF alta qualidade</strong><em class="tag rotulo">Recomendado</em><small>Para imprimir. Mantém o JPEG original das fotos, na medida exata do papel.</small></span></span></label>
 <label class="fmt"><input type="radio" name="fmt" value="grafica"><span class="fmt__c"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 14h10v7H7z"/><path d="M12 16.2c-.9 1-1.4 1.8-1.4 2.4a1.4 1.4 0 0 0 2.8 0c0-.6-.5-1.4-1.4-2.4z"/></svg><span class="fmt__t"><strong>Impressão profissional</strong><em class="tag rotulo">Cores fiéis</em><small>Para impressora fotográfica ou gráfica. Fotos originais em resolução total, com o perfil de cor de cada uma (inclusive Display P3 do iPhone) e o padrão sRGB declarado no arquivo.</small></span></span></label>
 <label class="fmt"><input type="radio" name="fmt" value="leve"><span class="fmt__c"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 15h5"/></svg><span class="fmt__t"><strong>PDF leve</strong><em class="tag rotulo">Recomprimido</em><small>Para mandar por e-mail. Nunca abaixo de 300 PPI.</small></span></span></label>
@@ -54,8 +55,8 @@
 
 <div class="opts" id="opts" hidden>
 <div class="opt"><span class="f__l" id="o-tipo-l">Arquivo</span><div class="seg" role="radiogroup" aria-labelledby="o-tipo-l"><label><input type="radio" name="tipo" value="png" checked><span>PNG</span></label><label><input type="radio" name="tipo" value="jpeg"><span>JPEG</span></label></div></div>
-<div class="opt"><span class="f__l" id="o-ppi-l">Resolução</span><div class="seg" role="radiogroup" aria-labelledby="o-ppi-l"><label><input type="radio" name="ppi" value="300" checked><span>300 PPI</span></label><label><input type="radio" name="ppi" value="600"><span>600 PPI</span></label></div></div>
-<label class="chk"><input type="checkbox" id="zip" checked><span class="chk__b" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Reunir tudo em um arquivo ZIP, com nomes neutros</span></label>
+<div class="opt" id="o-ppi"><span class="f__l" id="o-ppi-l">Resolução</span><div class="seg" role="radiogroup" aria-labelledby="o-ppi-l"><label><input type="radio" name="ppi" value="300" checked><span>300 PPI</span></label><label><input type="radio" name="ppi" value="600"><span>600 PPI</span></label></div></div>
+<label class="chk" id="zip-l"><input type="checkbox" id="zip" checked><span class="chk__b" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Reunir tudo em um arquivo ZIP, com nomes neutros</span></label>
 </div>
 
 <div class="est" role="status" aria-live="polite" aria-atomic="true">

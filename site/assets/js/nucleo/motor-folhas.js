@@ -3,7 +3,7 @@
 (function(){
 var PAPEIS={A3:{n:'A3',w:297,h:420},A4:{n:'A4',w:210,h:297},A5:{n:'A5',w:148,h:210},'13x18':{n:'13 × 18 cm',w:130,h:180},'10x15':{n:'10 × 15 cm',w:100,h:150}};
 var PADRAO={papel:'A4',w:210,h:297,orient:'retrato',margem:3,gap:0,girar:true,align:'center',separar:false,guias:true,contorno:false,compr:'continua',cor:'preto',rodape:false,assin:true};
-function papel(s){var p=s.papel==='custom'?{n:'Personalizado',w:s.w,h:s.h}:PAPEIS[s.papel];return s.orient==='paisagem'?{n:p.n,w:p.h,h:p.w}:p}
+function papel(s){var p=s.papel==='custom'?{n:s.nome||'Personalizado',w:s.w,h:s.h}:PAPEIS[s.papel];   /* D-195: a Colagem leva o nome do tamanho (ex.: Quadrado 1:1) */return s.orient==='paisagem'?{n:p.n,w:p.h,h:p.w}:p}
 function grade(s,p,giro,fr){                                     /* colunas × linhas para um giro */
   var aw=p.w-2*s.margem,ah=p.h-2*s.margem,fw=giro?fr.h:fr.w,fh=giro?fr.w:fr.h;
   var c=Math.max(0,Math.floor((aw+s.gap)/(fw+s.gap))),r=Math.max(0,Math.floor((ah+s.gap)/(fh+s.gap)));

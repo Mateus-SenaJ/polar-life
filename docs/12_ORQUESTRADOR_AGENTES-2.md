@@ -194,7 +194,7 @@ Esta tabela **substitui** a do DOC-00 §2 para resolver conflitos. Origem da mud
 | MT | Motor e dados | `08_MOTOR_E_DADOS.md` | 7 |
 | LG | Legal e privacidade | `09_LEGAL_PRIVACIDADE.md` | 8 |
 | LOG | Histórico | `10_LOG_DECISOES.md` | 9 (só informa) |
-| PROMPT | Prompts e checklist | `11_PROMPTS_TELAS.md` | 10 |
+| PROMPT | Prompts e checklist | removido em 2026-11-12 (D-194): as telas já existem; histórico no git | — |
 
 ---
 

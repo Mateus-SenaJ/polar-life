@@ -136,24 +136,34 @@ if (quer('modelo')) {
 }
 
 /* ===================== 3 · colagens para as redes (Início) ===================== */
+/* D-195: cada cartão mostra a primeira imagem que o modelo gera de verdade (PLCOLAGEM.MODELOS + PLGERADOR.imagens), com a
+   moldura Clássica, fotos, filtros e legendas de exemplo; reduzida para 240 px de altura em 2× */
 if (quer('redes')) {
   console.log('Colagens para as redes (Início):');
-  const P = async (foto, flt, fmt, linhas) => polaroid({ foto, fmt: fmt || 'classico', fonte: 'Caveat', pt: [12, 10], linhas: linhas || ['', ''], flt });
-  const nove = [['paisagem-mar', 'praia'], ['amigas-praia', 'verao'], ['cidade-grafite', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro'], ['paisagem-estrelas', 'original'], ['amigos-cidade', 'instantanea'], ['casal-noite', 'cinema'], ['paisagem-rochas', 'desbotado']];
-  const pn = []; for (const [f, t] of nove) pn.push(await P(f, t, 'mini'));
-  await compor('rede-mural.jpg', 240, 240, '#FFFFFF', pn.map((png, i) => ({ png, x: 14 + (i % 3) * 72, y: 8 + Math.floor(i / 3) * 76, w: 68, r: [-3, 2, -1, 3, -2, 1, 2, -3, 1][i], s: 3, so: .2 })), 84);
-  const mesaP = []; for (const [f, t, l] of [['casal-por-do-sol', 'polaroid', 'Fim de tarde'], ['amigos-praia', 'verao', 'Praia'], ['cidade-porto', 'cinema', 'Porto'], ['amigos-acampamento', 'retro', 'Fogueira'], ['paisagem-lago', 'original', 'Lago']]) mesaP.push(await P(f, t, 'classico', [l, '']));
-  await compor('rede-mesa.jpg', 240, 240, MESA, [{ png: mesaP[0], x: 12, y: 14, w: 92, r: -9 }, { png: mesaP[1], x: 128, y: 8, w: 92, r: 7 }, { png: mesaP[2], x: 20, y: 120, w: 92, r: 6 }, { png: mesaP[3], x: 130, y: 118, w: 92, r: -6 }, { png: mesaP[4], x: 74, y: 62, w: 92, r: 2 }]);
-  const capa = await P('amigos-abraco', 'verao', 'classico', ['Nossa turma', 'jul/26']);
-  const cap = []; for (const [f, t] of [['amigos-trilha', 'retro'], ['amigos-praia', 'verao'], ['amigos-acampamento', 'cinema']]) cap.push(await P(f, t, 'mini'));
-  await compor('rede-capa.jpg', 192, 240, '#FFFFFF', [{ png: capa, x: 26, y: 6, w: 140, r: -1, s: 5, so: .2 }, ...cap.map((png, i) => ({ png, x: 6 + i * 62, y: 168, w: 56, r: [-4, 2, 5][i], s: 3, so: .2 }))], 84);
-  const tempo = []; for (const [f, t, l] of [['casal-serra', 'original', '02/07'], ['casal-campo', 'pastel', '09/07'], ['casal-ponte', 'antiga', '16/07'], ['casal-noite', 'cinema', '23/07']]) tempo.push(await P(f, t, 'mini', [l, '']));
-  await compor('rede-tempo.jpg', 192, 240, '#FFFFFF', tempo.map((png, i) => ({ png, x: i % 2 ? 104 : 14, y: 4 + i * 50, w: 72, r: i % 2 ? 4 : -4, s: 3, so: .2 })), 84, '<svg style="position:absolute;inset:0" width="192" height="240"><path d="M96 8V232" stroke="#006194" stroke-width="1.5" stroke-dasharray="3 4"/></svg>');
-  const varalP = []; for (const [f, t] of [['amigas-praia', 'verao'], ['casal-bicicletas', 'polaroid'], ['paisagem-mar', 'praia'], ['amigos-praia', 'original']]) varalP.push(await P(f, t, 'mini'));
-  const fio = '<svg style="position:absolute;inset:0;z-index:2" width="135" height="240"><path d="M0 22Q67 40 135 22M0 136Q67 154 135 136" stroke="#000" stroke-width="1" fill="none"/><g fill="#FD761A"><rect x="31" y="23" width="5" height="13" rx="1" transform="rotate(-5 33 29)"/><rect x="96" y="27" width="5" height="13" rx="1" transform="rotate(4 98 33)"/><rect x="33" y="137" width="5" height="13" rx="1" transform="rotate(3 35 143)"/><rect x="96" y="141" width="5" height="13" rx="1" transform="rotate(-4 98 147)"/></g></svg>';
-  await compor('rede-varal.jpg', 135, 240, '#FFFFFF', [{ png: varalP[0], x: 6, y: 30, w: 56, r: -5, s: 3, so: .2 }, { png: varalP[1], x: 71, y: 34, w: 56, r: 4, s: 3, so: .2 }, { png: varalP[2], x: 8, y: 144, w: 56, r: 3, s: 3, so: .2 }, { png: varalP[3], x: 71, y: 148, w: 56, r: -4, s: 3, so: .2 }], 84, fio);
-  const tira = []; for (const [f, t] of [['amigos-skate', 'noir'], ['cidade-rua', 'pb'], ['cidade-mochila', 'pb'], ['cidade-multidao', 'antiga']]) tira.push(await P(f, t, 'mini'));
-  await compor('rede-tira.jpg', 135, 240, '#FFFFFF', tira.map((png, i) => ({ png, x: 38, y: 4 + i * 58, w: 58, r: 0, s: 2, so: .18 })), 84);
+  const leg = await legenda({ fonte: 'Caveat', pt: [12, 10] });
+  const REDES = [
+    ['mural', 'rede-mural.jpg', [['paisagem-mar', 'praia'], ['amigas-praia', 'verao'], ['cidade-grafite', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro'], ['paisagem-estrelas', 'original'], ['amigos-cidade', 'instantanea'], ['casal-noite', 'cinema'], ['paisagem-rochas', 'desbotado']]],
+    ['mesa', 'rede-mesa.jpg', [['casal-por-do-sol', 'polaroid', 'Fim de tarde'], ['amigos-praia', 'verao', 'Praia'], ['cidade-porto', 'cinema', 'Porto'], ['amigos-acampamento', 'retro', 'Fogueira']]],
+    ['capa', 'rede-capa.jpg', [['amigos-abraco', 'verao', 'Nossa turma', 'jul/26'], ['amigos-trilha', 'retro'], ['amigos-praia', 'verao'], ['amigos-acampamento', 'cinema']]],
+    ['tempo', 'rede-tempo.jpg', [['casal-serra', 'original', '02/07'], ['casal-campo', 'pastel', '09/07'], ['casal-ponte', 'antiga', '16/07'], ['casal-noite', 'cinema', '23/07']]],
+    ['varal', 'rede-varal.jpg', [['amigas-praia', 'verao'], ['casal-bicicletas', 'polaroid'], ['paisagem-mar', 'praia'], ['amigos-praia', 'original']]],
+    ['tira', 'rede-tira.jpg', [['amigos-skate', 'noir'], ['cidade-rua', 'pb'], ['cidade-mochila', 'pb'], ['cidade-multidao', 'antiga']]],
+  ];
+  await p.goto(srv.url + 'app/editor/gerar/'); await p.waitForFunction(() => !!window.PLGERADOR && !!window.PLCOLAGEM);
+  for (const [id, arq, lista] of REDES) {
+    const q = [{ leg, fr: frDe('classico'), nome: 'Vitrine' }].concat(lista.map(([f, t, l1, l2]) => { const e = Object.assign({}, ENTRADAS[ID[f] - 1]); e.flt = { id: t, int: 100 }; e.pl = [{ v: l1 || '', m: true }, { v: l2 || '', m: true }]; return e; }));
+    const b64 = await p.evaluate(async ({ q, id }) => {
+      sessionStorage.setItem('pl-quadro', JSON.stringify(q)); sessionStorage.setItem('pl-fotos', JSON.stringify(q.slice(1).map((e) => e.src)));
+      sessionStorage.setItem('pl-colagem', JSON.stringify(PLCOLAGEM.comModelo({}, id)));
+      const r = await PLGERADOR.imagens(PLGERADOR.projeto(), { f: 'rede', tipo: 'png' }), a = r.arquivos[0];
+      const im = await createImageBitmap(new Blob([a.bytes], { type: 'image/png' })), W = Math.round(480 * a.wpx / a.hpx), c = document.createElement('canvas');
+      c.width = W; c.height = 480; const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, W, 480);
+      const b = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', .86)), u = new Uint8Array(await b.arrayBuffer()); let s = '';
+      for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192));
+      return btoa(s);
+    }, { q, id });
+    writeFileSync(OUT + arq, Buffer.from(b64, 'base64')); console.log('  ✔ ' + arq);
+  }
 }
 
 /* ===================== 4 · banners do Início (1200 × 500, fundo preto, conteúdo à direita) ===================== */

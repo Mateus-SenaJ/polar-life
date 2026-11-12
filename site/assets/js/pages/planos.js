@@ -19,12 +19,12 @@ function render(){
   var L=C.limites().planos,pl=C.plano()||{};
   var atualId=pl.codigo?'codigo':(pl.id==='admin'?'pro':pl.id);
   var h='';
-  /* chip «Valores de teste» (modo demo, C-f) */
+  /* chip «Demonstração · sem cobrança» (modo demo, C-f; D-194: a compra simulada fica, sem a palavra «teste») */
   var top=document.querySelector('.top h1');
   if(C.modo&&C.modo()==='demo'&&!document.querySelector('.plns__chip')){
     var ch=document.createElement('span');
     ch.className='plns__chip';
-    ch.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg>Valores de teste';
+    ch.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9.5a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9V3"/></svg>Demonstração · sem cobrança';
     top.appendChild(ch)
   }
 
@@ -127,7 +127,7 @@ $('f-planos').addEventListener('submit',function(ev){
      {txt:'Mudar para o Grátis',cb:function(){C.rebaixarGratis();fecharDlg();toast('Plano mudado para o Grátis.');render()}}])
 });
 function depoisCompra(r){
-  if(r&&r.ok&&r.comprou){toast('Compra concluída · Ambiente de teste');render()}
+  if(r&&r.ok&&r.comprou){toast('Compra concluída · demonstração, sem cobrança');render()}
 }
 
 /* ---------- pop-up simples (padrões do app) ---------- */

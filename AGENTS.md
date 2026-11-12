@@ -1,7 +1,7 @@
 # PolarLife · instruções para agentes de código
 
 Editor web **local-first** de polaroids. Site estático em `site/` (HTML, CSS e JS sem build), publicado no GitHub Pages.
-Leia `README.md`, `STATUS.md` (seção da última etapa) e `PROXIMOS_PASSOS.md` antes de mudar algo.
+Leia `README.md` e `STATUS.md` antes de mudar algo.
 A especificação está em `docs/` (o `docs/12_ORQUESTRADOR_AGENTES-2.md` §1.3 é a fonte de autoridade).
 
 ## Travas (nunca quebrar)
@@ -25,7 +25,7 @@ A especificação está em `docs/` (o `docs/12_ORQUESTRADOR_AGENTES-2.md` §1.3 
 ## Onde fica cada coisa
 - `site/assets/js/nucleo/` domínio sem DOM de tela (`PLFOLHAS`, `PLTEXTO`, `PLGERADOR`) · `js/ui/` componentes compartilhados · `js/editor/` módulos do inspetor e do pré-voo · `js/pages/` um script por rota.
 - `site/assets/css/base/` (fontes, tokens, LED) · `css/ui/` · `css/editor/` · `css/pages/` (um por tela).
-- `tools/` manutenção · `tests/unit/`, `tests/e2e/` (Node), `tests/e2e-py/` (legado) · saídas em `tests/saida/` (fora do git).
+- `tools/` manutenção · `tests/unit/`, `tests/e2e/` (Node) · saídas em `tests/saida/` (fora do git).
 - Um nome `window.PLxxx` por arquivo (o `verificar` acusa colisão). Arquivo novo vai na camada certa; não crie pasta nova sem motivo.
 
 ## Verificação obrigatória antes de entregar

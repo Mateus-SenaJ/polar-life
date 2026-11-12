@@ -193,13 +193,18 @@ function fundoTela(p,px){
   var b=PLCOLAGEM.blurMm(F.suave)*px;   /* a caixa cresce o desfoque para as bordas não clarearem (igual ao PDF) */
   return{css:'#FFFFFF',html:'<div class="sheet__fundo" data-fundo="foto" aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div style="position:absolute;inset:'+(-b)+'px;background:url('+u+') '+F.px+'% '+F.py+'%/cover no-repeat'+(b>0?';filter:blur('+b+'px)':'')+'"></div><div style="position:absolute;inset:0;background:rgba(255,255,255,'+PLCOLAGEM.clareia(F.suave)+')"></div></div>'}
 }
+/* D-195: fio do varal e traço da linha do tempo (atrás das polaroids); pregadores e marcas na frente, só na borda branca (T4) */
+function decoTela(sh,px,z){
+  var d=sh&&sh.deco?sh.deco.filter(function(x){return x.z===z}):[];if(!d.length)return'';
+  return'<svg class="sheet__deco" aria-hidden="true" width="1" height="1" style="position:absolute;left:0;top:0;overflow:visible;pointer-events:none">'+d.map(function(x){return x.t==='linha'?'<line x1="'+x.x1*px+'" y1="'+x.y1*px+'" x2="'+x.x2*px+'" y2="'+x.y2*px+'" stroke="'+x.cor+'" stroke-width="'+Math.max(.6,x.larg*px)+'"/>':'<rect x="'+x.x*px+'" y="'+x.y*px+'" width="'+x.w*px+'" height="'+x.h*px+'" fill="'+x.cor+'"/>'}).join('')+'</svg>'
+}
 function desenhar(el,sh,p,px,det,idx,total){
   var fs='',fd=fundoTela(p,px);
   if(det&&REAL_ED){          /* os filtros das fotos ajustadas: um SVG só, no começo da folha */
     var defs=sh.cells.map(function(c){var e=(EST_Q&&EST_Q[c.f.n])||{};return PLFOTOTELA.filtro('pf-'+c.f.n,e)}).filter(Boolean).join('');
     if(defs)fs='<svg width="0" height="0" aria-hidden="true">'+defs+'</svg>';
   }
-  var h=fd.html+fs+sh.cells.map(function(c){return polaroid(c,sh,px,det)}).join('')+linhas(sh,p,px);
+  var h=fd.html+fs+decoTela(sh,px,'atras')+sh.cells.map(function(c){return polaroid(c,sh,px,det)}).join('')+linhas(sh,p,px)+decoTela(sh,px,'frente');
   if(det&&!colOn()&&D.rodape&&px>1.2)h+='<div class="sheet__foot" style="bottom:'+Math.max(1,D.margem/2-1.2)*px+'px;font-size:'+2.2*px+'px">'+NOME+' · Folha '+(idx+1)+' de '+total+'</div>';
   el.style.width=p.w*px+'px';el.style.height=p.h*px+'px';el.style.setProperty('--mm',px+'px');el.style.background=fd.css;el.innerHTML=h;
   if(det)ajustarLeg(el,px)
@@ -238,7 +243,7 @@ function snapHist(){return JSON.stringify({d:D,c:C})}                   /* D-176
 var R,cur=0,hist=[snapHist()],hi=0,lastK='',lastT=0;
 function resumoTxt(){
   if(R.erro)return'A polaroid não cabe neste papel';
-  if(R.colagem){var n=R.g.n,f=R.sheets.length;return f?n+(n===1?' polaroid':' polaroids')+' por folha · '+f+(f===1?' folha':' folhas'):'Sem fotos para a colagem'}   /* D-150: a contagem é a do layout (PLCOLAGEM), não a grade de Folhas */
+  if(R.colagem){var n=R.g.n,f=R.sheets.length,im=!!PLCOLAGEM.rede(C);return f?n+(n===1?' polaroid':' polaroids')+(im?' por imagem · ':' por folha · ')+f+(im?(f===1?' imagem':' imagens'):(f===1?' folha':' folhas')):'Sem fotos para a colagem'}   /* D-195 */   /* D-150: a contagem é a do layout (PLCOLAGEM), não a grade de Folhas */
   return R.g.n+' por folha · '+R.sheets.length+' folhas · aproveitamento '+aprov(R)+'%'
 }
 function render(){
@@ -402,14 +407,14 @@ function desenharVazia(st,sh,p){
   var px=Math.min((st.clientWidth-8)/p.w,(st.clientHeight-8)/p.h);if(!(px>0))px=2;
   var fd=colOn()?fundoTela(p,px):{html:'',css:''},L0=colOn()?PLCOLAGEM.LAYOUTS.filter(function(l){return l.id===C.layout})[0]:null;
   sh.className='sheet sheet--vazia';sh.style.width=p.w*px+'px';sh.style.height=p.h*px+'px';sh.style.background=fd.css||'';
-  sh.innerHTML=fd.html+s0.cells.map(function(c){return polVazia(c,px)}).join('')
+  sh.innerHTML=fd.html+decoTela(s0,px,'atras')+s0.cells.map(function(c){return polVazia(c,px)}).join('')+decoTela(s0,px,'frente')
    +'<div class="vazia"><p class="vazia__t">'+(L0?'Colagem «'+L0.n+'»':'Folha de polaroids')+': escolha as fotos para preencher.</p>'
    +'<button type="button" class="led-btn led-btn--light" data-add-fotos><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Adicionar fotos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button></div>';
   sh.setAttribute('aria-label',(L0?'Colagem «'+L0.n+'»':'Folha de polaroids')+' sem fotos: '+k+' molduras vazias.');
   return true
 }
 /* gancho para o pré-voo: mede a legenda em todas as folhas, desenhando-as fora da tela */
-window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,C:C,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
+window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,C:C,S:cfg(),col:colOn(),rede:colOn()?PLCOLAGEM.rede(C):null,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
   foraTodas:function(){var t=0,box=document.createElement('div');box.setAttribute('aria-hidden','true');box.style.cssText='position:absolute;left:-99999px;top:0;visibility:hidden';document.body.appendChild(box);
     R.sheets.forEach(function(sh,i){var el=document.createElement('div');el.className='sheet';el.style.position='relative';box.appendChild(el);desenhar(el,sh,R.p,4,true,i,R.sheets.length);t+=FORA});
     document.body.removeChild(box);return t}}}};
@@ -443,14 +448,16 @@ function colSet(fn,k){C=PLCOLAGEM.norm(C);fn(C);C=PLCOLAGEM.norm(C);commit(k||'c
 function painelColagem(){
   var C=PLCOLAGEM.norm(COL()),F=C.fundo,h='',L=PLCOLAGEM.LAYOUTS.filter(function(l){return l.id===C.layout})[0];
   /* D-176: tamanho próprio da colagem (não mexe no papel das Folhas) e escolha das fotos que entram */
-  var PE=PLCOLAGEM.PECAS,TODAS=!C.fotos;
-  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Tamanho da colagem</h3><p class="f__h">A colagem tem papel próprio: as Folhas de polaroids para recortar continuam como estão.</p>'
-    +'<div class="f"><label class="f__l" for="col-peca">Papel da colagem</label><div class="sel"><select id="col-peca">'+Object.keys(PE).map(function(k){return'<option value="'+k+'"'+(k===C.peca?' selected':'')+'>'+PE[k].n+' ('+PE[k].w+' × '+PE[k].h+' mm)</option>'}).join('')+'</select></div></div>'
-    +'<div class="f"><span class="f__l" id="col-ori-l">Orientação</span><div class="seg" role="radiogroup" aria-labelledby="col-ori-l">'+[['retrato','Retrato'],['paisagem','Paisagem']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-ori" value="'+t[0]+'"'+(C.orient===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>'
+  var PE=PLCOLAGEM.PECAS,TODAS=!C.fotos,RD=PE[C.peca].rede;
+  function opc(k){var q=PE[k];return'<option value="'+k+'"'+(k===C.peca?' selected':'')+'>'+q.n+' ('+(q.rede?q.rede.w+' × '+q.rede.h+' px':q.w+' × '+q.h+' mm')+')</option>'}
+  var ks=Object.keys(PE);   /* D-195: para imprimir (folha, gasta folha) ou para as redes (imagem, não gasta folha · DOC-03 §3) */
+  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Tamanho da colagem</h3><p class="f__h">'+(RD?'Imagem para compartilhar nas redes: não gasta folha.':'A colagem tem papel próprio: as Folhas de polaroids para recortar continuam como estão.')+'</p>'
+    +'<div class="f"><label class="f__l" for="col-peca">Tamanho</label><div class="sel"><select id="col-peca"><optgroup label="Para imprimir">'+ks.filter(function(k){return!PE[k].rede}).map(opc).join('')+'</optgroup><optgroup label="Para as redes (imagem)">'+ks.filter(function(k){return PE[k].rede}).map(opc).join('')+'</optgroup></select></div></div>'
+    +(RD?'':'<div class="f"><span class="f__l" id="col-ori-l">Orientação</span><div class="seg" role="radiogroup" aria-labelledby="col-ori-l">'+[['retrato','Retrato'],['paisagem','Paisagem']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-ori" value="'+t[0]+'"'+(C.orient===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>')
     +faixa('col-margem','Margem da colagem',C.margem,3,25,' mm')+'</section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fotos da colagem</h3><div class="sw-row"><div><span class="f__l">Usar todas as fotos</span><p class="f__h">'+(TODAS?'Todas as '+FOTOS.length+' fotos entram na colagem.':C.fotos.length+' de '+FOTOS.length+' fotos escolhidas.')+'</p></div><button type="button" class="sw" id="col-todas" role="switch" aria-checked="'+TODAS+'" aria-label="Usar todas as fotos"><span></span></button></div>'
     +(TODAS?'':'<div class="foto-grid" id="col-sel">'+FOTOS.map(function(f){var on=C.fotos.indexOf(f.src)>=0,u=REAL_ED?PLFOTOTELA.tem(f.src,true):'';if(REAL_ED&&!u&&!PLFOTOTELA.falhou(f.src))pedirMini(f.src,false);return'<button type="button" class="foto-mini" data-col-foto="'+f.src+'" aria-pressed="'+on+'">'+(u?'<span style="padding-top:0">'+PLFOTOTELA.html(u,0,'cover')+'</span>':'')+'<small>'+(on?'✓ ':'')+'Foto '+f.n+'</small></button>'}).join('')+'</div><p class="f__h">Toque nas fotos para tirar ou pôr na colagem.</p>')+'<button type="button" class="btn2" data-add-fotos><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Adicionar fotos à colagem</button></section>';   /* D-188 */
-  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Layout</h3><div class="f"><label class="f__l" for="col-layout">Disposição das polaroids</label><div class="sel"><select id="col-layout">'+PLCOLAGEM.LAYOUTS.map(function(l){return'<option value="'+l.id+'"'+(l.id===C.layout?' selected':'')+'>'+l.n+'</option>'}).join('')+'</select></div><p class="f__h" id="col-layout-h">'+L.d+' A medida da polaroid não muda: o que não cabe passa para a folha seguinte.</p></div></section>';
+  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Layout</h3><div class="f"><label class="f__l" for="col-layout">Disposição das polaroids</label><div class="sel"><select id="col-layout">'+PLCOLAGEM.LAYOUTS.map(function(l){return'<option value="'+l.id+'"'+(l.id===C.layout?' selected':'')+'>'+l.n+'</option>'}).join('')+'</select></div><p class="f__h" id="col-layout-h">'+L.d+(L.esc?' As polaroids diminuem por igual para caber.':' A medida da polaroid não muda: o que não cabe passa para a folha seguinte.')+'</p></div></section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fundo da folha</h3><div class="f"><span class="f__l" id="col-tipo-l">Tipo de fundo</span><div class="seg" role="radiogroup" aria-labelledby="col-tipo-l" id="col-tipo">'+[['cor','Cor'],['gradiente','Degradê'],['foto','Foto']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-tipo" value="'+t[0]+'"'+(F.tipo===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>';
   function cor(id,rot,v){return'<div class="f"><label class="f__l" for="'+id+'">'+rot+'</label><div class="col-cor"><input type="color" id="'+id+'" value="'+v.toLowerCase()+'" aria-label="'+rot+'"><input type="text" id="'+id+'-hex" value="'+v+'" maxlength="7" inputmode="text" autocomplete="off" spellcheck="false" aria-label="'+rot+', código hexadecimal"></div></div>'}
   function faixa(id,rot,v,min,max,u){return'<div class="f"><div class="f__top"><label class="f__l" for="'+id+'">'+rot+'</label><span class="mono" id="'+id+'-v">'+v+u+'</span></div><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+v+'"></div>'}

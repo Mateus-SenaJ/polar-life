@@ -118,7 +118,7 @@ try {
   console.log('Colagem · layouts (tela = PDF, MT-02):');
   await abrirEditor(p, null);
   const layouts = await p.evaluate(() => PLCOLAGEM.LAYOUTS.map(l => l.id));
-  ok(layouts.length >= 4 && layouts.length <= 6, 'o editor oferece ' + layouts.length + ' layouts: ' + layouts.join(', '));
+  ok(layouts.length === 10, 'o editor oferece ' + layouts.length + ' layouts: ' + layouts.join(', '));
   for (const lay of layouts) {
     await abrirEditor(p, colagem(lay, { tipo: 'cor', cor: '#336699' }));
     const r = await p.evaluate(async () => {
@@ -140,7 +140,7 @@ try {
       });
       const C = PLEDITOR.ctx(), FRr = C.FR, cobr = Math.max(...C.R.sheets.map(sh => PLCOLAGEM.cobertura(sh.cells, FRr.w, FRr.h, { x0: FRr.lado / FRr.w, x1: (FRr.w - FRr.lado) / FRr.w, y0: FRr.topo / FRr.h, y1: (FRr.topo + FRr.jh) / FRr.h })));
       const cartao = document.getElementById('result-t').textContent, maxCel = Math.max(...C.R.sheets.map(sh => sh.cells.length));
-      return { cobr, cartao, maxCel, nFolhas: C.R.sheets.length, n, total: grupos.length, pior, ang, fora, folhas: L.paginas.length, noDom: sheet.querySelectorAll('.pol').length, guias: pg.itens.filter(i => i.t === 'linha').length, fundo: pg.itens[0].t, contornos: pg.itens.filter(i => i.t === 'grupo' && i.itens.some(x => x.t === 'ret')).length };
+      return { cobr, cartao, maxCel, nFolhas: C.R.sheets.length, n, total: grupos.length, pior, ang, fora, folhas: L.paginas.length, noDom: sheet.querySelectorAll('.pol').length, guias: pg.itens.filter(i => i.t === 'linha').length - (C.R.sheets[0].deco || []).filter(d => d.t === 'linha').length,   /* D-195: o fio do varal e o traço da linha do tempo não são guias */ fundo: pg.itens[0].t, contornos: pg.itens.filter(i => i.t === 'grupo' && i.itens.some(x => x.t === 'ret')).length };
     });
     ok(r.n === r.total && r.n > 0 && r.pior < 0.08 && r.ang < 0.05, `${lay}: ${r.n} polaroids, centro tela × PDF até ${r.pior.toFixed(3)} mm e ângulo até ${r.ang.toFixed(3)}°`);
     ok(r.cobr <= 0.21, `${lay}: com a janela real da foto, no máximo ${(r.cobr * 100).toFixed(1)}% de uma foto fica coberta por outra polaroid (limite de 20%)`);
@@ -151,7 +151,7 @@ try {
   console.log('Colagem · barra lateral e moldura branca:');
   await abrirEditor(p, { papel: 'A4', margem: 3, gap: 0 });
   const bl0 = await p.evaluate(() => ({ colagem: document.getElementById('rail-colagem').disabled, em: !!document.querySelector('#rail-colagem em'), on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), memo: [...document.querySelectorAll('.rail__i')].filter(b => /Lembran/.test(b.textContent)).map(b => b.disabled && /Em breve/.test(b.textContent))[0], card: document.getElementById('result-t').textContent }));
-  ok(bl0.colagem === false && !bl0.em && !bl0.on && bl0.fol && bl0.memo === true, 'barra lateral: «Colagem» ativa (sem «Em breve»), «Folhas» marcada, «Lembranças» continua «Em breve»');
+  ok(bl0.colagem === false && !bl0.em && !bl0.on && bl0.fol && bl0.memo === undefined, 'barra lateral: «Colagem» ativa (sem «Em breve»), «Folhas» marcada e sem «Lembranças» (D-194: o que não funciona sai da tela)');
   ok(/aproveitamento/.test(bl0.card), 'Folhas comuns: o cartão continua mostrando o aproveitamento da grade');
   await p.click('#rail-colagem'); await p.waitForTimeout(200);
   const bl1 = await p.evaluate(() => ({ on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), ativo: PLEDITOR.ctx().C.ativo, modo: document.getElementById('ctx-modo').textContent, saved: JSON.parse(sessionStorage.getItem('pl-colagem')).ativo }));

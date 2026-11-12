@@ -237,10 +237,10 @@ function avancado(l,dis){
     var pd=padAlvo();
     for(var i=0;i<2;i++){
       var ln=LT.padLinha(pd.l[i]);
-      h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Linha '+(i+1)+'</label></div>'
+      h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Legenda '+(i+1)+'</label></div>'
        +'<div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
-       +'<div class="seg" role="radiogroup" aria-label="Tamanho da linha '+(i+1)+'">'+TAMS.map(function(t){return'<label class="seg__o"><input type="radio" name="pad-p-'+i+'" value="'+t[0]+'" data-padp="'+i+'"'+(t[0]===ln.pt?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div>'
-       +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da linha '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div>'
+       +'<div class="seg" role="radiogroup" aria-label="Tamanho da legenda '+(i+1)+'">'+TAMS.map(function(t){return'<label class="seg__o"><input type="radio" name="pad-p-'+i+'" value="'+t[0]+'" data-padp="'+i+'"'+(t[0]===ln.pt?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div>'
+       +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div>'
        +'<button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
     }
     h+='<label class="chk"><input type="checkbox" id="pad-own"'+(Q.S().pad?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Padrão próprio para esta foto</strong><span class="f__h">As outras fotos não mudam.</span></span></label>'
@@ -317,12 +317,12 @@ function topoPainel(l){
    +'</section>'
 }
 function secLinhas(l,dis){
-  var pd=l.pad,h='<section class="mod" aria-labelledby="lm-lin"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-lin">Linhas</h3><div class="lg-col" id="lg-lin">';
+  var pd=l.pad,h='<section class="mod" aria-labelledby="lm-lin"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-lin">Textos</h3><div class="lg-col" id="lg-lin">';
   for(var i=0;i<2;i++){
     var ln=LT.padLinha(pd.l[i]);
-    h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Linha '+(i+1)+'</label><button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
-     +'<div class="lg-ln"><div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'" aria-label="Tipo da linha '+(i+1)+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
-     +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da linha '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div></div></div>'
+    h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Legenda '+(i+1)+'</label><button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
+     +'<div class="lg-ln"><div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'" aria-label="Tipo da legenda '+(i+1)+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
+     +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div></div></div>'
   }
   return h+'</div></section>'
 }
@@ -331,7 +331,7 @@ function secEstilo(l,dis){
   var e=estLn();
   return'<section class="mod" aria-labelledby="lm-est"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-est">Estilo</h3>'
    +'<div class="f"><div class="seg seg--3" role="radiogroup" aria-label="Aplicar o estilo a">'
-   +[['0','Linha 1'],['1','Linha 2'],['a','Ambas']].map(function(o){return'<label class="seg__o"><input type="radio" name="alvo" value="'+o[0]+'"'+(UI.alvo===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>'
+   +[['0','Legenda 1'],['1','Legenda 2'],['a','Ambas']].map(function(o){return'<label class="seg__o"><input type="radio" name="alvo" value="'+o[0]+'"'+(UI.alvo===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>'
    +seletorLn()
    +sld('ln.pt','Tamanho','pt',6,32,1,0,'')
    +cores('ln',e.cor)+'</section>'
@@ -357,7 +357,7 @@ function secAvancado(l,dis){
    +sld('av.esp','Espaçamento entre letras','em',0,0.2,0.01,2,'')
    +seg('lmeta','Duas linhas',[['linhas','Separadas'],['junto','Na mesma linha']],l.meta||'linhas','meta')
    +(jt?seg('avsep','Separador',[['•','•'],['·','·'],['–','–'],['/','/']],a.sep,'av.sep'):'')
-   +seg('lordem','Ordem',[['data-loc','Linha 1 primeiro'],['loc-data','Linha 2 primeiro']],l.ordem||'data-loc','ordem')
+   +seg('lordem','Ordem',[['data-loc','Legenda 1 primeiro'],['loc-data','Legenda 2 primeiro']],l.ordem||'data-loc','ordem')
    +seg('lmedida','Medir espaços por',[['caixa','Caixa do texto'],['letras','Topo das letras']],l.medida||'caixa','medida')
    +(window.PLMET?PLMET.html():'')
    +'</div></section>';

@@ -400,7 +400,7 @@ function listarCodigos(){
 
 PLCONTA={
   modo:function(){return 'demo'},                             /* 'servidor' quando houver backend (DOC-12 §6) */
-  provedores:function(){return [{id:'google',nome:'Google'},{id:'apple',nome:'Apple'}]},      /* D-144: Google e Apple, no segundo bloco */ /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
+  provedores:function(){return [{id:'google',nome:'Google'}]},      /* D-144: segundo bloco; D-194: a Apple saiu (só simulava a entrada) */ /* modo demo: o botão leva ao cadastro local e avisa que o provedor ainda não é acessado (T7) */
   completarCadastro:completarCadastro,entrarComProvedor:entrarComProvedor,precisaCadastro:precisaCadastro,cadastroPendente:cadastroPendente,
   temLocalStorage:temLocalStorage,
   sessao:sessao,sessaoCodigo:sessaoCodigo,temSessao:temSessao,

@@ -12,6 +12,8 @@ import { maisAbertos } from '../helpers/mais.mjs';
 const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.push(m); console.log('  ✘ ' + m); };
 const srv = await servir();
 const nav = await chromium.launch();
+const _novoCtx = nav.newContext.bind(nav);
+nav.newContext = async (o) => { const c = await _novoCtx(o); await c.addInitScript(() => { try { localStorage.setItem('pl-ver-contas-teste', '1'); } catch (e) {} }); return c; };   /* D-194: contas de teste à vista só com a marca do aparelho */
 const saida = fileURLToPath(new URL('../saida/contas/', import.meta.url));
 await mkdir(saida, { recursive: true });
 
@@ -200,7 +202,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(srv.url + 'app/entrar/');
   const provs = await p.locator('[data-prov]').allTextContents();
-  provs.join('|') === 'Continuar com Google|Continuar com Apple' ? ok('segundo bloco: Google e Apple') : ruim('provedores: ' + provs.join('|'));
+  provs.join('|') === 'Continuar com Google' ? ok('segundo bloco: só o Google (D-194: a Apple, que só simulava, saiu)') : ruim('provedores: ' + provs.join('|'));
   const ordem = await p.evaluate(() => {
     const q = s => document.querySelector(s), antes = (a, b) => !!(a.compareDocumentPosition(b) & 4);
     const em = q('#email'), se = q('#senha'), esq = q('#b-esqueci'), led = q('#b-enviar'), criar = q('#b-criar'), prov = q('[data-prov]'), cod = q('#b-via-codigo');
@@ -214,7 +216,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
     };
   });
   ordem.bloco1 ? ok('primeiro bloco: e-mail, senha, «Esqueci a senha», «Entrar» e «Criar nova conta»') : ruim('ordem do primeiro bloco');
-  ordem.bloco2 ? ok('segundo bloco (Google e Apple) vem depois; «Entrar com código» fica abaixo') : ruim('ordem do segundo bloco');
+  ordem.bloco2 ? ok('segundo bloco (Google) vem depois; «Entrar com código» fica abaixo') : ruim('ordem do segundo bloco');
   ordem.senha ? ok('campo de senha mascarado, com autocomplete correto') : ruim('campo de senha');
   ordem.discretos && ordem.alvos ? ok('«Esqueci a senha» e «Entrar com código» são links discretos com alvo ≥ 44 px (T3)') : ruim('peso/alvo dos links discretos');
   (await p.locator('.led-btn').count()) === 1 && ordem.led === 'Entrar' ? ok('um único LED na entrada: «Entrar» (T8)') : ruim('LED da entrada: ' + ordem.led);

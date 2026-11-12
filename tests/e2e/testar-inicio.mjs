@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* T-32 · Início depois do login (openspec «inicio-depois-do-login» · spec inicio):
    guarda de sessão, faixa preta com banners (rotação de 8 s, pausa com o cursor e movimento reduzido),
-   «Continue de onde parou», 8 modelos, 6 colagens «Em breve», um único LED e a aplicação de um modelo.
+   «Continue de onde parou», 8 modelos, 6 colagens para as redes (D-195: «Usar este modelo»), um único LED e a aplicação de um modelo.
    Uso: node tests/e2e/testar-inicio.mjs  (Chromium do Playwright) */
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
@@ -35,6 +35,8 @@ async function contexto(email, opts = {}) {
 
 const srv = await servir();
 const nav = await chromium.launch();
+const _novoCtx = nav.newContext.bind(nav);
+nav.newContext = async (o) => { const c = await _novoCtx(o); await c.addInitScript(() => { try { localStorage.setItem('pl-ver-contas-teste', '1'); } catch (e) {} }); return c; };   /* D-194: contas de teste à vista só com a marca do aparelho */
 try {
   /* ---- A · sem sessão vai para a tela de entrar (com o destino guardado) ---- */
   {
@@ -63,7 +65,7 @@ try {
       const faixa = document.querySelector('.faixa');
       const cs = faixa && getComputedStyle(faixa);
       const modelos = [...document.querySelectorAll('.mdl')];
-      const breves = [...document.querySelectorAll('.selo-breve')];
+      const breves = [...document.querySelectorAll('.colag__b')];
       return {
         faixa: !!faixa, fundoFaixa: cs && cs.backgroundColor, alturaFaixa: faixa && Math.round(faixa.getBoundingClientRect().height),
         slides: document.querySelectorAll('.faixa__slide').length,
@@ -98,7 +100,7 @@ try {
     r.nomes.includes('Praia 🌊') ? ok(`${rot}: o nome do modelo traz o emoji`) : ruim(`${rot}: nomes sem emoji (${r.nomes.join(' | ')})`);
     r.botoes === 8 ? ok(`${rot}: cada modelo tem o botão «Usar este modelo» (sem emoji)`) : ruim(`${rot}: ${r.botoes} botões de modelo`);
     r.colagens === 6 ? ok(`${rot}: 6 cartões de colagem`) : ruim(`${rot}: ${r.colagens} cartões de colagem`);
-    r.breves === 6 && r.textoBreve.every(t => t === 'Em breve') ? ok(`${rot}: as 6 colagens têm o selo «Em breve»`) : ruim(`${rot}: selos «Em breve» fora do esperado (${r.textoBreve.join(', ')})`);
+    r.breves === 6 && r.textoBreve.every(t => t === 'Usar este modelo') ? ok(`${rot}: as 6 colagens têm «Usar este modelo» (D-195)`) : ruim(`${rot}: botões das colagens fora do esperado (${r.textoBreve.join(', ')})`);
     r.leds === 1 && r.ledsVisiveis === 1 ? ok(`${rot}: um único botão LED na tela (T8)`) : ruim(`${rot}: ${r.leds} botões LED (${r.ledsVisiveis} visíveis)`);
     r.rolagem <= 0 ? ok(`${rot}: sem rolagem lateral`) : ruim(`${rot}: rolagem lateral de ${r.rolagem} px`);
     r.nota && r.rodape ? ok(`${rot}: nota de privacidade e rodapé`) : ruim(`${rot}: faltam a nota ou o rodapé`);

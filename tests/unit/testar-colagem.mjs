@@ -23,7 +23,7 @@ const velho = FL.paginar(Object.assign({}, FL.PADRAO, { margem: 10, gap: 4 }), F
 ok(velho.g.n === 4 && velho.sheets.length === 6 && Math.abs(velho.sheets[0].cells[1].x - velho.sheets[0].cells[0].x - 92) < 1e-9, 'projeto salvo com 10/4 segue com 10 mm e 4 mm (92 mm de passo)');
 
 console.log('Layouts da Colagem (D-150):');
-ok(C.LAYOUTS.length >= 4 && C.LAYOUTS.length <= 6, 'entre 4 e 6 layouts: ' + C.LAYOUTS.map(l => l.id).join(', '));
+ok(C.LAYOUTS.map(l => l.id).join() === 'grade,mosaico,espalhadas,tira,coracao,mural,capa,tempo,varal,cabine', '10 layouts (5 + os 5 das redes, D-195): ' + C.LAYOUTS.map(l => l.id).join(', '));
 let combos = 0, fora = 0, nao = 0, difer = 0, cob = 0, pior = 0;
 for (const papel of ['A4', 'A3', 'A5', '13x18'])
   for (const orient of ['retrato', 'paisagem'])
@@ -60,12 +60,29 @@ const baixo = hc.filter(c => c.y + c.h / 2 > Math.max(...ys) - 20);
 ok(baixo.length >= 1 && Math.abs(baixo[0].x + baixo[0].w / 2 - cxm) < 5 && Math.max(...xs) - Math.min(...xs) > 0.9 * (Math.max(...ys) - Math.min(...ys)), 'coração: ponta embaixo no centro e conjunto mais largo que alto (formato de coração)');
 ok(esp.some(c => c.rot !== 0) && esp.every(c => Math.abs(c.rot) <= 6), 'espalhadas: leve rotação, no máximo 6°');
 const med = FL.paginar(s5('espalhadas'), FR, fotos(24)).sheets[0].cells;
-ok(['grade', 'mosaico', 'espalhadas', 'tira'].every(l => FL.paginar(s5(l), FR, fotos(24)).sheets.every(sh => sh.cells.every(c => c.s === 1 && ((c.w === 88 && c.h === 107) || (c.w === 107 && c.h === 88))))), 'a medida da polaroid não muda nos layouts, só no Coração (D-133, D-153)');
+ok(['grade', 'mosaico', 'espalhadas', 'tira'].every(l => FL.paginar(s5(l), FR, fotos(24)).sheets.every(sh => sh.cells.every(c => c.s === 1 && ((c.w === 88 && c.h === 107) || (c.w === 107 && c.h === 88))))), 'a medida da polaroid não muda nos layouts de papel (só o Coração e os das redes ajustam a escala) — Coração (D-133, D-153)');
 ok(FL.contar(s5('coracao'), FR, 24, 0).folhas === FL.paginar(s5('coracao'), FR, fotos(24)).sheets.length, 'contar() e paginar() concordam com a Colagem ligada');
 ok(FL.paginar(s5('grade'), FR, fotos(24)).colagem === true && !FL.paginar(FL.PADRAO, FR, fotos(24)).colagem, 'sem Colagem ligada, vale a grade de Folhas');
 ok(FL.paginar(Object.assign({}, FL.PADRAO, { papel: '10x15', orient: 'retrato', colagem: { ativo: true, layout: 'espalhadas' } }), FR, fotos(3)).erro === true, 'papel pequeno demais: erro claro, sem posição inválida');
 
-console.log('Fundo (D-151):');
+console.log('Colagens para as redes (D-195):');
+const sr = (l, peca, extra) => C.config({}, Object.assign({ ativo: true, layout: l, peca }, extra || {}));
+ok(['r11', 'r45', 'r916'].map(k => C.PECAS[k].rede.w + 'x' + C.PECAS[k].rede.h).join() === '1080x1080,1080x1350,1080x1920' && C.PECAS.r916.h * 4.5 === 1920, 'tamanhos para as redes: 1080 × 1080, 1080 × 1350 e 1080 × 1920 (4,5 px por mm)');
+ok(C.rede(sr('mural', 'r11')).w === 1080 && C.rede({ peca: 'r45' }).h === 1350 && C.rede(sr('mural', 'A4')) === null, 'rede() vale para a configuração da folha e para a da colagem; papel não é rede');
+ok(C.norm({ peca: 'r916', orient: 'paisagem' }).orient === 'retrato' && FL.papel(sr('mural', 'r45')).n === 'Retrato 4:5', 'imagem para as redes é sempre em pé e leva o nome do tamanho');
+ok(C.MODELOS.length === 6 && C.MODELOS.every(m => C.LAYOUTS.some(l => l.id === m.c.layout) && C.PECAS[m.c.peca].rede), 'os 6 modelos do Início usam layouts e tamanhos que existem');
+const cm = C.comModelo({ ativo: false, layout: 'grade', peca: 'A4', fotos: [3, 5] }, 'tempo');
+ok(cm.ativo && cm.layout === 'tempo' && cm.peca === 'r45' && cm.fotos.join() === '3,5' && cm.fundo.tipo === 'cor', 'comModelo liga a Colagem, troca layout, tamanho e fundo e mantém as fotos escolhidas');
+const um = l => C.paginar(sr(l, 'r11'), FR, fotos(1)).sheets[0].cells[0].s, umA4 = l => C.paginar(sr(l, 'A4'), FR, fotos(1)).sheets[0].cells[0].s;
+ok(['mural', 'capa', 'tempo', 'varal', 'cabine'].every(l => um(l) > 1.5 && umA4(l) <= 1), 'nas redes a polaroid cresce para ocupar a imagem; no papel nunca passa da medida real');
+const rT = C.paginar(sr('tempo', 'r45'), FR, [5, 3, 9, 1].map((d, i) => ({ n: i + 1, src: i + 1, m: { iso: '2026-07-0' + d } })));
+ok(rT.sheets[0].cells.map(c => c.f.n).join() === '4,2,1,3', 'Linha do tempo: na ordem das datas');
+ok(rT.sheets[0].deco.filter(d => d.t === 'linha').length === 1 && rT.sheets[0].deco.filter(d => d.t === 'cheio').length === 4, 'Linha do tempo: um traço e uma marca por polaroid');
+const rV = C.paginar(sr('varal', 'r916'), Object.assign({ topo: 6 }, FR), fotos(6)), sv = rV.sheets[0];
+const pinos = sv.deco.filter(d => d.t === 'cheio'), fio = sv.deco.filter(d => d.t === 'linha');
+ok(pinos.length === 6 && fio.length > 0 && fio.every(d => d.z === 'atras') && pinos.every(d => d.z === 'frente'), 'Varal: fio por trás e um pregador por polaroid na frente');
+ok(sv.cells.every((c, i) => { const s = c.s, a = c.rot * Math.PI / 180, h = c.h * s / 2, ty = c.y + c.h / 2 - h * Math.cos(a), pb = pinos[i].y + pinos[i].h; return pb <= ty + 6 * s + .01; }), 'Varal: o pregador fica só na borda branca de cima (T4: nada sobre a foto)');
+
 const n1 = C.norm({ ativo: 1, layout: 'xx', fundo: { tipo: 'foto', cor: 'azul', ang: 725, px: 150, py: -3, suave: 200, foto: 'a' } });
 ok(n1.layout === 'espalhadas' && n1.fundo.cor === '#FFFFFF' && n1.fundo.ang === 0 && n1.fundo.px === 100 && n1.fundo.py === 0 && n1.fundo.suave === 100 && n1.fundo.foto === null, 'norm() corrige layout, cor, ângulo, posição, suavização e foto inválidos');
 ok(C.norm({ fundo: { cor: '#12ab9c' } }).fundo.cor === '#12AB9C', 'a cor é livre: qualquer #RRGGBB');

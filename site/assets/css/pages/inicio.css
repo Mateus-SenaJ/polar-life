@@ -76,8 +76,7 @@ a{color:inherit}
 .colag__frase{margin:0;font-family:var(--font-expressive);font-weight:500;font-size:22px;line-height:1.2;color:var(--black)}
 .colag__nome{margin:0;font-size:14px;font-weight:500;line-height:1.3}
 .colag__px{margin:0}
-.selo-breve{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 12px;background:var(--surface-subtle);border-radius:999px;font:500 13px/1 var(--font)}
-.selo-breve .ico{width:18px;height:18px}
+.colag__b{align-self:flex-start;margin-top:4px}   /* D-195: «Usar este modelo» */
 
 /* ===== banners de simulação (4 e 5) · HTML/CSS/SVG, sem vídeo (D-118) =====
    O loop dura 6 s e para com o cursor em cima ou com o foco dentro da faixa (a classe `is-pausa`
