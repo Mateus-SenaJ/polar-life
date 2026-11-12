@@ -32,7 +32,7 @@ var PRESETS={ /* 8 estilos prontos (DV-03); cada um muda o look, não o texto */
 };
 var PADRAO=LT.LEG0; /* mesmo conteúdo do padrão antigo, na mesma ordem de chaves: projetos salvos comparam por JSON */
 var DEFL={meta:'junto',ordem:'data-loc',medida:'caixa'}; /* chaves novas (D-113): ausentes no projeto = padrão */
-var UI={sel:null,cat:'todas',busca:'',fav:['Caveat'],rec:[],aberto:{},conf:false,err:null};
+var UI={sel:null,cat:'todas',busca:'',aberto:{},conf:false,err:null};
 var COR={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 function copia(o){return JSON.parse(JSON.stringify(o))}
 function real(){return LT.ehReal()}
@@ -68,7 +68,8 @@ function checar(v){
 
 /* ---------- desenho na polaroid ---------- */
 function pintar(){
-  var l=LT.comPadrao(L(),Q.S()),pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
+  var l=LT.ajustarCorpo(LT.comPadrao(L(),Q.S()),Q.FR,LT.larguraTela),   /* D-192 */
+      pq=$('pq'),top=$('cap-top'),band=$('cap-band'),meta=$('cap-meta'),cap=$('cap');
   var orig=!!l.original,al=l.al||'esq';
   top.hidden=orig;band.hidden=orig;
   [].slice.call(pq.querySelectorAll('.lg-xl')).forEach(function(n){n.parentNode.removeChild(n)}); /* sai antes: o .lg-lc do fluxo continua achável */
@@ -85,7 +86,7 @@ function pintar(){
   var M=Q.meta?Q.meta(Q.cur()):{data:DATA,cidade:LOCAL.cidade,iso:'2026-07-14T08:00'};
   var dt=l._pad?l._dt:(l.data.on&&M.data?LT.cxMeta(l,FMT[l.data.fmt][1](M.data)):''),lc=l._pad?l._lc:(l.loc.on&&M.cidade?LT.cxMeta(l,localTxt(l.loc,M.cidade)):'');   /* D-139: padrão de 2 linhas */
   var txt=l.txt.on?caixa(T(),l.txt.caixa):'';
-  var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=l.medida==='letras'&&!!(dt||lc);
+  var junto=(l.meta||'junto')!=='linhas',ordem=l.ordem||'data-loc',letras=(l.medida==='letras'||!!l._pad)&&!!(dt||lc);   /* D-192: projeto real sempre nas posições de PLTEXTO.linhas */
   var fe=LT.famLG(l.txt.font,l.txt),espM=function(o){return o.esp!=null?';letter-spacing:'+o.esp+'em':''};   /* D-148 */
   var capHTML=txt?'<span class="lg-txt" id="lg-txt" style="font-family:'+fam(l.txt.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+';--pt:'+l.txt.pt+';letter-spacing:'+l.txt.esp+'em;color:'+cor('txt')+'"></span>':'';
   var dtH=dt?'<time class="lg-dt" datetime="'+M.iso.slice(0,10)+'" style="font-family:'+fam(l.data.font)+stF(l.data)+';--pt:'+l.data.pt+';color:'+cor('data')+espM(l.data)+'"></time>':'';
@@ -157,29 +158,56 @@ function cores(k,v){
   return'<div class="f"><div class="f__top"><span class="f__l" id="l-c-'+k+'">Cor da inscrição</span>'+rst(k+'.cor')+'</div><div class="cores" role="radiogroup" aria-labelledby="l-c-'+k+'">'
    +[['preto','Preto'],['azul','Azul'],['laranja','Laranja']].map(function(c){return'<label class="cor"><input type="radio" name="cor-'+k+'" value="'+c[0]+'" data-k="'+k+'.cor"'+(v===c[0]?' checked':'')+'><span class="cor__b"><i style="background:'+COR[c[0]]+'"></i>'+c[1]+'</span></label>'}).join('')+'</div></div>'
 }
-function seletor(k){
-  var l=L()[k],f=fonte(l.font),abre=UI.sel===k,fe=LT.famLG(l.font,l);
-  var h='<div class="f"><div class="f__top"><span class="f__l" id="l-f-'+k+'">Fonte</span>'+rst(k+'.font')+'</div>'
-   +'<button type="button" class="fsel" data-fsel="'+k+'" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(l.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+amostra(k)+'</span><span class="rotulo fsel__n">'+l.font+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
-  if(abre){
-    var lista=FONTES.filter(function(x){return(UI.cat==='todas'||(UI.cat==='fav'?UI.fav.indexOf(x.n)>=0:UI.cat==='rec'?UI.rec.indexOf(x.n)>=0:x.c===UI.cat))&&x.n.toLowerCase().indexOf(UI.busca.toLowerCase())>=0});
-    carregar(lista);
-    h+='<div class="fpick"><label class="fbusca"><svg class="ico sm"><use href="#i-search"/></svg><input type="search" id="fbusca" placeholder="Buscar fonte" aria-label="Buscar fonte por nome" value="'+UI.busca.replace(/"/g,'&quot;')+'" autocomplete="off"></label>'
-     +'<div class="fcats" role="tablist" aria-label="Categorias de fonte">'+[['todas','Todas'],['fav','Favoritas'],['rec','Recentes']].concat(Object.keys(CAT).map(function(c){return[c,CAT[c]]})).map(function(c){return'<button type="button" role="tab" class="fcat rotulo" data-fcat="'+c[0]+'" aria-selected="'+(UI.cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
-     +'<ul class="flist" aria-label="Fontes">'+(lista.length?lista.map(function(x){var on=x.n===l.font,fv=UI.fav.indexOf(x.n)>=0;
-       return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+amostra(k)+'</span><span class="rotulo fitem__n">'+x.n+' · '+CAT[x.c]+'</span></button><button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'}).join(''):'<li class="f__h">Nenhuma fonte encontrada. Limpe a busca ou escolha outra categoria.</li>')+'</ul>'
-     +'<p class="f__h">Se uma fonte não carregar, entra a padrão da categoria e a revisão de impressão avisa.</p></div>'
-  }
-  return h+'</div>'
+/* ---------- D-186: Fonte em lista suspensa, com Itálico e Negrito ao lado ----------
+   Lista: busca; Todas · Favoritas · Recentes · Itálico e negrito; grupos por categoria; coração para favoritar; I e N mostram
+   as variantes reais da família. Favoritas e recentes ficam no aparelho (pl-fontes) e valem em todos os projetos.
+   Os dois botões ficam sempre à vista, ao lado da fonte; sem a variante real, ficam desabilitados e o texto explica. */
+var PREF=(function(){try{var o=JSON.parse(localStorage.getItem('pl-fontes')||'null');if(o&&Array.isArray(o.fav)&&Array.isArray(o.rec))return o}catch(e){}return{fav:['Fondamento Itálico','Caveat'],rec:[]}})();
+function guardaPref(){try{localStorage.setItem('pl-fontes',JSON.stringify(PREF))}catch(e){}}
+function escH(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fontePor(n){return FONTES.filter(function(x){return x.n===n})[0]||null}
+function varDe(x){var v=LT.VAR[x.fam]||['400'];return{it:x.it||v.some(function(y){return/i$/.test(y)}),b:v.indexOf('700')>=0||v.indexOf('700i')>=0}}
+function ambos(x){var v=varDe(x);return v.it&&v.b}
+var FCATS=[['todas','Todas'],['fav','Favoritas'],['rec','Recentes'],['in','Itálico e negrito']];
+function itemFonte(x,atual,amo){
+  var on=x.n===atual,fv=PREF.fav.indexOf(x.n)>=0,v=varDe(x);
+  return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+escH(amo)+'</span>'
+   +'<span class="fitem__n"><span class="rotulo">'+x.n+'</span>'+(v.it?'<span class="fvar fvar--i" title="Tem itálico">I</span>':'')+(v.b?'<span class="fvar fvar--b" title="Tem negrito">N</span>':'')+'</span></button>'
+   +'<button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'
 }
-/* D-148: Itálico e Negrito do texto. Só a variante que a família tem; sem ela o botão fica desabilitado e explica (nada é sintetizado). */
-function estiloTxt(l){
-  var e=LT.estilosDe(l.txt.font,l.txt),fam=fonte(l.txt.font).fam,msg=[];
-  function bt(k,rot,x){return'<button type="button" class="btn2 btn2--sm est-b" data-est="'+k+'" aria-pressed="'+x.on+'"'+(x.ok?'':' disabled')+'>'+rot+'</button>'}
-  if(e.it.natural)msg.push('Esta fonte já é itálica.');else if(!e.it.ok)msg.push(fam+' não tem itálico'+(e.b.on?' em negrito':'')+'.');
-  if(!e.b.ok&&!e.b.on)msg.push(fam+' não tem negrito'+(e.it.on?' em itálico':'')+'.');
-  return'<div class="f" id="f-est"><div class="f__top"><span class="f__l" id="l-est">Estilo do texto</span></div><div class="row2" role="group" aria-labelledby="l-est">'+bt('it','Itálico',e.it)+bt('b','Negrito',e.b)+'</div><p class="f__h" id="lg-est-h">'+(msg.join(' ')||'Normal, itálico ou negrito: só aparecem as variantes reais da fonte.')+'</p></div>'
+function listaFontes(atual,amo){
+  var q=UI.busca.toLowerCase(),cat=UI.cat,gr=[],vistas=[];
+  function passa(x){return!!x&&x.n.toLowerCase().indexOf(q)>=0}
+  if(cat==='fav')gr.push(['Favoritas',PREF.fav.map(fontePor).filter(passa)]);
+  else if(cat==='rec')gr.push(['Recentes',PREF.rec.map(fontePor).filter(passa)]);
+  else if(cat==='in')gr.push(['Com itálico e negrito',FONTES.filter(function(x){return ambos(x)&&passa(x)})]);
+  else{if(!q){if(PREF.rec.length)gr.push(['Recentes',PREF.rec.map(fontePor).filter(Boolean)]);if(PREF.fav.length)gr.push(['Favoritas',PREF.fav.map(fontePor).filter(Boolean)])}
+    Object.keys(CAT).forEach(function(c){gr.push([CAT[c],FONTES.filter(function(x){return x.c===c&&passa(x)})])})}
+  gr=gr.filter(function(g){return g[1].length});
+  gr.forEach(function(g){vistas=vistas.concat(g[1])});carregar(vistas);
+  var vazio=cat==='fav'?'Nenhuma favorita ainda. Toque no coração de uma fonte para guardá-la aqui.':cat==='rec'?'As fontes que você usar aparecem aqui.':'Nenhuma fonte encontrada. Limpe a busca ou escolha outro filtro.';
+  return'<div class="fpick" id="fpick"><label class="fbusca"><svg class="ico sm"><use href="#i-search"/></svg><input type="search" id="fbusca" placeholder="Buscar fonte" aria-label="Buscar fonte por nome" value="'+escH(UI.busca)+'" autocomplete="off"></label>'
+   +'<div class="fcats" role="tablist" aria-label="Mostrar">'+FCATS.map(function(c){return'<button type="button" role="tab" class="fcat rotulo" data-fcat="'+c[0]+'" aria-selected="'+(cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
+   +'<ul class="flist" aria-label="Fontes">'+(gr.length?gr.map(function(g){return'<li class="fgrp rotulo" aria-hidden="true">'+g[0]+'</li>'+g[1].map(function(x){return itemFonte(x,atual,amo)}).join('')}).join(''):'<li class="f__h">'+vazio+'</li>')+'</ul>'
+   +'<p class="f__h">I = tem itálico · N = tem negrito. Se uma fonte não carregar, entra a padrão da categoria e a revisão de impressão avisa.</p></div>'
 }
+var ICO_IT='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5h8M6 19h8M14.5 5l-5 14"/></svg>',
+    ICO_N='<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width:3"><path d="M7 19V5l10 14V5"/></svg>';
+function botoesEst(x){
+  function bt(k,rot,ic,y){return'<button type="button" class="est-ico" data-est="'+k+'" aria-pressed="'+y.on+'"'+(y.ok?'':' disabled')+'>'+ic+'<span class="est-ico__t">'+rot+'</span></button>'}
+  return'<div class="fdd__est" id="f-est" role="group" aria-label="Estilo do texto">'+bt('it','Itálico',ICO_IT,x.it)+bt('b','Negrito',ICO_N,x.b)+'</div>'
+}
+function msgEst(x,fm){var m=[];if(x.it.natural)m.push('Esta fonte já é itálica.');else if(!x.it.ok)m.push(fm+' não tem itálico'+(x.b.on?' em negrito':'')+'.');if(!x.b.ok&&!x.b.on)m.push(fm+' não tem negrito'+(x.it.on?' em itálico':'')+'.');return m.join(' ')||'Itálico e negrito usam as variantes reais da fonte.'}
+/* campo «Fonte»: [lista suspensa] [Itálico] [Negrito]; o = estilo da linha (com b e it) ou null quando a linha não tem os botões */
+function campoFonte(k,atual,o,amo,extra){
+  var abre=UI.sel===k,fe=LT.famLG(atual,o||{}),x=o?LT.estilosDe(atual,o):null,ft=fontePor(atual),fm=ft?ft.fam:atual;
+  return'<div class="f fdd"><div class="f__top"><span class="f__l" id="l-f-'+k+'">Fonte'+(x?' e estilo':'')+'</span>'+(extra||'')+'</div>'
+   +'<div class="fdd__row"><button type="button" class="fsel" data-fsel="'+k+'" aria-haspopup="true" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(atual)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+escH(amo)+'</span><span class="rotulo fsel__n">'+atual+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>'
+   +(x?botoesEst(x):'')+'</div>'
+   +(x?'<p class="f__h" id="lg-est-h">'+msgEst(x,fm)+'</p>':'')
+   +(abre?listaFontes(atual,amo):'')+'</div>'
+}
+function seletor(k){var l=L()[k];return campoFonte(k,l.font,k==='txt'?l:null,amostra(k),rst(k+'.font'))}
 function sw(k,rot,on,off){return'<div class="sw-row"><div><span class="f__l" id="s-'+k+'">'+rot+'</span></div><button type="button" class="sw" data-sw="'+k+'" role="switch" aria-checked="'+on+'"'+(off?' aria-disabled="true"':'')+' aria-labelledby="s-'+k+'"><span></span></button></div>'}
 /* ---------- D-139 · Avançado: padrão de 2 linhas, sugestões e exceção por foto ---------- */
 var TIPOS=[['loc','Localização'],['data','Data'],['pt','Ponto turístico'],['txt','Texto livre'],['nenhum','Nenhum']],TAMS=[[7,'P'],[8,'M'],[10,'G'],[12,'GG']];
@@ -298,40 +326,20 @@ function secLinhas(l,dis){
   }
   return h+'</div></section>'
 }
-function seletorLn(){
-  var e=estLn(),f=fonte(e.font),abre=UI.sel==='ln',fe=LT.famLG(e.font,e),amo=(function(){var c=LT.comPadrao(L(),Q.S());return(c._dt||c._lc||'Itacaré - BA')})();
-  var h='<div class="f"><div class="f__top"><span class="f__l" id="l-f-ln">Fonte</span></div>'
-   +'<button type="button" class="fsel" data-fsel="ln" aria-expanded="'+abre+'" aria-labelledby="l-f-ln fv-ln"><span id="fv-ln" class="fsel__s" style="font-family:'+fam(e.font)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+amo+'</span><span class="rotulo fsel__n">'+e.font+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>';
-  if(abre){
-    var lista=FONTES.filter(function(x){return(UI.cat==='todas'||(UI.cat==='fav'?UI.fav.indexOf(x.n)>=0:UI.cat==='rec'?UI.rec.indexOf(x.n)>=0:x.c===UI.cat))&&x.n.toLowerCase().indexOf(UI.busca.toLowerCase())>=0});
-    carregar(lista);
-    h+='<div class="fpick"><label class="fbusca"><svg class="ico sm"><use href="#i-search"/></svg><input type="search" id="fbusca" placeholder="Buscar fonte" aria-label="Buscar fonte por nome" value="'+UI.busca.replace(/"/g,'&quot;')+'" autocomplete="off"></label>'
-     +'<div class="fcats" role="tablist" aria-label="Categorias de fonte">'+[['todas','Todas'],['fav','Favoritas'],['rec','Recentes']].concat(Object.keys(CAT).map(function(c){return[c,CAT[c]]})).map(function(c){return'<button type="button" role="tab" class="fcat rotulo" data-fcat="'+c[0]+'" aria-selected="'+(UI.cat===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>'
-     +'<ul class="flist" aria-label="Fontes">'+(lista.length?lista.map(function(x){var on=x.n===e.font,fv=UI.fav.indexOf(x.n)>=0;
-       return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+amo+'</span><span class="rotulo fitem__n">'+x.n+' · '+CAT[x.c]+'</span></button><button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'}).join(''):'<li class="f__h">Nenhuma fonte encontrada. Limpe a busca ou escolha outra categoria.</li>')+'</ul></div>'
-  }
-  return h+'</div>'
-}
-function estiloLn(){                              /* Itálico e Negrito reais para qualquer linha; sem a variante, o botão fica desabilitado e explica */
-  var e=estLn(),x=LT.estilosDe(e.font,e),ft=FONTES.filter(function(y){return y.n===e.font})[0],fam=ft?ft.fam:e.font,msg=[];
-  function bt(k,rot,y){return'<button type="button" class="btn2 btn2--sm est-b" data-est="'+k+'" aria-pressed="'+y.on+'"'+(y.ok?'':' disabled')+'>'+rot+'</button>'}
-  if(x.it.natural)msg.push('Esta fonte já é itálica.');else if(!x.it.ok)msg.push(fam+' não tem itálico'+(x.b.on?' em negrito':'')+'.');
-  if(!x.b.ok&&!x.b.on)msg.push(fam+' não tem negrito'+(x.it.on?' em itálico':'')+'.');
-  return'<div class="f" id="f-est"><div class="row2" role="group" aria-label="Estilo do texto">'+bt('it','Itálico',x.it)+bt('b','Negrito',x.b)+'</div><p class="f__h" id="lg-est-h">'+msg.join(' ')+'</p></div>'
-}
+function seletorLn(){var e=estLn(),amo=(function(){var c=LT.comPadrao(L(),Q.S());return(c._dt||c._lc||'Itacaré - BA')})();return campoFonte('ln',e.font,e,amo)}
 function secEstilo(l,dis){
   var e=estLn();
   return'<section class="mod" aria-labelledby="lm-est"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm-est">Estilo</h3>'
    +'<div class="f"><div class="seg seg--3" role="radiogroup" aria-label="Aplicar o estilo a">'
    +[['0','Linha 1'],['1','Linha 2'],['a','Ambas']].map(function(o){return'<label class="seg__o"><input type="radio" name="alvo" value="'+o[0]+'"'+(UI.alvo===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>'
-   +seletorLn()+estiloLn()
+   +seletorLn()
    +sld('ln.pt','Tamanho','pt',6,32,1,0,'')
    +cores('ln',e.cor)+'</section>'
 }
 function secPosicao(l,dis){
   return'<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
    +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al')
-   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'')+'</section>'
+   +sld('dy','Deslocar para baixo','mm',0,5,0.1,1,'A legenda começa 3 mm abaixo da foto; daqui ela só desce.')+'</section>'
 }
 function secPresets(l,dis){
   return'<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos</h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
@@ -389,14 +397,14 @@ function montarEx(){
   /* 2 · Posição (D-136): o texto é sempre abaixo, alinhado entre as margens da foto */
   h+='<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
    +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al','O texto fica entre as mesmas margens laterais da foto.')
-   +sld('dy','Deslocar na vertical','mm',-5,5,0.1,1,'De −5 a +5 mm.')+'</section>';
+   +sld('dy','Deslocar para baixo','mm',0,5,0.1,1,'De 0 a 5 mm: a legenda começa 3 mm abaixo da foto e só desce.')+'</section>';
   /* 3 · Estilos prontos */
   h+='<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos <span class="mono" style="float:right">'+Object.keys(PRESETS).length+'</span></h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
    +Object.keys(PRESETS).map(function(k){return'<label class="preset"><input type="radio" name="preset" value="'+k+'"'+(l.preset===k?' checked':'')+'><span>'+PRESETS[k].t+'</span></label>'}).join('')+'</div></section>';
   /* 4 · Texto livre */
   h+='<section class="mod" aria-labelledby="lm1"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm1">Texto livre</h3>'+sw('txt.on','Mostrar texto livre',l.txt.on)
    +'<div class="f" id="f-texto"><div class="f__top"><label class="f__l" for="lg-in">Texto desta foto</label><span class="mono f__h" id="lg-cnt">0/80</span></div><div class="num lg-num"><input id="lg-in" maxlength="80" autocomplete="off" style="text-align:left;padding-left:12px"></div><p class="f__h" id="lg-h">Até 80 caracteres.</p><div id="lg-conf" hidden></div></div>'
-   +seletor('txt')+estiloTxt(l)
+   +seletor('txt')
    +sld('txt.pt','Tamanho','pt',8,32,1,0,'De 8 a 32 pt.')
    +'<label class="chk"><input type="checkbox" data-chk="txt.fit"'+(l.txt.fit?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Ajustar para caber</strong><span class="f__h">Reduz o tamanho até o texto caber na área segura.</span></span></label>'
    +seg('caixa','Caixa',[['normal','Normal'],['maiusc','Maiúsc.'],['cap','Capitalizada']],l.txt.caixa,'txt.caixa')
@@ -450,7 +458,7 @@ function sincronizar(){
   var se=$('lg-sug-est');if(se)se.textContent=l.original?'Não se aplica com «Sem legendas» ligado.':l.sug!==false?'Ligado · cidade, data e ponto vêm sugeridos da foto e você pode editar.':'Desligado · você escreve tudo; nada é preenchido sozinho.';
   sincPad();
   [].forEach.call(document.querySelectorAll('[data-av]'),function(e){e.value=String(LT.av(l)[e.getAttribute('data-av')])});
-  var et=$('f-est');if(et)et.outerHTML=real()?estiloLn():estiloTxt(l);
+  var et=$('f-est');if(et){var oe2=real()?estLn():l.txt,fn2=oe2.font,xe=LT.estilosDe(fn2,oe2);et.outerHTML=botoesEst(xe);var mh=$('lg-est-h');if(mh)mh.textContent=msgEst(xe,(fontePor(fn2)||{fam:fn2}).fam)}
   [].forEach.call(document.querySelectorAll('input[name=alvo]'),function(i){i.checked=i.value===UI.alvo});
   var fl=$('fv-ln');if(fl){var ee=estLn(),ff=LT.famLG(ee.font,ee);fl.style.fontFamily=fam(ee.font);fl.style.fontStyle=ff.i?'italic':'normal';fl.style.fontWeight=ff.w}
   if(window.PLMET)PLMET.render();
@@ -479,6 +487,17 @@ function padraoPocket(){
 }
 /* ---------- eventos (delegação) ---------- */
 var P=$('p-legendas');
+/* D-186: a lista suspensa de fontes fecha com Esc ou com um toque fora; as setas ↑ e ↓ andam pelas fontes */
+document.addEventListener('click',function(e){if(UI.sel&&!(e.target.closest&&e.target.closest('.fdd'))){UI.sel=null;UI.busca='';montar()}});
+document.addEventListener('keydown',function(e){
+  if(!UI.sel)return;
+  if(e.key==='Escape'){var k=UI.sel;UI.sel=null;UI.busca='';montar();var bt=document.querySelector('[data-fsel="'+k+'"]');if(bt)bt.focus();e.preventDefault();return}
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
+  var it=[].slice.call(document.querySelectorAll('#fpick .fitem__b')),i=it.indexOf(document.activeElement);if(!it.length)return;
+  if(e.target.id==='fbusca'){if(e.key==='ArrowDown'){it[0].focus();e.preventDefault()}return}
+  if(i<0)return;var j=e.key==='ArrowDown'?Math.min(it.length-1,i+1):i-1;
+  if(j<0)$('fbusca').focus();else it[j].focus();e.preventDefault()
+});
 P.addEventListener('input',function(e){
   var t=e.target,k;
   if(t.id==='lg-in'){
@@ -495,7 +514,8 @@ P.addEventListener('input',function(e){
   if(t.id==='pl-in-0'||t.id==='pl-in-1'){var ii=+t.id.slice(-1),e2=Q.S();e2.pl=e2.pl||[{v:'',m:false},{v:'',m:false}];e2.pl[ii]={v:t.value,m:true};Q.commit('lg:pl');  /* digitou: vira manual */
     var dl=$('pl-dl-'+ii);if(dl&&sugOn()&&window.PLLOCAIS&&LT.padLinha(padAlvo().l[ii]).t==='loc')PLLOCAIS.buscar(t.value,8).then(function(r){dl.innerHTML=r.map(function(x){return'<option value="'+PLLOCAIS.rotulo(x)+'"></option>'}).join('')});
     var rb=document.querySelector('[data-restaurar="'+ii+'"]');if(rb)rb.hidden=!sugOn()||LT.padLinha(padAlvo().l[ii]).t==='txt';return}
-  if(t.id==='fbusca'){UI.busca=t.value;var pos=t.selectionStart;montar();var n=$('fbusca');n.focus();n.setSelectionRange(pos,pos);return}
+  if(t.id==='fbusca'){UI.busca=t.value;if(t.value)UI.cat='todas';   /* D-186: a busca procura em todas */
+    var pos=t.selectionStart;montar();var n=$('fbusca');n.focus();n.setSelectionRange(pos,pos);return}
 });
 P.addEventListener('change',function(e){
   var t=e.target;
@@ -522,12 +542,12 @@ P.addEventListener('click',function(e){
   if(b.hasAttribute('data-est')){var ke=b.getAttribute('data-est'),ch=ke==='it'?'it':'b';
     if(real()){setLn(ch,!estLn()[ch]);Q.commit('lg:est');montar();return}
     var tx=L().txt;if(tx[ch])delete tx[ch];else tx[ch]=true;Q.commit('lg:est');montar();return}   /* D-148 */
-  if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';montar();return}
-  if(b.hasAttribute('data-fcat')){UI.cat=b.getAttribute('data-fcat');montar();return}
-  if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');UI.rec=[n].concat(UI.rec.filter(function(x){return x!==n})).slice(0,5);var s=UI.sel;UI.sel=null;var Lf=L();
+  if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';UI.cat='todas';montar();var c0=UI.sel&&document.querySelector('#fpick .fitem.is-on');if(c0){var fl0=c0.parentNode,y0=c0.offsetTop-fl0.offsetTop;if(y0+c0.offsetHeight>fl0.clientHeight)fl0.scrollTop=y0-fl0.clientHeight/3}return}   /* abre mostrando a fonte atual, sem esconder os primeiros grupos à toa */
+  if(b.hasAttribute('data-fcat')){var fc=b.getAttribute('data-fcat');UI.cat=fc;montar();var nb=document.querySelector('[data-fcat="'+fc+'"]');if(nb)nb.focus();return}
+  if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');PREF.rec=[n].concat(PREF.rec.filter(function(x){return x!==n})).slice(0,6);guardaPref();UI.busca='';var s=UI.sel;UI.sel=null;var Lf=L();
     if(s==='ln'){setLn('font',n);alvosLn().forEach(function(i){var ln=Lf.pad.l[i],ee=LT.estilosDe(n,ln);if(ln.b&&!ee.b.ok)delete ln.b;ee=LT.estilosDe(n,ln);if(ln.it&&!ee.it.ok)delete ln.it});Q.commit('lg:font');montar();return}
     Lf[s].font=n;if(s==='txt'){var ee=LT.estilosDe(n,Lf.txt);if(Lf.txt.b&&!ee.b.ok)delete Lf.txt.b;ee=LT.estilosDe(n,Lf.txt);if(Lf.txt.it&&!ee.it.ok)delete Lf.txt.it}Q.commit('lg:font');montar();return}
-  if(b.hasAttribute('data-fav')){var f=b.getAttribute('data-fav'),i=UI.fav.indexOf(f);if(i>=0)UI.fav.splice(i,1);else UI.fav.push(f);montar();return}
+  if(b.hasAttribute('data-fav')){var f=b.getAttribute('data-fav'),i=PREF.fav.indexOf(f);if(i>=0)PREF.fav.splice(i,1);else PREF.fav.push(f);guardaPref();montar();var fb=document.querySelector('[data-fav="'+f+'"]');if(fb)fb.focus();return}
   if(b.hasAttribute('data-lreset')){var kr=b.getAttribute('data-lreset');
     if(DEFL[kr]!==undefined){delete L()[kr];Q.commit('lg:'+kr);montar();return} /* D-113: resetar = tirar a chave */
     if(kr.indexOf('ln.')===0){setLn(kr.slice(3),undefined);Q.commit('lg:'+kr);montar();return}

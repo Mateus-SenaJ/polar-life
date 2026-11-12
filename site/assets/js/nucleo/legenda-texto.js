@@ -33,6 +33,8 @@ var FONTES=[
  /* D-179: a letra das fotos do Retro Pocket (Lucida Calligraphy, proprietária) → Fondamento Itálico, a livre mais parecida, e 10 da mesma família */
  ['Fondamento Itálico','cal','Fondamento',1],['Fondamento','cal'],['Quintessential','cal'],['Felipa','cal'],['Marck Script','cal'],['Niconne','cal'],
  ['Bilbo Swash Caps','cal'],['Almendra','cal'],['Courgette','cal'],['Oregano','cal'],['Merienda','cal'],['Sofia','cal'],
+ /* D-186: com itálico e negrito reais (os dois botões ao lado da fonte funcionam nelas) */
+ ['IBM Plex Mono','dat'],['Space Mono','dat'],['Playfair Display','edi'],['Merriweather','edi'],['Alegreya','edi'],['Cormorant Garamond','edi'],['Josefin Sans','lim'],
  ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],['Lora','edi'],['Crimson Pro','edi'],
  ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400],['Nunito','lim'],['DM Sans','lim']
 ].map(function(f){return{n:f[0],c:f[1],fam:f[2]||f[0],it:!!f[3],w:f[4]||400,css:"'"+(f[2]||f[0])+"',"+FB[f[1]]}});
@@ -43,8 +45,8 @@ FONT_LG['IBM Plex Mono']=["'IBM Plex Mono',ui-monospace,monospace",0,400];
 /* D-148: variantes que existem como arquivo (site/assets/fonts/ e fonts/pdf/). '700i' = negrito itálico. Nada é sintetizado:
    a tela e o PDF só usam uma variante que existe; sem ela, o botão fica desabilitado e o resto cai na mais próxima. */
 var VAR={'Inter':['300','400','500'],'Cormorant Garamond':['300','400','500','700','300i','400i','700i'],'Caveat':['400','500','700'],'Kalam':['400','700'],
- 'Courier Prime':['400','700','400i','700i'],'EB Garamond':['400','700','400i','700i'],'Libre Baskerville':['400','700','400i'],'Playfair Display':['400i'],
- 'Amatic SC':['400','700'],'Fondamento':['400','400i'],'Almendra':['400','700','400i','700i'],'Oregano':['400','400i'],'Merienda':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
+ 'Courier Prime':['400','700','400i','700i'],'EB Garamond':['400','700','400i','700i'],'Libre Baskerville':['400','700','400i'],'Playfair Display':['400','700','400i','700i'],
+ 'Amatic SC':['400','700'],'IBM Plex Mono':['400','700','400i','700i'],'Space Mono':['400','700','400i','700i'],'Josefin Sans':['400','700','400i','700i'],'Merriweather':['400','700','400i','700i'],'Alegreya':['400','700','400i','700i'],'Dancing Script':['400','700'],'Fondamento':['400','400i'],'Almendra':['400','700','400i','700i'],'Oregano':['400','400i'],'Merienda':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
 function temVar(fam,w,i){return(VAR[fam]||['400']).indexOf(w+(i?'i':''))>=0}
 function variante(fam,w,i){                                    /* {w,i} existente mais próximo (mesmo itálico primeiro) */
   var l=(VAR[fam]||['400']).map(function(v){return{w:parseInt(v,10),i:/i$/.test(v)}}),r=null,d=1e9;
@@ -144,6 +146,7 @@ function migrar(leg){
   if(leg.al==null||leg.al==='')leg.al=dx<-1?'esq':dx>1?'dir':'esq';
   else if(leg.al!=='esq'&&leg.al!=='centro'&&leg.al!=='dir')leg.al='esq';
   delete leg.dx;                     /* o alinhamento assume a posição horizontal (FN-07) */
+  if(typeof leg.dy==='number'&&leg.dy<0)leg.dy=0;   /* D-192: a legenda começa 3 mm abaixo da foto e só pode descer */
   return leg
 }
 /* ---------- D-139 · padrão avançado de 2 linhas (fonte única: tela, Folhas e PDF · MT-02) ----------
@@ -184,7 +187,7 @@ function apaDe(m){return m&&(m.iso!==undefined?m:null)}
 function linhaTexto(leg,l,i,f){
   if(l.t==='nenhum')return'';
   var p=f&&f.pl&&f.pl[i];
-  if(p&&typeof p.v==='string')return p.v;
+  if(p&&typeof p.v==='string'&&(p.m||p.v))return p.v;   /* D-184b: sugestão vazia guardada (ex.: calculada sem rede) não tapa o lugar lido da foto; vazio digitado vale */
   if(!ehReal())return'';
   if(l.t==='txt'){var s=f&&(f.leg!=null?f.leg:f.txt);return typeof s==='string'?s:''}
   if(leg.sug===false)return'';
@@ -244,6 +247,26 @@ function limparMedTela(){cacheM={}}
    Cada linha vem com: k ('data' | 'loc' | 'meta'), est (dono da linha), corpo (mm),
    asc/desc/capMax (mm), lh (multiplicador do corpo), base (mm da borda de cima da moldura à linha de base),
    top (mm ao topo da caixa da linha) e letrasTop (mm ao topo das maiúsculas). */
+/* D-192: a legenda vai de onde a foto começa até onde ela termina (mesma margem da moldura) e começa 3 mm abaixo da foto.
+   Texto mais largo que a foto diminui o corpo da linha até caber (nunca aumenta; mínimo de 3 pt). Função única: o Quadro,
+   as Folhas e o PDF chamam esta, cada um com a própria medida de largura (canvas na tela, fontkit no PDF) · MT-02. */
+var LEG_TOPO=3,PT_MIN=3;
+function larguraJanela(fr){return!fr?0:fr.cw?fr.cjw:(fr.jw!=null?fr.jw:fr.w-2*fr.lado)}
+function ajustarCorpo(c,fr,largura){
+  if(!c||!c._pad||typeof largura!=='function')return c;
+  var J=larguraJanela(fr);if(!(J>0))return c;
+  var d=copia(c),dt=d._dt||'',lc=d._lc||'',junto=(d.meta||'junto')!=='linhas';
+  function fator(w){return w>J?J/w:1}
+  function aplica(o,k){if(k<1)o.pt=Math.max(PT_MIN,Math.floor(o.pt*k*10)/10)}
+  if(junto){var s=dt&&lc?sepMeta(d):'',w=(dt?largura(dt,d.data):0)+(lc?largura(lc,d.loc):0)+(s?largura(s,{font:'IBM Plex Mono',pt:Math.max(d.data.pt,d.loc.pt)}):0),k=fator(w);aplica(d.data,k);aplica(d.loc,k)}
+  else{if(dt)aplica(d.data,fator(largura(dt,d.data)));if(lc)aplica(d.loc,fator(largura(lc,d.loc)))}
+  return d
+}
+function larguraTela(txt,est){                   /* largura em mm na tela (a mesma fonte do PDF, medida pelo canvas) */
+  if(!txt)return 0;var fm=famLG(est.font,est);if(!ctxT)ctxT=document.createElement('canvas').getContext('2d');
+  ctxT.font=(fm.i?'italic ':'')+fm.w+' 100px '+fm.f;var c=est.pt*.3528;
+  return ctxT.measureText(txt).width/100*c+(est.esp||0)*c*txt.length
+}
 function linhas(leg,fr,medir,opts){
   opts=opts||{};
   var f=fr&&fr.cw?{topo:fr.ct,jh:fr.cjh,jw:fr.cjw,lado:fr.cl}:fr||{};
@@ -267,8 +290,8 @@ function linhas(leg,fr,medir,opts){
     var par=ordem==='loc-data'?[['loc',leg.loc,mL,cL],['data',leg.data,mD,cD]]:[['data',leg.data,mD,cD],['loc',leg.loc,mL,cL]];
     par.forEach(function(p){L.push({k:p[0],est:p[1],corpo:p[3],asc:p[2].asc,desc:p[2].desc,capMax:p[2].cap*p[3]})})
   }
-  if(medida==='letras'){                          /* MT-02: 1ª maiúscula a 4 mm da foto; a 2ª, 2 mm abaixo da base da 1ª */
-    var b=wb+4+L[0].capMax;
+  if(medida==='letras'||leg._pad){                /* D-192 · MT-02: 1ª maiúscula a 3 mm da foto (fixo); a 2ª, 2 mm abaixo da base da 1ª */
+    var b=wb+LEG_TOPO+L[0].capMax;
     L.forEach(function(ln,i){if(i)b+=2+ln.capMax;
       ln.lh=ln.asc+ln.desc;ln.base=b;ln.top=b-ln.asc*ln.corpo;ln.letrasTop=b-ln.capMax})
   }else{                                          /* caixa: linha de 1,2 corpo (mesma conta do PDF) */
@@ -279,5 +302,5 @@ function linhas(leg,fr,medir,opts){
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,lugarTxt:lugarTxt,cxMeta:cxMeta,caixaLG:caixaLG,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,lugarTxt:lugarTxt,cxMeta:cxMeta,caixaLG:caixaLG,ajustarCorpo:ajustarCorpo,larguraTela:larguraTela,LEG_TOPO:3,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

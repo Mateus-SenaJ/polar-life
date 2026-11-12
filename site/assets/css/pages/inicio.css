@@ -163,3 +163,10 @@ a{color:inherit}
 }
 /* D-169: a prévia da colagem mantém a proporção quando a coluna fica estreita (768–820 px) */
 .colag__prev img{height:auto;max-height:240px;object-fit:contain}
+/* D-190: a faixa preta vai de uma borda à outra da tela (sem laterais claras), sem mudar o alinhamento do conteúdo:
+   a sombra preta estende o fundo para os lados e o recorte deixa só a altura da faixa */
+.ini .faixa{border-radius:0;box-shadow:0 0 0 100vmax var(--black);clip-path:inset(0 -100vmax)}
+
+/* D-191: prévias com fotos reais (polaroid inteira, com a legenda do modelo) */
+.mdl__img--foto{object-fit:contain}
+.colag__prev img{border-radius:4px}

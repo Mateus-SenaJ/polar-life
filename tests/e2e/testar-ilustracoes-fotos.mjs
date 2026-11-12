@@ -16,14 +16,14 @@ const falhas = [], ok = m => console.log('  ✔ ' + m), ruim = m => { falhas.pus
 const saida = fileURLToPath(new URL('../saida/ilustracoes-fotos/', import.meta.url));
 await mkdir(saida, { recursive: true });
 
-const CENAS = {                                   // cena da mesa → foto que entra no lugar
-  'mesa-cena-praia': 'praia.jpg',
-  'mesa-cena-montanha': 'montanha.jpg',
-  'mesa-cena-cidade': 'cidade.jpg',
-  'mesa-cena-sol': 'por-do-sol.jpg',
-  'mesa-cena-festa': 'aniversario.jpg',
-  'mesa-cena-viagem': 'viagem.jpg',
-  'mesa-cena-noite': 'casal.jpg'
+const CENAS = {                                   // cena da mesa → foto real (CC0, D-191; sem aniversário)
+  'mesa-cena-praia': 'amigos-praia.jpg',
+  'mesa-cena-montanha': 'amigos-trilha.jpg',
+  'mesa-cena-cidade': 'casal-cidade.jpg',
+  'mesa-cena-sol': 'casal-por-do-sol.jpg',
+  'mesa-cena-fogueira': 'amigos-acampamento.jpg',
+  'mesa-cena-viagem': 'amigos-estrada.jpg',
+  'mesa-cena-noite': 'casal-noite.jpg'
 };
 const TELAS = [{ rota: 'app/entrar/', nome: 'entrar' }, { rota: '', nome: 'apresentacao' }];
 const TAMANHOS = [[1440, 900], [390, 844]];

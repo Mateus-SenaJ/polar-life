@@ -30,8 +30,8 @@ const ARQS = [
   { name: 'itapua.jpg', mimeType: 'image/jpeg', buffer: comExif('2026:11:24 11:00:00', [-12.9535, -38.3635]) },
   { name: 'sem-exif.jpg', mimeType: 'image/jpeg', buffer: base },
 ];
-const folhas = (p) => p.evaluate(() => [].map.call(document.querySelectorAll('#sheet .pol'), (e) => [].map.call(e.querySelectorAll('.pol__mline'), (m) => m.textContent)));
-const esperaFolha = (p, i, txt) => p.waitForFunction((a) => { const e = document.querySelectorAll('#sheet .pol')[a[0]]; return !!e && [].map.call(e.querySelectorAll('.pol__mline'), (m) => m.textContent).join('|') === a[1]; }, [i, txt], { timeout: 15000 }).then(() => true, () => false);
+const folhas = (p) => p.evaluate(() => [].map.call(document.querySelectorAll('#sheet .pol'), (e) => [].map.call(e.querySelectorAll('.pol__mline, .pol__ml'), (m) => m.textContent)));
+const esperaFolha = (p, i, txt) => p.waitForFunction((a) => { const e = document.querySelectorAll('#sheet .pol')[a[0]]; return !!e && [].map.call(e.querySelectorAll('.pol__mline, .pol__ml'), (m) => m.textContent).join('|') === a[1]; }, [i, txt], { timeout: 15000 }).then(() => true, () => false);
 async function pdfTxt(p) {
   await p.goto(srv.url + 'app/editor/gerar/');
   await p.waitForFunction(() => !!window.PLGERADOR);
@@ -49,7 +49,7 @@ const abrirQuadro = async (p, n) => {
   await p.click('#tab-legendas'); await p.waitForSelector('#lg-av-t');
   if (await p.locator('#lg-av').isHidden()) await p.click('#lg-av-t');
 };
-const linhasQuadro = (p) => p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), (e) => e.textContent).filter(Boolean).join('|'));
+const linhasQuadro = (p) => p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), (e) => e.textContent).filter(Boolean).join('|'));
 
 try {
   const ctx = await nav.newContext({ viewport: { width: 1440, height: 900 } });
@@ -80,9 +80,21 @@ try {
   let pdf = await pdfTxt(p);
   ok(pdf.includes('Salvador - BA') && pdf.includes('23/11/26') && pdf.includes('24/11/26'), 'PDF sem passar pelo Quadro: ' + JSON.stringify(pdf));
 
+  /* D-184b: sugestão vazia guardada (ex.: calculada sem rede) não tapa o lugar lido da foto; linha apagada à mão continua vazia */
+  await abrirFolhas(p);
+  await p.evaluate(() => {
+    const q = [{}].concat(JSON.parse(sessionStorage.getItem('pl-fotos')).map((s) => ({ src: s, z: 100, ang: 0, px: 0, py: 0, rot: 0, flip: false, modo: 'preencher', adj: {}, flt: { id: 'original', int: 100 } })));
+    q[1].pl = [{ v: '', m: false }, { v: '', m: false }]; q[2].pl = [{ v: '', m: true }, { v: '', m: false }];
+    sessionStorage.setItem('pl-quadro', JSON.stringify(q));
+  });
+  await abrirFolhas(p);
+  ok(await esperaFolha(p, 0, 'Salvador - BA|23/11/26'), 'sugestão vazia guardada não tapa o lugar lido da foto');
+  ok(await esperaFolha(p, 1, '24/11/26'), 'linha de local apagada à mão continua vazia');
+  await p.evaluate(() => sessionStorage.removeItem('pl-quadro'));
+
   console.log('\nQuadro aberto e fechado sem mexer em nada:');
   await abrirQuadro(p, 1);
-  await p.waitForFunction(() => /Salvador - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m'), (e) => e.textContent).join('|')));
+  await p.waitForFunction(() => /Salvador - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), (e) => e.textContent).join('|')));
   ok((await linhasQuadro(p)) === 'Salvador - BA|23/11/26', 'Quadro mostra «Salvador - BA|23/11/26»');
   await abrirFolhas(p);
   ok(await esperaFolha(p, 0, 'Salvador - BA|23/11/26'), 'de volta às Folhas, o local continua (antes sumia)');
@@ -93,7 +105,7 @@ try {
   const ph = await p.getAttribute('#md-c', 'placeholder');
   ok(ph === 'Salvador - BA (da foto)', 'o campo Cidade mostra de onde vem o local: «' + ph + '»');
   await p.click('[data-clr="c"]');
-  await p.waitForFunction(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), (e) => e.textContent).filter(Boolean).join('|') === '23/11/26');
+  await p.waitForFunction(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), (e) => e.textContent).filter(Boolean).join('|') === '23/11/26');
   ok(true, 'Quadro: só a data fica');
   ok((await p.textContent('[data-clr="c"]')) === 'Usar o local da foto', 'o botão vira «Usar o local da foto»');
   await abrirFolhas(p);
@@ -102,12 +114,12 @@ try {
   ok(pdf.filter((t) => t === 'Salvador - BA').length === 1 && pdf.includes('23/11/26'),'PDF: só a foto 2 tem «Salvador - BA» ' + JSON.stringify(pdf));
   await abrirQuadro(p, 1);
   await p.click('[data-clr="c"]');
-  await p.waitForFunction(() => /Salvador - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m'), (e) => e.textContent).join('|')));
+  await p.waitForFunction(() => /Salvador - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), (e) => e.textContent).join('|')));
   ok(true, '«Usar o local da foto» devolve «Salvador - BA»');
 
   console.log('\nCidade digitada vale mais que a do GPS:');
   await p.fill('#md-c', 'Itacaré - BA'); await p.press('#md-c', 'Tab');
-  await p.waitForFunction(() => /Itacaré - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m'), (e) => e.textContent).join('|')));
+  await p.waitForFunction(() => /Itacaré - BA/.test([].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), (e) => e.textContent).join('|')));
   ok(true, 'Quadro: «Itacaré - BA»');
   await abrirFolhas(p);
   ok(await esperaFolha(p, 0, 'Itacaré - BA|23/11/26'), 'Folhas: «Itacaré - BA|23/11/26»');

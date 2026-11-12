@@ -233,8 +233,8 @@ try {
   ok(re.fr.w === 66 && re.fr.h === 99 && re.fr.jw === 60 && re.fr.jh === 79 && re.fr.lado === 3 && re.fr.topo === 3,
     'PDF: moldura Pocket no projeto (66 × 99, janela 60 × 79)');
   ok(re.nLoc === 24 && re.nData === 24 && re.mono, 'PDF: 24 linhas de local e 24 de data, só em Fondamento Itálico, a letra das fotos do Pocket (texto livre ausente)');
-  ok(re.locY !== null && re.dataY !== null && Math.abs((re.locY - re.capU) / 1000 - 86) <= 0.1,
-    'PDF: topo das maiúsculas da 1ª linha a 4 mm da borda inferior da janela (' + ((re.locY - re.capU) / 1000).toFixed(3) + ' mm ≈ 86)');
+  ok(re.locY !== null && re.dataY !== null && Math.abs((re.locY - re.capU) / 1000 - 85) <= 0.1,
+    'PDF: topo das maiúsculas da 1ª linha a 3 mm da borda inferior da janela, D-192 (' + ((re.locY - re.capU) / 1000).toFixed(3) + ' mm ≈ 85)');
   ok(re.dataY !== null && Math.abs((re.dataY - re.locY) / 1000 - (2 + re.capU / 1000)) <= 0.1,
     'PDF: topo das maiúsculas da 2ª linha = linha de base da 1ª + 2 mm (Δ ' + ((re.dataY - re.locY) / 1000).toFixed(3) + ' mm)');
   ok(re.locX === 3000 && re.dataX === 3000, 'PDF: as duas linhas coladas na margem lateral (x = 3 mm)');
@@ -260,8 +260,8 @@ try {
   });
   ok(rf.n === 8 && rf.ordemOk, 'T-07 DOM: 8 linhas .pol__ml, «Campos do Jordão - SP» antes de «14/07/26»');
   ok(rf.pior <= 0.3, 'T-07 DOM: topo de cada linha bate com PLTEXTO.linhas (Δ ' + rf.pior.toFixed(3) + ' mm ≤ 0,3)');
-  ok(Math.abs(rf.l0 - 86) < 1e-6 && Math.abs(rf.l1 - (rf.b0 + 2)) < 1e-6,
-    'cálculo único: letrasTop da 1ª = 86 mm e da 2ª = linha de base da 1ª + 2 mm');
+  ok(Math.abs(rf.l0 - 85) < 1e-6 && Math.abs(rf.l1 - (rf.b0 + 2)) < 1e-6,
+    'cálculo único: letrasTop da 1ª = 85 mm (3 mm da foto, D-192) e da 2ª = linha de base da 1ª + 2 mm');
 
   console.log('Assinatura no canto inferior direito (D-128):');
   const rsig = await page.evaluate(async () => {
@@ -301,7 +301,7 @@ try {
   ok(rpv.fora === 0 && !rpv.bl.some(t => /área segura/.test(t)),
     'pré-voo do Pocket padrão: nenhum bloqueio de área segura');
 
-  console.log('Local longo alcança a assinatura:');
+  console.log('Local longo (D-192: diminui para caber):');
   await guardarQuadro(FR_POCKET, legPocket({ ordem: 'data-loc' }), 4, 'São José do Vale do Rio Preto');
   await abrirEditor();
   const rlong = await page.evaluate(() => {
@@ -312,8 +312,8 @@ try {
     return { fora: PLEDITOR.ctx().foraTodas(), bl: PLPREVOO.analisar().bl,
       toca: !!(b && b.right > sr.left && b.left < sr.right && b.bottom > sr.top && b.top < sr.bottom) };
   });
-  ok(rlong.fora > 0 && rlong.bl.some(t => /área segura/.test(t)) && rlong.toca,
-    'um local muito longo que alcança a assinatura bloqueia a impressão');
+  ok(rlong.fora === 0 && !rlong.toca && !rlong.bl.some(t => /área segura/.test(t)),   /* D-192: o corpo diminui até caber na largura da foto */
+    'um local muito longo diminui até caber na largura da foto: não alcança a assinatura e não bloqueia a impressão');
 
   console.log('Ordem invertida e Caveat na data:');
   await guardarQuadro(FR_POCKET, legPocket({ ordem: 'data-loc', data: { font: 'Caveat' } }), 4);
@@ -343,8 +343,8 @@ try {
   });
   ok(rg1.dom.n === 2 && rg1.dom.primeiroData && rg1.dom.primeiroTxt === '14/07/26' && /Caveat/.test(rg1.dom.fam1),
     'T-07: data primeiro (em Caveat) e local depois');
-  ok(rg1.dY !== null && Math.abs((rg1.dY - rg1.capD) / 1000 - 86) <= 0.1,
-    'PDF: topo das maiúsculas da data (Caveat) a 4 mm da janela (' + ((rg1.dY - rg1.capD) / 1000).toFixed(3) + ' mm ≈ 86)');
+  ok(rg1.dY !== null && Math.abs((rg1.dY - rg1.capD) / 1000 - 85) <= 0.1,
+    'PDF: topo das maiúsculas da data (Caveat) a 3 mm da janela (' + ((rg1.dY - rg1.capD) / 1000).toFixed(3) + ' mm ≈ 85)');
   ok(rg1.lY !== null && Math.abs((rg1.lY - rg1.dY) / 1000 - (2 + rg1.capM / 1000)) <= 0.1,
     'PDF: local = linha de base da data + 2 mm (Δ ' + ((rg1.lY - rg1.dY) / 1000).toFixed(3) + ' mm)');
   const rg1p = await gerar({ f: 'pdf' });

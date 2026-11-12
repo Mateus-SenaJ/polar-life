@@ -11,7 +11,9 @@ function renomearNoCartao(b,id){ /* edição no próprio cartão (sem prompt do 
   inp.addEventListener('blur',function(){fim(true)})
 }
 function capas(){[].forEach.call(document.querySelectorAll('[data-capa]'),function(img){PLPROJETOS.capa(img.getAttribute('data-capa')).then(function(b){if(!b)return;img.src=URL.createObjectURL(b);img.classList.add('avatar--foto')})})}
-function atualizar(){PLPROJETOS.listar().then(function(a){render(a);capas()})}function abrir(id){PLPROJETOS.abrir(id).then(function(p){location.href=p&&!p.fotos&&!p.exemplo?'adicionar-fotos/':'editor/'   /* D-158: projeto sem fotos continua em «Adicionar fotos» */},function(){atualizar();toast('Não foi possível abrir este projeto.')})}function baixar(o){var b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(o.projeto.nome||'projeto')+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)}
+function atualizar(){PLPROJETOS.listar().then(function(a){render(a);capas()})}function abrir(id){PLPROJETOS.abrir(id).then(function(p){var col=null;try{col=JSON.parse(sessionStorage.getItem('pl-colagem')||'null')}catch(e){}
+  if(p&&!p.fotos&&!p.exemplo&&col&&col.ativo){try{if(!sessionStorage.getItem('pl-fotos'))sessionStorage.setItem('pl-fotos','[]')}catch(e){}location.href='editor/#colagem';return}   /* D-188: colagem vazia abre no modelo */
+  location.href=p&&!p.fotos&&!p.exemplo?'adicionar-fotos/':'editor/'   /* D-158: projeto sem fotos continua em «Adicionar fotos» */},function(){atualizar();toast('Não foi possível abrir este projeto.')})}function baixar(o){var b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(o.projeto.nome||'projeto')+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)}
 $('lista').addEventListener('click',function(e){var b=e.target.closest('button,a');if(!b)return;if(b.dataset.more){var m=document.querySelector('[data-menu="'+b.dataset.more+'"]');m.hidden=!m.hidden;return}var id=b.dataset.id||b.dataset.open;if(!id)return;e.preventDefault(); /* o nome (data-open) também abre o projeto de verdade */if(b.dataset.act==='abrir'||b.dataset.open){abrir(id);return}if(b.dataset.act==='renomear'){renomearNoCartao(b,id);return}if(b.dataset.act==='duplicar'){PLPROJETOS.duplicar(id).then(atualizar);return}if(b.dataset.act==='backup'){PLPROJETOS.exportar(id).then(baixar);return}if(b.dataset.act==='excluir'){selecionado=id;$('scrim').hidden=false;$('dialog').hidden=false;$('dlg-cancel').focus()}});
 function fechar(){$('scrim').hidden=true;$('dialog').hidden=true}$('dlg-cancel').onclick=fechar;$('scrim').onclick=fechar;$('dlg-del').onclick=function(){PLPROJETOS.excluir(selecionado).then(function(){fechar();atualizar();toast('Projeto excluído')})};$('novo1').onclick=function(){location.href='novo-projeto/'};
 var input=document.createElement('input');input.type='file';input.accept='.polarlife,application/json';input.hidden=true;document.body.appendChild(input);$('backup').onclick=$('criar-backup').onclick=function(){input.click()};input.onchange=function(){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{PLPROJETOS.importar(JSON.parse(r.result)).then(function(){atualizar();toast('Backup aberto como novo projeto')},function(){toast('Não foi possível abrir este backup.')})}catch(e){toast('Não foi possível abrir este backup.')}input.value=''};r.readAsText(f)};atualizar();
@@ -21,16 +23,20 @@ function mostrar(){bi.hidden=!P.podeInstalar();dica.hidden=!P.dicaIos();barra.hi
 bi.onclick=function(){P.instalar().then(mostrar)};$('pwa-dica-fechar').onclick=function(){P.fecharDica();mostrar()};
 P.aoMudar(mostrar);mostrar();P.espaco().then(function(e){$('aviso-espaco').hidden=!(e&&e.cheio)})});
 /* D-177: sugestões com foto real e «Colagem» criam o projeto já no formato/modo certo e seguem para escolher as fotos */
-var SUG={viagem:{nome:'Polaroids da viagem'},aniversario:{nome:'Festa de aniversário',fmt:'mini'},casal:{nome:'Nós dois',fmt:'pocket'},
-  coracao:{nome:'Coração de verão',col:'coracao'},varal:{nome:'Varal de memórias',col:'tira'},mesa:{nome:'Mesa de recordações',col:'espalhadas'}};
+/* D-187: cada sugestão abre exatamente o modelo da imagem (tools/gerar-vitrine.mjs usa os mesmos formatos e layouts) */
+var BRANCO={tipo:'cor',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40};
+var SUG={viagem:{nome:'Viagem com a turma',fmt:'classico'},cidade:{nome:'Rolê na cidade',fmt:'imini'},casal:{nome:'Nós dois',fmt:'pocket'},
+  coracao:{nome:'Coração de verão',col:{layout:'coracao',orient:'paisagem',fundo:BRANCO}},varal:{nome:'Varal de memórias',col:{layout:'tira',orient:'paisagem',fundo:BRANCO}},
+  mesa:{nome:'Mesa de recordações',col:{layout:'espalhadas',orient:'paisagem',fundo:{tipo:'foto'}}}};
 function comecar(o){
-  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-prevoo','pl-exportar'].forEach(function(k){sessionStorage.removeItem(k)});
+  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-prevoo','pl-exportar','pl-volta'].forEach(function(k){sessionStorage.removeItem(k)});
     if(o.fmt)sessionStorage.setItem('pl-fmt',o.fmt);
-    if(o.col)sessionStorage.setItem('pl-colagem',JSON.stringify({ativo:true,layout:o.col,fundo:{tipo:'foto'}}))}catch(e){}
-  var ir=function(){location.href='adicionar-fotos/'};
+    if(o.col)sessionStorage.setItem('pl-colagem',JSON.stringify(Object.assign({ativo:true,fundo:{tipo:'foto'}},o.col)))}catch(e){}
+  /* D-188: colagem começa pelo modelo (as molduras vazias na tela) e as fotos entram depois; polaroids seguem para escolher as fotos */
+  var ir=o.col?function(){try{sessionStorage.setItem('pl-fotos','[]')}catch(e){}location.href='editor/#colagem'}:function(){location.href='adicionar-fotos/'};
   if(!window.PLPROJETOS){ir();return}
   PLPROJETOS.criar(o.nome).then(ir,ir)
 }
 $('sugs').addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-sug]');if(!b)return;var o=SUG[b.getAttribute('data-sug')];if(o)comecar(o)});
-$('criar-colagem').onclick=function(){comecar({nome:'Colagem de '+new Date().toLocaleDateString('pt-BR'),col:'espalhadas'})};
+$('criar-colagem').onclick=function(){comecar({nome:'Colagem de '+new Date().toLocaleDateString('pt-BR'),col:{layout:'espalhadas'}})};
 })();

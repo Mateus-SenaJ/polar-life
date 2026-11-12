@@ -203,3 +203,12 @@ a{color:inherit}
 @media (min-width:1920px){
   .hero__title{font-size:clamp(96px,min(5.4vw,11svh),140px)}
 }
+/* D-189: transição limpa entre o branco e o vídeo no desktop. O vídeo é ampliado (scale 1,14) e passava da borda do quadro;
+   o corte acontecia onde a máscara já tinha um pouco de imagem, e ficava uma linha reta. A máscara vai para o quadro (que não
+   é ampliado): o vídeo some de verdade no branco. Topo do herói mais perto do cabeçalho. */
+@media (min-width:1024px){
+  .hero{align-items:start;padding-top:32px;padding-bottom:40px}       /* o texto começa logo abaixo do cabeçalho, sem o vão do centro */
+  .hero__arte{margin-top:-32px;margin-bottom:-40px}
+  .midia--hero .midia__video{-webkit-mask-image:none;mask-image:none}
+  .midia--hero{-webkit-mask-image:linear-gradient(to right,transparent 0,rgba(0,0,0,.08) 14%,rgba(0,0,0,.5) 32%,#000 50%);mask-image:linear-gradient(to right,transparent 0,rgba(0,0,0,.08) 14%,rgba(0,0,0,.5) 32%,#000 50%)}
+}

@@ -180,6 +180,7 @@ function layoutLegenda(f,fr,leg,s){
   /* MT-01/MT-02: tudo em µm dentro desta função; fr e constantes entram em mm. */
   var L=mm(fr.lado),T=mm(fr.topo),JW=mm(fr.jw),JH=mm(fr.jh),GAP_FOTO=mm(2.2),GAP_META=mm(1.2);
   if(leg)leg=LT.comPadrao(leg,f);   /* D-139: padrão de 2 linhas (mesma função da tela e das Folhas) */
+  if(leg&&leg._pad)leg=LT.ajustarCorpo(leg,fr,function(t,e){return medir(t,estiloObj(e))/1000});   /* D-192: mesma regra da tela, com a medida do PDF */
   if(leg&&leg.original){return []} /* D-135: só a foto e a moldura (sem apagar nada) */
   if(leg){
     legOu=leg;

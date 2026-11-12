@@ -36,9 +36,9 @@ var MODELOS=[
  {id:'por-do-sol',nome:'Pôr do sol',emoji:'🌅',fmt:'iwide',fonte:'Sacramento',preset:'simples',cor:'laranja',al:'esq',
   texto:'Fim de tarde',dataOn:false,locOn:false,uso:'Paisagens horizontais, céu',img:'polaroid-por-do-sol.svg',
   prev:[['Fim de tarde','txt']]},
- {id:'aniversario',nome:'Aniversário',emoji:'🎂',fmt:'isq',fonte:'Dancing Script',preset:'contornada',cor:'azul',al:'esq',
-  texto:'Mais um ano',dataOn:true,dataFmt:9,locOn:false,uso:'Festa, presente de aniversário',img:'polaroid-aniversario.svg',
-  prev:[['Mais um ano','txt'],['14 de julho','data']]},
+ {id:'turma',nome:'Turma',emoji:'🤝',fmt:'isq',fonte:'Dancing Script',preset:'contornada',cor:'azul',al:'esq',
+  texto:'Nossa turma',dataOn:true,dataFmt:9,locOn:false,uso:'Amigos, encontros, viagem em grupo',img:'polaroid-praia.svg',
+  prev:[['Nossa turma','txt'],['14 de julho','data']]},
  {id:'viagem',nome:'Viagem',emoji:'✈️',fmt:'classico',fonte:'Caveat',preset:'pin',cor:'preto',al:'esq',
   texto:'Até a próxima',dataOn:false,locOn:true,uso:'Roteiro com várias cidades',img:'polaroid-viagem.svg',
   prev:[['Campos do Jordão, SP','loc'],['Até a próxima','txt']]},
@@ -46,20 +46,20 @@ var MODELOS=[
   texto:'Nós dois',dataOn:false,locOn:false,uso:'Casal, presente a dois',img:'polaroid-casal.svg',
   prev:[['Nós dois','txt']]},
  {id:'neste-dia',nome:'Neste dia',emoji:'📅',fmt:'classico',fonte:'Cutive Mono',preset:'calendario',cor:'azul',al:'esq',
-  texto:'Pra lembrar',dataOn:true,dataFmt:0,locOn:false,uso:'Aniversário de data, retrospectiva',img:'polaroid-calendario.svg',
+  texto:'Pra lembrar',dataOn:true,dataFmt:0,locOn:false,uso:'Datas especiais, retrospectiva',img:'polaroid-calendario.svg',
   prev:[['14.07.26','data'],['Pra lembrar','txt']]}
 ];
 /* ---------- as 6 colagens (brief §2.5 · DOC-06 §4) ---------- */
 var COLAGENS=[
- {formato:'Feed 1:1',px:'1080 × 1080',img:'colagem-feed.svg',w:800,h:800,itens:[
-  {nome:'Mural do mês',frase:'Tudo o que cabe em nove quadros.'},
-  {nome:'Mesa espalhada',frase:'Do jeito que ficaram na mesa.'}]},
- {formato:'Retrato 4:5',px:'1080 × 1350',img:'colagem-retrato.svg',w:800,h:1000,itens:[
-  {nome:'Capa e destaques',frase:'Uma foto grande e as que vieram junto.'},
-  {nome:'Linha do tempo',frase:'O mês, na ordem em que aconteceu.'}]},
- {formato:'Stories 9:16',px:'1080 × 1920',img:'colagem-stories.svg',w:800,h:1422,itens:[
-  {nome:'Varal',frase:'Um varal para os dias de sol.'},
-  {nome:'Tira',frase:'Quatro fotos, uma história só.'}]}
+ {formato:'Feed 1:1',px:'1080 × 1080',w:240,h:240,itens:[
+  {nome:'Mural do mês',frase:'Tudo o que cabe em nove quadros.',img:'rede-mural.jpg'},
+  {nome:'Mesa espalhada',frase:'Do jeito que ficaram na mesa.',img:'rede-mesa.jpg'}]},
+ {formato:'Retrato 4:5',px:'1080 × 1350',w:192,h:240,itens:[
+  {nome:'Capa e destaques',frase:'Uma foto grande e as que vieram junto.',img:'rede-capa.jpg'},
+  {nome:'Linha do tempo',frase:'O mês, na ordem em que aconteceu.',img:'rede-tempo.jpg'}]},
+ {formato:'Stories 9:16',px:'1080 × 1920',w:135,h:240,itens:[
+  {nome:'Varal',frase:'Um varal para os dias de sol.',img:'rede-varal.jpg'},
+  {nome:'Tira',frase:'Quatro fotos, uma história só.',img:'rede-tira.jpg'}]}
 ];
 
 /* ---------- utilidades ---------- */
@@ -196,11 +196,10 @@ function modelos(){
   if(!ul)return;
   ul.innerHTML=MODELOS.map(function(m){
     var f=FMT[m.fmt];
-    var img=m.img
-      ? '<img class="mdl__img" src="../../assets/img/ilustracoes/'+m.img+'" width="92" height="112" alt="" loading="lazy">'
-      : '<div class="mdl__vazia"><span class="mdl__janela"></span></div>';
+    /* D-191: a prévia é a polaroid de verdade (tools/gerar-vitrine.mjs): foto real, moldura, fonte e legenda do próprio modelo */
+    var img='<img class="mdl__img mdl__img--foto" src="../../assets/img/vitrine/modelo-'+m.id+'.jpg" width="200" height="244" alt="" loading="lazy">';
     return '<li class="mdl">'
-      +'<div class="mdl__prev">'+img+'<p class="mdl__leg">'+prevModelo(m)+'</p></div>'
+      +'<div class="mdl__prev">'+img+'</div>'
       +'<h3 class="mdl__nome">'+esc(m.nome+' '+m.emoji)+'</h3>'
       +'<p class="mdl__meta mono">'+esc(f.n+' '+nf(f.w)+' × '+nf(f.h)+' · '+PRESET[m.preset])+'</p>'
       +'<p class="mdl__uso">'+esc(m.uso)+'</p>'
@@ -216,7 +215,7 @@ function colagens(){
   c.innerHTML=COLAGENS.map(function(g){
     var itens=g.itens.map(function(it){
       return '<li class="colag">'
-        +'<div class="colag__prev"><img src="../../assets/img/ilustracoes/'+g.img+'" width="'+g.w+'" height="'+g.h+'" alt="" loading="lazy"></div>'
+        +'<div class="colag__prev"><img src="../../assets/img/vitrine/'+it.img+'" width="'+g.w+'" height="'+g.h+'" alt="" loading="lazy"></div>'   /* D-191: cada colagem com fotos reais */
         +'<p class="colag__frase">'+esc(it.frase)+'</p>'
         +'<p class="colag__nome">'+esc(it.nome)+'</p>'
         +'<p class="colag__px mono">'+esc(g.px)+'</p>'
@@ -321,4 +320,5 @@ modelos();
 colagens();
 projetos();
 eventos();
+window.PLINICIO={MODELOS:MODELOS,legDe:legDe,frDe:frDe};   /* D-191: tools/gerar-vitrine.mjs faz a prévia de cada modelo com o mesmo legDe/frDe do «Usar este modelo» */
 })();

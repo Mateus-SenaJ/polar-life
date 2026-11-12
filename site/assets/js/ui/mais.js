@@ -16,7 +16,7 @@ var REGRAS={
   'Recorte e posição':['Endireitar','Girar 90°','Grade de composição','Mostrar a foto inteira'],
   'Luz e cor':['Temperatura'],
   'Detalhe':['Realces','Sombras','Vinheta'],
-  'Estilo':['Itálico','Cor da inscrição'],
+  'Estilo':['Cor da inscrição'],   /* D-186: Itálico e Negrito ficam à vista, ao lado da fonte */
   'Posição':['Deslocar na vertical'],
   'Personalizar':['Faixa inferior','Margens laterais','Cantos'],
   'Medidas':['Largura da janela','Altura da janela','Margem lateral','Faixa superior','Faixa inferior','Cantos arredondados','Travar','Medidas manuais']

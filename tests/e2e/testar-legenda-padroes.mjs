@@ -53,9 +53,9 @@ const abrirAv = async p => {
   if (await p.locator('#lg-av').isHidden()) await p.click('#lg-av-t');
 };
 const st = (p, n) => p.evaluate(n => { const e = PLQ.ST()[n]; return JSON.parse(JSON.stringify({ pad: e.pad || null, pl: e.pl || null })); }, n);
-const linhasQuadro = p => p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent));
+const linhasQuadro = p => p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), e => e.textContent));
 const esperaPl = (p, n, i, v) => p.waitForFunction(a => { const e = PLQ.ST()[a[0]]; return e.pl && e.pl[a[1]] && e.pl[a[1]].v === a[2]; }, [n, i, v], { timeout: 15000 });
-const folhas = p => p.evaluate(() => [].map.call(document.querySelectorAll('#sheet .pol'), e => ({ n: e.getAttribute('data-n'), ml: [].map.call(e.querySelectorAll('.pol__mline'), m => m.textContent) })));
+const folhas = p => p.evaluate(() => [].map.call(document.querySelectorAll('#sheet .pol'), e => ({ n: e.getAttribute('data-n'), ml: [].map.call(e.querySelectorAll('.pol__mline, .pol__ml'), m => m.textContent) })));
 async function pdfTxt(p) {
   await p.goto(srv.url + 'app/editor/gerar/');
   await p.waitForFunction(() => !!window.PLGERADOR);
@@ -105,7 +105,7 @@ try {
   await p.click('label.seg__o:has(input[name=alvo][value="0"])');
   await p.evaluate(() => { const r = document.getElementById('r-ln.pt'); r.value = 12; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await p.waitForTimeout(300);
-  const tam = await p.evaluate(() => [document.querySelector('#cap-meta .lg-dt'), document.querySelector('#cap-meta .lg-lc')].map(e => parseFloat(getComputedStyle(e).fontSize)));
+  const tam = await p.evaluate(() => [document.querySelector('#cap-meta .lg-dt, #pq .lg-xl .lg-dt'), document.querySelector('#cap-meta .lg-lc, #pq .lg-xl .lg-lc')].map(e => parseFloat(getComputedStyle(e).fontSize)));
   ok(tam[0] > tam[1], 'a linha 1 (12) fica maior que a linha 2 (8): ' + tam);
 
   titulo('Tela = Folhas = PDF:');
@@ -190,7 +190,7 @@ try {
   await p2.click('#tab-legendas'); await p2.waitForSelector('#lg-av-t'); await p2.click('#lg-av-t');
   await p2.click('[data-sw=padon]');
   await p2.waitForFunction(() => PLQ.ST()[1].pl && PLQ.ST()[1].pl.length === 2, null, { timeout: 15000 });
-  const ex = await p2.evaluate(() => ({ pl: PLQ.ST()[1].pl.map(x => x.v), n: document.querySelectorAll('#cap-meta .lg-m').length }));
+  const ex = await p2.evaluate(() => ({ pl: PLQ.ST()[1].pl.map(x => x.v), n: document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x').length }));
   ok(ex.pl.length === 2 && ex.pl.every(v => typeof v === 'string'), 'exemplo: o padrão liga sem erro e as linhas são texto (' + JSON.stringify(ex.pl) + ')');
 } catch (e) { console.log('  ✘ erro: ' + e.stack); falhas.push(String(e)); }
 

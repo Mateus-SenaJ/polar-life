@@ -83,3 +83,29 @@
 .est-b{min-width:0}
 .lg-ln{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:8px}
 @media (max-width:420px){.lg-ln{grid-template-columns:1fr}}
+
+/* D-186: Fonte em lista suspensa, com Itálico e Negrito ao lado (sempre à vista). A lista abre logo abaixo do campo,
+   com busca, filtros (Todas · Favoritas · Recentes · Itálico e negrito) e grupos por categoria */
+.fdd__row{display:flex;align-items:stretch;gap:8px}
+.fdd__row .fsel{flex:1;min-width:0}
+.fdd__est{display:flex;gap:8px;flex:none}
+.est-ico{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:60px;min-height:52px;padding:4px 8px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-subtle);cursor:pointer;color:var(--black);font:inherit}
+.est-ico .ico{width:20px;height:20px}
+.est-ico__t{font-size:11px;line-height:1.2;font-weight:500}
+.est-ico[aria-pressed=true]{background:var(--black);color:var(--white);border-color:var(--black)}
+.est-ico:disabled{cursor:not-allowed;box-shadow:none;background:var(--surface-subtle);border-style:dashed}
+.est-ico:disabled .ico,.est-ico:disabled .est-ico__t{opacity:.5}
+.est-ico:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.fdd .fpick{margin-top:8px;box-shadow:var(--shadow-card)}
+.fdd .fcats{flex-wrap:wrap;overflow:visible}
+.fgrp{padding:12px 12px 4px;font-size:var(--rotulo-s);border-top:1px solid var(--outline-subtle)}
+.fgrp:first-child{border-top:0;padding-top:4px}
+.fitem__n{display:flex;align-items:center;gap:6px;min-width:0}
+.fvar{flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid var(--outline-subtle);border-radius:4px;font:500 11px/1 'Inter',system-ui,sans-serif}
+.fvar--i{font-style:italic}
+@media (max-width:420px){.est-ico{min-width:52px;padding:4px}.est-ico__t{font-size:10px}}
+/* D-186: o campo mostra a amostra e, embaixo, o nome da fonte (também no celular) */
+.fdd .fsel{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:8px;row-gap:0;align-items:center;padding:6px 12px}
+.fdd .fsel__s{grid-column:1;grid-row:1;font-size:20px}
+.fdd .fsel__n{grid-column:1;grid-row:2;display:block;max-width:none;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fdd .fsel>.ico{grid-column:2;grid-row:1 / span 2}

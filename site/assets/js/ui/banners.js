@@ -4,7 +4,7 @@
    Com movimento reduzido: sem rotação automática (troca instantânea pelos pontos) e sem botão de pausa. */
 (function(){
 'use strict';
-var ROTA=8000,PLBANNERS;
+var ROTA=5000,PLBANNERS;   /* D-190: passa mais rápido (antes 8 s) */
 
 function semMovimento(){try{return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){return false}}
 

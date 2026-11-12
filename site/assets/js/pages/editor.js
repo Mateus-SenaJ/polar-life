@@ -112,6 +112,7 @@ function polaroid(c,s,px,det){
     var yb=(FR.topo+FR.jh)*px;
     var cap,meta,tr='',mls='';
     var LGp=PLTEXTO.comPadrao(LG,c.f);   /* D-139 */
+    if(LGp&&LGp._pad)LGp=PLTEXTO.ajustarCorpo(LGp,FR,PLTEXTO.larguraTela);   /* D-192: corpo menor quando o texto passa da largura da foto */
     if(LGp){
       var DF=dadosFoto(c.f),dtx=LGp._pad?LGp._dt:(LGp.data.on&&DF.d?PLTEXTO.cxMeta(LGp,FMTD[LGp.data.fmt||0](DF.d)):''),lcx=LGp._pad?LGp._lc:(LGp.loc.on&&DF.c?PLTEXTO.cxMeta(LGp,localLG(LGp.loc,DF.c)):'');   /* D-148 */
       var t=LGp.txt.on?caixaLG(c.f.leg,LGp.txt.caixa):'';
@@ -127,7 +128,7 @@ function polaroid(c,s,px,det){
         var rws=(ordem==='loc-data'?[[LGp.loc,lcx],[LGp.data,dtx]]:[[LGp.data,dtx],[LGp.loc,lcx]]).filter(function(r){return r[1]});
         meta=rws.length?'<span class="pol__meta">'+rws.map(function(r){return'<span class="pol__mline" style="'+estLG(r[0],0,px)+'">'+esc(r[1])+'</span>'}).join('')+'</span>':''
       }
-      if(LGp.medida==='letras'&&(dtx||lcx)){      /* D-113 · MT-02: linhas nas posições exatas de PLTEXTO.linhas */
+      if((LGp.medida==='letras'||LGp._pad)&&(dtx||lcx)){      /* D-113 · D-192 · MT-02: linhas nas posições exatas de PLTEXTO.linhas */
         var LNS=PLTEXTO.linhas(LGp,FR,PLTEXTO.medTela,{temData:!!dtx,temLoc:!!lcx});
         var dX=dtx?'<time datetime="'+DF.iso+'" style="'+estLG(LGp.data,0,px,';line-height:0')+'">'+esc(dtx)+'</time>':'',
             lX=lcx?'<span style="'+estLG(LGp.loc,0,px,';line-height:0')+'">'+esc(lcx)+'</span>':'',
@@ -242,6 +243,7 @@ function resumoTxt(){
 }
 function render(){
   R=PLFOLHAS.paginar(cfg(),FR,FOTOS);
+  ['go','go2'].forEach(function(i){var g=$(i);if(g)g.hidden=vazio()});   /* D-188: sem fotos não há o que revisar; o LED da tela é «Adicionar fotos» */
   var N=R.sheets.length;if(cur>=N)cur=Math.max(0,N-1);
   var p=R.p,orient=(colOn()?C.orient:D.orient)==='paisagem'?'paisagem':'retrato';   /* D-176 */
   var outro=Object.assign({},D,{orient:D.orient==='paisagem'?'retrato':'paisagem'}),RO=PLFOLHAS.paginar(outro,FR,FOTOS),sug=$('sug-orient');if(sug){var eco=!R.erro&&!RO.erro&&RO.sheets.length<R.sheets.length;sug.hidden=!eco;if(eco){var no=outro.orient==='paisagem'?'Paisagem':'Retrato';$('sug-orient-t').textContent=no+': '+RO.g.n+' por folha · economiza '+(R.sheets.length-RO.sheets.length)+' folha'+(R.sheets.length-RO.sheets.length===1?'':'s');$('sug-orient-b').textContent='Usar '+no.toLowerCase();$('sug-orient-b').onclick=function(){D.orient=outro.orient;commit('orient')}}}
@@ -296,6 +298,7 @@ function render(){
 }
 function desenharMesa(){
   var st=$('stage'),sh=$('sheet'),p=R.p;
+  if(vazio()&&!R.erro&&desenharVazia(st,sh,p))return;   /* D-188: projeto real ainda sem fotos: o modelo com as molduras vazias */
   if(R.erro||!R.sheets.length){sh.className='sheet is-empty';   /* sem folha: papel pequeno demais ou projeto ainda sem fotos */var px0=Math.min(st.clientWidth*.7/p.w,st.clientHeight/p.h);sh.style.width=p.w*px0+'px';sh.style.height=p.h*px0+'px';sh.innerHTML='';sh.setAttribute('aria-label','Folha vazia. A polaroid não cabe neste papel.');return}
   sh.className='sheet';
   var px=Math.min((st.clientWidth-8)/p.w,(st.clientHeight-8)/p.h);if(!(px>0))px=2;
@@ -380,6 +383,31 @@ $('guias').onclick=function(){
 $('apply').onclick=function(){toast('Aplicado a '+NF+(NF===1?' foto':' fotos'))};
 $('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){window.PLPREVOO.abrir(this)};   /* T-18 · pré-voo */
+/* D-188: modelo primeiro, fotos depois. Sem fotos, a folha mostra o modelo com as molduras vazias e «Adicionar fotos»
+   (o único LED da tela, T8); na Colagem, a escolha volta direto para cá. */
+function vazio(){return REAL_ED&&!FOTOS.length}
+function irAdicionar(){try{if(colOn())sessionStorage.setItem('pl-volta','colagem');else sessionStorage.removeItem('pl-volta')}catch(e){}
+  var ir=function(){location.href='../adicionar-fotos/'};if(window.PLSESSAO&&PLSESSAO.salvarJa)PLSESSAO.salvarJa().then(ir,ir);else ir()}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-add-fotos]');if(!b)return;e.preventDefault();irAdicionar()});
+['rail-q','modes-q'].forEach(function(i){var a=$(i);if(a)a.addEventListener('click',function(e){if(vazio()){e.preventDefault();irAdicionar()}})});   /* sem fotos, o Quadro mostraria o exemplo */
+function polVazia(c,px){   /* moldura vazia na posição da célula: centro, giro da grade, rotação e escala (como no PDF) */
+  var s=c.s||1,w=FR.w*s*px,h=FR.h*s*px,ang=(c.giro?90:0)+(c.rot||0),cx=(c.x+c.w/2)*px,cy=(c.y+c.h/2)*px;
+  return'<div class="pol-vazia" data-add-fotos aria-hidden="true" style="left:'+(cx-w/2)+'px;top:'+(cy-h/2)+'px;width:'+w+'px;height:'+h+'px;transform:rotate('+ang+'deg)">'
+   +'<span class="pol-vazia__jan" style="left:'+FR.lado*s*px+'px;top:'+FR.topo*s*px+'px;width:'+FR.jw*s*px+'px;height:'+FR.jh*s*px+'px"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></div>'
+}
+function desenharVazia(st,sh,p){
+  var k=colOn()?Math.min(R.g.cap||0,16):(R.g.n||0),i,ph=[];if(k<1)return false;
+  for(i=1;i<=k;i++)ph.push({n:i,src:0,v:false,leg:'',m:null});
+  var RV=PLFOLHAS.paginar(cfg(),FR,ph),s0=RV.sheets[0];if(!s0)return false;
+  var px=Math.min((st.clientWidth-8)/p.w,(st.clientHeight-8)/p.h);if(!(px>0))px=2;
+  var fd=colOn()?fundoTela(p,px):{html:'',css:''},L0=colOn()?PLCOLAGEM.LAYOUTS.filter(function(l){return l.id===C.layout})[0]:null;
+  sh.className='sheet sheet--vazia';sh.style.width=p.w*px+'px';sh.style.height=p.h*px+'px';sh.style.background=fd.css||'';
+  sh.innerHTML=fd.html+s0.cells.map(function(c){return polVazia(c,px)}).join('')
+   +'<div class="vazia"><p class="vazia__t">'+(L0?'Colagem «'+L0.n+'»':'Folha de polaroids')+': escolha as fotos para preencher.</p>'
+   +'<button type="button" class="led-btn led-btn--light" data-add-fotos><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Adicionar fotos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button></div>';
+  sh.setAttribute('aria-label',(L0?'Colagem «'+L0.n+'»':'Folha de polaroids')+' sem fotos: '+k+' molduras vazias.');
+  return true
+}
 /* gancho para o pré-voo: mede a legenda em todas as folhas, desenhando-as fora da tela */
 window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,C:C,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
   foraTodas:function(){var t=0,box=document.createElement('div');box.setAttribute('aria-hidden','true');box.style.cssText='position:absolute;left:-99999px;top:0;visibility:hidden';document.body.appendChild(box);
@@ -421,7 +449,7 @@ function painelColagem(){
     +'<div class="f"><span class="f__l" id="col-ori-l">Orientação</span><div class="seg" role="radiogroup" aria-labelledby="col-ori-l">'+[['retrato','Retrato'],['paisagem','Paisagem']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-ori" value="'+t[0]+'"'+(C.orient===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>'
     +faixa('col-margem','Margem da colagem',C.margem,3,25,' mm')+'</section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fotos da colagem</h3><div class="sw-row"><div><span class="f__l">Usar todas as fotos</span><p class="f__h">'+(TODAS?'Todas as '+FOTOS.length+' fotos entram na colagem.':C.fotos.length+' de '+FOTOS.length+' fotos escolhidas.')+'</p></div><button type="button" class="sw" id="col-todas" role="switch" aria-checked="'+TODAS+'" aria-label="Usar todas as fotos"><span></span></button></div>'
-    +(TODAS?'':'<div class="foto-grid" id="col-sel">'+FOTOS.map(function(f){var on=C.fotos.indexOf(f.src)>=0,u=REAL_ED?PLFOTOTELA.tem(f.src,true):'';if(REAL_ED&&!u&&!PLFOTOTELA.falhou(f.src))pedirMini(f.src,false);return'<button type="button" class="foto-mini" data-col-foto="'+f.src+'" aria-pressed="'+on+'">'+(u?'<span style="padding-top:0">'+PLFOTOTELA.html(u,0,'cover')+'</span>':'')+'<small>'+(on?'✓ ':'')+'Foto '+f.n+'</small></button>'}).join('')+'</div><p class="f__h">Toque nas fotos para tirar ou pôr na colagem.</p>')+'</section>';
+    +(TODAS?'':'<div class="foto-grid" id="col-sel">'+FOTOS.map(function(f){var on=C.fotos.indexOf(f.src)>=0,u=REAL_ED?PLFOTOTELA.tem(f.src,true):'';if(REAL_ED&&!u&&!PLFOTOTELA.falhou(f.src))pedirMini(f.src,false);return'<button type="button" class="foto-mini" data-col-foto="'+f.src+'" aria-pressed="'+on+'">'+(u?'<span style="padding-top:0">'+PLFOTOTELA.html(u,0,'cover')+'</span>':'')+'<small>'+(on?'✓ ':'')+'Foto '+f.n+'</small></button>'}).join('')+'</div><p class="f__h">Toque nas fotos para tirar ou pôr na colagem.</p>')+'<button type="button" class="btn2" data-add-fotos><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Adicionar fotos à colagem</button></section>';   /* D-188 */
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Layout</h3><div class="f"><label class="f__l" for="col-layout">Disposição das polaroids</label><div class="sel"><select id="col-layout">'+PLCOLAGEM.LAYOUTS.map(function(l){return'<option value="'+l.id+'"'+(l.id===C.layout?' selected':'')+'>'+l.n+'</option>'}).join('')+'</select></div><p class="f__h" id="col-layout-h">'+L.d+' A medida da polaroid não muda: o que não cabe passa para a folha seguinte.</p></div></section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fundo da folha</h3><div class="f"><span class="f__l" id="col-tipo-l">Tipo de fundo</span><div class="seg" role="radiogroup" aria-labelledby="col-tipo-l" id="col-tipo">'+[['cor','Cor'],['gradiente','Degradê'],['foto','Foto']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-tipo" value="'+t[0]+'"'+(F.tipo===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>';
   function cor(id,rot,v){return'<div class="f"><label class="f__l" for="'+id+'">'+rot+'</label><div class="col-cor"><input type="color" id="'+id+'" value="'+v.toLowerCase()+'" aria-label="'+rot+'"><input type="text" id="'+id+'-hex" value="'+v+'" maxlength="7" inputmode="text" autocomplete="off" spellcheck="false" aria-label="'+rot+', código hexadecimal"></div></div>'}
@@ -463,7 +491,7 @@ function painelExtra(id){
       if(REAL_ED&&!u&&!PLFOTOTELA.falhou(f.src))pedirMini(f.src,false);
       return'<button type="button" class="foto-mini" data-abrir="'+f.n+'">'+(u?'<span style="padding-top:0">'+PLFOTOTELA.html(u,0,'cover')+'</span>':'')+'<small>Foto '+f.n+'</small></button>'
     }).join('');
-    h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Suas fotos · '+NF+'</h3><div class="foto-grid">'+minis+'</div><a class="btn2" href="../adicionar-fotos/">Adicionar fotos</a><p class="f__h">Abra uma foto para recortar, duplicar ou remover.</p></section>';
+    h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Suas fotos · '+NF+'</h3><div class="foto-grid">'+minis+'</div><a class="btn2" href="../adicionar-fotos/" data-add-fotos>Adicionar fotos</a><p class="f__h">Abra uma foto para recortar, duplicar ou remover.</p></section>';
   }
   if(id==='tab-ajustes'){var a=q[ids[0]]&&q[ids[0]].adj||{};h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Luz e cor</h3>'+window.PLCTRL.numero('ef-brilho','Brilho',a.brilho||0,-100,100,1,'')+window.PLCTRL.numero('ef-contraste','Contraste',a.contraste||0,-100,100,1,'')+'<div class="f"><label class="f__l" for="ef-filtro">Filtro</label><div class="sel"><select id="ef-filtro"><option value="original">Original</option><option value="pb">Preto e branco</option><option value="retro">Retrô</option><option value="cinema">Cinema</option></select></div></div><p class="f__h">As alterações respeitam ajustes individuais protegidos.</p></section>'}
   if(id==='tab-legendas'){h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Legenda</h3><div class="sw-row"><div><span class="f__l">Sem legendas</span><p class="f__h" id="orig-estado">'+(LG.original?'Ligado · só a foto e a moldura':'Desligado · textos visíveis')+'</p></div><button type="button" class="sw" id="ef-original" role="switch" aria-checked="'+!!LG.original+'" aria-label="Sem legendas"><span></span></button></div><div class="f"><span class="f__l" id="ef-al-l">Alinhamento</span><div class="seg" role="radiogroup" aria-labelledby="ef-al-l" id="ef-al"><label class="seg__o"><input type="radio" name="ef-al" value="esq"><span>Esquerda</span></label><label class="seg__o"><input type="radio" name="ef-al" value="centro"><span>Centro</span></label><label class="seg__o"><input type="radio" name="ef-al" value="dir"><span>Direita</span></label></div><p class="f__h">Sempre abaixo da foto, nas mesmas margens laterais.</p></div></section>'}

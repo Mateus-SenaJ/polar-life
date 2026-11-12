@@ -6,6 +6,10 @@ var tm,picked=[],salvando=Promise.resolve();
 var JA=(function(){try{var a=JSON.parse(sessionStorage.getItem('pl-fotos')||'null');return Array.isArray(a)&&window.PLPROJETOS&&PLPROJETOS.atual()?a:[]}catch(e){return []}})();
 var PROJ0=window.PLPROJETOS?PLPROJETOS.atual():'';
 var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
+/* D-188: veio da Colagem (modelo primeiro, fotos depois): ao continuar, volta direto para ela, com as fotos novas na colagem */
+var VOLTA=(function(){try{var c=JSON.parse(sessionStorage.getItem('pl-colagem')||'null');return sessionStorage.getItem('pl-volta')==='colagem'&&c&&c.ativo}catch(e){return false}})();
+function juntarColagem(){try{var c=JSON.parse(sessionStorage.getItem('pl-colagem')||'null');if(c&&Array.isArray(c.fotos)){for(var i=1;i<=picked.length;i++)if(c.fotos.indexOf(MAXJA+i)<0)c.fotos.push(MAXJA+i);sessionStorage.setItem('pl-colagem',JSON.stringify(c))}}catch(e){}}
+if(VOLTA){var vl=document.querySelector('.app-header a.btn2');if(vl)vl.href='../editor/#colagem';var hp=document.querySelector('.head p');if(hp)hp.textContent='As fotos escolhidas vão direto para a sua colagem. Elas continuam no seu aparelho.'}
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},Math.max(4000,m.length*60))}   /* aviso longo fica mais tempo para ler */
 
 /* D-181: «Outros lugares» saiu; toda forma nova de trazer fotos entra na caixa «Escolha suas fotos» (aparelho, câmera, Google Fotos). */
@@ -84,7 +88,7 @@ function firmarSelecao(){
   }catch(e){}
 }
 $('btn-device').addEventListener('click',function(){
-  if(picked.length){firmarSelecao();salvando.then(function(){return window.PLSESSAO?PLSESSAO.salvarJa():null}).catch(function(){}).then(function(){location.href='../processando/'});return}   /* 44: grava o projeto antes de sair */
+  if(picked.length){firmarSelecao();if(VOLTA)juntarColagem();salvando.then(function(){return window.PLSESSAO?PLSESSAO.salvarJa():null}).catch(function(){}).then(function(){try{sessionStorage.removeItem('pl-volta')}catch(e){}location.href=VOLTA?'../editor/#colagem':'../processando/'});return}   /* 44: grava o projeto antes de sair · D-188: da Colagem, volta direto para ela */
   $('f-device').click();
 });
 $('btn-camera').addEventListener('click',function(){

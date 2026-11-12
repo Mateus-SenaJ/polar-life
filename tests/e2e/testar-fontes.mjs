@@ -23,6 +23,8 @@ const CATALOGO = [ // [família, estilo, peso] · 24 fontes de legenda + as do s
   ['Fondamento', 'italic', 400], ['Fondamento'], ['Quintessential'], ['Felipa'], ['Marck Script'], ['Niconne'], ['Bilbo Swash Caps'],
   ['Almendra'], ['Almendra', 'normal', 700], ['Almendra', 'italic', 400], ['Almendra', 'italic', 700], ['Courgette'],
   ['Oregano'], ['Oregano', 'italic', 400], ['Merienda'], ['Merienda', 'normal', 700], ['Sofia'],
+  // D-186: com itálico e negrito reais
+['IBM Plex Mono', 'normal', 700], ['IBM Plex Mono', 'italic', 400], ['IBM Plex Mono', 'italic', 700], ['Space Mono', 'normal', 400], ['Space Mono', 'normal', 700], ['Space Mono', 'italic', 400], ['Space Mono', 'italic', 700], ['Playfair Display', 'normal', 400], ['Playfair Display', 'normal', 700], ['Playfair Display', 'italic', 700], ['Dancing Script', 'normal', 700], ['Josefin Sans', 'normal', 400], ['Josefin Sans', 'normal', 700], ['Josefin Sans', 'italic', 400], ['Josefin Sans', 'italic', 700], ['Merriweather', 'normal', 400], ['Merriweather', 'normal', 700], ['Merriweather', 'italic', 400], ['Merriweather', 'italic', 700], ['Alegreya', 'normal', 400], ['Alegreya', 'normal', 700], ['Alegreya', 'italic', 400], ['Alegreya', 'italic', 700], ['IBM Plex Mono', 'normal', 400], ['Playfair Display', 'italic', 400], ['Cormorant Garamond', 'normal', 700], ['Cormorant Garamond', 'italic', 700],
 ];
 
 const srv = await servir();

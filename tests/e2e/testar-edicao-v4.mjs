@@ -109,7 +109,7 @@ try {
   await p.evaluate(() => { const r = document.getElementById('r-av.esp'); r.value = .1; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await aguardarCommit(p);
   const tela = await p.evaluate(() => {
-    const lc = document.querySelector('#cap-meta .lg-m > *'), dt = document.querySelector('#cap-meta .lg-m:nth-child(2) > *');
+    const lc = document.querySelector('#cap-meta .lg-m > *, #pq .lg-xl .lg-l--x > *'), dt = document.querySelector('#cap-meta .lg-m:nth-child(2) > *, #pq .lg-xl .lg-l--x:nth-child(2) > *');
     return { inc: document.getElementById('pq').style.getPropertyValue('--inc'), lc: lc && lc.textContent, ls: lc && parseFloat(getComputedStyle(lc).letterSpacing) / parseFloat(getComputedStyle(lc).fontSize), dt: dt && dt.textContent, leg: PLQ.ST()[0].leg };
   });
   ok(tela.inc === '5deg', 'a polaroid do Quadro gira 5° (' + tela.inc + ')');
@@ -122,7 +122,7 @@ try {
   ok(!!lcPdf && perto(lcPdf.esp, 0.1, 1e-6), 'no PDF a localização sai «RECIFE - PE» com espaçamento 0,1 em');
   ok(!!capPdf && perto(capPdf.ang, 5, 0.01) && !!lcPdf && perto(lcPdf.ang, 5, 0.01), 'no PDF o bloco de texto gira 5° (' + (capPdf && capPdf.ang.toFixed(2)) + '°)');
   await p.goto(srv.url + 'app/editor/'); await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length >= 3); await p.waitForTimeout(700);
-  const folha = await p.evaluate(() => { const f = document.querySelector('#sheet .pol'); const m = f.querySelector('.pol__meta'); const c = f.querySelector('.pol__cap'); return { meta: m && m.textContent, cap: c && getComputedStyle(c).transform !== 'none', tr: (f.querySelector('figcaption') || f).getAttribute('data-preset') !== undefined, ls: m && m.querySelector('span,time') ? getComputedStyle(m.querySelector('span,time')).letterSpacing : '' }; });
+  const folha = await p.evaluate(() => { const f = document.querySelector('#sheet .pol'); const m = f.querySelector('.pol__meta') || f.querySelector('figcaption'); const c = f.querySelector('.pol__cap'); return { meta: m && m.textContent, cap: c && getComputedStyle(c).transform !== 'none', tr: (f.querySelector('figcaption') || f).getAttribute('data-preset') !== undefined, ls: m && m.querySelector('span,time') ? getComputedStyle(m.querySelector('span,time')).letterSpacing : '' }; });
   ok(/RECIFE - PE/.test(folha.meta || ''), 'nas Folhas a localização também sai em MAIÚSCULAS (' + folha.meta + ')');
 
   titulo('4 · Formatos de data e localização (selects em Avançado):');
@@ -161,7 +161,7 @@ try {
   const est = await p.evaluate(() => [...document.querySelectorAll('[data-est]')].map(b => ({ k: b.dataset.est, off: b.disabled })));
   ok(est.length === 2 && est.every(e => !e.off), 'Lora oferece Itálico e Negrito');
   await p.click('[data-est=b]'); await p.click('[data-est=it]'); await p.waitForTimeout(500);
-  const loraTela = await p.evaluate(async () => { await document.fonts.load('italic 700 20px Lora'); const e = document.querySelector('#cap-meta .lg-m > *'), c = getComputedStyle(e); return { w: c.fontWeight, s: c.fontStyle, ok: document.fonts.check('italic 700 20px Lora') }; });
+  const loraTela = await p.evaluate(async () => { await document.fonts.load('italic 700 20px Lora'); const e = document.querySelector('#cap-meta .lg-m > *, #pq .lg-xl .lg-l--x > *'), c = getComputedStyle(e); return { w: c.fontWeight, s: c.fontStyle, ok: document.fonts.check('italic 700 20px Lora') }; });
   ok(loraTela.w === '700' && loraTela.s === 'italic' && loraTela.ok, 'na tela: Lora em negrito itálico (' + JSON.stringify(loraTela) + ')');
   const itL = (await listaPdf(p)).find(i => i.txt === 'RECIFE - PE');
   ok((await listaPdf(p)).filter(i => /RECIFE|09\/03/.test(i.txt)).every(i => i.fonte.fam === 'Lora' && i.fonte.peso === 700 && i.fonte.it === true) && itL && itL.fonte.fam === 'Lora' && itL.fonte.peso === 700 && itL.fonte.it === true, 'na display list do PDF: as duas linhas em Lora 700 itálico');
@@ -169,7 +169,7 @@ try {
   ok(fpdf.nomes.some(n => /LoraItalico|Lora-700-Italico/.test(n)), 'o PDF embute a Lora 700 itálica (' + fpdf.nomes.filter(n => /Lora/.test(n)).join(', ') + ')');
   ok(!fpdf.avisos.some(a => /FonteReserva/.test(a.motivo)), 'o PDF não usou fonte reserva');
   await p.goto(srv.url + 'app/editor/'); await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length >= 3); await p.waitForTimeout(700);
-  const capF = await p.evaluate(() => { const c = document.querySelector('#sheet .pol .pol__mline'), s = c && getComputedStyle(c); return s && { w: s.fontWeight, s: s.fontStyle, f: s.fontFamily }; });
+  const capF = await p.evaluate(() => { const c = document.querySelector('#sheet .pol .pol__mline, #sheet .pol .pol__ml'), s = c && getComputedStyle(c); return s && { w: s.fontWeight, s: s.fontStyle, f: s.fontFamily }; });
   ok(capF && capF.w === '700' && capF.s === 'italic' && /Lora/.test(capF.f), 'nas Folhas: Lora em negrito itálico (' + JSON.stringify(capF) + ')');
   await abrirQuadro(p, 1); await p.click('#tab-legendas'); await p.waitForSelector('[data-fsel=ln]');
   const desabilita = async (fonte) => {
@@ -281,7 +281,7 @@ try {
   await m.reload();
   await m.waitForFunction(() => window.PLQ && PLQ.ST()[1] && PLQ.ST()[1].meta);
   await m.waitForTimeout(600);
-  const mig = await m.evaluate(() => ({ pad: PLQ.ST()[0].leg.pad, p1: PLQ.ST()[1].pl, p2: PLQ.ST()[2].pl, lin: [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent) }));
+  const mig = await m.evaluate(() => ({ pad: PLQ.ST()[0].leg.pad, p1: PLQ.ST()[1].pl, p2: PLQ.ST()[2].pl, lin: [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), e => e.textContent) }));
   ok(mig.pad && mig.pad.on && mig.pad.l[0].t === 'txt' && mig.pad.l[0].font === 'Kalam' && mig.pad.l[0].cor === 'azul' && mig.pad.l[0].pt === 14, 'a legenda antiga vira Linha 1 = Texto livre, com a fonte, a cor e o tamanho de antes (' + JSON.stringify(mig.pad && mig.pad.l[0]) + ')');
   ok(mig.p1[0].v === 'Dia de praia' && mig.p2[0].v === 'Outro dia', 'o texto livre de cada foto vira o texto da Linha 1');
   ok(mig.lin[0] === 'Dia de praia', 'a polaroid mostra o texto da foto (' + mig.lin + ')');

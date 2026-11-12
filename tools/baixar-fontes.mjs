@@ -57,6 +57,19 @@ const GH = [
   ['Oregano', 'oregano', 'Oregano-Regular.ttf', 400, 0], ['Oregano', 'oregano', 'Oregano-Italic.ttf', 400, 1],
   ['Merienda', 'merienda', 'Merienda[wght].ttf', 400, 0, { wght: 400 }], ['Merienda', 'merienda', 'Merienda[wght].ttf', 700, 0, { wght: 700 }],
   ['Sofia', 'sofia', 'Sofia-Regular.ttf', 400, 0],
+  // D-186: famílias com itálico e negrito reais (os botões Itálico e Negrito ao lado da fonte funcionam nelas)
+  ['IBM Plex Mono', 'ibmplexmono', 'IBMPlexMono-Bold.ttf', 700, 0], ['IBM Plex Mono', 'ibmplexmono', 'IBMPlexMono-Italic.ttf', 400, 1],
+  ['IBM Plex Mono', 'ibmplexmono', 'IBMPlexMono-BoldItalic.ttf', 700, 1],
+  ['Space Mono', 'spacemono', 'SpaceMono-Regular.ttf', 400, 0], ['Space Mono', 'spacemono', 'SpaceMono-Bold.ttf', 700, 0],
+  ['Space Mono', 'spacemono', 'SpaceMono-Italic.ttf', 400, 1], ['Space Mono', 'spacemono', 'SpaceMono-BoldItalic.ttf', 700, 1],
+  ['Playfair Display', 'playfairdisplay', 'PlayfairDisplay[wght].ttf', 400, 0, { wght: 400 }], ['Playfair Display', 'playfairdisplay', 'PlayfairDisplay[wght].ttf', 700, 0, { wght: 700 }],
+  ['Playfair Display', 'playfairdisplay', 'PlayfairDisplay-Italic[wght].ttf', 700, 1, { wght: 700 }],
+  ['Dancing Script', 'dancingscript', 'DancingScript[wght].ttf', 700, 0, { wght: 700 }],
+  ...[[400, 0], [700, 0], [400, 1], [700, 1]].flatMap(([w, i]) => [
+    ['Josefin Sans', 'josefinsans', i ? 'JosefinSans-Italic[wght].ttf' : 'JosefinSans[wght].ttf', w, i, { wght: w }],
+    ['Merriweather', 'merriweather', i ? 'Merriweather-Italic[opsz,wdth,wght].ttf' : 'Merriweather[opsz,wdth,wght].ttf', w, i, { wght: w, opsz: 18, wdth: 100 }],
+    ['Alegreya', 'alegreya', i ? 'Alegreya-Italic[wght].ttf' : 'Alegreya[wght].ttf', w, i, { wght: w }],
+  ]),
 ];
 const WEB_PULA = new Set(['inter-400', 'inter-500']);           // o site segue com os .woff atuais
 

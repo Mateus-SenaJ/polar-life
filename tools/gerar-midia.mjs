@@ -22,7 +22,7 @@ export const ESPERADOS = [
   'video/camera-foto.mp4', 'video/camera-foto.webm', 'video/camera-foto-poster.jpg',
   // fotos de pessoas para as polaroids
   'img/fotos/amigos-praia.jpg', 'img/fotos/amigos-trilha.jpg', 'img/fotos/casal-cidade.jpg', 'img/fotos/casal-por-do-sol.jpg',
-  'img/fotos/amigos-viagem.jpg', 'img/fotos/familia-aniversario.jpg', 'img/fotos/casal-cafe.jpg', 'img/fotos/familia-parque.jpg'
+  'img/fotos/amigos-estrada.jpg', 'img/fotos/amigos-acampamento.jpg', 'img/fotos/casal-noite.jpg', 'img/fotos/familia-por-do-sol.jpg'   // D-191: fotos reais CC0, sem aniversário
 ];
 const tem = ESPERADOS.filter(a => { const p = join(ASSETS, a); return existsSync(p) && statSync(p).size > 0; });
 const texto = `/* Gerado por tools/gerar-midia.mjs (npm run midia). Não edite à mão. */\nwindow.PLMIDIA_ARQUIVOS=${JSON.stringify(tem)};\n`;

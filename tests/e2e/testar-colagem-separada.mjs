@@ -13,7 +13,7 @@ const ruim = (m) => { falhas++; console.log('  ✘ ' + m); };
 const srv = await servir();
 const nav = await chromium.launch();
 const SCRIPTS = ['assets/vendor/pdf-lib.min.js', 'assets/vendor/fontkit.umd.min.js', 'assets/js/nucleo/legenda-texto.js', 'assets/js/nucleo/icc.js', 'assets/js/nucleo/gerador.js'];
-const nomes = ['praia', 'montanha', 'cidade', 'por-do-sol', 'aniversario', 'viagem'];
+const nomes = ['praia', 'montanha', 'cidade', 'por-do-sol', 'casal', 'viagem'];
 const dados = {}; for (const n of nomes) dados[n] = (await readFile(new URL('../../site/assets/img/fotos/' + n + '.jpg', import.meta.url))).toString('base64');
 const pt2mm = (v) => Math.round(v / 72 * 25.4);
 try {

@@ -77,7 +77,7 @@ async function pdfInfo(p) {
 }
 const capQuadro = p => p.evaluate(() => ({
   cap: (document.getElementById('cap') || {}).textContent,
-  meta: (document.getElementById('cap-meta') || {}).textContent,
+  meta: ((document.getElementById('cap-meta') || {}).textContent || '') + [].map.call(document.querySelectorAll('#pq .lg-xl .lg-l'), (e) => ' ' + e.textContent).join(''),   /* D-192: projeto real nas linhas absolutas */
   xl: [].map.call(document.querySelectorAll('.lg-xl .lg-l'), e => e.textContent),
   meta1: PLQ.ST()[1] ? PLQ.ST()[1].meta : null,
   metaAtual: PLQ.ST()[PLQ.cur()] ? PLQ.ST()[PLQ.cur()].meta : null,
@@ -87,9 +87,9 @@ const capQuadro = p => p.evaluate(() => ({
 const polFolhas = p => p.evaluate(() => [].map.call(document.querySelectorAll('#sheet .pol'), e => ({
   n: e.getAttribute('data-n'),
   cap: (e.querySelector('.pol__cap') || {}).textContent || '',
-  meta: (e.querySelector('.pol__meta') || {}).textContent || '',
+  meta: ((e.querySelector('.pol__meta') || {}).textContent || '') + [].map.call(e.querySelectorAll('.pol__ml'), (m) => ' ' + m.textContent).join(''),   /* D-192: linhas absolutas */
   ml: [].map.call(e.querySelectorAll('.pol__ml'), m => m.textContent),
-  lin: [].map.call(e.querySelectorAll('.pol__mline'), m => m.textContent),
+  lin: [].map.call(e.querySelectorAll('.pol__mline, .pol__ml'), m => m.textContent),
   foot: (document.querySelector('.sheet__foot') || {}).textContent || ''
 })));
 
@@ -120,10 +120,10 @@ try {
   await p.selectOption('#pad-t-0', 'txt'); await p.waitForTimeout(300);
   await p.fill('#pl-in-0', 'Praia do Forte');
   await p.waitForTimeout(300);
-  const comTexto = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent));
+  const comTexto = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), e => e.textContent));
   ok(comTexto[0] === 'Praia do Forte', 'a foto 1 mostra o texto digitado na Linha 1 (' + comTexto + ')');
   await p.click('#fnext'); await p.waitForTimeout(250);
-  const outra = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m'), e => e.textContent));
+  const outra = await p.evaluate(() => [].map.call(document.querySelectorAll('#cap-meta .lg-m, #pq .lg-xl .lg-l--x'), e => e.textContent));
   ok(!outra.includes('Praia do Forte'), 'a foto 2 continua sem esse texto (' + outra + ')');
   await p.click('#fprev'); await p.waitForTimeout(250);
 

@@ -33,17 +33,18 @@ try {
     m.criar <= m.limite ? ok(`${w}×${h}: sugestões e opções de criar visíveis sem rolar (até ${m.criar} px de ${m.limite})`) : ruim(`${w}×${h}: opções abaixo da dobra ${JSON.stringify(m)}`);
     m.sugTopo < m.criar && m.criar < m.projs && m.card ? ok(`${w}×${h}: ordem sugestões → criar → seus projetos`) : ruim(`${w}×${h}: ordem ${JSON.stringify(m)}`);
     if (w === 390) {
-      m.imgs === 6 && m.ok === 6 ? ok('6 sugestões, todas com foto real carregada') : ruim(`fotos das sugestões: ${m.ok}/${m.imgs}`);
+      m.imgs === 6 && m.ok === 6 ? ok('6 sugestões, todas com a imagem real do modelo carregada') : ruim(`fotos das sugestões: ${m.ok}/${m.imgs}`);
       m.led === 1 ? ok('um único botão LED na tela: «Polaroids para imprimir» (T8)') : ruim('LEDs na tela: ' + m.led);
     }
     erros.length === 0 || ruim('erros: ' + erros.join(' | '));
     await ctx.close();
   }
   /* cada sugestão cria o projeto certo */
-  for (const [sug, conf] of [['coracao', (s) => s.col && s.col.ativo && s.col.layout === 'coracao' && !s.fmt], ['casal', (s) => s.fmt === 'pocket' && !s.col], ['viagem', (s) => !s.fmt && !s.col]]) {
+  /* D-187/D-188: polaroids seguem para escolher as fotos; colagens abrem o modelo (fotos depois) */
+  for (const [sug, conf, rota] of [['coracao', (s) => s.col && s.col.ativo && s.col.layout === 'coracao' && s.col.orient === 'paisagem' && !s.fmt, 'editor'], ['casal', (s) => s.fmt === 'pocket' && !s.col, 'adicionar-fotos'], ['viagem', (s) => s.fmt === 'classico' && !s.col, 'adicionar-fotos'], ['cidade', (s) => s.fmt === 'imini' && !s.col, 'adicionar-fotos']]) {
     const { ctx, p } = await contexto(390, 844, false);
     await p.click(`[data-sug="${sug}"]`);
-    await p.waitForURL('**/app/adicionar-fotos/', { timeout: 8000 });
+    await p.waitForURL('**/app/' + rota + '/**', { timeout: 8000 });
     const s = await p.evaluate(async () => ({ fmt: sessionStorage.getItem('pl-fmt'), col: JSON.parse(sessionStorage.getItem('pl-colagem') || 'null'), nome: (await PLPROJETOS.listar()).find((x) => x.id === PLPROJETOS.atual()).nome }));
     conf(s) ? ok(`sugestão «${s.nome}»: projeto criado e segue para escolher as fotos`) : ruim(`sugestão ${sug}: ${JSON.stringify(s)}`);
     await ctx.close();
@@ -52,7 +53,7 @@ try {
     const { ctx, p } = await contexto(390, 844, false);
     const vazio = await p.evaluate(() => ({ txt: !document.getElementById('vazio').hidden, lista: document.getElementById('lista').hidden, hub: !!document.querySelector('.sug') }));
     vazio.txt && vazio.lista && vazio.hub ? ok('sem projetos: sugestões e opções continuam no topo e aparece o aviso «Nenhum projeto ainda»') : ruim('estado vazio: ' + JSON.stringify(vazio));
-    await p.click('#criar-colagem'); await p.waitForURL('**/app/adicionar-fotos/', { timeout: 8000 });
+    await p.click('#criar-colagem'); await p.waitForURL('**/app/editor/**', { timeout: 8000 });
     const c = await p.evaluate(() => JSON.parse(sessionStorage.getItem('pl-colagem') || 'null'));
     c && c.ativo ? ok('«Colagem» cria um projeto já no Modo Colagem') : ruim('Colagem: ' + JSON.stringify(c));
     await p.goto(srv.url + 'app/'); await p.click('#novo1'); await p.waitForURL('**/app/novo-projeto/', { timeout: 8000 });

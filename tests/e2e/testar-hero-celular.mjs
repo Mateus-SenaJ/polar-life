@@ -9,6 +9,8 @@ try {
   for (const [w, h] of [[390, 844], [375, 667], [360, 740], [412, 915], [768, 1024], [1280, 720], [1440, 900]]) {
     const p = await nav.newPage({ viewport: { width: w, height: h } });
     await p.goto(srv.url, { waitUntil: 'networkidle' });
+    /* mede depois da entrada (a frase sobe 28 px em 0,8 s): no CI a medida no meio da animação dava falso «abaixo da dobra» */
+    await p.evaluate(() => Promise.all([...document.querySelectorAll('.hero__copy > *, .hero__title .hl')].flatMap((e) => e.getAnimations()).map((a) => a.finished.catch(() => {}))));
     const m = await p.evaluate(() => {
       const a = document.querySelector('.hero__arte').getBoundingClientRect(), t = document.getElementById('titulo').getBoundingClientRect();
       const leds = [...document.querySelectorAll('a.led-btn')].map(e => getComputedStyle(e).textDecorationLine + getComputedStyle(e.querySelector('.btn-content') || e).textDecorationLine);

@@ -40,7 +40,7 @@ const quadro = p => p.evaluate(() => {
     oculto: cx.getAttribute('aria-hidden'), estado: cx.getAttribute('data-midia-estado'), classes: cx.className,
     attrs: { muted: v.muted || v.hasAttribute('muted'), loop: v.loop, inline: v.playsInline, autoplay: v.autoplay, preload: v.getAttribute('preload'), controls: v.controls, tab: v.getAttribute('tabindex') },
     poster: v.getAttribute('poster'), fontes: [...v.querySelectorAll('source')].map(s => s.getAttribute('src')), pausado: v.paused, src: v.currentSrc,
-    ajuste: getComputedStyle(v).objectFit, mascara: getComputedStyle(v).maskImage || getComputedStyle(v).webkitMaskImage,
+    ajuste: getComputedStyle(v).objectFit, mascara: (() => { const s1 = getComputedStyle(v); let m = s1.maskImage || s1.webkitMaskImage; if (!m || m === 'none') { const c = v.closest('.midia'), s2 = c && getComputedStyle(c); if (s2) m = s2.maskImage || s2.webkitMaskImage; } return m; })(),   /* D-189: no desktop a máscara fica no quadro (o vídeo é ampliado) */
     reserva: r ? { op: getComputedStyle(r).opacity, vis: getComputedStyle(r).visibility } : null
   };
 });

@@ -293,9 +293,12 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 .tab{min-width:44px;padding:0 4px}
 .logo,.logo-h{flex:none}
 
-/* D-171: no toque, o controle deslizante só se move com arrasto horizontal (PLDESLIZAR); o gesto vertical rola a tela */
-.desl-toque input[type=range]{pointer-events:none}
-.desl-toque :has(> input[type=range]){touch-action:pan-y}
+/* D-171 · D-185: o controle deslizante só se move com arrasto (PLDESLIZAR), no mouse, na caneta e no toque; clique ou toque
+   na barra não muda nada; no toque, o gesto vertical rola a tela */
+.desl input[type=range]{pointer-events:none}
+.desl :has(> input[type=range]){touch-action:pan-y;cursor:grab}
+.desl :has(> input[type=range]) input:not([type=range]){cursor:auto}
+.desl-arrasto,.desl-arrasto *{cursor:grabbing!important;user-select:none}
 
 /* D-172: seta «mais ajustes» no título de cada seção; avançados ocultos até abrir. Ponto laranja = ajuste escondido alterado */
 .mod__h--mais{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -310,3 +313,13 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 @media (prefers-reduced-motion:reduce){.mais .ico{transition:none}}
 /* D-172: com o Filtro recolhido, só 6 filtros à vista — o escolhido e o sugerido nunca somem */
 .mod--temmais:not(.mod--mais) .flt > li:nth-child(n+7):not(:has([aria-checked="true"])):not(:has(.ft__s)){display:none}
+/* D-188: modelo primeiro, fotos depois — molduras vazias na posição do modelo e o convite para adicionar as fotos */
+.sheet--vazia{cursor:pointer}
+.pol-vazia{position:absolute;background:var(--white);box-shadow:0 1px 3px rgb(0 0 0/.12);transform-origin:50% 50%}
+.pol-vazia__jan{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--surface-subtle);outline:1px dashed rgb(0 0 0/.35);outline-offset:-1px}
+.pol-vazia__jan .ico{width:40%;max-width:22px;height:auto;aspect-ratio:1;stroke:var(--blue)}
+.vazia{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:12px;width:min(320px,86%);padding:20px;background:var(--white);border-radius:16px;box-shadow:var(--shadow-card);text-align:center;cursor:default}
+.vazia__t{margin:0;font-size:15px;line-height:1.5}
+.vazia .led-btn{width:100%}
+.vazia{top:auto;bottom:4%;transform:translateX(-50%);gap:8px;width:min(300px,84%);padding:12px 16px;background:rgb(255 255 255/.94)}   /* o convite fica embaixo: o desenho do modelo continua à vista */
+.vazia__t{font-size:13px}

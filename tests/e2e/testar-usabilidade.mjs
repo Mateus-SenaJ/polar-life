@@ -11,7 +11,7 @@ const srv = await servir(); const nav = await chromium.launch();
 const ctx = await nav.newContext({ serviceWorkers: 'block' });
 await ctx.addInitScript(() => localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })));
 const p = await ctx.newPage(); p.setDefaultTimeout(20000);
-const nomes = ['praia', 'montanha', 'cidade', 'por-do-sol', 'aniversario', 'viagem'];
+const nomes = ['praia', 'montanha', 'cidade', 'por-do-sol', 'casal', 'viagem'];
 const dados = {}; for (const n of nomes) dados[n] = (await readFile(new URL('../../site/assets/img/fotos/' + n + '.jpg', import.meta.url))).toString('base64');
 await p.goto(srv.url + 'app/adicionar-fotos/');
 await p.evaluate(async ({ nomes, dados }) => {
