@@ -563,6 +563,31 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p2.close(); await c2.close();
 }
 
+/* ===================== I2 · e-mail e senha das contas de teste (D-196) ===================== */
+{
+  const c = await contexto(null), p = await c.newPage();
+  await p.goto(srv.url + 'app/entrar/'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
+  await p.reload(); await p.waitForFunction(() => !!window.PLCONTA);
+  (await p.evaluate(() => PLCONTA.entrarComSenha('admin@polarlife.test', 'senha-errada-123').then(() => 'entrou', (e) => e.tipo))) === 'incorreto'
+    ? ok('senha errada numa conta de teste: recusada, sem dizer se o e-mail existe') : ruim('senha errada entrou numa conta de teste');
+  /* o texto das senhas fica com o dono, fora do git: confere as 4 quando o arquivo existe (PL_CONTAS ou .local/contas-de-teste.txt) */
+  let txt = null;
+  try { txt = await readFile(process.env.PL_CONTAS || fileURLToPath(new URL('../../.local/contas-de-teste.txt', import.meta.url)), 'utf8'); } catch {}
+  const pares = txt ? [...txt.matchAll(/^\S.*?(\S+@polarlife\.test)\s+(\S{8,})\s*$/gm)].map((m) => [m[1], m[2]]) : [];
+  if (pares.length === 4) {
+    const perfis = await p.evaluate(async (L) => { const r = []; for (const [e, sn] of L) { try { const x = await PLCONTA.entrarComSenha(e, sn); r.push(x.perfil + ':' + PLCONTA.sessao().email); } catch (er) { r.push('falhou:' + e); } PLCONTA.sair(); } return r.join(); }, pares);
+    perfis === 'admin:admin@polarlife.test,gratis:gratis@polarlife.test,avulsa:folha@polarlife.test,pro:pro@polarlife.test'
+      ? ok('as 4 contas de teste entram com e-mail e senha, cada uma no seu plano') : ruim('senhas das contas de teste: ' + perfis);
+    const [ea, sa] = pares[0];
+    await p.goto(srv.url + 'app/entrar/'); await p.fill('#email', ea); await p.fill('#senha', sa); await p.click('#b-enviar');
+    await p.waitForURL('**/app/inicio/**', { timeout: 15000 }).then(() => ok('pela tela: a conta Admin entra com e-mail e senha e cai no Início'), () => ruim('pela tela: a conta Admin não entrou com e-mail e senha'));
+  } else console.log('  – senhas das contas de teste fora deste computador: conferência das 4 senhas pulada');
+  /* a senha criada neste aparelho («Esqueci a senha») vale no lugar da fixa */
+  const r3 = await p.evaluate(async () => { PLCONTA.entrarComo('pro'); await PLCONTA.definirSenha('outra-senha-123'); PLCONTA.sair(); const x = await PLCONTA.entrarComSenha('pro@polarlife.test', 'outra-senha-123'); return x.perfil; });
+  r3 === 'pro' ? ok('senha nova criada no aparelho vale no lugar da fixa') : ruim('senha nova no aparelho: ' + r3);
+  await c.close();
+}
+
 /* ===================== J · movimento reduzido (checklist §8.9) ===================== */
 {
   const c = await nav.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });

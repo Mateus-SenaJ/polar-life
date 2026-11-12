@@ -251,6 +251,14 @@ function cadastroPendente(){var sc=sessaoCodigo();if(sc)return !sc.email;return 
    por conta, em pl-contas-teste[email].senha = {alg, it, sal, hash}. 5 erros seguidos → espera de 30 s.
    Modo demonstração: «Esqueci a senha» usa o código de 6 dígitos mostrado na tela (D-116). */
 var IT_SENHA=150000,TENTA_SENHA={n:0,bloqueadoAte:0},SAL_VAZIO='00000000000000000000000000000000';
+/* D-196: as contas de teste também entram com e-mail e senha, em qualquer aparelho. Aqui fica só a derivação (PBKDF2 com sal);
+   a senha em texto fica com o dono, fora do git. Uma senha criada neste aparelho («Esqueci a senha») vale no lugar dela. */
+var SENHAS_PADRAO={
+  'admin@polarlife.test':{alg:'PBKDF2-SHA256',it:150000,sal:'55f38803f9c27d2ea2224fc972242b9d',hash:'c4fa801c539c9575beb761b2b75902267ee1f4fffabed90646e4d6123406d588'},
+  'gratis@polarlife.test':{alg:'PBKDF2-SHA256',it:150000,sal:'948d3bfd19bd4086c96e5fac053ffa3a',hash:'7317818f6c2e8207b4e7f15d0fc736b1d7c59e7c1edf79e2d2fe7c60c6e2415d'},
+  'folha@polarlife.test':{alg:'PBKDF2-SHA256',it:150000,sal:'640b2b32ea91bab82554e5eeed4789df',hash:'fa5376cc9bdee442dfb6231eb25b98e4676e206ce5e1cde2f62a22fc47bde5bb'},
+  'pro@polarlife.test':{alg:'PBKDF2-SHA256',it:150000,sal:'56dc2f2997264f438a7fc135375b77ea',hash:'00a05f89eeb9629079b1f0408190ff5706927af84753051b03ea827b327bbbf4'}
+};
 function paraHex(buf){var b=new Uint8Array(buf),h='',i,c;for(i=0;i<b.length;i++){c=b[i].toString(16);h+=c.length<2?'0'+c:c}return h}
 function deHex(h){var b=new Uint8Array(h.length/2),i;for(i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);return b}
 function derivarSenha(senha,sal,it){
@@ -281,13 +289,13 @@ function criarConta(d){ /* «Criar nova conta»: nome, e-mail, senha e aceite; j
 function entrarComSenha(emailBruto,senha){
   var email=normEmail(emailBruto);
   if(agora()<TENTA_SENHA.bloqueadoAte)return Promise.reject({tipo:'tentativas',esperaMs:TENTA_SENHA.bloqueadoAte-agora()});
-  var t=ler('pl-contas-teste',null)||{},c=t[email],reg=c&&c.senha;
+  var t=ler('pl-contas-teste',null)||{},c=t[email],reg=c&&c.senha||SENHAS_PADRAO[email]||null;
   /* conta sem senha ou inexistente: deriva do mesmo jeito e responde igual (não revela se o e-mail existe) */
   return derivarSenha(senha,reg?reg.sal:SAL_VAZIO,reg?reg.it:IT_SENHA).then(function(h){
     if(reg&&h===reg.hash){
-      TENTA_SENHA.n=0;
-      gravar('pl-conta',{email:email,nome:c.nome,provedor:'senha',entrouEm:agora()});
-      return {email:email,nome:c.nome,perfil:c.perfil||'gratis'}
+      TENTA_SENHA.n=0;var cc=contaDe(email);   /* conta de teste que nunca entrou neste aparelho: vem dos padrões */
+      gravar('pl-conta',{email:email,nome:cc.nome,provedor:'senha',entrouEm:agora()});
+      return {email:email,nome:cc.nome,perfil:cc.perfil||'gratis'}
     }
     TENTA_SENHA.n++;
     if(TENTA_SENHA.n>=5){TENTA_SENHA={n:0,bloqueadoAte:agora()+30000};return Promise.reject({tipo:'tentativas',esperaMs:30000})}
