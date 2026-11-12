@@ -55,7 +55,9 @@ function seo(h, s) {                                            // 35: SEO e sem
 }
 const VENDOR = join(SITE, 'assets', 'vendor');
 // D-147: endereços de NAVEGAÇÃO (a pessoa vai ao Google e volta), não recursos carregados pela página (T6)
-const NAVEGACAO = { 'assets/js/nucleo/google.js': ['https://accounts.google.com/o/oauth2/v2/auth', 'https://accounts.google.com'] };
+const NAVEGACAO = { 'assets/js/nucleo/google.js': ['https://accounts.google.com/o/oauth2/v2/auth', 'https://accounts.google.com', 'https://www.googleapis.com/auth/photospicker.mediaitems.readonly'],
+  // D-168: API REST do seletor do Google Fotos (chamada só quando a pessoa escolhe fotos do Google; CSP connect-src)
+  'assets/js/nucleo/google-fotos.js': ['https://photospicker.googleapis.com/v1/'] };
 for (const f of arquivos.filter(f => /\.(js|css)$/.test(f) && !f.startsWith(VENDOR))) {  // vendor: URLs só em comentários internos, sem requisição (T6)
   const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const nav = NAVEGACAO[rel(f).split('\\').join('/')] || [];

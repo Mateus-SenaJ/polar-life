@@ -512,6 +512,11 @@ function semSuporte(){ /* §1.4: sem localStorage */
 }
 /* volta do Google (D-147g): lida antes de tudo, e o token sai da barra de endereço */
 var GR=window.PLGOOGLE&&PLGOOGLE.lerRetorno();
+if(GR&&GR.fotos){   /* D-168: volta da permissão do Google Fotos — guarda o acesso só nesta aba e segue para a tela de fotos */
+  if(!GR.erro){try{sessionStorage.setItem('pl-gfotos',JSON.stringify({token:GR.token,expira:GR.expira}))}catch(e){}}
+  var vf=String(GR.voltar||'');if(!/^\/(?!\/)/.test(vf))vf=G?G.raiz()+'adicionar-fotos/':'../adicionar-fotos/';
+  location.replace(vf.split('#')[0]+(GR.erro?'#google-fotos-'+GR.erro:'#google-fotos'));
+}else{
 if(GR&&GR.voltar&&!voltar)voltar=GR.voltar;
 if(C&&G){
   if(!C.temLocalStorage())semSuporte();
@@ -525,5 +530,6 @@ if(C&&G){
   else renderEmail('');
 }else{
   document.documentElement.className+=' sem-js'
+}
 }
 })();

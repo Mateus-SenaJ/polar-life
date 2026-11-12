@@ -162,5 +162,33 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Tab'){var a=$('dlg-close'),z=$('dlg-pick');
     if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
 });
+/* D-168: Google Fotos pelo seletor oficial. Sem acesso nesta aba → pede a permissão (volta aqui com #google-fotos);
+   com acesso → abre o seletor do Google numa janela e as fotos escolhidas entram como as do aparelho. */
+(function(){
+  var b=$('btn-gfotos');if(!b)return;
+  if(!(window.PLGOOGLE&&PLGOOGLE.ativo()&&window.PLGFOTOS&&window.fetch)){b.hidden=true;return}
+  var ocupado=false;
+  function rotulo(t){b.lastChild.nodeValue=t}
+  b.addEventListener('click',function(){
+    if(ocupado)return;
+    if(!PLGFOTOS.conectado()){toast('Abrindo o Google para você escolher as fotos…');PLGOOGLE.iniciarFotos(location.pathname);return}
+    var j=null;try{j=window.open('about:blank','pl-google-fotos','width=980,height=760')}catch(e){}
+    ocupado=true;b.setAttribute('aria-busy','true');rotulo('Escolha as fotos na janela do Google…');
+    PLGFOTOS.escolher(j,function(fase,n,t){if(fase==='baixando')rotulo('Trazendo as fotos…');if(fase==='progresso')rotulo('Trazendo '+n+' de '+t+'…')})
+      .then(function(fs){
+        if(fs.length)receive(fs);
+        toast(fs.length?(fs.length===1?'1 foto do Google Fotos':fs.length+' fotos do Google Fotos')+(fs.falhas?' · '+fs.falhas+' não vieram':'')+(fs.videos?' · vídeos ficam de fora':''):'Nenhuma foto escolhida.')
+      },function(e){
+        var m={acesso:'O acesso ao Google Fotos expirou. Toque de novo para permitir.',tempo:'O tempo para escolher acabou. Tente de novo.'}[e&&e.erro]||'Não foi possível trazer as fotos do Google agora.';
+        toast(m)
+      }).then(function(){ocupado=false;b.removeAttribute('aria-busy');rotulo('Do Google Fotos')})
+  });
+  var h=location.hash;
+  if(/^#google-fotos/.test(h)){
+    try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+    if(h==='#google-fotos'&&PLGFOTOS.conectado()){toast('Google Fotos conectado. Toque em «Do Google Fotos» para escolher.');b.focus()}
+    else toast(h==='#google-fotos-cancelado'?'Você não permitiu o acesso ao Google Fotos.':'Não foi possível conectar ao Google Fotos.')
+  }
+})();
 window.addEventListener('hashchange',function(){location.reload()});
 })();

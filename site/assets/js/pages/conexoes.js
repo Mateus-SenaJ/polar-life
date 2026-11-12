@@ -15,7 +15,7 @@ var S=[
  {id:'camera',sec:'trazer',n:'Câmera',ic:'camera',e:'disp',a:'No celular, tire a foto na hora.'},
  {id:'apple',sec:'trazer',n:'Apple Fotos (iPhone e iPad)',ic:'aparelho',e:'disp',a:'No iPhone, escolha Biblioteca de Fotos no seletor. As fotos do iCloud que já aparecem na galeria funcionam.',t:'dev'},
  {id:'icloud',sec:'trazer',n:'iCloud Fotos (web)',ic:'nuvem',e:'ind',a:'Não há acesso por aqui. No iPhone ou iPad, toque em Do aparelho e escolha Biblioteca de Fotos.',g:'apple'},
- {id:'google',sec:'trazer',n:'Google Fotos',ic:'nuvem',e:'em2',a:'Você escolhe as fotos no Google. O Polar Life só recebe as selecionadas.'},
+ {id:'google',sec:'trazer',n:'Google Fotos',ic:'nuvem',e:'disp',a:'Você escolhe as fotos numa janela do próprio Google. Só as escolhidas vêm para este aparelho.'},
  {id:'nuvens',sec:'trazer',n:'Drive, Dropbox e OneDrive',ic:'nuvem',e:'em3',a:'Seletores oficiais de cada serviço, em versão futura.'},
  {id:'compartilhar',sec:'levar',n:'Compartilhar o arquivo',ic:'share',e:'disp',a:temShare?'Envie pelo menu do aparelho.':'Neste navegador o arquivo é baixado e você escolhe o aplicativo.',t:'saida'},
  {id:'instagram',sec:'levar',n:'Instagram',ic:'rede',e:'ind',a:'O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho. Para enviar, use Compartilhar ou baixe a imagem.',t:'rede',g:'rede'},

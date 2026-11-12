@@ -10,8 +10,22 @@ var AUTH='https://accounts.google.com/o/oauth2/v2/auth',CHAVE='pl-google-pedido'
 
 function aleatorio(){var b=new Uint8Array(16);window.crypto.getRandomValues(b);return Array.prototype.map.call(b,function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
 function ativo(){return !!(CLIENT_ID&&window.crypto&&window.crypto.getRandomValues&&window.sessionStorage)}
-/* a volta é sempre a própria tela de entrar, na raiz do site (Vercel ou GitHub Pages) */
-function retornoUrl(){return location.origin+location.pathname.replace(/[^\/]*$/,'')}
+/* a volta é sempre a tela de entrar (único endereço de retorno cadastrado no Google), de qualquer tela do app */
+function retornoUrl(){var p=location.pathname,i=p.indexOf('/app/');return location.origin+(i>=0?p.slice(0,i):p.replace(/\/[^\/]*$/,''))+'/app/entrar/'}
+var ESCOPO_FOTOS='https://www.googleapis.com/auth/photospicker.mediaitems.readonly';
+
+/* Google Fotos (D-168): pede só a permissão de ler as fotos que a pessoa escolher no seletor oficial do Google.
+   Volta à tela de entrar com um token de acesso de 1 h no fragmento; a tela de entrar o guarda na aba e segue para «voltar». */
+function iniciarFotos(voltar){
+  if(!ativo())return false;
+  var pedido={state:aleatorio(),tipo:'fotos',voltar:voltar||'',em:Date.now()};
+  try{sessionStorage.setItem(CHAVE,JSON.stringify(pedido))}catch(e){return false}
+  location.assign(AUTH+'?'+[
+    ['client_id',CLIENT_ID],['redirect_uri',retornoUrl()],['response_type','token'],
+    ['scope',ESCOPO_FOTOS],['state',pedido.state],['include_granted_scopes','true']
+  ].map(function(p){return p[0]+'='+encodeURIComponent(p[1])}).join('&'));
+  return true
+}
 
 function iniciar(voltar){
   if(!ativo())return false;
@@ -32,12 +46,18 @@ function b64url(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='
    Confere state, nonce, aud, iss, exp e e-mail verificado. A assinatura não é conferida aqui: a sessão é local
    (nenhum servidor confia neste token) e a CSP só permite conexões ao próprio site. */
 function lerRetorno(){
-  var h=location.hash||'';if(h.indexOf('id_token=')<0&&h.indexOf('error=')<0)return null;
+  var h=location.hash||'';if(h.indexOf('id_token=')<0&&h.indexOf('access_token=')<0&&h.indexOf('error=')<0)return null;
   var q={};h.slice(1).split('&').forEach(function(p){var i=p.indexOf('=');if(i>0)q[decodeURIComponent(p.slice(0,i))]=decodeURIComponent(p.slice(i+1).replace(/\+/g,' '))});
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}   /* tira o token da barra e do histórico */
   var pedido=null;try{pedido=JSON.parse(sessionStorage.getItem(CHAVE)||'null');sessionStorage.removeItem(CHAVE)}catch(e){}
-  if(q.error)return {erro:q.error==='access_denied'?'cancelado':'google'};
+  var fotos=!!(pedido&&pedido.tipo==='fotos');
+  if(q.error)return {erro:q.error==='access_denied'?'cancelado':'google',fotos:fotos,voltar:pedido&&pedido.voltar};
   if(!pedido||q.state!==pedido.state)return {erro:'estado'};
+  if(fotos){   /* D-168: token só com a permissão do seletor de fotos */
+    var esc=String(q.scope||'').split(' ');
+    if(!q.access_token||esc.indexOf(ESCOPO_FOTOS)<0)return {erro:'permissao',fotos:true,voltar:pedido.voltar};
+    return {fotos:true,token:String(q.access_token),expira:Date.now()+Math.max(60,Number(q.expires_in)||3600)*1000,voltar:pedido.voltar}
+  }
   var c;try{c=JSON.parse(b64url(String(q.id_token).split('.')[1]||''))}catch(e){return {erro:'token'}}
   var agoraS=Math.floor(Date.now()/1000);
   if(c.aud!==CLIENT_ID||(c.iss!=='https://accounts.google.com'&&c.iss!=='accounts.google.com')||!(c.exp>agoraS)||c.nonce!==pedido.nonce)return {erro:'token'};
@@ -45,6 +65,6 @@ function lerRetorno(){
   return {email:String(c.email).toLowerCase(),nome:String(c.name||c.given_name||'').trim(),voltar:pedido.voltar}
 }
 
-window.PLGOOGLE={ativo:ativo,iniciar:iniciar,lerRetorno:lerRetorno,retornoUrl:retornoUrl,
+window.PLGOOGLE={ativo:ativo,iniciar:iniciar,iniciarFotos:iniciarFotos,lerRetorno:lerRetorno,retornoUrl:retornoUrl,
   _definirId:function(id){CLIENT_ID=String(id||'')}};   /* só para testes */
 })();
