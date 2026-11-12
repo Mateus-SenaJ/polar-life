@@ -37,10 +37,24 @@ function paginar(s,fr,fotos){                                     /* mesma conta
 var FORMATOS={classico:{w:88,h:107,jh:76,lado:6,topo:6},mini:{w:60,h:73,jh:48,lado:6,topo:6},pocket:{w:66,h:99,jh:79,lado:3,topo:3},imini:{w:54,h:86,jh:62,lado:4,topo:5},isq:{w:72,h:86,jh:62,lado:5,topo:5},iwide:{w:108,h:86,jh:62,lado:4.5,topo:5}};
 function formatoInicial(){var v=null;try{v=sessionStorage.getItem('pl-fmt')}catch(e){}var f=v&&v!=='classico'&&FORMATOS.hasOwnProperty(v)?FORMATOS[v]:null;
   return f?{fmt:v,w:f.w,h:f.h,jh:f.jh,lado:f.lado,topo:f.topo,rad:.4,man:false,lock:true,ori:'v'}:null}
+/* D-176: as Folhas de polaroids e a Colagem têm estados separados (pl-folhas e pl-colagem). Um projeto antigo, com a
+   Colagem guardada dentro das Folhas (D-150), é migrado uma vez: a colagem vai para pl-colagem e as Folhas voltam ao normal. */
+function lerJ(k){try{return JSON.parse(sessionStorage.getItem(k)||'null')}catch(e){return null}}
+function migrar(){
+  var f=lerJ('pl-folhas');if(!f||typeof f!=='object'||!f.colagem)return;
+  try{if(!lerJ('pl-colagem'))sessionStorage.setItem('pl-colagem',JSON.stringify(f.colagem));delete f.colagem;sessionStorage.setItem('pl-folhas',JSON.stringify(f))}catch(e){}
+}
+function lerFolhas(){                               /* 30a: orientação da T-06 e, por cima, o que o editor salvou — nunca com colagem */
+  migrar();var d=Object.assign({},PADRAO);
+  try{if(sessionStorage.getItem('pl-orientacao')==='separar')d.separar=true}catch(e){}
+  var o=lerJ('pl-folhas');if(o&&(PAPEIS[o.papel]||o.papel==='custom'))d=Object.assign(d,o);
+  delete d.colagem;return d
+}
+function lerColagem(){migrar();var c=lerJ('pl-colagem')||{};return window.PLCOLAGEM?PLCOLAGEM.norm(c):c}
+function modoColagem(){migrar();var c=lerJ('pl-colagem');return !!(c&&c.ativo)}
 window.PLFOLHAS={FORMATOS:FORMATOS,formatoInicial:formatoInicial,MARGEM_MIN:3,PAPEIS:PAPEIS,PADRAO:PADRAO,papel:papel,grade:grade,melhor:melhor,contar:contar,paginar:paginar,
-  ler:function(){                                   /* 30a: orientação da T-06 e, por cima, o que o editor salvou */
-    var d=Object.assign({},PADRAO);
-    try{if(sessionStorage.getItem('pl-orientacao')==='separar')d.separar=true}catch(e){}
-    try{var o=JSON.parse(sessionStorage.getItem('pl-folhas')||'null');if(o&&(PAPEIS[o.papel]||o.papel==='custom'))d=Object.assign(d,o)}catch(e){}
-    return d}};
+  lerFolhas:lerFolhas,lerColagem:lerColagem,modoColagem:modoColagem,
+  ler:function(){                                   /* D-176: no modo Colagem, a folha da colagem; senão, as Folhas de polaroids */
+    var d=lerFolhas();
+    return modoColagem()&&window.PLCOLAGEM?PLCOLAGEM.config(d,lerColagem()):d}};
 })();

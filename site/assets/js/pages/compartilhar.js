@@ -7,7 +7,7 @@ var $=function(i){return document.getElementById(i)},tm;
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function pl(n,s,p){return n+' '+(n===1?s:p)}
 function fmt(m){return m>=1000?(m/1000).toFixed(1).replace('.',',')+' GB':m>=10?Math.round(m)+' MB':(Math.max(.1,Math.round(m*10)/10)+'').replace('.',',')+' MB'}
-function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}
   for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var estado=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 var A=null;try{A=JSON.parse(sessionStorage.getItem('pl-arquivos')||'null')}catch(e){}

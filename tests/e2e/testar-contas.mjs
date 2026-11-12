@@ -16,7 +16,7 @@ await mkdir(saida, { recursive: true });
 
 /* pré-voo válido (mesma chave() de exportar.js/gerar.js): djb2 de pl-quadro|pl-folhas vazios */
 const PREVOO = n => `(() => {
-  let t = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || ''), x = 5381;
+  let t = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || '') + '|' + (sessionStorage.getItem('pl-colagem') || ''), x = 5381;
   for (let i = 0; i < t.length; i++) x = ((x << 5) + x + t.charCodeAt(i)) | 0;
   sessionStorage.setItem('pl-prevoo', JSON.stringify({ ok: true, k: String(x), n: ${n}, fotos: 24, por: 4, papel: 'A4', w: 210, h: 297, orient: 'retrato' }));
   sessionStorage.setItem('pl-exportar', JSON.stringify({ f: 'pdf', lim: 150 }));

@@ -17,7 +17,7 @@ function plural(n,s,p){return n+' '+(n===1?s:p)}
 function sheets(){return Math.ceil(D.total/D.perSheet)}
 /* D-159: em projeto real, a previsão usa o formato e o papel escolhidos (mesma conta do editor, MT-02) */
 var PREV={papel:'A4',fmt:'Clássico 88 × 107 mm'};
-if(REAL&&window.PLFOLHAS){(function(){var s=PLFOLHAS.ler(),f=PLFOLHAS.formatoInicial()||PLFOLHAS.FORMATOS.classico,g=PLFOLHAS.melhor(s,PLFOLHAS.papel(s),f);
+if(REAL&&window.PLFOLHAS){(function(){var s=(PLFOLHAS.lerFolhas||PLFOLHAS.ler)(),f=PLFOLHAS.formatoInicial()||PLFOLHAS.FORMATOS.classico,g=PLFOLHAS.melhor(s,PLFOLHAS.papel(s),f);
   var NOMES={mini:'Mini quadrado',pocket:'Retro Pocket',imini:'Instax Mini',isq:'Instax Square',iwide:'Instax Wide'};
   if(g.n>0)D.perSheet=g.n;PREV.papel=PLFOLHAS.papel(s).n;PREV.fmt=(NOMES[f.fmt]||'Clássico')+' '+String(f.w).replace('.',',')+' × '+String(f.h).replace('.',',')+' mm'})()}
 function cell(l,v,s){return '<div><dt class="rotulo">'+l+'</dt><dd>'+v+(s?'<span>'+s+'</span>':'')+'</dd></div>'}

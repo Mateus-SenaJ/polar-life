@@ -3,7 +3,7 @@
 var $=function(i){return document.getElementById(i)},tm,ctrl=null,arquivos=[],P=null,O=null;
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function pl(n,s,p){return n+' '+(n===1?s:p)}
-function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 function fmt(m){return m>=1073741824?(m/1073741824).toFixed(1).replace('.',',')+' GB':m>=10485760?Math.round(m/1048576)+' MB':(Math.max(.1,Math.round(m/104857.6)/10)+'').replace('.',',')+' MB'}
 try{P=JSON.parse(sessionStorage.getItem('pl-prevoo')||'null');O=JSON.parse(sessionStorage.getItem('pl-exportar')||'null')}catch(e){}
 if(!P||!P.ok||P.k!==chave()||!O){$('corpo').hidden=true;$('trava').hidden=false;$('h1').textContent='Falta escolher o formato';$('sub').textContent='';return}

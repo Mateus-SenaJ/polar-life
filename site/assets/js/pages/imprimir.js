@@ -6,7 +6,7 @@ var $=function(i){return document.getElementById(i)},tm;
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function pl(n,s,p){return n+' '+(n===1?s:p)}
 function pc(n){return (Math.round(n*1000)/10).toFixed(1).replace('.',',')+'%'}
-function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var estado=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 var P=null;try{P=JSON.parse(sessionStorage.getItem('pl-prevoo')||'null')}catch(e){}
 var papel=P&&P.ok?P.papel:'A4',W=P&&P.ok?P.w:210,H=P&&P.ok?P.h:297;

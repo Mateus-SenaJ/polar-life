@@ -48,7 +48,7 @@ async function projetoGerado(p) {
 }
 async function abrirEditor(p, folhas) {
   await p.goto(srv.url + 'app/editor/');
-  await p.evaluate(f => { if (f) sessionStorage.setItem('pl-folhas', JSON.stringify(f)); else sessionStorage.removeItem('pl-folhas'); }, folhas);
+  await p.evaluate(f => { sessionStorage.removeItem('pl-colagem'); /* D-176: cada cenário começa sem colagem própria; a colagem dentro de pl-folhas migra */ if (f) sessionStorage.setItem('pl-folhas', JSON.stringify(f)); else sessionStorage.removeItem('pl-folhas'); }, folhas);
   await p.reload({ waitUntil: 'networkidle' });
   await p.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0 && !!window.PLEDITOR);
   await p.waitForTimeout(250);
@@ -152,10 +152,10 @@ try {
   ok(bl0.colagem === false && !bl0.em && !bl0.on && bl0.fol && bl0.memo === true, 'barra lateral: «Colagem» ativa (sem «Em breve»), «Folhas» marcada, «Lembranças» continua «Em breve»');
   ok(/aproveitamento/.test(bl0.card), 'Folhas comuns: o cartão continua mostrando o aproveitamento da grade');
   await p.click('#rail-colagem'); await p.waitForTimeout(200);
-  const bl1 = await p.evaluate(() => ({ on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), ativo: PLEDITOR.ctx().D.colagem.ativo, modo: document.getElementById('ctx-modo').textContent, saved: JSON.parse(sessionStorage.getItem('pl-folhas')).colagem.ativo }));
+  const bl1 = await p.evaluate(() => ({ on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), ativo: PLEDITOR.ctx().C.ativo, modo: document.getElementById('ctx-modo').textContent, saved: JSON.parse(sessionStorage.getItem('pl-colagem')).ativo }));
   ok(bl1.on && !bl1.fol && bl1.ativo === true && bl1.saved === true && bl1.modo === 'Modo Colagem', 'clicar em «Colagem» liga o Modo Colagem (e salva no projeto)');
   await p.click('#rail-folhas'); await p.waitForTimeout(200);
-  const bl2 = await p.evaluate(() => ({ on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), ativo: PLEDITOR.ctx().D.colagem.ativo }));
+  const bl2 = await p.evaluate(() => ({ on: document.getElementById('rail-colagem').classList.contains('is-on'), fol: document.getElementById('rail-folhas').classList.contains('is-on'), ativo: PLEDITOR.ctx().C.ativo }));
   ok(!bl2.on && bl2.fol && bl2.ativo === false, 'clicar em «Folhas» desliga o Modo Colagem');
   await abrirEditor(p, colagem('grade', { tipo: 'cor', cor: '#D84B20' }));
   {

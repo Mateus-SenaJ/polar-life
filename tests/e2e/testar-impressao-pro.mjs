@@ -82,7 +82,7 @@ try {
   erros.length === 0 ? ok('nenhum erro de página') : ruim('erros: ' + erros.join(' | '));
 
   /* tela de exportar: a opção existe, mostra o roteiro de impressão e leva até o botão de gerar */
-  await p.evaluate(() => { const k = (() => { let s = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || ''); let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return String(h); })(); sessionStorage.setItem('pl-prevoo', JSON.stringify({ ok: true, k, n: 1, fotos: 2, papel: 'A4', orient: 'retrato', w: 210, h: 297 })); });
+  await p.evaluate(() => { const k = (() => { let s = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || '') + '|' + (sessionStorage.getItem('pl-colagem') || ''); let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return String(h); })(); sessionStorage.setItem('pl-prevoo', JSON.stringify({ ok: true, k, n: 1, fotos: 2, papel: 'A4', orient: 'retrato', w: 210, h: 297 })); });
   await p.setViewportSize({ width: 390, height: 844 });
   await p.goto(srv.url + 'app/editor/exportar/', { waitUntil: 'networkidle' });
   const antes = await p.evaluate(() => { const r = document.getElementById('go').getBoundingClientRect(); return r.top > innerHeight; });

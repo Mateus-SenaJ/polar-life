@@ -13,7 +13,7 @@ function ok(v, m) { console.log((v ? '✔ ' : '✘ ') + m); if (!v) falhas.push(
 await page.addInitScript(() => {
   localStorage.setItem('pl-conta', JSON.stringify({ email: 'pro@polarlife.test', entrouEm: Date.now() })); // sessão de teste: a guarda de /app/ exige conta (D-123)
   /* mesma chave() de exportar.js/gerar.js: djb2 de pl-quadro + '|' + pl-folhas (vazios aqui) */
-  let t = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || ''), x = 5381;
+  let t = (sessionStorage.getItem('pl-quadro') || '') + '|' + (sessionStorage.getItem('pl-folhas') || '') + '|' + (sessionStorage.getItem('pl-colagem') || ''), x = 5381;
   for (let i = 0; i < t.length; i++) x = ((x << 5) + x + t.charCodeAt(i)) | 0;
   const h = String(x);
   sessionStorage.setItem('pl-prevoo', JSON.stringify({ ok: true, k: h, n: 6, fotos: 24, por: 4, papel: 'A4', w: 210, h: 297 }));

@@ -52,7 +52,8 @@ var NF=FOTOS.length;
 document.getElementById('scope-t').textContent='Alterando: Todas as fotos · '+NF;
 document.getElementById('apply-t').textContent='Aplicar ao lote · '+NF+(NF===1?' foto':' fotos');
 var DEF={papel:'A4',w:210,h:297,orient:'retrato',margem:3,gap:0,girar:true,align:'center',separar:false,guias:true,contorno:false,compr:'continua',cor:'preto',rodape:false,assin:true};
-var D=PLFOLHAS.ler();                                          /* T-06 (pl-orientacao) + o que o editor salvou (D-085) */
+var D=(PLFOLHAS.lerFolhas||PLFOLHAS.ler)();                     /* T-06 (pl-orientacao) + o que o editor salvou (D-085) · D-176: só as Folhas */
+var C=PLFOLHAS.lerColagem?PLFOLHAS.lerColagem():{};              /* D-176: a Colagem tem estado próprio (pl-colagem) */
 /* assinatura segue a regra do plano (D-123): Grátis e Folha avulsa sempre ligada; Pro pode desligar */
 var PLN=window.PLCONTA&&PLCONTA.plano?PLCONTA.plano():null;
 if(PLN&&!PLN.assinaturaPodeDesligar)D.assin=true;
@@ -60,7 +61,7 @@ else if(PLN&&PLN.assinaturaDesligada){try{var _f=JSON.parse(sessionStorage.getIt
 var COR={preto:'#000000',azul:'#006194',laranja:'#FD761A'};
 
 /* ---------- estado inicial: escolha da T-06 e estados de revisão por hash ---------- */
-function salvaD(){try{sessionStorage.setItem('pl-folhas',JSON.stringify(D));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
+function salvaD(){try{sessionStorage.setItem('pl-folhas',JSON.stringify(D));sessionStorage.setItem('pl-colagem',JSON.stringify(C));if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 var est=(location.hash.match(/^#estado-([\w-]+)$/)||[])[1];
 if(est==='parcial')D.separar=true;
 if(est==='nao-cabe')D.papel='10x15';
@@ -174,10 +175,12 @@ function linhas(sh,p,px){                                          /* guias de c
   return o+'</svg>'
 }
 /* ---------- Modo Colagem (D-150 a D-152): fundo + posições vindas de PLCOLAGEM, as mesmas do PDF (MT-02) ---------- */
-function colOn(){return !!(D.colagem&&D.colagem.ativo&&window.PLCOLAGEM)}
+function colOn(){return !!(C&&C.ativo&&window.PLCOLAGEM)}
+function cfg(){return colOn()?PLCOLAGEM.config(D,C):D}
+function COL(){return C}         /* D-176: a folha que está na tela — Colagem ou Folhas, nunca misturadas */
 function fundoTela(p,px){
   if(!colOn())return{css:'',html:''};
-  var F=PLCOLAGEM.fundo(D.colagem,FOTOS,REAL_ED);
+  var F=PLCOLAGEM.fundo(C,FOTOS,REAL_ED);
   if(F.tipo==='cor')return{css:F.cor,html:''};
   if(F.tipo==='gradiente')return{css:'linear-gradient('+F.ang+'deg,'+F.cor+','+F.cor2+')',html:''};
   var u=PLFOTOTELA.tem(F.src,true);
@@ -192,7 +195,7 @@ function desenhar(el,sh,p,px,det,idx,total){
     if(defs)fs='<svg width="0" height="0" aria-hidden="true">'+defs+'</svg>';
   }
   var h=fd.html+fs+sh.cells.map(function(c){return polaroid(c,sh,px,det)}).join('')+linhas(sh,p,px);
-  if(det&&D.rodape&&px>1.2)h+='<div class="sheet__foot" style="bottom:'+Math.max(1,D.margem/2-1.2)*px+'px;font-size:'+2.2*px+'px">'+NOME+' · Folha '+(idx+1)+' de '+total+'</div>';
+  if(det&&!colOn()&&D.rodape&&px>1.2)h+='<div class="sheet__foot" style="bottom:'+Math.max(1,D.margem/2-1.2)*px+'px;font-size:'+2.2*px+'px">'+NOME+' · Folha '+(idx+1)+' de '+total+'</div>';
   el.style.width=p.w*px+'px';el.style.height=p.h*px+'px';el.style.setProperty('--mm',px+'px');el.style.background=fd.css;el.innerHTML=h;
   if(det)ajustarLeg(el,px)
 }
@@ -226,16 +229,17 @@ function ajustarLeg(el,px){
 }
 
 /* ---------- estado e interface ---------- */
-var R,cur=0,hist=[JSON.stringify(D)],hi=0,lastK='',lastT=0;
+function snapHist(){return JSON.stringify({d:D,c:C})}                   /* D-176: o desfazer cobre Folhas e Colagem */
+var R,cur=0,hist=[snapHist()],hi=0,lastK='',lastT=0;
 function resumoTxt(){
   if(R.erro)return'A polaroid não cabe neste papel';
   if(R.colagem){var n=R.g.n,f=R.sheets.length;return f?n+(n===1?' polaroid':' polaroids')+' por folha · '+f+(f===1?' folha':' folhas'):'Sem fotos para a colagem'}   /* D-150: a contagem é a do layout (PLCOLAGEM), não a grade de Folhas */
   return R.g.n+' por folha · '+R.sheets.length+' folhas · aproveitamento '+aprov(R)+'%'
 }
 function render(){
-  R=PLFOLHAS.paginar(D,FR,FOTOS);
+  R=PLFOLHAS.paginar(cfg(),FR,FOTOS);
   var N=R.sheets.length;if(cur>=N)cur=Math.max(0,N-1);
-  var p=R.p,orient=D.orient==='paisagem'?'paisagem':'retrato';
+  var p=R.p,orient=(colOn()?C.orient:D.orient)==='paisagem'?'paisagem':'retrato';   /* D-176 */
   var outro=Object.assign({},D,{orient:D.orient==='paisagem'?'retrato':'paisagem'}),RO=PLFOLHAS.paginar(outro,FR,FOTOS),sug=$('sug-orient');if(sug){var eco=!R.erro&&!RO.erro&&RO.sheets.length<R.sheets.length;sug.hidden=!eco;if(eco){var no=outro.orient==='paisagem'?'Paisagem':'Retrato';$('sug-orient-t').textContent=no+': '+RO.g.n+' por folha · economiza '+(R.sheets.length-RO.sheets.length)+' folha'+(R.sheets.length-RO.sheets.length===1?'':'s');$('sug-orient-b').textContent='Usar '+no.toLowerCase();$('sug-orient-b').onclick=function(){D.orient=outro.orient;commit('orient')}}}
   /* campos */
   var sel=$('papel');if(!sel.options.length){[['A4','A4 (210 × 297 mm)'],['A3','A3 (297 × 420 mm)'],['A5','A5 (148 × 210 mm)'],['13x18','13 × 18 cm (130 × 180 mm)'],['10x15','10 × 15 cm (100 × 150 mm)'],['custom','Personalizado (50–1000 mm)']].forEach(function(o){var e=document.createElement('option');e.value=o[0];sel.appendChild(e)})}
@@ -321,15 +325,15 @@ var toqueX;$('stage').addEventListener('pointerdown',function(e){toqueX=e.client
 function commit(k){
   var antes=R.sheets.length;
   render();
-  var s=JSON.stringify(D),now=Date.now();
+  var s=snapHist(),now=Date.now();
   if(s===hist[hi])return;
   if(k&&k===lastK&&now-lastT<700&&hi>0){hist[hi]=s}else{hist=hist.slice(0,hi+1);hist.push(s);hi++}
   lastK=k;lastT=now;salvaD();
   render();
   var dep=R.sheets.length;
-  if(!R.erro&&antes&&dep&&antes!==dep)toast(antes+' folhas → '+dep+' folhas',true)
+  if(k!=='modo'&&!R.erro&&antes&&dep&&antes!==dep)toast(antes+' folhas → '+dep+' folhas',true)
 }
-function aplicarHist(j){hi=j;D=JSON.parse(hist[hi]);lastK='';salvaD();render()}
+function aplicarHist(j){hi=j;var o=JSON.parse(hist[hi]);D=o.d;C=o.c;lastK='';salvaD();render()}
 function desfazer(){if(hi>0){var a=R.sheets.length;aplicarHist(hi-1);toast('Alteração desfeita')}}
 $('undo').onclick=desfazer;$('redo').onclick=function(){if(hi<hist.length-1){aplicarHist(hi+1);toast('Alteração refeita')}};
 $('toast-undo').onclick=function(){if(hi>0){aplicarHist(hi-1);toast('Alteração desfeita')}};
@@ -373,7 +377,7 @@ $('apply').onclick=function(){toast('Aplicado a '+NF+(NF===1?' foto':' fotos'))}
 $('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
 $('go').onclick=$('go2').onclick=function(){window.PLPREVOO.abrir(this)};   /* T-18 · pré-voo */
 /* gancho para o pré-voo: mede a legenda em todas as folhas, desenhando-as fora da tela */
-window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
+window.PLEDITOR={toast:toast,ctx:function(){return{R:R,D:D,C:C,FR:FR,FOTOS:FOTOS,LG:LG,aprov:aprov,ppi:ppiDe,
   foraTodas:function(){var t=0,box=document.createElement('div');box.setAttribute('aria-hidden','true');box.style.cssText='position:absolute;left:-99999px;top:0;visibility:hidden';document.body.appendChild(box);
     R.sheets.forEach(function(sh,i){var el=document.createElement('div');el.className='sheet';el.style.position='relative';box.appendChild(el);desenhar(el,sh,R.p,4,true,i,R.sheets.length);t+=FORA});
     document.body.removeChild(box);return t}}}};
@@ -400,13 +404,20 @@ function quadro(){try{var q=JSON.parse(sessionStorage.getItem('pl-quadro')||'nul
 function salvarQuadro(q){q[0]=q[0]||{};q[0].leg=LG;q[0].fr=FR;q[0].nome=REAL_ED?NOME:null;EST_Q=q;try{sessionStorage.setItem('pl-quadro',JSON.stringify(q));sessionStorage.removeItem('pl-fmt');   /* D-159: a moldura já está no projeto */if(window.PLSESSAO)PLSESSAO.agendar()}catch(e){}}
 function escopo(){var n=alvo().length;$('scope-t').textContent='Alterando: '+(ESCOPO==='folha'?'Esta folha':'Todas as fotos')+' · '+n;var a=$('escopo-ajuda');if(a)a.textContent=ESCOPO==='folha'?'Somente as '+n+' fotos desta folha.':'Todas as '+n+' fotos do projeto.'}
 /* ---------- aba Colagem (D-150 a D-152) ---------- */
-function modoColagem(ligar){return function(e){if(e)e.preventDefault();if(colOn()===ligar)return;colSet(function(c){c.ativo=ligar});if(ABA==='tab-colagem')painelExtra(ABA)}}
+function modoColagem(ligar){return function(e){if(e)e.preventDefault();if(colOn()===ligar)return;colSet(function(c){c.ativo=ligar},'modo');abasDoModo()}}
 ['rail-folhas','modes-folhas'].forEach(function(i){$(i).onclick=modoColagem(false)});['rail-colagem','modes-colagem'].forEach(function(i){$(i).onclick=modoColagem(true)});
 if(location.hash==='#colagem')setTimeout(function(){modoColagem(true)();try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}},0);   /* D-161: «Colagem» no Quadro abre as Folhas já no modo Colagem */
-function colSet(fn,k){D.colagem=PLCOLAGEM.norm(D.colagem);fn(D.colagem);D.colagem=PLCOLAGEM.norm(D.colagem);commit(k||'colagem')}
+function colSet(fn,k){C=PLCOLAGEM.norm(C);fn(C);C=PLCOLAGEM.norm(C);commit(k||'colagem')}
 function painelColagem(){
-  var C=PLCOLAGEM.norm(D.colagem),F=C.fundo,h='',L=PLCOLAGEM.LAYOUTS.filter(function(l){return l.id===C.layout})[0];
-  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Modo Colagem</h3><div class="sw-row"><div><span class="f__l">Usar Colagem</span><p class="f__h" id="col-estado">'+(C.ativo?'Ligado · polaroids compostas sobre um fundo, sem guias de corte':'Desligado · folhas em grade para recortar')+'</p></div><button type="button" class="sw" id="col-ativo" role="switch" aria-checked="'+C.ativo+'" aria-label="Usar Colagem"><span></span></button></div></section>';
+  var C=PLCOLAGEM.norm(COL()),F=C.fundo,h='',L=PLCOLAGEM.LAYOUTS.filter(function(l){return l.id===C.layout})[0];
+  /* D-176: tamanho próprio da colagem (não mexe no papel das Folhas) e escolha das fotos que entram */
+  var PE=PLCOLAGEM.PECAS,TODAS=!C.fotos;
+  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Tamanho da colagem</h3><p class="f__h">A colagem tem papel próprio: as Folhas de polaroids para recortar continuam como estão.</p>'
+    +'<div class="f"><label class="f__l" for="col-peca">Papel da colagem</label><div class="sel"><select id="col-peca">'+Object.keys(PE).map(function(k){return'<option value="'+k+'"'+(k===C.peca?' selected':'')+'>'+PE[k].n+' ('+PE[k].w+' × '+PE[k].h+' mm)</option>'}).join('')+'</select></div></div>'
+    +'<div class="f"><span class="f__l" id="col-ori-l">Orientação</span><div class="seg" role="radiogroup" aria-labelledby="col-ori-l">'+[['retrato','Retrato'],['paisagem','Paisagem']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-ori" value="'+t[0]+'"'+(C.orient===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>'
+    +faixa('col-margem','Margem da colagem',C.margem,3,25,' mm')+'</section>';
+  h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fotos da colagem</h3><div class="sw-row"><div><span class="f__l">Usar todas as fotos</span><p class="f__h">'+(TODAS?'Todas as '+FOTOS.length+' fotos entram na colagem.':C.fotos.length+' de '+FOTOS.length+' fotos escolhidas.')+'</p></div><button type="button" class="sw" id="col-todas" role="switch" aria-checked="'+TODAS+'" aria-label="Usar todas as fotos"><span></span></button></div>'
+    +(TODAS?'':'<div class="foto-grid" id="col-sel">'+FOTOS.map(function(f){var on=C.fotos.indexOf(f.src)>=0,u=REAL_ED?PLFOTOTELA.tem(f.src,true):'';if(REAL_ED&&!u&&!PLFOTOTELA.falhou(f.src))pedirMini(f.src,false);return'<button type="button" class="foto-mini" data-col-foto="'+f.src+'" aria-pressed="'+on+'">'+(u?'<span style="padding-top:0">'+PLFOTOTELA.html(u,0,'cover')+'</span>':'')+'<small>'+(on?'✓ ':'')+'Foto '+f.n+'</small></button>'}).join('')+'</div><p class="f__h">Toque nas fotos para tirar ou pôr na colagem.</p>')+'</section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Layout</h3><div class="f"><label class="f__l" for="col-layout">Disposição das polaroids</label><div class="sel"><select id="col-layout">'+PLCOLAGEM.LAYOUTS.map(function(l){return'<option value="'+l.id+'"'+(l.id===C.layout?' selected':'')+'>'+l.n+'</option>'}).join('')+'</select></div><p class="f__h" id="col-layout-h">'+L.d+' A medida da polaroid não muda: o que não cabe passa para a folha seguinte.</p></div></section>';
   h+='<section class="mod"><h3 class="mod__h rotulo rotulo--m">Fundo da folha</h3><div class="f"><span class="f__l" id="col-tipo-l">Tipo de fundo</span><div class="seg" role="radiogroup" aria-labelledby="col-tipo-l" id="col-tipo">'+[['cor','Cor'],['gradiente','Degradê'],['foto','Foto']].map(function(t){return'<label class="seg__o"><input type="radio" name="col-tipo" value="'+t[0]+'"'+(F.tipo===t[0]?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div></div>';
   function cor(id,rot,v){return'<div class="f"><label class="f__l" for="'+id+'">'+rot+'</label><div class="col-cor"><input type="color" id="'+id+'" value="'+v.toLowerCase()+'" aria-label="'+rot+'"><input type="text" id="'+id+'-hex" value="'+v+'" maxlength="7" inputmode="text" autocomplete="off" spellcheck="false" aria-label="'+rot+', código hexadecimal"></div></div>'}
@@ -424,7 +435,11 @@ function painelColagem(){
 }
 function ligaColagem(id){
   var P=$('painel-extra'),q=function(s){return P.querySelector(s)};
-  q('#col-ativo').onclick=function(){colSet(function(c){c.ativo=!c.ativo});painelExtra(id)};
+  var pc=q('#col-peca');if(pc)pc.onchange=function(){var v=this.value;colSet(function(c){c.peca=v});painelExtra(id)};
+  [].forEach.call(P.querySelectorAll('[name=col-ori]'),function(r){r.onchange=function(){var v=this.value;colSet(function(c){c.orient=v});painelExtra(id)}});
+  var mg=q('#col-margem');if(mg)mg.oninput=function(){q('#col-margem-v').textContent=mg.value+' mm';colSet(function(c){c.margem=+mg.value},'col-margem')};
+  var td=q('#col-todas');if(td)td.onclick=function(){colSet(function(c){c.fotos=c.fotos?null:FOTOS.map(function(f){return f.src})});painelExtra(id)};
+  [].forEach.call(P.querySelectorAll('[data-col-foto]'),function(b){b.onclick=function(){var v=+b.getAttribute('data-col-foto');colSet(function(c){var a=c.fotos||[],i=a.indexOf(v);if(i>=0){if(a.length>1)a.splice(i,1)}else a.push(v);c.fotos=FOTOS.map(function(f){return f.src}).filter(function(x){return a.indexOf(x)>=0})});painelExtra(id)}});
   q('#col-layout').onchange=function(){var v=this.value;colSet(function(c){c.layout=v});painelExtra(id)};
   [].forEach.call(P.querySelectorAll('[name=col-tipo]'),function(r){r.onchange=function(){var v=this.value;colSet(function(c){c.fundo.tipo=v});painelExtra(id)}});
   function cor(i,k){var a=q('#'+i),b=q('#'+i+'-hex');if(!a)return;
@@ -463,7 +478,11 @@ function painelExtra(id){
   [].forEach.call($('painel-extra').querySelectorAll('[data-abrir]'),function(b){b.onclick=function(){location.href='quadro/#foto-'+b.getAttribute('data-abrir')}})
 }
 function aba(t){ABA=t.id;tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});var papel=t.id==='tab-papel';$('p-papel').hidden=!papel;$('p-outra').hidden=papel;$('p-outra').setAttribute('aria-labelledby',t.id);if(!papel)painelExtra(t.id)}
-tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
+tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:-1;if(j<0)return;j=(j+tabs.length)%tabs.length;for(var n=0;tabs[j].hidden&&n<tabs.length;n++)j=(j+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}});
+/* D-176: no modo Colagem a aba «Papel» (das Folhas) dá lugar à aba «Colagem»; nas Folhas, o contrário */
+function abasDoModo(){var co=colOn(),tp=$('tab-papel'),tc=$('tab-colagem');if(!tp||!tc)return;tp.hidden=co;tc.hidden=!co;
+  if(co&&ABA!=='tab-colagem'&&(ABA==='tab-papel'||!ABA||colOn()))aba(tc);else if(!co&&ABA==='tab-colagem')aba(tp)}
+abasDoModo();
 
 /* tablet: inspetor deslizante · celular: painel inferior com 25%, 50% e 85% */
 var insp=$('insp'),content=$('main'),SN=[25,50,85],sn=0,mq=window.matchMedia('(max-width:767.98px)'),mt=window.matchMedia('(min-width:768px) and (max-width:1023.98px)');

@@ -4,7 +4,7 @@ var $=function(i){return document.getElementById(i)},tm;
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},5000)}
 function pl(n,s,p){return n+' '+(n===1?s:p)}
 function chave(){                                     /* mesma chave do pré-voo: se o projeto mudou depois da revisão, a revisão perde a validade */
-  var s='';try{s=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}
+  var s='';try{s=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}
   for(var h=5381,i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)
 }
 var P=null;try{P=JSON.parse(sessionStorage.getItem('pl-prevoo')||'null')}catch(e){}

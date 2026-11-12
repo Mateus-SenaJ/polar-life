@@ -9,7 +9,7 @@ function nf(n){return String(Math.round(n*10)/10).replace('.',',')}
 var COORD=/-?\d{1,3}[.,]\d{3,}\s*[,;]\s*-?\d{1,3}[.,]\d{3,}/,ARQ=/^(IMG|DSC|DSCN|PXL|MVIMG)[_-]?\d+|\.(jpe?g|png|heic|webp)$/i;
 var MB_FOLHA=1.5;                                   /* [HIPÓTESE] ~1,5 MB por folha a 300 PPI; o estimador real vem com o PDF (T-19) */
 var NAO_IMPRIMIVEL=window.PLFOLHAS?PLFOLHAS.MARGEM_MIN:3;                               /* D-150: padrão 3 mm; abaixo disso avisa (a área não imprimível depende da impressora) */
-function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')}catch(e){}
+function chave(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}
   for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}
 var disparo=null,confirmou=false,itens=null;
 

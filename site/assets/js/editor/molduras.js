@@ -138,7 +138,7 @@ function montar(){
 
 /* pop-up «Trocar formato» com antes e depois e o novo número de folhas (FN-03) · foco preso · Esc mantém */
 var fV,fG=null,fX=null;
-function folhasDe(f){var o=PLFOLHAS.ler(),n=Q.N,v=0,i;for(i=1;i<=n;i++)if(Q.vert(i))v++;
+function folhasDe(f){var o=(PLFOLHAS.lerFolhas||PLFOLHAS.ler)(),n=Q.N,v=0,i;for(i=1;i<=n;i++)if(Q.vert(i))v++;
   var h=f.ori==='h',r=PLFOLHAS.contar(o,{w:h?f.h:f.w,h:h?f.w:f.h},n,v),p=PLFOLHAS.papel(o);
   return r.naoCabe?'não cabe em '+p.n:r.folhas+(r.folhas===1?' folha':' folhas')+' em '+p.n}
 function medida(f){var h=f.ori==='h';return v2s(h?f.h:f.w)+' × '+v2s(h?f.w:f.h)+' '+UN[un].u}
