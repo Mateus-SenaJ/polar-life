@@ -353,7 +353,7 @@ function codigos(){
 function renderSemPermissao(){
   $('pe').hidden=true;
   var verT=false;try{verT=localStorage.getItem('pl-ver-contas-teste')==='1'}catch(e){}   /* D-194: o atalho para a conta Admin só no aparelho do dono */
-  $('corpo').innerHTML='<div class="adm-vazio"><h2>Este painel é só da conta Admin.</h2>'+
+  $('corpo').innerHTML='<div class="adm-vazio"><h2>Só a conta Admin abre este painel.</h2>'+
     '<p>Sua conta continua com o editor, a Conta e a exportação.</p>'+
     (verT?'<button type="button" class="btn2" id="b-como-admin">Entrar como Admin</button>':'<a class="btn2" href="../inicio/">Voltar ao Início</a>')+'</div>';
   if($('b-como-admin'))$('b-como-admin').addEventListener('click',function(){
