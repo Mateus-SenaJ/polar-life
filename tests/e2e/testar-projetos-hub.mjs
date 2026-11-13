@@ -34,7 +34,7 @@ try {
     m.sugTopo < m.criar && m.criar < m.projs && m.card ? ok(`${w}×${h}: ordem sugestões → criar → seus projetos`) : ruim(`${w}×${h}: ordem ${JSON.stringify(m)}`);
     if (w === 390) {
       const todas = await p.evaluate(() => Promise.all([...document.querySelectorAll('.sug__img')].map((i) => { i.loading = 'eager'; return i.decode().then(() => 1, () => 0); })).then((a) => a.reduce((s, x) => s + x, 0)));   /* D-198: as de fora da tela carregam quando aparecem */
-      m.imgs === 15 && todas === 15 ? ok('15 sugestões, todas com a imagem real do modelo') : ruim(`fotos das sugestões: ${todas}/${m.imgs}`);
+      m.imgs === 24 && todas === 24 ? ok('24 sugestões, todas com a imagem real do modelo') : ruim(`fotos das sugestões: ${todas}/${m.imgs}`);
       m.led === 1 ? ok('um único botão LED na tela: «Polaroids para imprimir» (T8)') : ruim('LEDs na tela: ' + m.led);
     }
     erros.length === 0 || ruim('erros: ' + erros.join(' | '));

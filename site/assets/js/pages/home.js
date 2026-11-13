@@ -35,7 +35,18 @@ var SUG={viagem:{nome:'Viagem com a turma',fmt:'classico'},cidade:{nome:'Rolê n
   'status-tempo':{nome:'Linha do tempo vertical',col:{peca:'r916',layout:'tempo',margem:10,fundo:BRANCO}},
   'status-capa':{nome:'Capa do status',col:{peca:'r916',layout:'capa',margem:10,fundo:{tipo:'cor',cor:'#F8F9FA'}}},
   'status-mural':{nome:'Mural do fim de semana',col:{peca:'r916',layout:'mural',margem:10,fundo:BRANCO}},
-  'status-mesa':{nome:'Mesa no status',col:{peca:'r916',layout:'espalhadas',margem:8,fundo:{tipo:'foto',suave:45}}}};
+  'status-mesa':{nome:'Mesa no status',col:{peca:'r916',layout:'espalhadas',margem:8,fundo:{tipo:'foto',suave:45}}},
+  /* mais 9, com os temas mais pedidos nas redes: feed 4:5 (1080 × 1350), quadrado 1:1 (1080 × 1080), stories e duas para imprimir.
+     Só tamanhos e layouts que a Colagem já tem (PLCOLAGEM.PECAS e LAYOUTS); a cor do fundo é conteúdo (DS-13) */
+  dump:{nome:'Photo dump do mês',col:{peca:'r45',layout:'mural',margem:10,fundo:{tipo:'cor',cor:'#F8F9FA'}}},
+  retrospectiva:{nome:'Retrospectiva do ano',col:{peca:'r11',layout:'mural',margem:10,fundo:BRANCO}},
+  aniversario:{nome:'Parabéns pra você',col:{peca:'r45',layout:'capa',margem:10,fundo:{tipo:'gradiente',cor:'#FFF1D6',cor2:'#FFD6E0',ang:160}}},
+  amigas:{nome:'Melhores amigas',col:{peca:'r11',layout:'espalhadas',margem:8,fundo:{tipo:'gradiente',cor:'#FFE1EC',cor2:'#E6DBFF',ang:135}}},
+  historia:{nome:'Nossa história',col:{peca:'r45',layout:'tempo',margem:10,fundo:BRANCO}},
+  'antes-depois':{nome:'Antes e depois',col:{peca:'r916',layout:'cabine',margem:14,fundo:{tipo:'cor',cor:'#F8F9FA'}}},
+  virada:{nome:'Virada do ano',col:{peca:'r45',layout:'varal',margem:10,fundo:{tipo:'gradiente',cor:'#101B3D',cor2:'#3B1F5B',ang:180}}},
+  ferias:{nome:'Férias em mosaico',fmt:'mini',col:{layout:'mosaico',orient:'paisagem',margem:8,fundo:BRANCO}},
+  poster:{nome:'Pôster de fotos',fmt:'mini',col:{peca:'20x30',layout:'grade',margem:10,fundo:BRANCO}}};
 function comecar(o){
   try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-prevoo','pl-exportar','pl-volta','pl-uma'].forEach(function(k){sessionStorage.removeItem(k)});
     if(o.fmt)sessionStorage.setItem('pl-fmt',o.fmt);
