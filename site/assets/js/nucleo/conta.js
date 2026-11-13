@@ -355,8 +355,189 @@ function excluirConta(){
   apagar('pl-conta');return true}
 function exportarDados(){
   var s=sessao();if(!s)return null;
-  var c=contaDe(s.email),d={produto:'PolarLife',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],geradoEm:new Date().toISOString()};
+  var c=contaDe(s.email),d={produto:'PolarLife',conta:{email:s.email,plano:plano()},recibos:c.recibos||[],perfil:perfil(),preferencias:preferencias(),codigos:codigos(),aceites:aceites(),geradoEm:new Date().toISOString()};   /* GET /conta/dados → «exportar_dados» */
   return new Blob([JSON.stringify(d,null,2)],{type:'application/json'})}
+
+/* ---------- Conta como página de configurações (perfil, uso, códigos, pagamentos, segurança, preferências) ----------
+   Leituras e gravações pequenas, no localStorage, com a MESMA forma das tabelas do DOC-15 §7 (nomes em camelCase, datas em ISO 8601),
+   para a tela não mudar quando a rota da API existir (DOC-15 §8). Nada daqui muda as funções de cima. Tudo local (T5). */
+function iso(ts){return ts?new Date(ts).toISOString():null}
+/* identidade.usuarios · futura GET /conta/perfil (SELECT com RLS). Sessão por código não tem conta: vem o que ela informou no cadastro. */
+function perfil(){
+  var sc=sessaoCodigo();
+  if(sc)return {id:null,email:sc.email||null,emailVerificadoEm:null,nome:sc.nome||null,situacao:'ativa',criadoEm:null,atualizadoEm:null,entrouEm:iso(sc.entrouEm),provedor:'codigo'};
+  var s=sessao();if(!s)return null;
+  var c=contaDe(s.email),prov=s.provedor||c.provedor||null;
+  return {id:null,email:s.email,
+    emailVerificadoEm:prov==='google'?iso(c.aceiteEm||s.entrouEm):null,   /* só o Google confirma o e-mail de verdade; o código por e-mail é simulado (D-116) */
+    nome:c.nome||s.nome||'',situacao:'ativa',criadoEm:iso(c.criadoEm||c.aceiteEm||null),atualizadoEm:iso(c.perfilEm||null),entrouEm:iso(s.entrouEm),provedor:prov}
+}
+/* identidade.usuarios (nome) · futura PATCH /conta/perfil → UPDATE (nome) com RLS (DOC-15 §4, correção). O e-mail troca por «trocar_email», com código. */
+function atualizarPerfil(d){
+  var nome=String(d&&d.nome||'').replace(/\s+/g,' ').trim();
+  if(nome.length<2||nome.length>60)return {erro:'nome'};
+  var sc=sessaoCodigo();
+  if(sc){sc.nome=nome;gravar('pl-codigo-sessao',sc);return {ok:true,nome:nome}}
+  var s=sessao();if(!s)return {erro:'sessao'};
+  var c=contaDe(s.email);c.nome=nome;c.perfilEm=agora();salvarConta(s.email,c);
+  s.nome=nome;gravar('pl-conta',s);
+  return {ok:true,nome:nome}
+}
+/* privacidade.aceites · futura GET /conta/aceites */
+function aceites(){
+  var s=sessao(),sc=sessaoCodigo(),t=sc?sc.aceiteEm:(s?contaDe(s.email).aceiteEm:null);
+  if(!t)return [];
+  return [{documento:'termos',aceitoEm:iso(t)},{documento:'privacidade',aceitoEm:iso(t)}]
+}
+/* identidade.credenciais_senha · a tela só sabe se existe senha, nunca o hash */
+function temSenha(){
+  var s=sessao();if(!s)return false;
+  var t=ler('pl-contas-teste',null)||{},c=t[s.email];
+  return !!((c&&c.senha)||SENHAS_PADRAO[s.email])
+}
+/* POST /conta/senha → «definir_senha» (a API confere a senha atual com «conta_por_email» + Argon2id e encerra as outras sessões).
+   Conta sem senha (Google ou código por e-mail) define a primeira direto. Erros: senha · atual · tentativas · indisponivel · sessao. */
+function trocarSenha(atual,nova){
+  var s=sessao();
+  if(!s)return Promise.reject({erro:'sessao'});
+  if(!senhaValida(nova))return Promise.reject({erro:'senha'});
+  var t=ler('pl-contas-teste',null)||{},c=t[s.email],reg=c&&c.senha||SENHAS_PADRAO[s.email]||null;
+  if(!reg)return definirSenha(nova);
+  if(agora()<TENTA_SENHA.bloqueadoAte)return Promise.reject({erro:'tentativas',esperaMs:TENTA_SENHA.bloqueadoAte-agora()});
+  return derivarSenha(String(atual||''),reg.sal,reg.it).then(function(h){
+    if(h!==reg.hash){
+      TENTA_SENHA.n++;
+      if(TENTA_SENHA.n>=5){TENTA_SENHA={n:0,bloqueadoAte:agora()+30000};return Promise.reject({erro:'tentativas',esperaMs:30000})}
+      return Promise.reject({erro:'atual'})
+    }
+    return definirSenha(nova)
+  },function(){return Promise.reject({erro:'indisponivel'})})
+}
+/* identidade.sessoes (sem o hash do token) · futura GET /conta/sessoes. Em demonstração a conta só existe neste navegador:
+   a lista tem uma linha, a deste aparelho. */
+function aparelhoAtual(){
+  var ua=navigator.userAgent||'';
+  var nav=/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/Firefox\//.test(ua)?'Firefox':/Chrome\//.test(ua)?'Chrome':/Safari\//.test(ua)?'Safari':'Navegador';
+  var so=/Android/.test(ua)?'Android':/iPhone|iPad|iPod/.test(ua)?'iOS':/Windows/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':/Linux/.test(ua)?'Linux':'';
+  return (nav+(so?' · '+so:'')).slice(0,80)
+}
+function sessoes(){
+  var e=sessaoCodigo()||sessao();
+  if(!e)return [];
+  return [{id:null,criadaEm:iso(e.entrouEm),ultimoUsoEm:iso(agora()),expiraEm:null,revogadaEm:null,aparelho:aparelhoAtual(),atual:true}]
+}
+/* POST /auth/sair-de-todos → «encerrar_sessoes». Devolve quantas sessões encerrou (aqui, a deste navegador). */
+function encerrarSessoes(){var n=temSessao()?1:0;sair();return n}
+/* Preferências da conta: unidade de medida e e-mails. [PENDENTE no DOC-15] Ainda não há tabela para isto: com servidor, pede uma
+   migração nova (ex.: identidade.preferencias) e uma linha no inventário (§2) antes da rota GET/PATCH /conta/preferencias.
+   Sem conta (sessão por código) a preferência é do aparelho (pl-preferencias). */
+var UNIDADES={mm:1,cm:1,pol:1};
+function prefPadrao(p){
+  p=p||{};
+  return {unidade:UNIDADES[p.unidade]?p.unidade:'mm',emails:{novidades:!!(p.emails&&p.emails.novidades)},atualizadoEm:p.atualizadoEm||null}
+}
+function preferencias(){
+  var s=sessao();
+  if(s&&!sessaoCodigo())return prefPadrao(contaDe(s.email).preferencias);
+  return prefPadrao(ler('pl-preferencias',null))
+}
+function salvarPreferencias(d){
+  var p=preferencias();
+  if(d&&d.unidade!==undefined){if(!UNIDADES[d.unidade])return {erro:'unidade'};p.unidade=d.unidade}
+  if(d&&d.emails&&d.emails.novidades!==undefined)p.emails.novidades=!!d.emails.novidades;
+  p.atualizadoEm=iso(agora());
+  var s=sessao();
+  if(s&&!sessaoCodigo()){var c=contaDe(s.email);c.preferencias=p;salvarConta(s.email,c)}
+  else gravar('pl-preferencias',p);
+  return {ok:true,preferencias:p}
+}
+/* Formas de pagamento · futura GET /conta/pagamentos/metodos, lida do provedor de pagamento (checkout hospedado): o banco nunca
+   guarda dado de cartão (DOC-15 §2, «Fora do banco, sempre»). Em demonstração a lista é sempre vazia: nada é cobrado. */
+function formasPagamento(){return []}
+/* comercial.recibos · futura GET /conta/recibos (SELECT com RLS). Os recibos de hoje são de demonstração (compra simulada). */
+function recibos(){
+  var s=sessao();if(!s||sessaoCodigo())return [];
+  return (contaDe(s.email).recibos||[]).map(function(r){
+    var m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.data||''),v=parseFloat(String(r.valor||'').replace(/[^\d,]/g,'').replace(',','.'));
+    return {numero:r.id,descricao:r.desc,valorCentavos:isNaN(v)?0:Math.round(v*100),moeda:'BRL',
+      emitidoEm:m?iso(new Date(+m[3],+m[2]-1,+m[1],12).getTime()):null,notaFiscalRef:null,demonstracao:true}
+  })
+}
+/* comercial.assinaturas (a viva) · futura GET /conta/assinatura. Nulo quando não há Pro. */
+function assinatura(){
+  var s=sessao();if(!s||sessaoCodigo())return null;
+  var c=contaDe(s.email);
+  if(perfilEfetivo(c)!=='pro')return null;
+  var L=limites().planos.pro,fim=c.proAte||(c.proDesde?c.proDesde+30*DIA:null);
+  return {situacao:c.canceladoEm?'cancelada_no_fim':'ativa',periodoInicio:iso(c.proDesde||null),periodoFim:iso(fim),canceladaEm:iso(c.canceladoEm||null),
+    assinaturaDesligada:!!c.assinaturaDesligada,valorCentavos:Math.round((L.precoMes!==undefined?L.precoMes:14.9)*100),moeda:'BRL',provedor:null}
+}
+/* GET /conta/direito → «direito_de_uso»: o mesmo JSON do contrato (DOC-12 §6.4), para a tela mostrar quanto dá para imprimir agora. */
+function direitoDeUso(){
+  var sc=sessaoCodigo();
+  if(sc)return {plano:'codigo',creditosPadrao:sc.usadoEm?0:sc.folhas,creditosGrande:0,folhasGratisNoMes:0,folhasGratisUsadasNoMes:0,usoNoMes:0,usoRazoavel:null,
+    fotosPorProjeto:sc.fotos,assinaturaPodeDesligar:false,assinaturaDesligada:false,expiraEm:null,renovaEm:null};
+  var p=plano();if(!p)return null;
+  var g=p.id==='gratis',pro=p.id==='pro'||p.id==='admin',a=assinatura(),d1=agoraBR(),m=d1.getMonth()+2,an=d1.getFullYear();
+  if(m>12){m=1;an++}
+  return {plano:p.id==='admin'?'pro':p.id,creditosPadrao:p.folhasCompradas.padrao,creditosGrande:p.folhasCompradas.grande,
+    folhasGratisNoMes:g?p.folhasMes:0,folhasGratisUsadasNoMes:g?Math.min(p.usadasMes,p.folhasMes):0,
+    usoNoMes:pro?p.usadasMes:0,usoRazoavel:pro?p.usoRazoavel:null,fotosPorProjeto:p.fotosPorProjeto,
+    assinaturaPodeDesligar:!!p.assinaturaPodeDesligar,assinaturaDesligada:!!p.assinaturaDesligada,
+    expiraEm:a?a.periodoFim:null,renovaEm:an+'-'+('0'+m).slice(-2)+'-01'}
+}
+/* Códigos de impressão da pessoa · comercial.codigos_impressao (usado_por) + movimentos_folhas (tipo 'codigo') · futura GET /conta/codigos.
+   Guarda só os 4 últimos caracteres («final»), como o banco. «restam» é só para a tela: as folhas de um código entram no saldo da
+   classe, e a conta considera que as compradas avulsas saem primeiro; quando o saldo fica menor que a soma dos códigos, baixa do
+   código mais antigo. */
+function codigos(){
+  var sc=sessaoCodigo();
+  if(sc){
+    var r=buscarCodigo(sc.hash),pc=PACOTES[sc.pacote]||{nome:'Avulso básico'};
+    return [{final:null,pacote:pc.nome,classe:'padrao',folhas:sc.folhas,restam:sc.usadoEm?0:sc.folhas,fotosMax:sc.fotos,resgatadoEm:iso(sc.entrouEm),
+      usadoEm:iso(sc.usadoEm||null),validoAte:r?iso(r.criadoEm+r.validaDias*DIA):null,situacao:sc.usadoEm?'usado':'disponivel',emUso:true}]
+  }
+  var s=sessao();if(!s)return [];
+  var c=contaDe(s.email),lista=c.codigos||[],saldo={padrao:c.folhasPadrao||0,grande:c.folhasGrande||0},soma={padrao:0,grande:0},i,x,mudou=false;
+  for(i=0;i<lista.length;i++)soma[lista[i].classe]+=lista[i].restam;
+  for(i=0;i<lista.length;i++){x=lista[i];
+    if(soma[x.classe]>saldo[x.classe]&&x.restam>0){var tira=Math.min(x.restam,soma[x.classe]-saldo[x.classe]);x.restam-=tira;soma[x.classe]-=tira;mudou=true}}
+  if(mudou){c.codigos=lista;salvarConta(s.email,c)}
+  return lista.map(function(k){
+    return {final:k.final,pacote:(PACOTES[k.pacote]||{nome:k.pacote}).nome,classe:k.classe,folhas:k.folhas,restam:k.restam,fotosMax:k.fotosMax,
+      resgatadoEm:iso(k.resgatadoEm),usadoEm:null,validoAte:iso(k.validoAte),situacao:k.restam>0?'disponivel':'usado',emUso:false}
+  })
+}
+/* POST /codigos/resgate → «resgatar_codigo» (PL002 não encontrado · PL003 usado, revogado ou vencido): uso único, credita as folhas
+   do pacote no saldo da conta. Diferente de verificarCodigo, que abre uma sessão sem conta. Mesma trava de tentativas (D-124). */
+function resgatarCodigo(entrada){
+  var s=sessao();
+  if(!s||sessaoCodigo())return Promise.reject({tipo:'semConta'});
+  var cod=normalizaCodigo(entrada);
+  if(!eCodigoPl(cod))return Promise.reject({tipo:'formato'});
+  return hashCodigo(cod).then(function(hash){
+    var r=buscarCodigo(hash);
+    if(!r){
+      if(!dvOk(cod))return Promise.reject({tipo:'dv'});
+      if(agora()<TENTA.bloqueadoAte)return Promise.reject({tipo:'tentativas',esperaMs:TENTA.bloqueadoAte-agora()});
+      TENTA.n++;
+      if(TENTA.n>=5){TENTA={n:5,bloqueadoAte:agora()+30000};return Promise.reject({tipo:'tentativas',esperaMs:30000})}
+      return Promise.reject({tipo:'invalido'})
+    }
+    var sit=situacaoCodigo(r);
+    if(sit!=='livre')return Promise.reject({tipo:sit});
+    var pc=PACOTES[r.pacote]||{nome:'Avulso básico',fotos:24,folhas:8},db;
+    r.usadoEm=agora();
+    if(r.semeado)materializar(hash,r);else{db=dbCodigos();db[hash]=r;gravar('pl-codigos',db)}
+    var c=contaDe(s.email);
+    c.folhasPadrao=(c.folhasPadrao||0)+pc.folhas;
+    c.codigos=c.codigos||[];
+    c.codigos.push({final:cod.slice(-4),pacote:r.pacote,classe:'padrao',folhas:pc.folhas,restam:pc.folhas,fotosMax:pc.fotos,resgatadoEm:agora(),validoAte:r.criadoEm+r.validaDias*DIA});
+    salvarConta(s.email,c);
+    TENTA.n=0;
+    return {ok:true,pacote:pc.nome,folhas:pc.folhas,classe:'padrao',fotosMax:pc.fotos}
+  },function(){return Promise.reject({tipo:'indisponivel'})})
+}
 
 /* ---------- admin (T-33) ---------- */
 function salvarLimites(obj){if(obj&&obj.planos)return gravar('pl-planos',obj);return false}
@@ -419,6 +600,10 @@ PLCONTA={
   comprar:comprar,assinarPro:assinarPro,cancelarPro:cancelarPro,rebaixarGratis:rebaixarGratis,
   trocarAssinatura:trocarAssinatura,excluirConta:excluirConta,exportarDados:exportarDados,
   limites:limites,contasTeste:contasTeste,moeda:moeda,
+  /* Conta como página de configurações: mesmas formas do DOC-15 §7, prontas para virar rota (DOC-15 §8) */
+  perfil:perfil,atualizarPerfil:atualizarPerfil,aceites:aceites,temSenha:temSenha,trocarSenha:trocarSenha,sessoes:sessoes,encerrarSessoes:encerrarSessoes,
+  preferencias:preferencias,salvarPreferencias:salvarPreferencias,formasPagamento:formasPagamento,recibos:recibos,assinatura:assinatura,
+  direitoDeUso:direitoDeUso,codigos:codigos,resgatarCodigo:resgatarCodigo,
   /* códigos de impressão (D-123/D-124) */
   pacotes:function(){return JSON.parse(JSON.stringify(PACOTES))},
   verificarCodigo:verificarCodigo,tentativasCodigo:tentativasCodigo,sairCodigo:sairCodigo,

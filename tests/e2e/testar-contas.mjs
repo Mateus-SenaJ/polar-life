@@ -506,6 +506,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.waitForURL('**/app/conta/planos/', { timeout: 5000 });
   ok('conta: «Ver folhas e planos» navega para os planos');
   await p.goBack();
+  await p.locator('.cfg__l[data-ir="privacidade"]:visible, .sec__cab[data-abre="privacidade"]:visible').first().click();   /* D-207: a Conta tem seções; exportar fica em Privacidade e dados */
   const [dl] = await Promise.all([p.waitForEvent('download'), p.locator('#b-exportar').click()]);
   const nome = dl.suggestedFilename();
   await dl.saveAs(join(saida, nome));
@@ -517,7 +518,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   /* Pro: interruptor de assinatura e cancelamento */
   const c2 = await contexto('pro@polarlife.test');
   const p2 = await c2.newPage();
-  await p2.goto(srv.url + 'app/conta/');
+  await p2.goto(srv.url + 'app/conta/#plano');   /* D-207: «Cancelar assinatura» fica em Plano e uso */
   const corpo2 = await p2.locator('#corpo').textContent();
   /uso razoável/.test(corpo2) && /Desligar a assinatura PolarLife/.test(corpo2)
     ? ok('conta Pro: uso razoável + interruptor da assinatura') : ruim('conta Pro: ' + corpo2.slice(0, 80));
