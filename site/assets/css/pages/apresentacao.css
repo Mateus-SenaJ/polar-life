@@ -49,7 +49,6 @@ a{color:inherit}
   mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.35) 10%,#000 26%)}
 @media (max-width:1023px){.hero{padding-bottom:0}}
 @media (min-width:600px) and (max-width:1023px){.midia--hero{aspect-ratio:16/10}}
-.midia--hero .midia__reserva{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .cam{height:62%;aspect-ratio:240/330;max-width:100%}
 .cam-svg{display:block;width:100%;height:100%}
 .cam .cam-real{height:100%;aspect-ratio:auto}
@@ -100,10 +99,9 @@ a{color:inherit}
   /* o vídeo ocupa a altura toda do hero, vai até a borda direita da tela e avança sob o branco do texto, onde some por máscara */
   .hero__arte{align-self:stretch;margin:-64px calc(-1*max(32px,(100vw - 1216px)/2)) -64px -64px}
   .midia--hero{aspect-ratio:auto;height:100%;min-height:420px}
-  .midia--hero .midia__video{object-position:62% 50%;
+  .midia--hero .midia__video,.midia--hero .midia__poster{object-position:62% 50%;
     -webkit-mask-image:linear-gradient(to right,transparent 0,rgba(0,0,0,.06) 12%,rgba(0,0,0,.45) 30%,#000 48%);
     mask-image:linear-gradient(to right,transparent 0,rgba(0,0,0,.06) 12%,rgba(0,0,0,.45) 30%,#000 48%)}
-  .midia--hero .midia__reserva{left:30%}
   @media (min-width:1280px){.hero__arte{margin-left:-160px}}
   .cam{height:74%}
   .hero__pol{width:128px;padding:10px 10px 40px}
@@ -196,6 +194,19 @@ a{color:inherit}
 .hero__more{margin-top:24px}
 @media (max-width:599px){
   .midia--hero{aspect-ratio:auto;height:max(200px,min(80vw,calc(100svh - 455px)))}
+}
+
+/* D-207 · celular: a frase «Suas fotos merecem o mundo real» sai de cima do vídeo e fica colada no título, que encolhe um
+   pouco para tudo continuar na primeira tela. O vídeo some no branco pela máscara do quadro (não do vídeo): assim o
+   movimento de câmera (escala no vídeo) não leva a borda do degradê junto. */
+@media (max-width:599px){
+  .hero__arte{margin-bottom:6px}
+  .midia--hero{height:max(220px,min(86vw,calc(100svh - 430px)))}
+  .midia--hero .midia__video,.midia--hero .midia__poster{object-position:50% 26%;-webkit-mask-image:none;mask-image:none}
+  .midia--hero{-webkit-mask-image:linear-gradient(to top,transparent 0,rgba(0,0,0,.35) 9%,#000 22%);mask-image:linear-gradient(to top,transparent 0,rgba(0,0,0,.35) 9%,#000 22%)}
+  .hero__title{margin-top:6px;font-size:clamp(34px,10.2vw,42px);line-height:1.02}
+  .hero__lead{margin-top:12px;font-size:17px}
+  .hero__cta{margin-top:20px}
 }
 @media (min-width:1024px){
   .hero__title{font-size:clamp(64px,min(6.4vw,10.5svh),96px)}

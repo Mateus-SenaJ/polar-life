@@ -73,10 +73,10 @@ function montar(){
 var dlgV,dlgAlvo=[];
 function dialogo(){
   if($('rem-dlg'))return;
-  var sc=document.createElement('div');sc.className='scrim';sc.id='rem-scrim';sc.hidden=true;
-  var d=document.createElement('div');d.className='dialog';d.id='rem-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
+  var sc=document.createElement('div');sc.className='scrim led-scrim';sc.id='rem-scrim';sc.hidden=true;   /* D-207: pop-up de verdade, como o da moldura */
+  var d=document.createElement('div');d.className='dialog led-dialog led-box led-box--3';d.id='rem-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
   d.setAttribute('aria-labelledby','rem-t');d.setAttribute('aria-describedby','rem-d');d.hidden=true;
-  d.innerHTML='<h2 id="rem-t"></h2><p id="rem-d"></p><div class="dialog__act">'
+  d.innerHTML='<h2 class="led-dialog__title" id="rem-t"></h2><p id="rem-d"></p><div class="dialog__act led-dialog__actions">'
     +'<button type="button" class="btn2 btn2--lg" id="rem-sim"><svg class="ico sm"><use href="#i-trash"/></svg><span></span></button>'
     +'<button type="button" class="led-btn led-btn--light" id="rem-nao"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Manter fotos</span></span></button></div>';
   document.body.appendChild(sc);document.body.appendChild(d);

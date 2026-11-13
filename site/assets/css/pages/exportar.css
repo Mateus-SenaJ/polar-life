@@ -16,6 +16,17 @@
 .fmt input:checked+.fmt__c::after{content:"";margin-left:auto;flex:none;width:20px;height:20px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
 .fmt input:focus-visible+.fmt__c{outline:2px solid var(--blue);outline-offset:3px}
 .opts{display:grid;gap:16px;margin-top:20px;padding:16px;border:1px solid var(--outline-subtle);border-radius:12px;background:#F8F9FA}
+.opt__h{flex-basis:100%;margin:0;font-size:13px;line-height:1.5;opacity:.72}
+/* D-207: «Avançado» na Colagem: formato, qualidade e os PDFs de impressão, recolhidos */
+.avanc{margin-top:16px;border:1px solid var(--outline-subtle);border-radius:12px}
+.avanc>summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;min-height:48px;padding:12px 16px;cursor:pointer;list-style:none;font-weight:500}
+.avanc>summary::-webkit-details-marker{display:none}
+.avanc>summary::before{content:"";flex:none;align-self:center;width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform 150ms var(--ease)}
+.avanc[open]>summary::before{transform:rotate(45deg)}
+.avanc>summary small{font-weight:400;font-size:13px;opacity:.72}
+.avanc>summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:12px}
+.avanc__in{padding:0 16px 16px}.avanc__in .opts{margin-top:0}
+.avanc__t{margin:16px 0 8px}
 .opt{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .f__l{font-size:14px;font-weight:500}
 .seg{display:inline-flex;border:1px solid var(--outline-subtle);border-radius:10px;overflow:hidden;background:#fff}

@@ -200,6 +200,8 @@ strong{font-weight:500}
 /* pop-up, toast: o visual LED vem de led.css; aqui só o layout */
 .dialog p{margin:12px 0 0;font-size:16px;line-height:1.6}
 .dialog__act{flex-wrap:wrap}
+.led-dialog__actions{flex-wrap:wrap}   /* D-207: no celular os dois botões descem um embaixo do outro, sempre à vista */
+@media (max-width:480px){.led-dialog__actions>*{flex:1 1 100%}}
 .toast{position:fixed;z-index:950;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:16px;max-width:calc(100vw - 32px);padding:12px 16px;font-size:14px;font-weight:500}
 .undo{min-height:44px;padding:0 8px;border:0;background:none;color:var(--blue);font:500 14px 'Inter',sans-serif;cursor:pointer}
 
@@ -279,6 +281,14 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
 @media(max-width:1023px){.aviso{margin-top:6px}}
 /* Modo Colagem (D-150 a D-152): campos de cor, faixas e foto do fundo */
 .col-cor{display:flex;align-items:center;gap:8px}
+/* D-207: caixa de texto da colagem, campo do texto e aviso de fotos que faltam */
+.col-caixa{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--white);pointer-events:none}
+.col-caixa__fita{position:absolute;left:50%;background:var(--orange)}
+.col-caixa__t{max-width:88%;overflow:hidden;font-family:Caveat,cursive;font-weight:500;line-height:1;white-space:nowrap;color:var(--black)}
+.col-txt{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);font:400 16px 'Inter',system-ui,sans-serif;color:var(--black)}
+.col-txt:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.col-falta{margin:0 0 16px}.col-falta p{margin:0 0 10px}
+.msg--warn{border:1px solid var(--outline-subtle);border-left:4px solid var(--orange)}.msg--warn>.ico{color:var(--orange);stroke-width:2}
 .col-cor input[type=color]{flex:none;width:44px;height:44px;padding:2px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);cursor:pointer}
 .col-cor input[type=text]{flex:1;min-width:0;min-height:44px;padding:0 12px;border:1px solid var(--outline-subtle);border-radius:8px;background:var(--white);font:400 14px 'IBM Plex Mono',monospace;text-transform:uppercase}
 .mod input[type=range]{width:100%;min-height:44px;accent-color:var(--blue);cursor:pointer}

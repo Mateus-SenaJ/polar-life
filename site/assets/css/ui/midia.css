@@ -1,7 +1,10 @@
 /* Mídia realista (D-140 a D-143): vídeo decorativo com poster e reserva, câmera realista e
    legendas manuscritas das polaroids. O quadro tem proporção fixa: nada pula quando o vídeo chega. */
 .midia{position:relative;overflow:hidden}
-.midia__video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.midia__video,.midia__poster{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.midia__pic{display:contents}
+/* D-207: o vídeo fica transparente até ter imagem; por baixo, o primeiro quadro dele (poster) */
+.midia__video{z-index:1}
 .midia__reserva{position:relative;z-index:1;transition:opacity 600ms var(--ease),visibility 0s linear 600ms}
 /* o vídeo começou a tocar (ou já existe o poster definitivo): a reserva desenhada sai de cena */
 .midia.is-tocando .midia__reserva,.midia.tem-poster .midia__reserva{opacity:0;visibility:hidden}

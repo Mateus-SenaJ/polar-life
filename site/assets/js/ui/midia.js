@@ -33,12 +33,32 @@ function carregar(cx,v,nome){
   v.muted=true;v.load();tocar(v)
 }
 function tocar(v){if(v.ended)return;try{var p=v.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
+/* D-207 · movimento de câmera preso ao tempo do vídeo: [fração da duração, x %, y %, escala]. object-position x y põe o
+   ponto (x, y) do vídeo no mesmo ponto do quadro, então a escala em torno dele aproxima exatamente ali. Suave nos dois
+   sentidos (smoothstep), volta ao começo no fim do laço. Com movimento reduzido nem chega aqui (só o poster). */
+function percurso(cx,v,nome){
+  var k=cx.getAttribute('data-midia-percurso'+(/-vertical$/.test(nome)?'-vertical':'')),P;
+  try{P=JSON.parse(k||'null')}catch(e){P=null}
+  if(!P||P.length<2||!window.requestAnimationFrame)return;
+  function em(t){var i=0;while(i<P.length-2&&t>P[i+1][0])i++;var a=P[i],b=P[i+1],u=b[0]>a[0]?Math.max(0,Math.min(1,(t-a[0])/(b[0]-a[0]))):1;u=u*u*(3-2*u);
+    return[a[1]+(b[1]-a[1])*u,a[2]+(b[2]-a[2])*u,a[3]+(b[3]-a[3])*u]}
+  var p0=em(0),pos=p0[0].toFixed(2)+'% '+p0[1].toFixed(2)+'%',poster=cx.querySelector('.midia__poster');
+  if(poster)poster.style.objectPosition=pos;
+  v.style.objectPosition=pos;
+  function passo(){
+    if(!v.paused&&v.duration>0){var q=em((v.currentTime%v.duration)/v.duration),s=q[0].toFixed(2)+'% '+q[1].toFixed(2)+'%';
+      v.style.objectPosition=s;v.style.transformOrigin=s;v.style.transform='scale('+q[2].toFixed(4)+')'}
+    requestAnimationFrame(passo)}
+  requestAnimationFrame(passo)
+}
 function video(cx){
   var v=cx.querySelector('video');if(!v)return;
   var nome=variante(cx.getAttribute('data-midia')),b=base(cx);
-  if(tem('video/'+nome+'-poster.jpg')){v.setAttribute('poster',b+'video/'+nome+'-poster.jpg');cx.classList.add('tem-poster')}
+  if(cx.querySelector('.midia__poster'))cx.classList.add('tem-poster');   /* D-207: o poster já está no HTML (<picture>), certo para cada tela */
+  else if(tem('video/'+nome+'-poster.jpg')){v.setAttribute('poster',b+'video/'+nome+'-poster.jpg');cx.classList.add('tem-poster')}
   if(!tem('video/'+nome+'.mp4'))return;                    /* ainda sem vídeo: poster e desenho */
   if(reduzido()||economia())return;                        /* só o poster */
+  percurso(cx,v,nome);
   if(!window.IntersectionObserver){carregar(cx,v,nome);return}
   var io=new IntersectionObserver(function(es){
     es.forEach(function(en){

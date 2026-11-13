@@ -20,9 +20,22 @@ if(!ok){
   $('resumo').textContent='Falta revisar a impressão.';
   return
 }
-var REDE=P.rede||null,COL=!!P.col,VIS=REDE?['rede']:COL?['pdf','grafica','leve','folhas']:['pdf','grafica','leve','folhas','polaroids'];
+/* D-207: na Colagem (para as redes ou para imprimir) a primeira opção é a imagem para compartilhar, em PNG na qualidade Alta;
+   formato, qualidade e os PDFs de impressão ficam em «Avançado». A imagem para compartilhar não gasta folha (D-054, D-125). */
+var REDE=P.rede||null,COL=!!P.col,VIS=REDE?['rede']:COL?['rede','pdf','grafica','leve','folhas']:['pdf','grafica','leve','folhas','polaroids'];
 [].forEach.call(document.querySelectorAll('input[name=fmt]'),function(r){var on=VIS.indexOf(r.value)>=0,l=r.closest('.fmt');if(l)l.hidden=!on;r.disabled=!on;r.checked=false});
 document.querySelector('input[name=fmt][value='+VIS[0]+']').checked=true;
+if(COL){
+  if(!REDE)$('fmt-rede-d').textContent='PNG na melhor qualidade para compartilhar ou mandar para alguém. Para imprimir na medida, use um PDF em «Avançado».';
+  var av=document.createElement('details');av.className='avanc';av.id='avanc';
+  av.innerHTML='<summary><span>Avançado</span><small>formato do arquivo, qualidade'+(REDE?'':' e PDF para imprimir')+'</small></summary><div class="avanc__in"></div>';
+  $('fmts').parentNode.insertBefore(av,$('fmts').nextSibling);
+  var dentro=av.querySelector('.avanc__in');dentro.appendChild($('opts'));
+  if(!REDE){var g=document.createElement('div');g.className='fmts fmts--av';g.setAttribute('role','radiogroup');g.setAttribute('aria-label','Para imprimir');
+    ['pdf','grafica','leve','folhas'].forEach(function(v){var l=document.querySelector('input[name=fmt][value='+v+']').closest('.fmt');g.appendChild(l)});
+    var t=document.createElement('p');t.className='avanc__t rotulo';t.textContent='Para imprimir';dentro.appendChild(t);dentro.appendChild(g)}
+  document.querySelector('input[name=qual][value=alta]').checked=true;
+}
 $('resumo').textContent=REDE?pl(P.n,'imagem','imagens')+' · '+pl(P.fotos,'foto','fotos')+' · '+P.papel+' ('+REDE.w+' × '+REDE.h+' px)'
   :pl(P.n,'folha','folhas')+' · '+pl(P.fotos,'foto','fotos')+' · '+P.papel+' '+(P.orient==='paisagem'?'paisagem':'retrato');
 
@@ -30,18 +43,19 @@ $('resumo').textContent=REDE?pl(P.n,'imagem','imagens')+' · '+pl(P.fotos,'foto'
 var MB_ORIG=2.4,MB_LEVE=.7,MB_SOBRA=.05,MB_FIEL=3.6;              /* PDF: por foto (JPEG original ≈ 12 MP) e por folha */
 var A4=210*297;
 function mb(f,o){
-  var area=P.w*P.h,esc=(o.ppi/300)*(o.ppi/300);
+  var area=P.w*P.h,esc=(o.ppi/300)*(o.ppi/300),alta=o.qual==='alta';
   if(f==='pdf')return P.fotos*MB_ORIG+P.n*MB_SOBRA;
   if(f==='leve')return P.fotos*MB_LEVE+P.n*MB_SOBRA;
   if(f==='grafica')return P.fotos*MB_FIEL+P.n*MB_SOBRA;               /* D-174: originais + perfis de cor */
-  if(f==='rede')return P.n*(o.tipo==='png'?2.2:.45)*(REDE?REDE.h/1080:1);   /* 1080 px de largura */
+  if(f==='rede')return P.n*(o.tipo==='png'?2.2:.45)*(REDE?REDE.h/1080:P.h/P.w)*(alta?(REDE?4:1.8):1);   /* 1080 px de largura; Alta: o dobro nas redes, 1440 px na colagem para imprimir */
   var un=f==='folhas'?area/A4:(88*107)/A4,n=f==='folhas'?P.n:P.fotos;     /* A4 a 300 PPI: PNG ≈ 9 MB, JPEG ≈ 1,8 MB */
   return n*un*esc*(o.tipo==='png'?9:1.8)*(o.zip?.97:1)
 }
 function fmt(m){return m>=1000?(m/1000).toFixed(1).replace('.',',')+' GB':m>=10?Math.round(m)+' MB':(Math.max(.1,Math.round(m*10)/10)+'').replace('.',',')+' MB'}
 function lerOpc(){
   var f=document.querySelector('input[name=fmt]:checked').value,img=f==='folhas'||f==='polaroids'||f==='rede';
-  return{f:f,img:img,tipo:document.querySelector('input[name=tipo]:checked').value,ppi:+document.querySelector('input[name=ppi]:checked').value,zip:$('zip').checked}
+  var q=document.querySelector('input[name=qual]:checked').value;
+  return{f:f,img:img,tipo:document.querySelector('input[name=tipo]:checked').value,qual:q,ppi:q==='alta'?600:300,zip:$('zip').checked}
 }
 var ROT={pdf:'Gerar PDF',grafica:'Gerar PDF profissional',leve:'Gerar PDF leve',folhas:'Gerar imagens',polaroids:'Gerar imagens',rede:'Gerar imagens'};
 /* folhas que a exportação conta (DOC-03 §3): a colagem para as redes não conta */
@@ -49,7 +63,9 @@ function folhasDe(o){return o.f==='rede'?0:o.f==='polaroids'?Math.ceil(P.fotos/4
 function arquivosDe(o){return o.f==='polaroids'?P.fotos:P.n}
 function atualiza(){
   var o=lerOpc(),m=mb(o.f,o),v=Math.max(1,Math.ceil(m/LIM));
-  $('opts').hidden=!o.img;$('o-ppi').hidden=o.f==='rede';$('zip-l').hidden=arquivosDe(o)<2;$('aviso-100').hidden=o.img||o.f==='grafica';$('aviso-pro').hidden=o.f!=='grafica';
+  $('opts').hidden=!o.img;$('o-ppi').hidden=false;
+  $('o-qual-h').textContent=o.f==='rede'?(o.qual==='alta'?(REDE?'O dobro de pixels: '+REDE.w*2+' × '+REDE.h*2+' px, mais nítida em telas grandes.':'1440 px de largura, nítida em qualquer tela.'):(REDE?REDE.w+' × '+REDE.h+' px, o tamanho das redes.':'1080 px de largura, arquivo menor.'))
+    :o.qual==='alta'?'Para ampliar ou imprimir em papel fotográfico. Arquivo bem maior.':'Na medida certa para imprimir em casa.';$('zip-l').hidden=arquivosDe(o)<2;$('aviso-100').hidden=o.img||o.f==='grafica';$('aviso-pro').hidden=o.f!=='grafica';
   $('est-v').textContent='≈ '+fmt(m);
   var zipa=o.zip&&arquivosDe(o)>1,un=o.img&&!zipa?arquivosDe(o):v;
   $('est-s').textContent=o.img&&!zipa?(un>1?pl(un,'arquivo','arquivos')+' separados.':'1 arquivo.')

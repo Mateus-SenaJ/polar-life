@@ -68,110 +68,15 @@
       </p>
     </div>
 
-    <!-- vídeo realista ao lado do título (D-140): mesa de fim de tarde, o celular é guardado e as polaroids ficam.
-         Decorativo (aria-hidden), mudo, em loop; o PLMIDIA carrega o arquivo só quando ele existe e entra na tela.
-         Reserva: poster local + câmera com a polaroid saindo (A2) e duas polaroids com legenda. -->
+    <!-- vídeo realista ao lado do título (D-140). D-207: só o vídeo, sem desenho de reserva: antes de tocar aparece o
+         primeiro quadro do próprio vídeo (em pé no celular). A descrição vem do roteiro do vídeo (docs/prompts-flow.md).
+         No celular, um movimento de câmera acompanha o vídeo: do celular na mão até as polaroids da mesa (PLMIDIA). -->
     <div class="hero__arte">
-     <div class="midia midia--hero" data-midia="mesa-polaroids" data-midia-base="assets/" aria-hidden="true">
-      <video class="midia__video" muted autoplay loop playsinline preload="none" poster="assets/img/fotos/mesa.jpg" tabindex="-1" disablepictureinpicture></video>
-      <div class="midia__reserva">
-      <div class="cam mov-cam" data-mov="cam" data-mov-quando="carregar" data-midia-cam>
-        <!-- Câmera instantânea · ilustração definitiva (arquivo-fonte: assets/img/ilustracoes/camera-instantanea.svg).
-             O arquivo está embutido aqui para animar o grupo #cam-foto (A2), sem requisição extra (T6).
-             A foto já fica na posição final (translate 75 255.8 = 150 + 58% da própria altura): a animação
-             a devolve para a fenda e a traz de volta. O brilho do flash é a sobreposição #cam-flash-luz. -->
-        <svg class="cam-svg" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" focusable="false">
-          <defs>
-            <filter id="cam-papel" x="-30%" y="-25%" width="160%" height="175%" color-interpolation-filters="sRGB">
-              <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000000" flood-opacity=".06" result="cam-s1"/>
-              <feDropShadow in="cam-s1" dx="0" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity=".08" result="cam-s2"/>
-              <feDropShadow in="cam-s2" dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity=".1"/>
-            </filter>
-            <clipPath id="cam-clip-fenda"><rect x="-40" y="220" width="380" height="600"/></clipPath>
-            <g id="cam-cena-montanha">
-              <image data-midia-foto="familia-por-do-sol" data-midia-base="assets/" href="assets/img/fotos/familia-por-do-sol.jpg" x="0" y="0" width="76" height="76" preserveAspectRatio="xMidYMid slice"/>
-            </g>
-          </defs>
-          <g transform="translate(18 14) scale(.68)">
-          <!-- anima: cam-corpo bascula de leve, centro 150 112 -->
-          <g id="cam-corpo">
-            <rect x="-1.5" y="-1.5" width="303" height="228" rx="37.5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
-            <rect width="300" height="225" rx="36" fill="#FFFFFF"/>
-            <path d="M36 0H264A36 36 0 0 1 300 36V88H0V36A36 36 0 0 1 36 0Z" fill="#000000"/>
-            <rect x="1" y="1" width="298" height="223" rx="35" fill="none" stroke="#000000" stroke-opacity=".12" stroke-width="2"/>
-            <path d="M0 88H300" stroke="#000000" stroke-opacity=".1" stroke-width="2"/>
-            <!-- anima: cam-flash pisca, centro 64 44 -->
-            <g id="cam-flash">
-              <rect x="24" y="20" width="80" height="48" rx="10" fill="#F8F9FA"/>
-              <rect x="30" y="26" width="68" height="36" rx="6" fill="#FFFFFF"/>
-              <rect id="cam-flash-luz" x="30" y="26" width="68" height="36" rx="6" fill="#FFFFFF" opacity="0"/>
-              <path d="M38 35H90M38 44H90M38 53H90" fill="none" stroke="#006194" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
-              <path d="M52 29V59M76 29V59" fill="none" stroke="#006194" stroke-opacity=".3" stroke-width="1.5"/>
-              <path d="M34 30l10-2" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-            </g>
-            <g id="cam-visor">
-              <rect x="184" y="22" width="54" height="44" rx="9" fill="#F8F9FA"/>
-              <rect x="190" y="28" width="42" height="32" rx="5" fill="#006194"/>
-              <rect x="190" y="28" width="42" height="32" rx="5" fill="#000000" fill-opacity=".35"/>
-              <path d="M196 56L222 32" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>
-              <path d="M203 58L226 37" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".35"/>
-            </g>
-            <circle cx="262" cy="44" r="6" fill="#FD761A"/>
-            <circle cx="260" cy="42" r="1.6" fill="#FFFFFF" opacity=".8"/>
-            <circle cx="140" cy="44" r="3" fill="#FFFFFF" opacity=".5"/>
-            <!-- anima: cam-lente gira o anel de foco, centro 112 152 -->
-            <g id="cam-lente">
-              <circle cx="112" cy="152" r="70" fill="#000000" fill-opacity=".06"/>
-              <circle cx="112" cy="152" r="64" fill="#000000"/>
-              <circle cx="112" cy="152" r="57" fill="#F8F9FA"/>
-              <circle cx="112" cy="152" r="53" fill="#000000"/>
-              <circle cx="112" cy="152" r="47" fill="#006194"/>
-              <circle cx="112" cy="152" r="43" fill="none" stroke="#FFFFFF" stroke-opacity=".25" stroke-width="1.5"/>
-              <circle cx="112" cy="152" r="36" fill="#006194"/>
-              <circle cx="112" cy="152" r="36" fill="#000000" fill-opacity=".25"/>
-              <circle cx="112" cy="152" r="26" fill="#000000"/>
-              <circle cx="112" cy="152" r="14" fill="#006194" fill-opacity=".55"/>
-              <circle cx="112" cy="152" r="7" fill="#000000"/>
-              <path d="M78 178A47 47 0 0 0 146 178" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".35"/>
-              <circle cx="90" cy="128" r="11" fill="#FFFFFF" opacity=".92"/>
-              <circle cx="80" cy="144" r="4" fill="#FFFFFF" opacity=".7"/>
-              <circle cx="138" cy="172" r="5" fill="#FD761A"/>
-              <path d="M112 90v6M112 208v6M50 152h6M168 152h6" stroke="#FFFFFF" stroke-width="2" opacity=".5" stroke-linecap="round"/>
-            </g>
-            <!-- anima: cam-botao afunda 1 px, centro 246 130 -->
-            <g id="cam-botao">
-              <circle cx="246" cy="130" r="25" fill="#000000" fill-opacity=".08"/>
-              <circle cx="246" cy="130" r="20" fill="#FD761A"/>
-              <path d="M233 124a14 14 0 0 1 14-8" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".7"/>
-            </g>
-            <g fill="#000000" opacity=".85"><rect x="214" y="168" width="64" height="6" rx="3"/><rect x="214" y="180" width="64" height="6" rx="3"/><rect x="214" y="192" width="64" height="6" rx="3"/></g>
-            <circle cx="34" cy="196" r="5" fill="#FD761A"/>
-            <rect x="18" y="106" width="22" height="10" rx="5" fill="#000000" fill-opacity=".85"/>
-          </g>
-          <!-- anima: cam-fenda é a boca de saída, não se move -->
-          <g id="cam-fenda">
-            <rect x="66" y="212" width="168" height="16" rx="8" fill="#000000"/>
-            <path d="M76 216H224" fill="none" stroke="#F8F9FA" stroke-width="1.5" opacity=".35"/>
-          </g>
-          <g clip-path="url(#cam-clip-fenda)">
-            <!-- anima: cam-foto sai pela fenda, translateY 150 → 255.8 (58% da própria altura) -->
-            <g id="cam-foto" transform="translate(75 232)" filter="url(#cam-papel)">
-              <rect width="150" height="182.38" rx="3" fill="#FFFFFF"/>
-              <rect x=".5" y=".5" width="149" height="181.38" rx="3" fill="none" stroke="#000000" stroke-opacity=".05"/>
-              <rect x="10.23" y="10.23" width="129.54" height="129.54" fill="#006194" fill-opacity=".08"/>
-              <g transform="translate(10.23 10.23) scale(1.7045)"><use href="#cam-cena-montanha"/></g>
-              <rect x="10.23" y="10.23" width="129.54" height="129.54" fill="none" stroke="#000000" stroke-opacity=".06"/>
-            </g>
-          </g>
-          </g>
-        </svg>
-        <!-- câmera realista (D-142): entra no lugar do desenho quando o arquivo existe -->
-        <img class="cam-real" data-midia-camera="perfil" data-midia-base="assets/" width="800" height="626" alt="" hidden>
-      </div>
-      <!-- polaroids pousadas: moldura em HTML com a foto dentro, legenda e data manuscritas (D-143) -->
-      <figure class="hero__pol hero__pol--praia"><img data-midia-foto="amigos-praia" data-midia-base="assets/" src="assets/img/fotos/amigos-praia.jpg" width="76" height="76" alt="" loading="lazy"><figcaption class="hero__pol-leg">Praia com a turma<span>12/01/2025</span></figcaption></figure>
-      <figure class="hero__pol hero__pol--viagem"><img data-midia-foto="amigos-estrada" data-midia-base="assets/" src="assets/img/fotos/amigos-estrada.jpg" width="76" height="76" alt="" loading="lazy"><figcaption class="hero__pol-leg">Pé na estrada<span>03/2025</span></figcaption></figure>
-      </div>
+     <div class="midia midia--hero" data-midia="mesa-polaroids" data-midia-base="assets/"
+          data-midia-percurso-vertical="[[0,50,26,1],[0.18,50,26,1],[0.52,60,80,1.24],[0.8,60,80,1.24],[1,50,26,1]]"
+          role="img" aria-label="Vídeo: numa mesa de madeira, no fim da tarde, uma pessoa segura o celular e passa pelas fotos da galeria. Ao lado, polaroids espalhadas com fotos de amigos rindo, de uma praia, de uma montanha e de uma cidade ao pôr do sol.">
+      <picture class="midia__pic"><source media="(max-width:599px)" srcset="assets/video/mesa-polaroids-vertical-poster.jpg"><img class="midia__poster" src="assets/video/mesa-polaroids-poster.jpg" alt="" fetchpriority="high" decoding="async"></picture>
+      <video class="midia__video" muted autoplay loop playsinline preload="none" tabindex="-1" disablepictureinpicture aria-hidden="true"></video>
      </div>
     </div>
   </section>

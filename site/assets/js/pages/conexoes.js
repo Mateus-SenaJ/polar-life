@@ -15,7 +15,7 @@ var S=[
  {id:'camera',sec:'trazer',n:'Câmera',ic:'camera',e:'disp',a:'No celular, tire a foto na hora.'},
  {id:'apple',sec:'trazer',n:'Apple Fotos (iPhone e iPad)',ic:'aparelho',e:'disp',a:'No iPhone, escolha Biblioteca de Fotos no seletor. As fotos do iCloud que já aparecem na galeria funcionam.',t:'dev'},
  {id:'icloud',sec:'trazer',n:'iCloud Fotos (web)',ic:'nuvem',e:'ind',a:'Não há acesso por aqui. No iPhone ou iPad, toque em Do aparelho e escolha Biblioteca de Fotos.',g:'apple'},
- {id:'google',sec:'trazer',n:'Google Fotos',ic:'nuvem',e:'disp',a:'Você escolhe as fotos numa janela do próprio Google. Só as escolhidas vêm para este aparelho.'},
+ {id:'google',sec:'trazer',n:'Google Fotos',ic:'google',e:'disp',a:'Você escolhe as fotos numa janela do próprio Google. Só as escolhidas vêm para este aparelho.'},
  {id:'compartilhar',sec:'levar',n:'Compartilhar o arquivo',ic:'share',e:'disp',a:temShare?'Envie pelo menu do aparelho.':'Neste navegador o arquivo é baixado e você escolhe o aplicativo.',t:'saida'},
  {id:'instagram',sec:'levar',n:'Instagram',ic:'rede',e:'ind',a:'O Instagram não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho. Para enviar, use Compartilhar ou baixe a imagem.',t:'rede',g:'rede'},
  {id:'facebook',sec:'levar',n:'Facebook',ic:'rede',e:'ind',a:'O Facebook não permite importar por aqui. Salve a foto no aparelho e escolha Do aparelho. Para enviar, use Compartilhar ou baixe a imagem.',t:'rede',g:'rede'}
@@ -25,7 +25,7 @@ function porId(i){return S.filter(function(s){return s.id===i})[0]}
 function card(s){var e=EST[s.e];
  var acoes=s.e==='disp'?(s.id==='compartilhar'?'':'<a class="btn2" href="../adicionar-fotos/">Escolher fotos</a>'):s.e==='erro'?'':s.g?'<button type="button" class="btn2" data-g="'+s.g+'">Ver como fazer</button>':'<a class="btn2" href="../adicionar-fotos/">Escolher do aparelho</a>';
  if(s.t)acoes+='<button type="button" class="btn2" data-t="'+s.id+'">'+(s.e==='erro'?'Tentar de novo':'Testar conexão')+'</button>';
- return '<article class="cx" aria-labelledby="n-'+s.id+'"><div class="cx__top">'+svg(s.ic)+'<span class="cx__nome" id="n-'+s.id+'">'+s.n+'</span></div><span class="sel'+(s.e==='erro'?' sel--erro':'')+'">'+svg(e[0])+e[1]+'</span><p class="cx__ajuda">'+s.a+'</p><div class="cx__acoes">'+acoes+'</div></article>'}
+ return '<article class="cx" aria-labelledby="n-'+s.id+'"><div class="cx__top">'+(s.ic==='google'?'<img class="ico ico--g" src="../../assets/img/marcas/google-g.svg" width="20" height="20" alt="">':svg(s.ic))+'<span class="cx__nome" id="n-'+s.id+'">'+s.n+'</span></div><span class="sel'+(s.e==='erro'?' sel--erro':'')+'">'+svg(e[0])+e[1]+'</span><p class="cx__ajuda">'+s.a+'</p><div class="cx__acoes">'+acoes+'</div></article>'}
 ['trazer','levar'].forEach(function(k){$(k).innerHTML=S.filter(function(s){return s.sec===k}).map(card).join('')});
 
 /* diálogo (foco preso, Esc fecha) */

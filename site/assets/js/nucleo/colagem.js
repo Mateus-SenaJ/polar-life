@@ -4,19 +4,22 @@
    Cada célula: {f, x, y, w, h, giro, rot, s}: caixa sem rotação (w × h), giro de 90° da grade, rot em graus e escala s (1; só o Coração reduz) em torno do centro. */
 (function(){
 var LAYOUTS=[
-  {id:'grade',n:'Grade justa',d:'Polaroids encostadas, em linhas e colunas, no centro da folha.'},
-  {id:'mosaico',n:'Mosaico em tijolo',d:'Linhas encaixadas, cada uma deslocada meia polaroid.'},
-  {id:'espalhadas',n:'Espalhadas',d:'Polaroids soltas, com leve rotação e sobreposição.'},
-  {id:'tira',n:'Tira',d:'Faixas de polaroids lado a lado, como uma tira de fotos.'},
-  {id:'coracao',n:'Coração',d:'Polaroids menores formando um coração.',esc:true},
+  /* D-207: min = fotos que o tipo pede para ficar reconhecível (a Colagem avisa quantas faltam e só segue com elas) */
+  {id:'grade',n:'Grade justa',d:'Polaroids encostadas, em linhas e colunas, no centro da folha.',min:4},
+  {id:'mosaico',n:'Mosaico em tijolo',d:'Linhas encaixadas, cada uma deslocada meia polaroid.',min:5},
+  {id:'espalhadas',n:'Espalhadas',d:'Polaroids soltas, com leve rotação e sobreposição.',min:3},
+  {id:'tira',n:'Tira',d:'Faixas de polaroids lado a lado, como uma tira de fotos.',min:3},
+  {id:'coracao',n:'Coração',d:'Polaroids menores formando um coração.',esc:true,min:8},
   /* D-195: layouts das colagens para as redes (DOC-06 §4). As polaroids diminuem por igual para caber (como no Coração, D-153) */
-  {id:'mural',n:'Mural',d:'Grade com respiro entre as polaroids.',esc:true},
-  {id:'capa',n:'Capa e destaques',d:'Uma polaroid grande e as outras menores embaixo.',esc:true},
-  {id:'tempo',n:'Linha do tempo',d:'Uma polaroid de cada lado de um traço, na ordem das datas.',esc:true},
-  {id:'varal',n:'Varal',d:'Polaroids penduradas num fio, presas com pregadores.',esc:true},
-  {id:'cabine',n:'Tira vertical',d:'Polaroids empilhadas numa coluna, como na cabine de fotos.',esc:true}
+  {id:'mural',n:'Mural',d:'Grade com respiro entre as polaroids.',esc:true,min:4},
+  {id:'capa',n:'Capa e destaques',d:'Uma polaroid grande e as outras menores embaixo.',esc:true,min:3},
+  {id:'tempo',n:'Linha do tempo',d:'Uma polaroid de cada lado de um traço, na ordem das datas.',esc:true,min:3},
+  {id:'varal',n:'Varal',d:'Polaroids penduradas num fio, presas com pregadores.',esc:true,min:3},
+  {id:'cabine',n:'Tira vertical',d:'Polaroids empilhadas numa coluna, como na cabine de fotos.',esc:true,min:3}
 ];
-var PADRAO={ativo:false,layout:'espalhadas',fundo:{tipo:'foto',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40},peca:'A4',orient:'retrato',margem:3,fotos:null};
+var PADRAO={ativo:false,layout:'espalhadas',fundo:{tipo:'foto',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40},peca:'A4',orient:'retrato',margem:3,fotos:null,
+  sombra:true,cantos:'retos',legendas:'auto',texto:''};   /* D-207: nunca contorno preto; sombra suave, cantos e onde vai a legenda */
+var LEGENDAS=[['auto','Automático'],['todas','Em todas'],['uma','Só em uma'],['caixa','Caixa de texto']];
 /* D-176: a Colagem tem tamanho próprio, separado do papel das Folhas de polaroids.
    D-195: tamanhos para as redes (DOC-06 §3): a imagem sai com os pixels de «rede», 4,5 px por mm (240 mm = 1080 px), sempre em pé */
 var PECAS={A4:{n:'A4',w:210,h:297},A3:{n:'A3',w:297,h:420},A5:{n:'A5',w:148,h:210},'13x18':{n:'13 × 18 cm',w:130,h:180},'10x15':{n:'10 × 15 cm',w:100,h:150},'20x30':{n:'20 × 30 cm',w:200,h:300},'20x20':{n:'20 × 20 cm',w:200,h:200},
@@ -36,6 +39,9 @@ function norm(c){
   d.fundo.px=num(f.px,0,100,50);d.fundo.py=num(f.py,0,100,50);d.fundo.suave=Math.round(num(f.suave,0,100,d.fundo.suave));
   d.peca=PECAS.hasOwnProperty(o.peca)?o.peca:'A4';d.orient=o.orient==='paisagem'&&!PECAS[d.peca].rede?'paisagem':'retrato';d.margem=num(o.margem,3,25,3);   /* D-195: imagem para as redes é sempre em pé */
   d.fotos=Array.isArray(o.fotos)?o.fotos.map(Number).filter(function(n,i,a){return n%1===0&&n>=1&&a.indexOf(n)===i}):null;   /* null = todas as fotos */
+  d.sombra=o.sombra!==false;d.cantos=o.cantos==='redondos'?'redondos':'retos';                                   /* D-207 */
+  d.legendas=LEGENDAS.some(function(x){return x[0]===o.legendas})?o.legendas:'auto';
+  d.texto=typeof o.texto==='string'?o.texto.replace(/\s+/g,' ').trim().slice(0,60):'';
   return d
 }
 /* foto do fundo: a escolhida, se ainda estiver no projeto; senão a primeira (D-151) */
@@ -260,7 +266,20 @@ function porData(f){return f.map(function(x,i){return{x:x,i:i,d:x&&x.m&&x.m.iso|
 
 var MEMO={};
 function rede(s){var c=s&&s.colagem?norm(s.colagem):s&&s.peca?norm(s):null;return c&&PECAS[c.peca].rede||null}   /* aceita a config da folha ou a da colagem */
-function area(s,p){var m=s.margem;return{x0:m,y0:m,x1:p.w-m,y1:p.h-m,smax:rede(s)?2:1}}
+/* D-207: com a «Caixa de texto», uma faixa embaixo fica para ela (nunca por cima das fotos, T4) */
+function banda(p,m){return Math.max(18,Math.min(42,(p.h-2*m)*.14))}
+function comCaixa(s){var c=s&&s.colagem?norm(s.colagem):null;return!!(c&&c.ativo!==false&&c.legendas==='caixa')}
+function area(s,p){var m=s.margem;return{x0:m,y0:m,x1:p.w-m,y1:p.h-m-(comCaixa(s)?banda(p,m):0),smax:rede(s)?2:1}}
+/* D-207: as polaroids se encostam (alguma moldura cobre parte de outra)? Então a legenda vai só na de cima */
+function encostam(cells,fw,fh){return cells.length>1&&cobertura(cells,fw,fh,{x0:0,y0:0,x1:1,y1:1})>.001}
+function modoLegenda(c,cells,fw,fh){return c.legendas==='auto'?(encostam(cells,fw,fh)?'uma':'todas'):c.legendas}
+function textoCaixa(c,cells){if(c.texto)return c.texto;for(var i=0;i<cells.length;i++){var t=cells[i].f&&cells[i].f.leg;if(t&&String(t).trim())return String(t).trim().slice(0,60)}return'Nossas memórias'}
+/* a caixa: centrada na faixa de baixo, levemente torta; o corpo do texto sai daqui (o mesmo na tela, no PDF e na imagem) */
+function caixaDe(A,p,m,txt){var b=banda(p,m),aw=A.x1-A.x0,w=Math.min(aw*.8,170),h=Math.min(b*.68,28),mmTxt=Math.min(h*.5,(w*.86)/Math.max(6,txt.length*.42));
+  return{x:A.x0+(aw-w)/2,y:A.y1+(b-h)/2,w:w,h:h,rot:-2,txt:txt,pt:Math.round(mmTxt*72/25.4*100)/100}}
+/* D-207: fotos que faltam para o tipo de colagem (0 = pode seguir) */
+function minimo(c){c=norm(c);var L=LAYOUTS.filter(function(l){return l.id===c.layout})[0];return L&&L.min||1}
+function faltam(c,total){c=norm(c);var n=c.fotos?Math.min(total,c.fotos.length):total;return Math.max(0,minimo(c)-n)}
 function papel(s){return window.PLFOLHAS.papel(s)}
 /* capacidade = maior k tal que todos os k' ≤ k têm posição válida (dentro da margem e com a regra de sobreposição) */
 function capDe(id,A,fw,fh){
@@ -279,6 +298,9 @@ function paginar(s,fr,fotos){
   ns.forEach(function(m){
     var raw=L.pos(m,A,fr.w,fr.h),dc=decoDe(c.layout,raw,A,fr),cells=raw.map(function(q,i){q.f=fotos[k+i];return q});k+=m;
     var sh={cells:cells,grupo:'',per:cap,parcial:m<cap};if(dc.length)sh.deco=dc;
+    var ml=modoLegenda(c,cells,fr.w,fr.h);sh.legendas=ml;                                   /* D-207 */
+    if(ml==='uma')cells.forEach(function(q,i){if(i<cells.length-1)q.semLeg=true});
+    else if(ml==='caixa'){cells.forEach(function(q){q.semLeg=true});sh.caixa=caixaDe(A,p,s.margem,textoCaixa(c,cells))}
     sheets.push(sh)
   });
   var maior=ns.reduce(function(t,m){return Math.max(t,m)},0);
@@ -311,5 +333,5 @@ function comModelo(atual,id){
 }
 window.PLCOLAGEM={PECAS:PECAS,config:config,escolhidas:escolhidas,LAYOUTS:LAYOUTS,PADRAO:PADRAO,norm:norm,fotoDeFundo:fotoDeFundo,fundo:fundo,eixoGrad:eixoGrad,blurMm:blurMm,clareia:clareia,
   capacidade:capacidade,contar:contar,paginar:paginar,dentro:dentro,cobertura:cobertura,JAN:JAN,LIM:LIM,ativa:function(s){return!!(s&&s.colagem&&s.colagem.ativo)},
-  rede:rede,MODELOS:MODELOS,comModelo:comModelo};
+  rede:rede,MODELOS:MODELOS,comModelo:comModelo,LEGENDAS:LEGENDAS,minimo:minimo,faltam:faltam};
 })();

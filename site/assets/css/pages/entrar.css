@@ -313,3 +313,25 @@ body{margin:0;background:var(--white);color:var(--black);font-family:'Inter',sys
 html:not(.ver-testes) .cx-testes,html:not(.ver-testes) .cx-div--testes{display:none!important}
 /* D-194: só o Google no segundo bloco: o botão ocupa a linha toda */
 .cx-prov__b:only-child{grid-column:1/-1}
+
+/* D-207: «Entrar com código» numa linha só dele, logo abaixo do Google; os links legais embaixo, sem encostar.
+   O botão do Google mostra «Continuar com o Google» inteiro (texto da diretriz de marca) e o «G» oficial. */
+.ico--g{width:20px;height:20px;flex:none}
+.cx-prov__b[data-prov=google] .cx-pre{display:inline}
+.cx-cod{display:flex;justify-content:center;width:auto;height:auto;margin:2px 0 0}
+.cx-cod .cx-cod__b{padding:0 12px;font-size:14px}
+.cx-links{display:flex;justify-content:center;flex-wrap:wrap;width:auto;gap:0 10px;margin:0;font-size:12px}
+.cx-links a{display:inline-flex;align-items:center;min-height:44px}
+@media (max-width:1023px){
+  .cx-cod{margin:0}
+  .ent__caixa{padding:14px 16px 4px}
+  .cx-criar{margin-top:6px}
+  .cx-div{margin:6px 0}
+}
+@media (max-width:1023px) and (max-height:760px){
+  .ent__faixa{padding:16px 20px 20px}
+  .ent__titulo{margin-top:20px;font-size:24px}
+  .ent__caixa > .cx-div:first-of-type span{display:none}
+  .ent__caixa > .cx-div:first-of-type{margin:4px 0}
+  .fld,.fld--first{margin-top:6px}
+}

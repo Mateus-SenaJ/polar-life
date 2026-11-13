@@ -144,13 +144,13 @@ function folhasDe(f){var o=(PLFOLHAS.lerFolhas||PLFOLHAS.ler)(),n=Q.N,v=0,i;for(
 function medida(f){var h=f.ori==='h';return v2s(h?f.h:f.w)+' × '+v2s(h?f.w:f.h)+' '+UN[un].u}
 function dialogoFmt(){
   if($('fmt-dlg'))return;
-  var sc=document.createElement('div');sc.className='scrim';sc.id='fmt-scrim';sc.hidden=true;
-  var d=document.createElement('div');d.className='dialog';d.id='fmt-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
+  var sc=document.createElement('div');sc.className='scrim led-scrim';sc.id='fmt-scrim';sc.hidden=true;   /* D-207: pop-up de verdade (película + caixa nível 3), por cima do painel no celular */
+  var d=document.createElement('div');d.className='dialog led-dialog led-box led-box--3';d.id='fmt-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
   d.setAttribute('aria-labelledby','fmt-t');d.setAttribute('aria-describedby','fmt-d');d.hidden=true;
-  d.innerHTML='<h2 id="fmt-t"></h2><p id="fmt-d">A moldura vale para todas as fotos do projeto. O papel e o espaço entre polaroids não mudam.</p>'
+  d.innerHTML='<h2 class="led-dialog__title" id="fmt-t"></h2><p id="fmt-d">A moldura vale para todas as fotos do projeto. O papel e o espaço entre polaroids não mudam.</p>'
     +'<div class="antdep" role="group" aria-label="Antes e depois"><div><span class="rotulo antdep__k">Antes</span><strong id="fmt-a1"></strong><span class="mono" id="fmt-a2"></span><span class="mono" id="fmt-a3"></span></div>'
     +'<div><span class="rotulo antdep__k">Depois</span><strong id="fmt-d1"></strong><span class="mono" id="fmt-d2"></span><span class="mono" id="fmt-d3"></span></div></div>'
-    +'<div class="dialog__act"><button type="button" class="btn2 btn2--lg" id="fmt-nao">Manter formato atual</button>'
+    +'<div class="dialog__act led-dialog__actions"><button type="button" class="btn2 btn2--lg" id="fmt-nao">Manter formato atual</button>'
     +'<button type="button" class="led-btn led-btn--light" id="fmt-sim"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span>Trocar formato</span></span></button></div>';
   document.body.appendChild(sc);document.body.appendChild(d);
   $('fmt-nao').onclick=function(){fechaFmt()};sc.onclick=function(){fechaFmt()};

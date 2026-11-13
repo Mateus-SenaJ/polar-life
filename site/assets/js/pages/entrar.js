@@ -15,6 +15,8 @@ var MARCA={
  google:'<path d="M21.35 11.1H12v2.98h5.35c-.23 1.4-1.68 4.1-5.35 4.1a6.02 6.02 0 0 1 0-12.04c1.9 0 3.17.8 3.9 1.5l2.66-2.56A9.4 9.4 0 0 0 12 2.6a9.4 9.4 0 1 0 0 18.8c5.43 0 9.03-3.82 9.03-9.2 0-.62-.07-1.1-.18-1.1z"/>',
  apple:'<path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.86-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.05 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.65-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/>'
 };
+/* D-207: o Google entra com o «G» oficial em quatro cores (diretriz de marca do Google; exceção à T2 só para a marca dele) */
+function marca(id){return id==='google'?'<img class="ico--marca ico--g" src="../../assets/img/marcas/google-g.svg" width="20" height="20" alt="">':'<svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[id]||'')+'</svg>'}
 function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]})}
 var RE_EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,7 +76,7 @@ function renderEmail(manter){
     '</form>'+
     '<button type="button" class="btn2 cx-criar" id="b-criar"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Criar nova conta</button>'+
     '<div class="cx-div" aria-hidden="true"><span>ou</span></div>'+
-    '<div class="cx-prov" role="group" aria-label="Entrar com Google">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'"><svg class="ico ico--marca" viewBox="0 0 24 24" aria-hidden="true">'+(MARCA[pv.id]||'')+'</svg><span><span class="cx-pre">Continuar com </span>'+pv.nome+'</span></button>'}).join('')+'</div>'+
+    '<div class="cx-prov" role="group" aria-label="Entrar com Google">'+C.provedores().map(function(pv){return '<button type="button" class="btn2 cx-prov__b" data-prov="'+pv.id+'">'+marca(pv.id)+'<span><span class="cx-pre">Continuar com '+(pv.id==='google'?'o ':'')+'</span>'+pv.nome+'</span></button>'}).join('')+'</div>'+
     '<p class="cx-cod"><button type="button" class="cx-cod__b" id="b-via-codigo">Entrar com código</button></p>'+
     '<p class="cx-links"><a href="../../legal/#privacidade">Privacidade</a> · <a href="../../legal/#termos">Termos</a> · <a href="../../legal/#cookies">Cookies</a></p>'+
     '<div class="cx-div cx-div--testes" aria-hidden="true"><span>ou</span></div>'+
