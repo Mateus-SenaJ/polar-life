@@ -16,7 +16,7 @@ const quer = (g) => !so.length || so.includes(g);
 const FOTOS = ['amigos-viagem', 'paisagem-lago', 'amigos-estrada', 'cidade-rua', 'cidade-grafite', 'cidade-luzes', 'casal-por-do-sol', 'casal-cidade',
   'casal-serra', 'amigas-praia', 'familia-por-do-sol', 'amigos-abraco', 'casal-bicicletas', 'casal-praia', 'amigos-praia', 'amigos-trilha',
   'casal-noite', 'casal-ponte', 'casal-campo', 'amigos-cidade', 'amigos-acampamento', 'amigos-skate', 'paisagem-mar', 'paisagem-rochas',
-  'paisagem-estrelas', 'paisagem-pier', 'cidade-multidao', 'cidade-porto', 'cidade-mochila', 'praia', 'montanha', 'por-do-sol', 'cidade', 'viagem'];
+  'paisagem-estrelas', 'paisagem-pier', 'cidade-multidao', 'cidade-porto', 'cidade-mochila', 'praia', 'montanha', 'por-do-sol', 'cidade', 'viagem', 'casal'];
 const ID = Object.fromEntries(FOTOS.map((n, i) => [n, i + 1]));
 const FMT = { classico: { w: 88, h: 107, jh: 76, lado: 6, topo: 6 }, mini: { w: 60, h: 73, jh: 48, lado: 6, topo: 6 }, pocket: { w: 66, h: 99, jh: 79, lado: 3, topo: 3 },
   imini: { w: 54, h: 86, jh: 62, lado: 4, topo: 5 }, isq: { w: 72, h: 86, jh: 62, lado: 5, topo: 5 }, iwide: { w: 108, h: 86, jh: 62, lado: 4.5, topo: 5 } };
@@ -84,16 +84,85 @@ async function colagem(o) {
   return b64;
 }
 /* ---------- composição: as polaroids (PNG) sobre uma superfície, com sombra e leve giro ---------- */
-async function compor(nome, w, h, fundo, itens, q, extra) {
+async function compor(nome, w, h, fundo, itens, q, extra, sobre) {
+  if (fundo.charAt(0) === '<') { extra = fundo + (extra || ''); fundo = '#FFFFFF'; }   /* fundo desenhado (SVG) */
   const cp = await ctx.newPage(); await cp.setViewportSize({ width: w, height: h });
   const el = itens.map((it) => '<img src="data:image/png;base64,' + it.png + '" style="position:absolute;left:' + it.x + 'px;top:' + it.y + 'px;width:' + it.w + 'px;transform:rotate(' + (it.r || 0) + 'deg);filter:drop-shadow(0 ' + (it.s || 10) + 'px ' + (it.s || 10) * 1.8 + 'px rgba(0,0,0,' + (it.so || .28) + '))">').join('');
-  await cp.setContent('<html><head><style>html,body{margin:0;width:' + w + 'px;height:' + h + 'px;overflow:hidden}</style></head><body style="position:relative;background:' + fundo + '">' + (extra || '') + el + '</body></html>');
+  await cp.setContent('<html><head><style>html,body{margin:0;width:' + w + 'px;height:' + h + 'px;overflow:hidden}</style></head><body style="position:relative;background:' + fundo + '">' + (extra || '') + el + (sobre || '') + '</body></html>');
   await cp.waitForTimeout(400);
   const buf = await cp.screenshot({ type: 'jpeg', quality: q || 80 });
   writeFileSync(OUT + nome, buf); await cp.close();
   console.log('  ✔ vitrine/' + nome + ' (' + Math.round(buf.length / 1024) + ' KB)');
 }
-const MESA = 'url(' + srv.url + 'assets/img/fotos/mesa.jpg) center/cover';
+/* ---------- fundos das sugestões: desenhados aqui mesmo (SVG), sem arquivo nem imagem de fora (T6). Superfícies que se veem
+   em posts e stories: degradês de céu e pôr do sol, linho, papel, quadriculado, terrazzo, cortiça, confete… Cada um é um
+   <svg> de 400 × 300 que cobre o cartão; o sorteio é sempre o mesmo (semente fixa), para a imagem não mudar a cada geração ---------- */
+const sorteio = (semente) => { let a = semente >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+const n1 = (v) => Math.round(v * 10) / 10;
+/* pontos bem distribuídos: uma grade com cada ponto deslocado dentro da sua casa */
+const espalha = (cols, lins, r) => { const a = []; for (let j = 0; j < lins; j++) for (let i = 0; i < cols; i++) a.push([n1((i + .15 + r() * .7) * 400 / cols), n1((j + .15 + r() * .7) * 300 / lins)]); return a; };
+const GRAO = '<filter id="grao" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .25  0 0 0 0 .2  0 0 0 0 .15  0 0 0 .6 -.22"/></filter>';
+const fibra = (id, bf, forca) => '<filter id="' + id + '" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="' + bf + '" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .22  0 0 0 0 .12  0 0 0 ' + forca + ' ' + n1(-forca * .38) + '"/></filter>';
+const degr = (id, cores, v) => '<linearGradient id="' + id + '" x1="' + v[0] + '" y1="' + v[1] + '" x2="' + v[2] + '" y2="' + v[3] + '">' + cores.map((c, i) => '<stop offset="' + n1(i / (cores.length - 1)) + '" stop-color="' + c + '"/>').join('') + '</linearGradient>';
+const CHEIO = '<rect width="400" height="300" ';
+const tela = (defs, corpo, grao) => '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="position:absolute;left:0;top:0"><defs>' + GRAO + defs + '</defs>' + corpo + CHEIO + 'filter="url(#grao)" opacity="' + (grao == null ? .5 : grao) + '"/></svg>';
+const F = {
+  degrade: (cores, v) => tela(degr('d', cores, v || [0, 0, 1, 1]), CHEIO + 'fill="url(#d)"/>', .6),
+  nuvens: (cores, semente, cor) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of [[40, 50], [330, 36], [200, 20], [70, 250], [350, 230], [215, 285], [20, 150], [385, 140]]) for (let i = 0; i < 5; i++) c += '<ellipse cx="' + n1(x + (r() - .5) * 90) + '" cy="' + n1(y + (r() - .5) * 22) + '" rx="' + n1(24 + r() * 30) + '" ry="' + n1(10 + r() * 10) + '"/>';
+    return tela(degr('d', cores, [0, 0, 0, 1]) + '<filter id="nv" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>', CHEIO + 'fill="url(#d)"/><g fill="' + (cor || '#FFFFFF') + '" opacity=".82" filter="url(#nv)">' + c + '</g>', .35); },
+  praia: () => { const onda = (y, a) => { let d = 'M-20 -40V' + y; for (let x = -20; x <= 440; x += 20) d += 'L' + x + ' ' + n1(y + a * Math.sin(x / 46 + y / 9)); return d + 'V-40Z'; };
+    return tela(degr('m', ['#2FB7C9', '#7FDCD8'], [0, 0, 0, 1]), CHEIO + 'fill="#F4E1C1"/><g transform="rotate(-7 200 150)"><path d="' + onda(132, 9) + '" fill="#E6CFA8"/><path d="' + onda(120, 9) + '" fill="#FFFFFF" opacity=".9"/><path d="' + onda(108, 8) + '" fill="url(#m)"/><path d="' + onda(66, 6) + '" fill="#1FA3BD" opacity=".35"/></g>', .7); },
+  linho: (cor) => tela(fibra('fh', '.012 .7', .5) + fibra('fv', '.7 .012', .5), CHEIO + 'fill="' + cor + '"/>' + CHEIO + 'filter="url(#fh)"/>' + CHEIO + 'filter="url(#fv)"/>', .4),
+  quadriculado: (base, linha, passo) => tela('<pattern id="q" width="' + passo + '" height="' + passo + '" patternUnits="userSpaceOnUse" x="' + passo / 2 + '" y="' + passo / 2 + '"><path d="M' + passo + ' 0H0V' + passo + '" fill="none" stroke="' + linha + '" stroke-width="1.4"/></pattern>', CHEIO + 'fill="' + base + '"/>' + CHEIO + 'fill="url(#q)"/>', .45),
+  xadrez: (c1, c2, p) => tela('<pattern id="x" width="' + 2 * p + '" height="' + 2 * p + '" patternUnits="userSpaceOnUse"><rect width="' + p + '" height="' + p + '" fill="' + c2 + '"/><rect x="' + p + '" y="' + p + '" width="' + p + '" height="' + p + '" fill="' + c2 + '"/></pattern>', CHEIO + 'fill="' + c1 + '"/>' + CHEIO + 'fill="url(#x)"/>', .45),
+  listras: (c1, c2, larg) => tela('<pattern id="l" width="' + 2 * larg + '" height="10" patternUnits="userSpaceOnUse"><rect width="' + larg + '" height="10" fill="' + c2 + '"/></pattern>', CHEIO + 'fill="' + c1 + '"/>' + CHEIO + 'fill="url(#l)"/>', .5),
+  bolinhas: (base, cor, p, raio) => tela('<pattern id="b" width="' + p + '" height="' + p + '" patternUnits="userSpaceOnUse"><circle cx="' + p / 4 + '" cy="' + p / 4 + '" r="' + raio + '" fill="' + cor + '"/><circle cx="' + p * 3 / 4 + '" cy="' + p * 3 / 4 + '" r="' + raio + '" fill="' + cor + '"/></pattern>', CHEIO + 'fill="' + base + '"/>' + CHEIO + 'fill="url(#b)"/>', .45),
+  terrazzo: (base, cores, semente) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of espalha(13, 10, r)) { const n = 4 + Math.floor(r() * 3), raio = 2.5 + r() * r() * 11, g = r() * 6.28; let pts = '';
+      for (let i = 0; i < n; i++) { const a = g + (i + r() * .6) * 6.28 / n, q = raio * (.55 + r() * .6); pts += n1(x + Math.cos(a) * q) + ',' + n1(y + Math.sin(a) * q) + ' '; }
+      c += '<polygon points="' + pts.trim() + '" fill="' + cores[Math.floor(r() * cores.length)] + '"/>'; }
+    return tela('', CHEIO + 'fill="' + base + '"/>' + c, .55); },
+  cortica: () => tela('<filter id="ck" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".2" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 .42  0 0 0 0 .26  0 0 0 0 .12  0 0 0 3.4 -1.85"/></filter><filter id="cl" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="2" seed="29"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 .9  0 0 0 0 .72  0 0 0 2.2 -1.35"/></filter>',
+    CHEIO + 'fill="#CFA571"/>' + CHEIO + 'filter="url(#cl)" opacity=".7"/>' + CHEIO + 'filter="url(#ck)" opacity=".75"/>', 1),
+  confete: (cores, tons, semente) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of espalha(11, 8, r)) { const cor = tons[Math.floor(r() * tons.length)], t = r(), g = Math.round(r() * 180);
+      c += t < .4 ? '<circle cx="' + x + '" cy="' + y + '" r="' + n1(1.8 + r() * 2.2) + '" fill="' + cor + '"/>'
+        : t < .8 ? '<rect x="' + x + '" y="' + y + '" width="' + n1(5 + r() * 4) + '" height="3" rx="1" fill="' + cor + '" transform="rotate(' + g + ' ' + x + ' ' + y + ')"/>'
+        : '<path d="M' + x + ' ' + y + 'q4 -6 8 0t8 0" fill="none" stroke="' + cor + '" stroke-width="2" stroke-linecap="round" transform="rotate(' + g + ' ' + x + ' ' + y + ')"/>'; }
+    return tela(degr('d', cores, [0, 0, 1, 1]), CHEIO + 'fill="url(#d)"/><g opacity=".9">' + c + '</g>', .4); },
+  manchas: (base, bolas) => tela(bolas.map((b, i) => '<radialGradient id="mc' + i + '"><stop offset="0" stop-color="' + b[3] + '"/><stop offset=".45" stop-color="' + b[3] + '" stop-opacity=".7"/><stop offset="1" stop-color="' + b[3] + '" stop-opacity="0"/></radialGradient>').join(''), CHEIO + 'fill="' + base + '"/>' + bolas.map((b, i) => '<circle cx="' + b[0] + '" cy="' + b[1] + '" r="' + b[2] * 1.9 + '" fill="url(#mc' + i + ')"/>').join(''), .7),
+  luzes: (cores, tons, semente) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of espalha(9, 6, r)) c += '<circle cx="' + x + '" cy="' + y + '" r="' + n1(5 + r() * r() * 24) + '" fill="' + tons[Math.floor(r() * tons.length)] + '" opacity="' + n1(.1 + r() * .22) + '"/>';
+    return tela(degr('d', cores, [0, 0, .6, 1]) + '<filter id="lz" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.6"/></filter>', CHEIO + 'fill="url(#d)"/><g filter="url(#lz)">' + c + '</g>', .5); },
+  coracoes: (cores, tons, semente) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of espalha(9, 7, r)) c += '<path d="M0 3C-6 -4 -13 4 0 12C13 4 6 -4 0 3Z" fill="' + tons[Math.floor(r() * tons.length)] + '" opacity="' + n1(.55 + r() * .4) + '" transform="translate(' + x + ' ' + y + ') rotate(' + Math.round((r() - .5) * 50) + ') scale(' + n1(.6 + r() * .9) + ')"/>';
+    return tela(degr('d', cores, [0, 0, 1, 1]), CHEIO + 'fill="url(#d)"/>' + c, .4); },
+  estrelas: (cores, cor, semente) => { const r = sorteio(semente); let c = '';
+    for (const [x, y] of espalha(14, 10, r)) c += '<circle cx="' + x + '" cy="' + y + '" r="' + n1(.5 + r() * .9) + '" fill="#FFFFFF" opacity="' + n1(.35 + r() * .6) + '"/>';
+    for (const [x, y] of espalha(6, 4, r)) c += '<path d="M0 -6Q.8 -.8 6 0Q.8 .8 0 6Q-.8 .8 -6 0Q-.8 -.8 0 -6Z" fill="' + cor + '" opacity="' + n1(.6 + r() * .4) + '" transform="translate(' + x + ' ' + y + ') scale(' + n1(.5 + r() * .9) + ')"/>';
+    return tela(degr('d', cores, [0, 0, .3, 1]), CHEIO + 'fill="url(#d)"/>' + c, .35); },
+  ondas: (cores) => { let c = CHEIO + 'fill="' + cores[0] + '"/>';
+    cores.slice(1).forEach((cor, i) => { const y = 300 * (i + 1) / cores.length; let d = 'M-10 320V' + y; for (let x = -10; x <= 410; x += 14) d += 'L' + x + ' ' + n1(y + 13 * Math.sin(x / 58 + i * 1.9)); c += '<path d="' + d + 'V320Z" fill="' + cor + '"/>'; });
+    return tela('', c, .6); },
+  caderno: () => { let c = ''; for (let y = 28; y < 300; y += 22) c += '<path d="M0 ' + y + 'H400" stroke="#BCD6EC" stroke-width="1.2"/>';
+    return tela('', CHEIO + 'fill="#FFFCF3"/>' + c + '<path d="M44 0V300" stroke="#F2A9B4" stroke-width="1.4"/>', .45); },
+  doisTons: (c1, c2) => tela('', CHEIO + 'fill="' + c1 + '"/><path d="M228 0H400V300H172Z" fill="' + c2 + '"/>', .6),
+  parede: (cor) => tela('<radialGradient id="pl" cx=".22" cy=".1" r="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".5"/><stop offset=".6" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".08"/></radialGradient>', CHEIO + 'fill="' + cor + '"/>' + CHEIO + 'fill="url(#pl)"/>', .7),
+};
+/* fita adesiva de papel (washi) presa na borda de cima da peça, nunca sobre a foto (T4) */
+const fita = (x, y, giro, cor) => '<div style="position:absolute;left:' + x + 'px;top:' + y + 'px;width:66px;height:19px;transform:rotate(' + giro + 'deg);background:repeating-linear-gradient(45deg,rgba(255,255,255,.4) 0 4px,rgba(255,255,255,0) 4px 9px),' + cor + ';opacity:.9;box-shadow:0 1px 2px rgba(0,0,0,.18)"></div>';
+const FUNDO = {
+  viagem: F.nuvens(['#6FB7EA', '#CDE9FB'], 5), cidade: F.luzes(['#141B3F', '#3A2466', '#7A2F6B'], ['#FFD08A', '#FF8FB1', '#8FD3FF', '#FFFFFF'], 21), casal: F.manchas('#FFE9E4', [[60, 40, 120, '#FFC2D1'], [350, 80, 120, '#E4D1FF'], [200, 300, 130, '#FFD9B8']]),
+  coracao: F.coracoes(['#FFD3DF', '#FFE6EC'], ['#FFFFFF', '#FF9DB6', '#FFB9C9'], 9), varal: F.cortica(), mesa: F.terrazzo('#F6F1E9', ['#E8A18B', '#8FB8A8', '#F2C66D', '#5C7C8A', '#D9C3A9'], 4),
+  praia: F.praia(), familia: F.listras('#FFF6EA', '#FFD9BF', 26), quadradas: F.manchas('#DDF3EC', [[50, 60, 110, '#BFE3F7'], [360, 250, 120, '#C9EFD6'], [330, 30, 90, '#FFF3C9']]),
+  'status-tira': F.degrade(['#BDF0E6', '#5CC9D6', '#3B8FD1'], [0, 0, .5, 1]), 'status-varal': F.linho('#EEE5D6'), 'status-tempo': F.caderno(), 'status-capa': F.degrade(['#BFD9FF', '#D9CCFF', '#FFD6E8']),
+  'status-mural': F.bolinhas('#D6F1E4', '#FFFFFF', 30, 3.6), 'status-mesa': F.ondas(['#FCEBD2', '#F8CE9A', '#F0A679', '#DE7F68', '#B8627A']),
+  dump: F.quadriculado('#FBF6EC', '#E7CDB4', 22), retrospectiva: F.manchas('#5B3FD0', [[40, 30, 130, '#FF6FB5'], [370, 60, 120, '#3EC8FF'], [330, 300, 130, '#FFB05C'], [60, 300, 110, '#7B5CFF']]),
+  aniversario: F.confete(['#FFF0C2', '#FFDDE6'], ['#FF7FA5', '#5FC7E8', '#FFB12E', '#8E7CF0', '#49C79A', '#FFFFFF'], 31), amigas: F.xadrez('#FBEFFC', '#E3CFF7', 44),
+  historia: F.degrade(['#FFD59A', '#FF9E80', '#E873A2', '#8E67C7']), 'antes-depois': F.doisTons('#FFE2CF', '#CFE6F7'), ferias: F.nuvens(['#FFB79A', '#FFE0C4'], 12, '#FFF3F6'),
+  poster: F.parede('#C9D8C4'), virada: F.estrelas(['#6C63C9', '#B57FCB', '#F6A9B8', '#FFD9A6'], '#FFF6D8', 17),
+};
 
 /* ---------- D-198: uma colagem para as redes (imagem de verdade, 1080 px), reduzida para a prévia ---------- */
 async function imagemRede(cfg, lista, altura) {
@@ -119,38 +188,38 @@ if (quer('sug')) {
     await polaroid({ foto: 'amigos-viagem', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['Sydney com a turma', '03/2025'], flt: 'cinema' }),
     await polaroid({ foto: 'paisagem-lago', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['O lago mais azul', '04/2025'], flt: 'original' }),
     await polaroid({ foto: 'amigos-estrada', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['Pé na estrada', '03/2025'], flt: 'retro' })];
-  await compor('sug-viagem.jpg', 400, 300, MESA, [{ png: viagem[1], x: 16, y: 50, w: 150, r: -7 }, { png: viagem[2], x: 236, y: 56, w: 150, r: 6 }, { png: viagem[0], x: 122, y: 44, w: 156, r: -1 }]);
+  await compor('sug-viagem.jpg', 400, 300, FUNDO.viagem, [{ png: viagem[1], x: 16, y: 50, w: 150, r: -7 }, { png: viagem[2], x: 236, y: 56, w: 150, r: 6 }, { png: viagem[0], x: 122, y: 44, w: 156, r: -1 }]);
   const cidade = [
     await polaroid({ foto: 'cidade-rua', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Centro, 18h', '22/08/25'], flt: 'pb' }),
     await polaroid({ foto: 'cidade-grafite', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Beco das cores', '23/08/25'], flt: 'original' }),
     await polaroid({ foto: 'cidade-luzes', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Noite na cidade', '23/08/25'], flt: 'cinema' })];
-  await compor('sug-cidade.jpg', 400, 300, MESA, [{ png: cidade[0], x: 40, y: 48, w: 106, r: -8 }, { png: cidade[2], x: 254, y: 52, w: 106, r: 7 }, { png: cidade[1], x: 147, y: 42, w: 106, r: 1 }]);
+  await compor('sug-cidade.jpg', 400, 300, FUNDO.cidade, [{ png: cidade[0], x: 40, y: 48, w: 106, r: -8 }, { png: cidade[2], x: 254, y: 52, w: 106, r: 7 }, { png: cidade[1], x: 147, y: 42, w: 106, r: 1 }]);
   const casal = [
     await polaroid({ foto: 'casal-por-do-sol', fmt: 'pocket', pocket: true, linhas: ['Pipa - RN', '20/04/23'], flt: 'polaroid' }),
     await polaroid({ foto: 'casal-cidade', fmt: 'pocket', pocket: true, linhas: ['Salvador - BA', 'Pelourinho'], flt: 'desbotado' }),
     await polaroid({ foto: 'casal-serra', fmt: 'pocket', pocket: true, linhas: ['Itacaré - BA', '15/06/19'], flt: 'verao' })];
-  await compor('sug-casal.jpg', 400, 300, MESA, [{ png: casal[1], x: 40, y: 46, w: 110, r: -9 }, { png: casal[2], x: 250, y: 50, w: 110, r: 8 }, { png: casal[0], x: 145, y: 40, w: 112, r: -1 }]);
+  await compor('sug-casal.jpg', 400, 300, FUNDO.casal, [{ png: casal[1], x: 40, y: 46, w: 110, r: -9 }, { png: casal[2], x: 250, y: 50, w: 110, r: 8 }, { png: casal[0], x: 145, y: 40, w: 112, r: -1 }]);
   const coracao = await colagem({ layout: 'coracao', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['amigas-praia', 'casal-por-do-sol', 'amigos-praia', 'paisagem-mar', 'casal-bicicletas', 'familia-por-do-sol', 'amigos-abraco', 'casal-praia', 'paisagem-rochas', 'casal-campo', 'amigos-skate', 'casal-noite'], flts: ['verao', 'polaroid', 'original', 'praia', 'retro', 'original', 'verao', 'pb', 'cinema', 'pastel', 'noir', 'original'] });
-  await compor('sug-coracao.jpg', 400, 300, MESA, [{ png: coracao, x: 52, y: 44, w: 296, r: -2, s: 8 }]);
+  await compor('sug-coracao.jpg', 400, 300, FUNDO.coracao, [{ png: coracao, x: 52, y: 44, w: 296, r: -2, s: 8 }]);
   const varal = await colagem({ layout: 'tira', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['amigos-trilha', 'amigos-acampamento', 'paisagem-estrelas', 'amigos-viagem', 'casal-ponte', 'cidade-porto', 'amigos-cidade', 'casal-noite'], flts: ['retro', 'cinema', 'original', 'pastel', 'antiga', 'noir', 'instantanea', 'original'], linhas: ['Trilha', 'Fogueira', 'Céu', 'Sydney', 'Florença', 'Porto', 'Picnic', 'Noite'] });
-  await compor('sug-varal.jpg', 400, 300, MESA, [{ png: varal, x: 52, y: 44, w: 296, r: 2, s: 8 }]);
+  await compor('sug-varal.jpg', 400, 300, FUNDO.varal, [{ png: varal, x: 52, y: 44, w: 296, r: 2, s: 8 }]);
   const mesa = await colagem({ layout: 'espalhadas', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['casal-ponte', 'amigos-cidade', 'cidade-multidao', 'paisagem-lago', 'amigos-skate', 'casal-campo', 'cidade-mochila'], flts: ['polaroid', 'original', 'retro', 'verao', 'noir', 'pastel', 'desbotado'], fundo: { tipo: 'foto', cor: '#FFFFFF', cor2: '#F8F9FA', ang: 135, foto: null, px: 50, py: 50, suave: 40 }, fundoFoto: 'paisagem-mar', linhas: ['Florença', 'Picnic', 'Centro', 'Lago', 'Skate', 'Campo', 'Rolê'] });
-  await compor('sug-mesa.jpg', 400, 300, MESA, [{ png: mesa, x: 52, y: 44, w: 296, r: -1, s: 8 }]);
+  await compor('sug-mesa.jpg', 400, 300, FUNDO.mesa, [{ png: mesa, x: 52, y: 44, w: 296, r: -1, s: 8 }]);
   /* D-198: mais 3 de design e 6 colagens em pé (9:16) para status e reels, feitas pelo gerador de verdade */
   const praia = [
     await polaroid({ foto: 'paisagem-mar', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Mar azul', ''], flt: 'praia' }),
     await polaroid({ foto: 'praia', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Fim de tarde', ''], flt: 'verao' }),
     await polaroid({ foto: 'amigas-praia', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Dias de praia', '01/2026'], flt: 'verao' })];
-  await compor('sug-praia.jpg', 400, 300, MESA, [{ png: praia[0], x: 36, y: 84, w: 120, r: -8 }, { png: praia[1], x: 252, y: 88, w: 120, r: 7 }, { png: praia[2], x: 142, y: 70, w: 122, r: -1 }]);
+  await compor('sug-praia.jpg', 400, 300, FUNDO.praia, [{ png: praia[0], x: 36, y: 84, w: 120, r: -8 }, { png: praia[1], x: 252, y: 88, w: 120, r: 7 }, { png: praia[2], x: 142, y: 70, w: 122, r: -1 }]);
   const familia = [
     await polaroid({ foto: 'amigos-abraco', fmt: 'iwide', fonte: 'Patrick Hand', pt: [12, 10], linhas: ['Todo mundo junto', ''], flt: 'instantanea' }),
     await polaroid({ foto: 'familia-por-do-sol', fmt: 'iwide', fonte: 'Patrick Hand', pt: [12, 10], linhas: ['Família reunida', 'Natal 2025'], flt: 'verao' })];
-  await compor('sug-familia.jpg', 400, 300, MESA, [{ png: familia[0], x: 22, y: 96, w: 176, r: -5 }, { png: familia[1], x: 200, y: 70, w: 176, r: 5 }]);
+  await compor('sug-familia.jpg', 400, 300, FUNDO.familia, [{ png: familia[0], x: 22, y: 96, w: 176, r: -5 }, { png: familia[1], x: 200, y: 70, w: 176, r: 5 }]);
   const quadradas = [
     await polaroid({ foto: 'cidade-grafite', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Beco das cores', ''], flt: 'original' }),
     await polaroid({ foto: 'paisagem-pier', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Pôr do sol no píer', ''], flt: 'polaroid' }),
     await polaroid({ foto: 'casal-bicicletas', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Pedalando', ''], flt: 'pastel' })];
-  await compor('sug-quadradas.jpg', 400, 300, MESA, [{ png: quadradas[0], x: 40, y: 88, w: 116, r: -7 }, { png: quadradas[1], x: 246, y: 92, w: 116, r: 8 }, { png: quadradas[2], x: 142, y: 76, w: 118, r: 1 }]);
+  await compor('sug-quadradas.jpg', 400, 300, FUNDO.quadradas, [{ png: quadradas[0], x: 40, y: 88, w: 116, r: -7 }, { png: quadradas[1], x: 246, y: 92, w: 116, r: 8 }, { png: quadradas[2], x: 142, y: 76, w: 118, r: 1 }]);
   const STATUS = [
     ['status-tira', { peca: 'r916', layout: 'cabine', margem: 14, fundo: { tipo: 'cor', cor: '#000000' } }, [['amigas-praia', 'verao'], ['amigos-praia', 'praia'], ['casal-praia', 'polaroid'], ['paisagem-mar', 'original']]],
     ['status-varal', { peca: 'r916', layout: 'varal', margem: 10, fundo: { tipo: 'gradiente', cor: '#FFFFFF', cor2: '#F8F9FA', ang: 180 } }, [['familia-por-do-sol', 'verao'], ['casal-bicicletas', 'polaroid'], ['amigos-abraco', 'instantanea'], ['paisagem-pier', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro']]],
@@ -159,7 +228,24 @@ if (quer('sug')) {
     ['status-mural', { peca: 'r916', layout: 'mural', margem: 10, fundo: { tipo: 'cor', cor: '#FFFFFF' } }, [['paisagem-mar', 'praia'], ['amigas-praia', 'verao'], ['cidade-grafite', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro'], ['paisagem-estrelas', 'original'], ['amigos-cidade', 'instantanea'], ['casal-noite', 'cinema'], ['paisagem-rochas', 'desbotado'], ['casal-bicicletas', 'polaroid'], ['amigos-skate', 'noir'], ['cidade-porto', 'cinema']]],
     ['status-mesa', { peca: 'r916', layout: 'espalhadas', margem: 8, fundo: { tipo: 'foto', suave: 45 } }, [['casal-ponte', 'polaroid'], ['amigos-cidade', 'original'], ['cidade-multidao', 'retro'], ['paisagem-lago', 'verao']]],
   ];
-  for (const [nome, cfg, lista] of STATUS) { const png = await imagemRede(cfg, lista, 544); await compor('sug-' + nome + '.jpg', 400, 300, MESA, [{ png, x: 123, y: 14, w: 153, r: -2, s: 10, so: .35 }]); }
+  /* mais 9 sugestões populares (photo dump, retrospectiva, aniversário, melhores amigas, antes e depois…), nos tamanhos
+     das redes (4:5, 1:1 e 9:16) e duas para imprimir; os mesmos layouts e tamanhos que o cartão abre (home.js, SUG) */
+  const SOL = 'rgba(255,205,120,.9)', MENTA = 'rgba(150,215,195,.9)', R45 = { x: 96, y: 20, w: 208, alt: 520 }, R11 = { x: 76, y: 26, w: 248, alt: 496 };
+  const NOVAS = [
+    ['dump', { peca: 'r45', layout: 'mural', margem: 10, fundo: { tipo: 'cor', cor: '#F8F9FA' } }, [['cidade-grafite', 'original'], ['casal', 'retro'], ['amigos-cidade', 'instantanea'], ['paisagem-pier', 'original'], ['cidade-luzes', 'cinema'], ['amigos-skate', 'original'], ['praia', 'verao'], ['cidade-mochila', 'desbotado'], ['por-do-sol', 'original'], ['amigos-estrada', 'retro'], ['montanha', 'original'], ['casal-bicicletas', 'polaroid']], Object.assign({ r: -2 }, R45), fita(167, 11, -4, SOL)],
+    ['retrospectiva', { peca: 'r11', layout: 'mural', margem: 10, fundo: { tipo: 'cor', cor: '#FFFFFF' } }, [['paisagem-mar', 'praia', 'Janeiro'], ['amigos-viagem', 'cinema', 'Março'], ['casal-serra', 'original', 'Abril'], ['montanha', 'original', 'Junho'], ['amigos-acampamento', 'retro', 'Julho'], ['cidade', 'original', 'Setembro'], ['familia-por-do-sol', 'verao', 'Outubro'], ['paisagem-estrelas', 'original', 'Novembro'], ['amigos-abraco', 'verao', 'Dezembro']], Object.assign({ r: 2 }, R11)],
+    ['aniversario', { peca: 'r45', layout: 'capa', margem: 10, fundo: { tipo: 'gradiente', cor: '#FFF1D6', cor2: '#FFD6E0', ang: 160 } }, [['amigos-skate', 'verao', 'Parabéns pra você!', '13/11/2026'], ['amigos-praia', 'verao'], ['amigos-abraco', 'instantanea'], ['amigos-cidade', 'original'], ['familia-por-do-sol', 'verao']], Object.assign({ r: 2 }, R45)],
+    ['amigas', { peca: 'r11', layout: 'espalhadas', margem: 8, fundo: { tipo: 'gradiente', cor: '#FFE1EC', cor2: '#E6DBFF', ang: 135 } }, [['amigas-praia', 'verao', 'Nós duas'], ['amigos-cidade', 'instantanea', 'Piquenique'], ['amigos-abraco', 'verao', 'Sempre juntas'], ['amigos-estrada', 'retro', 'Pé na estrada']], Object.assign({ r: -2 }, R11)],
+    ['historia', { peca: 'r45', layout: 'tempo', margem: 10, fundo: { tipo: 'cor', cor: '#FFFFFF' } }, [['casal-cidade', 'original', 'O começo', '2021'], ['casal-bicicletas', 'polaroid', 'Primeira viagem', '2022'], ['casal-por-do-sol', 'verao', 'O pedido', '2023'], ['casal-serra', 'original', 'Nós dois', '2024']], Object.assign({ r: -2 }, R45)],
+    ['antes-depois', { peca: 'r916', layout: 'cabine', margem: 14, fundo: { tipo: 'cor', cor: '#F8F9FA' } }, [['casal-serra', 'original', 'Antes', '2019'], ['casal-campo', 'pastel', 'Depois', '2026']], { x: 123, y: 14, w: 153, alt: 544, r: 2 }],
+    ['virada', { peca: 'r45', layout: 'varal', margem: 10, fundo: { tipo: 'gradiente', cor: '#101B3D', cor2: '#3B1F5B', ang: 180 } }, [['cidade-luzes', 'cinema', 'Feliz ano novo!'], ['paisagem-estrelas', 'original'], ['amigos-skate', 'original'], ['cidade-porto', 'cinema']], Object.assign({ r: 2 }, R45)],
+  ];
+  for (const [nome, cfg, lista, g, sobre] of NOVAS) { const png = await imagemRede(cfg, lista, g.alt); await compor('sug-' + nome + '.jpg', 400, 300, FUNDO[nome], [{ png, x: g.x, y: g.y, w: g.w, r: g.r, s: 10, so: .3 }], 0, '', sobre); }
+  const ferias = await colagem({ layout: 'mosaico', orient: 'paisagem', margem: 8, fmt: 'mini', fotos: ['paisagem-mar', 'amigas-praia', 'praia', 'amigos-praia', 'montanha', 'paisagem-lago', 'viagem', 'amigos-estrada', 'paisagem-pier', 'por-do-sol', 'amigos-trilha', 'paisagem-rochas'], flts: ['praia', 'verao', 'verao', 'original', 'original', 'original', 'retro', 'retro', 'original', 'verao', 'original', 'desbotado'], linhas: ['Mar azul', 'Fim de tarde', 'Ondas', 'Pôr do sol', 'Serra', 'Lago', 'Estrada', 'Vento', 'Píer', 'Céu', 'Trilha', 'Rochas'] });
+  await compor('sug-ferias.jpg', 400, 300, FUNDO.ferias, [{ png: ferias, x: 52, y: 44, w: 296, r: -2, s: 8 }]);
+  const poster = await colagem({ peca: '20x30', layout: 'grade', orient: 'retrato', margem: 10, fmt: 'mini', fotos: ['amigos-abraco', 'paisagem-lago', 'casal-bicicletas', 'cidade-grafite', 'amigas-praia', 'paisagem-estrelas', 'amigos-trilha', 'cidade', 'familia-por-do-sol', 'paisagem-pier', 'casal-campo', 'amigos-viagem'], flts: ['verao', 'original', 'polaroid', 'original', 'verao', 'original', 'retro', 'original', 'verao', 'original', 'pastel', 'cinema'] });
+  await compor('sug-poster.jpg', 400, 300, FUNDO.poster, [{ png: poster, x: 112, y: 18, w: 176, r: 1, s: 8 }], 0, '', fita(104, 12, -38, MENTA) + fita(232, 12, 38, MENTA));
+  for (const [nome, cfg, lista] of STATUS) { const png = await imagemRede(cfg, lista, 544); await compor('sug-' + nome + '.jpg', 400, 300, FUNDO[nome], [{ png, x: 123, y: 14, w: 153, r: -2, s: 10, so: .35 }]); }
 }
 
 /* ===================== 2 · modelos do Início (cada um como o «Usar este modelo» aplica) ===================== */
