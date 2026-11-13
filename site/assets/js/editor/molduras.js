@@ -10,7 +10,7 @@ var $=function(i){return document.getElementById(i)};
 var FMT=[['classico','Clássico',88,107,1,6,6,76],['mini','Mini quadrado',60,73,1,6,6,48],['pocket','Retro Pocket',66,99,1,3,3,79],['imini','Instax Mini',54,86,1,4,5,62],['isq','Instax Square',72,86,1,5,5,62],['iwide','Instax Wide',108,86,1,4.5,5,62],['pers','Personalizado',88,107,1,6,6,76]];
 var UN={mm:{f:1,d:1,u:'mm'},cm:{f:10,d:2,u:'cm'},pol:{f:25.4,d:3,u:'pol'}};
 var un='mm',err=null,built=false;
-try{un=sessionStorage.getItem('pl-unidade')||'mm'}catch(e){}
+try{un=sessionStorage.getItem('pl-unidade')||(window.PLCONTA&&PLCONTA.preferencias?PLCONTA.preferencias().unidade:'mm')}catch(e){}   /* sem escolha na aba, vale a preferência da Conta */
 if(!UN[un])un='mm';
 var CAMPOS=[['w','Largura externa'],['h','Altura externa'],['jw','Largura da janela'],['jh','Altura da janela'],['lado','Margem lateral'],['topo','Faixa superior'],['bt','Faixa inferior (passe-partout)'],['rad','Cantos arredondados']];
 

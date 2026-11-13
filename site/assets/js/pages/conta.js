@@ -1,25 +1,48 @@
-/* T-27 · Conta · brief rodada 2 §3. Renderiza a partir de PLCONTA (plano, limites, recibos).
-   Pop-ups nível 3 com LED na opção segura (D-082). Sessão de código tem variante simplificada. */
+/* T-27 · Conta como página de configurações: Perfil, Plano e uso, Códigos, Pagamentos, Segurança, Preferências, Privacidade.
+   Navegação lateral no desktop (≥ 900 px) e lista que abre e fecha no celular. Tudo vem de PLCONTA, com a forma dos dados do
+   DOC-15 §8. Um LED só por tela (T8): «Ver folhas e planos». Pop-ups nível 3 com LED na opção segura (D-082).
+   Sessão por código de impressão (D-124) tem menos seções: não há conta, pagamento nem senha. */
 (function(){
 var $=function(i){return document.getElementById(i)};
 var C=window.PLCONTA,G=window.PLGUARDA;
 var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var MQ=window.matchMedia?window.matchMedia('(min-width:900px)'):null;
 var tmToast=null,abridor=null;
+var ativa=(location.hash||'').replace('#','');   /* seção aberta; no desktop, sem nenhuma, vale a primeira */
+var aberto={nome:false,senha:false};             /* formulários abertos dentro das seções */
+var aviso={};                                    /* recado do último envio de cada formulário: {erro:bool, txt} */
+var IDS=[];
 
 function toast(msg){clearTimeout(tmToast);$('toast-t').textContent=msg;$('toast').hidden=false;tmToast=setTimeout(function(){$('toast').hidden=true},4000)}
 function focar(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function ico(n){return '<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true">'+n+'</svg>'}
+function ico(n,g){return '<svg class="ico'+(g?'':' sm')+'" viewBox="0 0 24 24" aria-hidden="true">'+n+'</svg>'}
 var I={pessoa:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   lixeira:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   sair:'<path d="M9 4h9v16H9M5 12h9M11 9l3 3-3 3"/>',
-  panela:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
+  painel:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
   baixar:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
   aten:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
-  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>'};
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  lapis:'<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  folha:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/>',
+  codigo:'<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12"/>',
+  cartao:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  cadeado:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  ajustes:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  escudo:'<path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/>',
+  aparelho:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  seta:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  abre:'<path d="M6 9l6 6 6-6"/>',
+  mais:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>'};
 
-function dataLonga(ts){var d=new Date(ts);return d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear()}
+function dataLonga(t){var d=new Date(t);return d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear()}
+function dataCurta(t){var d=new Date(t);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()}
+function n1(n,um,varios){return n+' '+(n===1?um:varios)}
+function segundos(ms){return n1(Math.max(1,Math.ceil((ms||30000)/1000)),'segundo','segundos')}
+function desk(){return !!(MQ&&MQ.matches)}
 
 /* ---------- pop-up genérico (D-082) ---------- */
 function pop(titulo,html,acoes,rec){ /* acoes: [{led:bool, txt, ic, cb}]; rec usa o «Fechar» fixo */
@@ -42,7 +65,8 @@ function pop(titulo,html,acoes,rec){ /* acoes: [{led:bool, txt, ic, cb}]; rec us
     var alvo=act.querySelector('.led-btn')||act.querySelector('button');
     if(alvo)focar(alvo)
   }
-  $('scrim').hidden=false;dlg.hidden=false
+  $('scrim').hidden=false;dlg.hidden=false;
+  if(rec)focar($('rec-fechar'))
 }
 function fecharPop(rec){
   var dlg=rec?$('rec-dialog'):$('dialog');
@@ -57,132 +81,330 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){fecharPop(false);fecharPop(true)}
 });
 
-/* ---------- render ---------- */
-function render(){
-  var sc=C.sessaoCodigo(),cx=$('corpo');
-  if(sc){renderCodigo(sc,cx);return}
-  var s=C.sessao();if(!s){location.replace(G?G.urlEntrar(location.pathname):'../entrar/');return}
-  var pl=C.plano()||{},id=pl.id;
-  var h='';
+/* ---------- peças ---------- */
+function cartao(id,titulo,corpo){return '<div class="cc" role="group" aria-labelledby="'+id+'"><h3 class="cc__t" id="'+id+'">'+titulo+'</h3>'+corpo+'</div>'}
+function linha(rot,val){return '<div class="dl__l"><dt>'+rot+'</dt><dd>'+val+'</dd></div>'}
+function estado(ic,txt){return '<span class="est">'+ico(ic)+esc(txt)+'</span>'}
+function atn(txt){return '<div class="atn" role="status">'+ico(I.aten)+'<p>'+txt+'</p></div>'}
+function info(txt){return '<div class="info">'+ico(I.info)+'<p>'+txt+'</p></div>'}
+function recado(k){var a=aviso[k];return a?'<p class="'+(a.erro?'erro':'certo')+'" id="m-'+k+'" role="'+(a.erro?'alert':'status')+'">'+ico(a.erro?I.aten:I.check)+'<span>'+esc(a.txt)+'</span></p>':''}
+function inclui(itens){var h='<ul class="inc">',i;for(i=0;i<itens.length;i++)h+='<li>'+ico(I.check)+'<span>'+itens[i]+'</span></li>';return h+'</ul>'}
+function bloco(n,rot,sub){return '<div class="tile"><p class="tile__n">'+n+'</p><p class="tile__r">'+rot+'</p>'+(sub?'<p class="tile__s">'+sub+'</p>':'')+'</div>'}
+function led(id,txt,href){return '<a class="led-btn" id="'+id+'" href="'+href+'"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">'+txt+ico(I.seta,true)+'</span></a>'}
+var MES=function(){return MESES[new Date().getMonth()]};
 
-  /* cartão Você */
-  h+='<section class="cc" aria-labelledby="cc-voce"><h2 class="cc__t" id="cc-voce">Você</h2>'+
-    '<div class="cc__row"><div class="cc__pilha"><p class="cc__email">'+esc(s.email)+'</p>'+
-    '<p class="cc__meta">Entrou em '+dataLonga(s.entrouEm)+'</p></div>'+
-    '<span class="pill">'+esc(pl.nome||'Grátis')+'</span></div>'+
-    '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-sair">'+ico(I.sair)+'Sair</button></div></section>';
+/* ---------- 1 · Perfil e cadastro ---------- */
+function secPerfil(pf,cod){
+  var ENTRADA={senha:'E-mail e senha',google:'Google',email:'Código por e-mail',codigo:'Código de impressão'};
+  var h='<dl class="dl">';
+  if(cod&&!pf.email){
+    h+=linha('Cadastro','Você entrou com um código de impressão, sem nome nem e-mail.')
+  }else{
+    h+=linha('Nome','<span id="v-nome">'+esc(pf.nome||'Sem nome')+'</span>');
+    h+=linha('E-mail','<span id="v-email" class="quebra">'+esc(pf.email)+'</span>'+
+      (cod?'':pf.emailVerificadoEm?estado(I.check,'Confirmado pelo Google'):estado(I.info,'Ainda não confirmado')))
+  }
+  h+=linha('Forma de entrada',ENTRADA[pf.provedor]||(C.temSenha()?ENTRADA.senha:ENTRADA.email));
+  if(pf.criadoEm)h+=linha('Conta criada em',dataLonga(pf.criadoEm));
+  h+=linha('Entrou neste navegador em',dataLonga(pf.entrouEm));
+  h+='</dl>';
+  if(!cod||pf.email){
+    if(aberto.nome){
+      h+='<form class="frm" id="f-nome" novalidate><label class="cmp" for="in-nome"><span class="cmp__r">Nome</span>'+
+        '<input class="cmp__i" id="in-nome" type="text" maxlength="60" autocomplete="name" value="'+esc(pf.nome||'')+'"></label>'+recado('nome')+
+        '<div class="cc__act"><button type="submit" class="btn2" id="b-nome-salvar">'+ico(I.check)+'Salvar nome</button>'+
+        '<button type="button" class="btn2" id="b-nome-cancelar">'+ico(I.x)+'Cancelar</button></div></form>'
+    }else h+=recado('nome')+'<div class="cc__act"><button type="button" class="btn2" id="b-nome">'+ico(I.lapis)+'Editar nome</button></div>'
+  }
+  if(!cod)h+=info('Demonstração: esta conta fica guardada só neste navegador, e o PolarLife ainda não envia e-mail de confirmação. O e-mail identifica a conta e não pode ser trocado nesta versão.');
+  return {id:'perfil',nome:'Perfil e cadastro',ic:I.pessoa,resumo:pf.email||'Código de impressão',html:cartao('cc-cadastro','Cadastro',h)}
+}
 
-  /* cartão Plano */
-  h+='<section class="cc" aria-labelledby="cc-plano"><h2 class="cc__t" id="cc-plano">Plano</h2>';
-  if(id==='pro'){
-    h+='<p class="cc__plano">Pro · '+C.moeda(pl.preco)+' por mês</p>';
-    var ate=pl.renovaTs?dataLonga(pl.renovaTs):'';
-    if(pl.canceladoEm)h+='<p class="cc__meta">Pro até '+ate+' · depois, Grátis</p>';
-    h+='<ul class="cc__folhas"><li>'+esc(pl.usadasMes)+' de '+esc(pl.usoRazoavel)+' folhas usadas em '+MESES[new Date().getMonth()]+' · uso razoável</li>'+
-      '<li>Até '+esc(pl.fotosPorProjeto)+' fotos por projeto</li></ul>';
+/* ---------- 2 · Plano e uso ---------- */
+function secPlano(pl,du,as,sc){
+  var id=pl.id,h='',u='',res='';
+  if(sc){ /* sessão por código (D-124): um pacote, uma impressão */
+    var pc=C.pacotes()[sc.pacote]||{nome:'Avulso básico'};
+    h='<p class="cc__plano">'+esc(pc.nome)+'</p>'+
+      inclui(['Uma impressão de até '+n1(sc.folhas,'folha','folhas'),'Até '+sc.fotos+' fotos por projeto','Assinatura PolarLife nas polaroids: sempre ligada']);
+    u='<div class="tiles">'+bloco(du.creditosPadrao+' de '+sc.folhas,'folhas do pacote',sc.usadoEm?'Usado em '+dataCurta(sc.usadoEm):'Uso único')+'</div>';
+    if(sc.usadoEm)u+=atn('Seu código já foi usado.')+info('Para imprimir de novo, compre outro código de impressão ou entre com e-mail.');
+    res=pc.nome+' · '+(sc.usadoEm?'código usado':n1(sc.folhas,'folha','folhas'));
+    return {id:'plano',nome:'Plano e uso',ic:I.folha,resumo:res,html:cartao('cc-plano','Seu plano',h)+cartao('cc-uso','Disponível para imprimir',u)}
+  }
+  var pad=du.creditosPadrao,gra=du.creditosGrande;
+  if(id==='pro'||id==='admin'){
+    var fim=as&&as.periodoFim?dataLonga(as.periodoFim):'';
+    h='<div class="cc__row"><p class="cc__plano">Pro · '+(id==='admin'?'conta de administração':C.moeda(pl.preco)+' por mês')+'</p>'+
+      (id==='admin'?'':as&&as.canceladaEm?estado(I.info,'Cancelado'):estado(I.check,'Ativo'))+'</div>'+
+      inclui(['Folhas sem limite fixo, com uso razoável de '+esc(pl.usoRazoavel)+' por mês','Até '+esc(pl.fotosPorProjeto)+' fotos por projeto','Pode desligar a assinatura PolarLife nas polaroids']);
+    if(id==='admin')h+='<p class="cc__meta">Esta conta usa os limites do Pro, sem assinatura nem cobrança.</p>';
+    else if(as&&as.canceladaEm)h+='<p class="cc__meta" id="v-renova">'+(fim?'Pro até '+fim+' · depois, Grátis':'Pro até o fim do período já contratado · depois, Grátis')+'</p>';
+    else h+='<p class="cc__meta" id="v-renova">'+(fim?'Renova em '+fim+'.':'Renovação mensal.')+' Demonstração: nenhuma cobrança é feita.</p>';
+    if(id==='pro'){ /* assinatura: Pro pode desligar (D-119 / DOC-03 §2) */
+      if(as&&as.canceladaEm){
+        h+='<p class="cc__meta">A assinatura PolarLife volta a aparecer quando o plano virar Grátis.</p>'+
+          '<div class="cc__act"><button type="button" class="btn2" id="b-reativar">'+ico(I.check)+'Reativar o Pro</button></div>'
+      }else{
+        var ligada=!pl.assinaturaDesligada;
+        h+='<div class="sw-row"><div><p class="cc__meta" id="assin-l">'+(ligada?'Desligar':'Ligar')+' a assinatura PolarLife</p><p class="help">Muda o padrão de novos projetos. Os projetos atuais não mudam.</p></div>'+
+          '<button type="button" class="sw" id="assin" role="switch" aria-checked="'+(ligada?'true':'false')+'" aria-labelledby="assin-l"><span></span></button></div>'+
+          '<div class="cc__act"><a class="btn2" id="b-planos" href="planos/">'+ico(I.folha)+'Ver folhas e planos</a>'+
+          '<button type="button" class="btn2 btn2--danger" id="b-cancelar">'+ico(I.lixeira)+'Cancelar assinatura</button></div>'
+      }
+    }
+    var pct=Math.max(0,Math.min(100,Math.round(pl.usadasMes/pl.usoRazoavel*100)));
+    u='<div class="tiles">'+bloco(esc(pl.usadasMes)+' de '+esc(pl.usoRazoavel),'folhas usadas em '+MES(),'uso razoável do Pro')+
+      (pad?bloco(pad,pad===1?'folha padrão guardada':'folhas padrão guardadas'):'')+(gra?bloco(gra,gra===1?'folha grande guardada':'folhas grandes guardadas'):'')+'</div>'+
+      '<div class="barra" role="img" aria-label="'+pct+'% do uso razoável do mês"><span style="width:'+pct+'%"></span></div>'+
+      '<p class="cc__meta">Sem limite fixo: você pode continuar gerando folhas. O uso razoável existe só para acompanhar o mês e volta a zero no dia 1º.</p>';
     /* atenções (DOC-03 §4: nunca bloqueia) */
     var av=pl.avisoPct/100*pl.usoRazoavel;
-    if(pl.usadasMes>=pl.usoRazoavel)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Você chegou às '+pl.usoRazoavel+' folhas deste mês. Pode continuar exportando; vamos olhar o uso com calma.</p></div>';
-    else if(pl.usadasMes>=av)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Você usou '+pl.usadasMes+' das '+pl.usoRazoavel+' folhas do uso razoável deste mês.</p></div>';
-    /* assinatura: Pro pode desligar (D-119 / DOC-03 §2) */
-    if(pl.canceladoEm){
-      h+='<p class="cc__meta">A assinatura PolarLife volta a aparecer quando o plano virar Grátis.</p>'+
-        '<div class="cc__act"><button type="button" class="btn2" id="b-reativar">'+ico(I.check)+'Reativar o Pro</button></div>'
+    if(pl.usadasMes>=pl.usoRazoavel)u+=atn('Você chegou às '+pl.usoRazoavel+' folhas deste mês. Pode continuar exportando; vamos olhar o uso com calma.');
+    else if(pl.usadasMes>=av)u+=atn('Você usou '+pl.usadasMes+' das '+pl.usoRazoavel+' folhas do uso razoável deste mês.');
+    res='Pro · '+pl.usadasMes+' de '+pl.usoRazoavel+' folhas em '+MES()
+  }else{
+    var gratis=id==='gratis',fm=gratis?du.folhasGratisNoMes:0,fr=gratis?Math.max(0,fm-du.folhasGratisUsadasNoMes):0;
+    if(gratis){
+      h='<p class="cc__plano">Grátis · '+C.moeda(0)+'</p>'+
+        inclui([n1(fm,'folha grátis','folhas grátis')+' por mês','Até '+esc(pl.fotosPorProjeto)+' fotos por projeto','Assinatura PolarLife nas polaroids: sempre ligada'])+
+        '<p class="cc__meta" id="v-renova">A folha grátis renova em '+esc(pl.renovaEm||'')+'.</p>'
     }else{
-      var ligada=!pl.assinaturaDesligada;
-      h+='<div class="sw-row"><div><p class="cc__meta" id="assin-l">'+(ligada?'Desligar':'Ligar')+' a assinatura PolarLife</p><p class="help">Muda o padrão de novos projetos. Os projetos atuais não mudam.</p></div>'+
-        '<button type="button" class="sw" id="assin" role="switch" aria-checked="'+(ligada?'true':'false')+'" aria-labelledby="assin-l"><span></span></button></div>'+
-        '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-cancelar">'+ico(I.lixeira)+'Cancelar assinatura</button></div>'
+      h='<p class="cc__plano">Folha avulsa</p>'+
+        inclui(['Folhas compradas avulsas, sem mensalidade','Até '+esc(pl.fotosPorProjeto)+' fotos por projeto','Assinatura PolarLife nas polaroids: sempre ligada'])+
+        '<p class="cc__meta" id="v-renova">Sem mensalidade nem renovação.</p>'
     }
-  }else if(id==='avulsa'){
-    h+='<p class="cc__plano">Folha avulsa</p>'+
-      '<ul class="cc__folhas"><li>'+esc(pl.folhasCompradas.padrao)+' folhas padrão · '+esc(pl.folhasCompradas.grande)+' folhas grandes</li>'+
-      '<li>Até '+esc(pl.fotosPorProjeto)+' fotos por projeto</li>'+
-      '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>'+
-      '<div class="cc__act"><a class="led-btn" id="b-planos" href="planos/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Ver folhas e planos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>'
-  }else{ /* grátis */
-    var resta=Math.max(0,(pl.folhasMes||1)-pl.usadasMes);
-    h+='<p class="cc__plano">Grátis · '+C.moeda(0)+'</p>'+
-      '<ul class="cc__folhas"><li>'+resta+' de '+esc(pl.folhasMes||1)+' folha'+((pl.folhasMes||1)>1?'s':'')+' grátis disponível'+((pl.folhasMes||1)>1?'is':'')+' em '+MESES[new Date().getMonth()]+' · Renova em '+esc(pl.renovaEm||'')+'</li>'+
-      '<li>Até '+esc(pl.fotosPorProjeto)+' fotos por projeto</li>'+
-      '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>';
-    if(resta===0)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Sua folha grátis deste mês já foi usada.</p></div>';
-    h+='<div class="cc__act"><a class="led-btn" id="b-planos" href="planos/"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Ver folhas e planos<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>'
+    h+='<div class="cc__act"><a class="btn2" href="planos/">'+ico(I.folha)+'Ver folhas e planos</a></div>';   /* o LED da tela fica no cartão da conta, sempre à vista (T8) */
+    u='<div class="tiles">'+(gratis?bloco(fr+' de '+fm,(fm===1?'folha grátis':'folhas grátis')+' de '+MES(),'Renova em '+esc(pl.renovaEm||'')):'')+
+      bloco(pad,pad===1?'folha padrão':'folhas padrão','Comprada ou de código')+bloco(gra,gra===1?'folha grande':'folhas grandes','Comprada')+'</div>';
+    var tp=fr+pad,tg=fr+gra;
+    if(tp+tg===0)u+='<p class="cc__meta" id="v-limite">Você não tem folhas para gerar agora.</p>';
+    else u+='<p class="cc__meta" id="v-limite">Agora dá para gerar até '+(tp?n1(tp,'folha padrão','folhas padrão'):'')+(tp&&tg?' ou ':'')+(tg?n1(tg,'folha grande','folhas grandes'):'')+'.</p>';
+    if(gratis&&fr===0)u+=atn('Sua folha grátis deste mês já foi usada.');
+    res=(gratis?'Grátis':'Folha avulsa')+' · '+(tp+tg===0?'sem folhas agora':n1(Math.max(tp,tg),'folha disponível','folhas disponíveis'))
   }
-  h+='</section>';
+  return {id:'plano',nome:'Plano e uso',ic:I.folha,resumo:res,html:cartao('cc-plano','Seu plano',h)+cartao('cc-uso','Disponível para imprimir',u)}
+}
 
-  /* admin: cartão extra (§3.2) */
-  if(id==='admin'){
-    h+='<section class="cc" aria-labelledby="cc-admin"><h2 class="cc__t" id="cc-admin">Painel do admin</h2>'+
-      '<p class="cc__meta">Limites dos planos e contas deste aparelho.</p>'+
-      '<div class="cc__act"><a class="btn2" href="../admin/">'+ico(I.panelle)+'Abrir painel</a></div></section>'
+/* ---------- 3 · Códigos de impressão ---------- */
+function itemCodigo(k){
+  var cl=k.classe==='grande'?['folha grande','folhas grandes']:['folha padrão','folhas padrão'];
+  return '<li class="cod"><div class="cod__q"><p class="cod__n">'+esc(k.pacote)+(k.final?' <span class="mono">final '+esc(k.final)+'</span>':'')+'</p>'+
+    '<p class="cod__d">'+(k.emUso?(k.restam?'Vale para uma impressão de até '+n1(k.folhas,cl[0],cl[1]):'As '+k.folhas+' folhas do pacote já foram usadas'):'Restam '+k.restam+' de '+n1(k.folhas,cl[0],cl[1]))+'</p>'+
+    '<p class="cod__d">'+(k.emUso?'Em uso desde ':'Resgatado em ')+dataCurta(k.resgatadoEm)+(k.emUso&&k.restam&&k.validoAte?' · válido até '+dataCurta(k.validoAte):'')+'</p></div>'+
+    (k.situacao==='disponivel'?estado(I.check,'Disponível'):estado(I.info,'Usado'))+'</li>'
+}
+function secCodigos(cs,cod){
+  var liv=[],usa=[],i,h='',f='',tot=0;
+  for(i=0;i<cs.length;i++){if(cs[i].situacao==='disponivel'){liv.push(cs[i]);tot+=cs[i].restam}else usa.push(cs[i])}
+  if(!cod){
+    f='<form class="frm" id="f-codigo" novalidate><label class="cmp" for="in-codigo"><span class="cmp__r">Código de impressão</span>'+
+      '<input class="cmp__i cmp__i--cod" id="in-codigo" type="text" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="PL-XXXX-XXXX"></label>'+recado('codigo')+
+      '<div class="cc__act"><button type="submit" class="btn2" id="b-resgatar">'+ico(I.mais)+'Resgatar código</button></div></form>'+
+      '<p class="help">As folhas do código entram no saldo desta conta e cada código vale uma vez. Nesta versão de demonstração, o código é conferido neste navegador.</p>'
   }
+  if(!cs.length)h='<p class="vazio" id="cod-vazio">Nenhum código resgatado nesta conta.</p>';
+  else{
+    if(!cod)h+='<p class="cc__meta" id="cod-total">'+(tot?n1(tot,'folha de código disponível','folhas de código disponíveis')+'.':'Nenhuma folha de código disponível.')+'</p>';
+    if(liv.length){h+='<h4 class="grupo">Ainda podem ser usados ('+liv.length+')</h4><ul class="cod-lista" id="cod-livres">';for(i=0;i<liv.length;i++)h+=itemCodigo(liv[i]);h+='</ul>'}
+    if(usa.length){h+='<h4 class="grupo">Já usados ('+usa.length+')</h4><ul class="cod-lista" id="cod-usados">';for(i=0;i<usa.length;i++)h+=itemCodigo(usa[i]);h+='</ul>'}
+    if(!cod)h+='<p class="help">As folhas compradas avulsas saem primeiro; as de código, depois, começando pelo código mais antigo.</p>'
+  }
+  if(cod)h+=info('Com um código você entra sem conta. Para juntar vários códigos e guardar as folhas, entre com e-mail e resgate os códigos na Conta.');
+  return {id:'codigos',nome:'Códigos de impressão',ic:I.codigo,
+    resumo:cs.length?(liv.length?n1(liv.length,'código disponível','códigos disponíveis'):'Nenhum código disponível'):'Nenhum código resgatado',
+    html:(cod?'':cartao('cc-resgatar','Resgatar um código',f))+cartao('cc-codigos',cod?'Código em uso':'Seus códigos',h)}
+}
 
-  /* recibos */
-  var rs=pl.recibos||[];
-  h+='<section class="cc" aria-labelledby="cc-rec"><h2 class="cc__t" id="cc-rec">Recibos</h2>';
+/* ---------- 4 · Pagamentos ---------- */
+function secPagamentos(pl,as,rs,fp){
+  var h='',r='',a='',i;
+  if(!fp.length)h='<div class="vazio vazio--caixa" id="pg-vazio">'+ico(I.cartao,true)+'<p>Nenhuma forma de pagamento cadastrada. As compras desta versão são de demonstração e não cobram nada.</p></div>'+
+    '<p class="help">O PolarLife não pede nem guarda número de cartão.</p>';
+  if(pl.id==='pro'&&as){
+    a='<dl class="dl">'+linha('Plano','Pro · '+C.moeda(as.valorCentavos/100)+' por mês')+
+      linha(as.canceladaEm?'Vale até':'Próxima renovação',as.periodoFim?dataLonga(as.periodoFim):(as.canceladaEm?'Fim do período já contratado':'Mensal'))+
+      linha('Situação',as.canceladaEm?estado(I.info,'Cancelada'):estado(I.check,'Ativa'))+'</dl>'+
+      '<p class="help">Assinatura de demonstração: nenhuma cobrança é feita. Para cancelar ou reativar, use «Plano e uso».</p>'
+  }
   if(rs.length){
-    h+='<ul class="rec-lista">';
-    for(var i=0;i<rs.length;i++){
-      h+='<li class="rec"><div class="rec__q"><p class="rec__d mono">'+esc(rs[i].data)+'</p><p class="rec__v">'+esc(rs[i].desc)+' · <span class="mono">'+esc(rs[i].valor)+'</span></p></div>'+
+    r='<ul class="rec-lista">';
+    for(i=0;i<rs.length;i++){
+      r+='<li class="rec"><div class="rec__q"><p class="rec__d mono">'+(rs[i].emitidoEm?dataCurta(rs[i].emitidoEm):'')+' · '+esc(rs[i].numero)+'</p>'+
+        '<p class="rec__v">'+esc(rs[i].descricao)+' · <span class="mono">'+C.moeda(rs[i].valorCentavos/100)+'</span></p>'+
+        '<p class="rec__s">Demonstração: nada foi cobrado</p></div>'+
         '<button type="button" class="btn3" data-rec="'+i+'">Ver recibo</button></li>'
     }
-    h+='</ul>'
-  }else h+='<p class="rec-vazio">Nenhum recibo ainda.</p>';
-  h+='</section>';
-
-  /* seus dados */
-  h+='<section class="cc" aria-labelledby="cc-dados"><h2 class="cc__t" id="cc-dados">Seus dados</h2>'+
-    '<div class="cc__act"><button type="button" class="btn2" id="b-exportar">'+ico(I.baixar)+'Exportar meus dados</button>'+
-    '<button type="button" class="btn2 btn2--danger" id="b-excluir">'+ico(I.lixeira)+'Excluir conta</button></div>'+
-    '<p class="help">Suas fotos e projetos já estão no seu aparelho e não entram neste arquivo.</p></section>';
-
-  cx.innerHTML=h;
-  ligar()
+    r+='</ul>'
+  }else r='<p class="rec-vazio" id="rec-vazio">Nenhuma compra ainda.</p>';
+  return {id:'pagamentos',nome:'Pagamentos',ic:I.cartao,resumo:rs.length?n1(rs.length,'recibo','recibos')+' de demonstração':'Nenhuma compra ainda',
+    html:cartao('cc-formas','Formas de pagamento',h)+(a?cartao('cc-assin','Assinatura',a):'')+cartao('cc-rec','Histórico de compras e recibos',r)}
 }
 
-/* variante da sessão de código de impressão (D-124) */
-function renderCodigo(sc,cx){
-  var pc=C.pacotes()[sc.pacote]||{nome:'Avulso básico',fotos:24,folhas:8};
-  var h='<section class="cc" aria-labelledby="cc-voce"><h2 class="cc__t" id="cc-voce">Você</h2>'+
-    '<div class="cc__row"><div class="cc__pilha"><p class="cc__email">Compra com código de impressão</p>'+
-    '<p class="cc__meta">Entrou em '+dataLonga(sc.entrouEm)+'</p></div>'+
-    '<span class="pill">Pacote '+esc(pc.nome)+'</span></div>';
-  if(sc.usadoEm)h+='<div class="atn" role="status">'+ico(I.aten)+'<p>Seu código já foi usado.</p></div>';
-  h+='<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-sair">'+ico(I.sair)+'Sair</button></div></section>';
-  h+='<section class="cc" aria-labelledby="cc-plano"><h2 class="cc__t" id="cc-plano">Plano</h2>'+
-    '<p class="cc__plano">'+esc(pc.nome)+'</p>'+
-    '<ul class="cc__folhas"><li>'+(sc.usadoEm?'0':sc.folhas)+' de '+sc.folhas+' folhas do pacote</li>'+
-    '<li>Até '+sc.fotos+' fotos por projeto</li>'+
-    '<li>Assinatura PolarLife nas polaroids: sempre ligada</li></ul>'+
-    (sc.usadoEm?'<div class="info">'+ico(I.info)+'<p>Para imprimir de novo, compre outro código de impressão ou entre com e-mail.</p></div>':'')+
-    '</section>';
-  cx.innerHTML=h;
-  ligar()
+/* ---------- 5 · Segurança ---------- */
+function secSeguranca(ss){
+  var tem=C.temSenha(),h,a='',i;
+  h='<div class="cc__row"><p class="cc__meta" id="v-senha">'+(tem?'Você entra com e-mail e senha.':'Esta conta ainda não tem senha.')+'</p>'+
+    (tem?estado(I.check,'Senha definida'):estado(I.info,'Sem senha'))+'</div>';
+  if(aberto.senha){
+    h+='<form class="frm" id="f-senha" novalidate>'+
+      '<input class="so-leitor" type="text" autocomplete="username" value="'+esc((C.sessao()||{}).email||'')+'" tabindex="-1" aria-hidden="true" readonly>'+
+      (tem?'<label class="cmp" for="in-senha-atual"><span class="cmp__r">Senha atual</span><input class="cmp__i" id="in-senha-atual" type="password" autocomplete="current-password" maxlength="128"></label>':'')+
+      '<label class="cmp" for="in-senha-nova"><span class="cmp__r">Senha nova</span><input class="cmp__i" id="in-senha-nova" type="password" autocomplete="new-password" maxlength="128"></label>'+
+      '<label class="cmp" for="in-senha-rep"><span class="cmp__r">Repita a senha nova</span><input class="cmp__i" id="in-senha-rep" type="password" autocomplete="new-password" maxlength="128"></label>'+
+      recado('senha')+
+      '<div class="cc__act"><button type="submit" class="btn2" id="b-senha-salvar">'+ico(I.check)+'Salvar senha</button>'+
+      '<button type="button" class="btn2" id="b-senha-cancelar">'+ico(I.x)+'Cancelar</button></div></form>'
+  }else h+=recado('senha')+'<div class="cc__act"><button type="button" class="btn2" id="b-senha">'+ico(I.cadeado)+(tem?'Trocar senha':'Definir senha')+'</button></div>';
+  h+='<p class="help">De 8 a 128 caracteres. A senha não é guardada: fica só um resumo embaralhado dela, neste navegador.</p>';
+  a='<ul class="apr-lista" id="aparelhos">';
+  for(i=0;i<ss.length;i++)a+='<li class="apr">'+ico(I.aparelho,true)+'<div class="apr__q"><p class="apr__n">'+esc(ss[i].aparelho)+'</p><p class="apr__d">Entrou em '+dataLonga(ss[i].criadaEm)+'</p></div>'+(ss[i].atual?estado(I.check,'Este aparelho'):'')+'</li>';
+  a+='</ul>'+info('Demonstração: a conta fica só neste navegador, por isso só este aparelho aparece aqui.')+
+    '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-sair-todos">'+ico(I.sair)+'Sair de todos os aparelhos</button></div>';
+  return {id:'seguranca',nome:'Segurança',ic:I.cadeado,resumo:(tem?'Senha definida':'Sem senha')+' · '+n1(ss.length,'aparelho','aparelhos'),
+    html:cartao('cc-senha','Senha',h)+cartao('cc-aparelhos','Aparelhos conectados',a)}
 }
+
+/* ---------- 6 · Preferências ---------- */
+var UN=[['mm','Milímetros (mm)'],['cm','Centímetros (cm)'],['pol','Polegadas (pol)']];
+function secPreferencias(pr,cod){
+  var u='<fieldset class="opc" id="pref-un"><legend class="so-leitor">Unidade de medida</legend>',i,e='';
+  for(i=0;i<UN.length;i++)u+='<label class="opc__o"><input type="radio" name="pref-un" value="'+UN[i][0]+'"'+(pr.unidade===UN[i][0]?' checked':'')+'><span>'+ico(I.check)+UN[i][1]+'</span></label>';
+  u+='</fieldset><p class="help">Vale para as medidas da moldura personalizada, no editor.</p>';
+  if(!cod){
+    var on=pr.emails.novidades;
+    e='<div class="sw-row"><div><p class="cc__meta" id="nov-l">Novidades e dicas do PolarLife</p><p class="help" id="nov-e">'+(on?'Ligado':'Desligado')+'</p></div>'+
+      '<button type="button" class="sw" id="pref-novidades" role="switch" aria-checked="'+(on?'true':'false')+'" aria-labelledby="nov-l"><span></span></button></div>'+
+      '<p class="help">Nesta versão o PolarLife não envia e-mails. A sua escolha fica guardada neste navegador.</p>'
+  }
+  return {id:'preferencias',nome:'Preferências',ic:I.ajustes,resumo:'Medidas em '+pr.unidade+(cod?'':' · novidades por e-mail '+(pr.emails.novidades?'ligadas':'desligadas')),
+    html:cartao('cc-unidade','Unidade de medida',u)+(e?cartao('cc-emails','E-mails',e):'')+cartao('cc-app','Aplicativo','<div id="app-bloco"></div>')}
+}
+function renderApp(){ /* instalar é opcional (DOC-08 §7): só oferece quando o navegador deixa */
+  var cx=$('app-bloco'),P=window.PLPWA,h;
+  if(!cx)return;
+  if(P&&P.standalone())h='<div class="cc__row"><p class="cc__meta">Você está usando o PolarLife como aplicativo.</p>'+estado(I.check,'Instalado neste aparelho')+'</div>';
+  else if(P&&P.podeInstalar())h='<p class="cc__meta">Dá para instalar o PolarLife neste aparelho: ele abre numa janela própria e ganha um ícone.</p>'+
+    '<div class="cc__act"><button type="button" class="btn2" id="b-instalar">'+ico(I.baixar)+'Instalar o PolarLife</button></div>';
+  else if(P&&P.dicaIos())h='<p class="cc__meta">No iPhone ou iPad, abra o PolarLife no Safari, toque em Compartilhar e depois em «Adicionar à Tela de Início».</p>';
+  else h='<p class="cc__meta" id="app-sem">Este navegador não ofereceu a instalação agora. Se o menu dele tiver «Instalar» ou «Adicionar à tela inicial», também funciona.</p>';
+  h+=info('Instalar é opcional: pelo navegador o PolarLife funciona do mesmo jeito. Para desfazer, remova o aplicativo como qualquer outro (no computador, pelo menu da janela do app; no celular, segurando o ícone). Em alguns aparelhos, remover o aplicativo apaga os projetos guardados nele: salve um backup antes.');
+  h+=info('No Android, com o aplicativo instalado, os links do PolarLife podem abrir direto nele (sem a barra do navegador). Para continuar no navegador, remova o aplicativo ou desligue «Abrir links compatíveis» em Configurações › Apps › PolarLife.');   /* D-207: o modo app nunca é imposto pelo site */
+  cx.innerHTML=h;
+  var b=$('b-instalar');
+  if(b)b.addEventListener('click',function(){
+    P.instalar().then(function(ok){toast(ok?'PolarLife instalado neste aparelho.':'Instalação cancelada.');renderApp()})
+  })
+}
+
+/* ---------- 7 · Privacidade e dados ---------- */
+function secPrivacidade(ac,cod){
+  var d,t,x='';
+  if(cod)d='<p class="cc__meta">Você entrou com um código de impressão, sem conta. O que você informou fica só neste navegador e sai dele quando você sair. Suas fotos e projetos ficam no seu aparelho.</p>';
+  else d='<p class="cc__meta">Suas fotos e projetos ficam no seu aparelho. Os dados da conta (cadastro, plano, folhas, códigos e recibos) ficam, nesta versão de demonstração, só neste navegador.</p>'+
+    '<div class="cc__act"><button type="button" class="btn2" id="b-exportar">'+ico(I.baixar)+'Exportar meus dados</button></div>'+
+    '<p class="help">Suas fotos e projetos já estão no seu aparelho e não entram neste arquivo.</p>';
+  t=(ac.length?'<p class="cc__meta" id="v-aceite">Você aceitou os Termos e a Política de Privacidade em '+dataLonga(ac[0].aceitoEm)+'.</p>':'')+
+    '<ul class="docs"><li><a href="../../legal/#privacidade">'+ico(I.folha)+'Privacidade</a></li><li><a href="../../legal/#termos">'+ico(I.folha)+'Termos</a></li><li><a href="../../legal/#cookies">'+ico(I.folha)+'Cookies</a></li></ul>';
+  if(!cod)x=cartao('cc-excluir','Excluir conta','<p class="cc__meta">Apaga desta conta o cadastro, as folhas, os códigos resgatados e os recibos guardados neste navegador. Seus projetos e fotos continuam no aparelho.</p>'+
+    '<div class="cc__act"><button type="button" class="btn2 btn2--danger" id="b-excluir">'+ico(I.lixeira)+'Excluir conta</button></div>');
+  return {id:'privacidade',nome:'Privacidade e dados',ic:I.escudo,resumo:cod?'Termos e políticas':'Exportar dados ou excluir a conta',
+    html:cartao('cc-dados','Seus dados',d)+cartao('cc-docs','Termos e políticas',t)+x}
+}
+
+/* ---------- render ---------- */
+function render(){
+  var sc=C.sessaoCodigo(),s=C.sessao(),cx=$('corpo');
+  if(!sc&&!s){location.replace(G?G.urlEntrar(location.pathname):'../entrar/');return}
+  var cod=!!sc,pl=C.plano()||{},pf=C.perfil(),du=C.direitoDeUso(),as=C.assinatura(),secs=[],i,h,x;
+  secs.push(secPerfil(pf,cod));
+  secs.push(secPlano(pl,du,as,sc));
+  secs.push(secCodigos(C.codigos(),cod));
+  if(!cod){secs.push(secPagamentos(pl,as,C.recibos(),C.formasPagamento()));secs.push(secSeguranca(C.sessoes()))}
+  secs.push(secPreferencias(C.preferencias(),cod));
+  secs.push(secPrivacidade(C.aceites(),cod));
+  IDS=[];for(i=0;i<secs.length;i++)IDS.push(secs[i].id);
+  if(IDS.indexOf(ativa)<0)ativa='';
+
+  h='<div class="cfg"><aside class="cfg__lado" aria-label="Sua conta">'+
+    '<div class="quem"><p class="quem__n" id="quem-nome">'+esc(cod?(pf.nome||'Compra com código de impressão'):(pf.nome||pf.email))+'</p>'+
+    (pf.email?'<p class="quem__e quebra">'+esc(pf.email)+'</p>':'')+
+    '<span class="pill" id="quem-plano">'+esc(cod?'Pacote '+(pl.pacote||''):(pl.nome||'Grátis'))+'</span>'+
+    (!cod&&(pl.id==='gratis'||pl.id==='avulsa')?'<div class="quem__led">'+led('b-planos','Ver folhas e planos','planos/')+'</div>':'')+'</div>'+   /* T8: o único LED da Conta, visível em qualquer seção */
+    '<nav class="cfg__nav" aria-label="Seções da conta"><ul>';
+  for(i=0;i<secs.length;i++)h+='<li><a class="cfg__l" href="#'+secs[i].id+'" data-ir="'+secs[i].id+'">'+ico(secs[i].ic,true)+'<span>'+secs[i].nome+'</span></a></li>';
+  h+='</ul></nav><div class="cfg__fim">'+
+    (pl.id==='admin'?'<a class="btn2" id="b-admin" href="../admin/">'+ico(I.painel)+'Painel do admin</a>':'')+
+    '<button type="button" class="btn2 btn2--danger" id="b-sair">'+ico(I.sair)+'Sair</button></div></aside><div class="cfg__secs">';
+  for(i=0;i<secs.length;i++){x=secs[i];
+    h+='<section class="sec" id="sec-'+x.id+'" data-sec="'+x.id+'" aria-labelledby="t-'+x.id+'">'+
+      '<h2 class="sec__h" id="t-'+x.id+'"><button type="button" class="sec__cab" data-abre="'+x.id+'" aria-expanded="false" aria-controls="c-'+x.id+'">'+
+      ico(x.ic,true)+'<span class="sec__tt"><span class="sec__n">'+x.nome+'</span><span class="sec__res">'+esc(x.resumo)+'</span></span>'+
+      '<svg class="ico sec__seta" viewBox="0 0 24 24" aria-hidden="true">'+I.abre+'</svg></button></h2>'+
+      '<div class="sec__c" id="c-'+x.id+'">'+x.html+'</div></section>'
+  }
+  h+='</div></div>';
+  cx.innerHTML=h;
+  ligar();renderApp();aplicar()
+}
+
+/* mostra a seção ativa: painel único no desktop, lista que abre no celular */
+function aplicar(){
+  var d=desk(),atual=d?(ativa||IDS[0]):ativa,ss=document.querySelectorAll('.sec'),ls=document.querySelectorAll('.cfg__l'),i,on,b;
+  for(i=0;i<ss.length;i++){
+    on=ss[i].getAttribute('data-sec')===atual;
+    ss[i].classList.toggle('is-on',on);
+    b=ss[i].querySelector('.sec__cab');
+    b.setAttribute('aria-expanded',on?'true':'false');
+    b.tabIndex=d?-1:0                                  /* no desktop o título não é botão: quem troca é a navegação lateral */
+  }
+  for(i=0;i<ls.length;i++){
+    if(ls[i].getAttribute('data-ir')===atual)ls[i].setAttribute('aria-current','true');else ls[i].removeAttribute('aria-current')
+  }
+}
+function ir(id,rolar){
+  ativa=id;
+  try{history.replaceState(null,'',id?'#'+id:location.pathname+location.search)}catch(e){}
+  aplicar();
+  if(rolar&&id){var el=$('sec-'+id);if(el&&el.scrollIntoView)el.scrollIntoView({block:'start'})}
+}
+if(MQ){if(MQ.addEventListener)MQ.addEventListener('change',aplicar);else if(MQ.addListener)MQ.addListener(aplicar)}
+window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(IDS.indexOf(h)>=0&&h!==ativa){ativa=h;aplicar()}});
 
 /* ---------- ações ---------- */
+function sairPara(msg){toast(msg);setTimeout(function(){location.href=G?G.raiz():'../'},700)}
 function ligar(){
-  var b;
-  if(b=$('b-sair'))b.addEventListener('click',function(){
-    C.sair();
-    toast('Você saiu. Seus projetos continuam neste aparelho.');
-    setTimeout(function(){location.href=G?G.raiz():'../'},700)
+  var b,i,els;
+  els=document.querySelectorAll('.cfg__l');
+  for(i=0;i<els.length;i++)els[i].addEventListener('click',function(e){e.preventDefault();ir(this.getAttribute('data-ir'),false);var t=$('t-'+ativa);if(t){t.tabIndex=-1;focar(t)}});
+  els=document.querySelectorAll('.sec__cab');
+  for(i=0;i<els.length;i++)els[i].addEventListener('click',function(){if(desk())return;var id=this.getAttribute('data-abre');ir(ativa===id?'':id,ativa!==id)});
+
+  if(b=$('b-sair'))b.addEventListener('click',function(){C.sair();sairPara('Você saiu. Seus projetos continuam neste aparelho.')});
+
+  /* perfil */
+  if(b=$('b-nome'))b.addEventListener('click',function(){aberto.nome=true;delete aviso.nome;render();focar($('in-nome'))});
+  if(b=$('b-nome-cancelar'))b.addEventListener('click',function(){aberto.nome=false;delete aviso.nome;render();focar($('b-nome'))});
+  if(b=$('f-nome'))b.addEventListener('submit',function(e){
+    e.preventDefault();
+    var r=C.atualizarPerfil({nome:$('in-nome').value});
+    if(r.erro){aviso.nome={erro:true,txt:'Use um nome de 2 a 60 caracteres.'};render();focar($('in-nome'));return}
+    aberto.nome=false;aviso.nome={txt:'Nome salvo.'};toast('Nome salvo');render();focar($('b-nome'))
   });
+
+  /* plano */
   if(b=$('b-planos'))b.setAttribute('href','planos/'+(location.search||''));
   if(b=$('b-cancelar'))b.addEventListener('click',function(){
-    var pl=C.plano()||{},ate=pl.renovaTs?dataLonga(pl.renovaTs):'';
-    var dias=pl.renovaTs?Math.max(0,Math.ceil((pl.renovaTs-Date.now())/86400000)):30;
+    var as=C.assinatura()||{},ate=as.periodoFim?dataLonga(as.periodoFim):'o fim do período já contratado';
+    var dias=as.periodoFim?Math.max(0,Math.ceil((new Date(as.periodoFim).getTime()-Date.now())/86400000)):0;
     var extra=dias>23?'<p>Como você assinou há menos de 7 dias, o valor é devolvido por inteiro.</p>':''; /* [VALIDAR com advogado] */
     pop('Cancelar o Pro?',
       '<p>Você continua com o Pro até '+ate+'. Depois, a conta volta ao plano Grátis e a assinatura PolarLife volta a aparecer nas polaroids.</p>'+extra,
       [{led:true,txt:'Manter o Pro',cb:function(){fecharPop(false)}},
-       {txt:'Cancelar assinatura',ic:ico(I.lixeira),cb:function(){C.cancelarPro();fecharPop(false);toast('Assinatura cancelada. Você continua com o Pro até '+ate+'.');render()}}])
+       {txt:'Cancelar assinatura',ic:ico(I.lixeira),cb:function(){C.cancelarPro();fecharPop(false);toast('Assinatura cancelada. O Pro vale até '+ate+'.');render()}}])
   });
   if(b=$('b-reativar'))b.addEventListener('click',function(){
-    C.assinarPro('aprovado');
-    toast('Pro reativado');
-    render()
+    C.assinarPro('aprovado').then(function(){toast('Pro reativado');render()})
   });
   if(b=$('assin'))b.addEventListener('click',function(){
     var ligada=this.getAttribute('aria-checked')==='true'?false:true;
@@ -191,6 +413,74 @@ function ligar(){
     C.trocarAssinatura(!ligada); /* preferência de novos projetos (brief §3.2) */
     toast(ligada?'Novos projetos nascem com a assinatura PolarLife.':'Novos projetos nascem sem assinatura.')
   });
+
+  /* códigos de impressão */
+  if(b=$('f-codigo'))b.addEventListener('submit',function(e){
+    e.preventDefault();
+    var bt=$('b-resgatar');bt.disabled=true;
+    C.resgatarCodigo($('in-codigo').value).then(function(r){
+      aviso.codigo={txt:'Código resgatado: '+n1(r.folhas,'folha padrão entrou','folhas padrão entraram')+' na sua conta.'};
+      toast('Código resgatado');render();focar($('in-codigo'))
+    },function(er){
+      var t=er&&er.tipo,M={formato:'Confira o formato: PL seguido de 8 letras e números.',dv:'O dígito de conferência não bate. Confira o código digitado.',
+        usado:'Este código já foi usado.',vencido:'Este código venceu.',revogado:'Este código foi revogado.',invalido:'Código não encontrado. Confira e tente de novo.',
+        tentativas:'Muitas tentativas. Espere '+segundos(er&&er.esperaMs)+' e tente de novo.',indisponivel:'Não foi possível conferir o código neste navegador.'};
+      var v=$('in-codigo').value;
+      aviso.codigo={erro:true,txt:M[t]||M.indisponivel};render();
+      $('in-codigo').value=v;focar($('in-codigo'))
+    })
+  });
+
+  /* pagamentos */
+  els=document.querySelectorAll('.btn3[data-rec]');
+  for(i=0;i<els.length;i++)els[i].addEventListener('click',verRecibo);
+
+  /* segurança */
+  if(b=$('b-senha'))b.addEventListener('click',function(){aberto.senha=true;delete aviso.senha;render();focar($('in-senha-atual')||$('in-senha-nova'))});
+  if(b=$('b-senha-cancelar'))b.addEventListener('click',function(){aberto.senha=false;delete aviso.senha;render();focar($('b-senha'))});
+  if(b=$('f-senha'))b.addEventListener('submit',function(e){
+    e.preventDefault();
+    var at=$('in-senha-atual'),nova=$('in-senha-nova').value,rep=$('in-senha-rep').value,bt=$('b-senha-salvar');
+    function falha(txt,campo){aviso.senha={erro:true,txt:txt};render();focar($(campo))}
+    if(nova.length<8||nova.length>128){falha('A senha nova precisa ter de 8 a 128 caracteres.','in-senha-nova');return}
+    if(nova!==rep){falha('As duas senhas novas não são iguais.','in-senha-rep');return}
+    bt.disabled=true;
+    C.trocarSenha(at?at.value:'',nova).then(function(){
+      aberto.senha=false;aviso.senha={txt:'Senha salva.'};toast('Senha salva');render();focar($('b-senha'))
+    },function(er){
+      var t=er&&er.erro;
+      if(t==='atual')falha('A senha atual não confere.','in-senha-atual');
+      else if(t==='tentativas')falha('Muitas tentativas. Espere '+segundos(er.esperaMs)+' e tente de novo.','in-senha-atual');
+      else if(t==='senha')falha('A senha nova precisa ter de 8 a 128 caracteres.','in-senha-nova');
+      else falha('Não foi possível salvar a senha neste navegador.','in-senha-nova')
+    })
+  });
+  if(b=$('b-sair-todos'))b.addEventListener('click',function(){
+    pop('Sair de todos os aparelhos?',
+      '<p>Você sai da conta em todos os aparelhos, inclusive neste. Nesta versão de demonstração, a conta só está conectada neste navegador. Seus projetos continuam no aparelho.</p>',
+      [{led:true,txt:'Continuar conectado',cb:function(){fecharPop(false)}},
+       {txt:'Sair de todos',ic:ico(I.sair),cb:function(){C.encerrarSessoes();fecharPop(false);sairPara('Você saiu de todos os aparelhos.')}}])
+  });
+
+  /* preferências */
+  els=document.querySelectorAll('input[name="pref-un"]');
+  for(i=0;i<els.length;i++)els[i].addEventListener('change',function(){
+    if(!this.checked)return;
+    var r=C.salvarPreferencias({unidade:this.value});
+    if(r.erro)return;
+    try{sessionStorage.setItem('pl-unidade',this.value)}catch(e){}   /* o editor lê daqui (molduras.js) */
+    var s=document.querySelector('#sec-preferencias .sec__res');if(s)s.textContent=s.textContent.replace(/^Medidas em \S+/,'Medidas em '+this.value);
+    toast('Medidas em '+this.value)
+  });
+  if(b=$('pref-novidades'))b.addEventListener('click',function(){
+    var on=this.getAttribute('aria-checked')!=='true';
+    this.setAttribute('aria-checked',on?'true':'false');
+    $('nov-e').textContent=on?'Ligado':'Desligado';
+    C.salvarPreferencias({emails:{novidades:on}});
+    toast(on?'Preferência guardada: novidades ligadas.':'Preferência guardada: novidades desligadas.')
+  });
+
+  /* privacidade e dados */
   if(b=$('b-exportar'))b.addEventListener('click',function(){
     var blob=C.exportarDados();
     if(!blob){toast('Não foi possível exportar neste navegador.');return}
@@ -204,19 +494,20 @@ function ligar(){
     pop('Excluir sua conta?',
       '<p>Folhas, créditos e recibos desta conta serão apagados deste navegador. Seus projetos e fotos continuam no aparelho.</p>',
       [{led:true,txt:'Manter conta',cb:function(){fecharPop(false)}},
-       {txt:'Excluir conta',ic:ico(I.lixeira),cb:function(){C.excluirConta();fecharPop(false);toast('Conta apagada deste navegador.');setTimeout(function(){location.href=G?G.raiz():'../'},700)}}])
-  });
-  var rs=[].slice.call(document.querySelectorAll('.btn3[data-rec]'));
-  for(var i=0;i<rs.length;i++)rs[i].addEventListener('click',verRecibo)
+       {txt:'Excluir conta',ic:ico(I.lixeira),cb:function(){C.excluirConta();fecharPop(false);sairPara('Conta apagada deste navegador.')}}])
+  })
 }
 function verRecibo(){
-  var i=+this.getAttribute('data-rec'),r=((C.plano()||{}).recibos||[])[i];
+  var i=+this.getAttribute('data-rec'),r=C.recibos()[i];
   if(!r)return;
   pop('Recibo',
-    '<dl><dt>Número</dt><dd class="mono">'+esc(r.id)+'</dd><dt>Data</dt><dd>'+esc(r.data)+'</dd><dt>Descrição</dt><dd>'+esc(r.desc)+'</dd><dt>Valor</dt><dd class="mono">'+esc(r.valor)+'</dd></dl>'+
+    '<dl><dt>Número</dt><dd class="mono">'+esc(r.numero)+'</dd><dt>Data</dt><dd>'+(r.emitidoEm?dataCurta(r.emitidoEm):'')+'</dd><dt>Descrição</dt><dd>'+esc(r.descricao)+'</dd><dt>Valor</dt><dd class="mono">'+C.moeda(r.valorCentavos/100)+'</dd></dl>'+
     '<p>Recibo de demonstração: nenhuma cobrança foi feita.</p>',
     [{txt:'Fechar',cb:function(){fecharPop(true)}}],true)
 }
 
-if(C)render();
+if(C){
+  render();
+  if(window.PLPWA&&window.PLPWA.aoMudar)window.PLPWA.aoMudar(renderApp)
+}
 })();
