@@ -109,3 +109,17 @@
 .fdd .fsel__s{grid-column:1;grid-row:1;font-size:20px}
 .fdd .fsel__n{grid-column:1;grid-row:2;display:block;max-width:none;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fdd .fsel>.ico{grid-column:2;grid-row:1 / span 2}
+/* D-208: fontes do computador (Lucida) — estado em texto, nunca só por cor (T3) */
+.fitem__pc{font-size:12px;line-height:1.3;color:var(--blue)}
+.fdd [data-flocal]{margin-top:8px}
+/* D-208 · cidade em lista suspensa com busca (combobox) */
+.cbx{position:relative;overflow:visible}
+.cbx input{padding-right:48px!important}
+.cbx__abre{position:absolute;right:0;top:0;bottom:0;width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:var(--black);cursor:pointer}
+.cbx__lista{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;max-height:288px;overflow:auto;margin:0;padding:6px;list-style:none;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-lifted);text-align:left}
+.cbx__g{padding:10px 10px 4px;font-size:12px;line-height:1.3;color:var(--blue)}
+.cbx__o{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:8px;font-size:15px;line-height:1.3;color:var(--black);cursor:pointer}
+.cbx__o:hover{background:var(--surface-subtle)}
+.cbx__o.is-at{background:var(--surface-subtle);box-shadow:inset 0 0 0 2px var(--blue)}
+/* D-208 · «Só nesta foto» */
+.lgx [data-lgx-limpar]{margin-top:8px}

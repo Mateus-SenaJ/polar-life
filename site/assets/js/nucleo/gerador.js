@@ -101,7 +101,7 @@ function projeto(){
   if(!leg&&real)leg=LT.legInicial();   /* D-149: projeto real sem legenda salva = Localização · Data */
   var fotos=lista.map(function(e,k){
     var src=e.src;
-    return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,pad:e.pad||null,pl:e.pl||null,
+    return{n:k+1,src:src,v:real?false:!!VERT[src],leg:txt[k+1]!==undefined?txt[k+1]:(e.txt!=null?e.txt:(real?'':LT.LEG[(src-1)%4])),m:meta[k+1]||e.meta||null,pad:e.pad||null,pl:e.pl||null,lgx:LT.normLgx?LT.normLgx(e.lgx):null,   /* D-208: estilo próprio da foto */
       modo:e.modo||'preencher',z:e.z==null?100:e.z,ang:e.ang||0,px:e.px||0,py:e.py||0,rot:e.rot||0,flip:!!e.flip,
       adj:Object.assign({},ADJ0,e.adj||{}),flt:Object.assign({id:'original',int:100},e.flt||{})}
   });
@@ -129,10 +129,23 @@ function carregarBytes(url){
   if(cacheBytes[url])return Promise.resolve(cacheBytes[url]);
   return fetch(url).then(function(r){if(!r.ok)throw new Error('404');return r.arrayBuffer()}).then(function(ab){var u=new Uint8Array(ab);cacheBytes[url]=u;return u})
 }
+/* D-208: fonte do computador (PLFONTESLOCAIS) → os bytes lidos no aparelho; sem eles, a reserva livre, a mesma da tela */
+function bytesFonte(arq,url){
+  var FL=window.PLFONTESLOCAIS,loc=FL&&FL.porArq(arq);
+  if(!loc)return carregarBytes(url);
+  return FL.pronto.then(function(){
+    var b=FL.bytes(arq);if(b)return b;
+    if(loc.lic)return carregarBytes(url);                    /* arquivo licenciado para a web, se um dia existir */
+    var r=LT.famLG(loc.reserva,{}),rf=String(r.f).split("'")[1];fonteReserva[arq]=2;
+    return carregarBytes(BASE+'assets/fonts/pdf/'+arquivoFonte(rf,r.w,r.i))
+  })
+}
+if(window.PLFONTESLOCAIS)PLFONTESLOCAIS.ouvir(function(){   /* permissão nova: esquece a reserva e relê */
+  PLFONTESLOCAIS.LISTA.forEach(function(it){var u=BASE+'assets/fonts/pdf/'+it.arq;delete cacheFontes[it.arq];delete fonteReserva[it.arq];delete cacheBytes[u];if(typeof famImg!=='undefined')delete famImg[it.arq]})});
 function carregarFonte(fam,peso,it,avisos){
   var arq=arquivoFonte(fam,peso,it),url=BASE+'assets/fonts/pdf/'+arq;
-  if(cacheFontes[arq]){if(fonteReserva[arq])registrarAviso(avisos,'FonteReserva',arq,fam);return Promise.resolve(cacheFontes[arq])}
-  return carregarBytes(url).catch(function(){
+  if(cacheFontes[arq]){if(fonteReserva[arq]===1)registrarAviso(avisos,'FonteReserva',arq,fam);return Promise.resolve(cacheFontes[arq])}
+  return bytesFonte(arq,url).catch(function(){
     if(arq==='inter-400.ttf')throw new Error('FonteIndisponivel');
     fonteReserva[arq]=1;registrarAviso(avisos,'FonteReserva',arq,fam);
     return carregarBytes(BASE+'assets/fonts/pdf/inter-400.ttf')
@@ -357,7 +370,7 @@ function decoItens(d,z){return d.filter(function(x){return x.z===z}).map(functio
 function fundoItem(fd,p){
   var W=mm(p.w),H=mm(p.h),o={t:'fundo',tipo:fd.tipo,W:W,H:H};
   if(fd.tipo==='cor')o.cor=fd.cor;
-  else if(fd.tipo==='gradiente'){var e=PLCOLAGEM.eixoGrad(p.w,p.h,fd.ang);o.cor=fd.cor;o.cor2=fd.cor2;o.eixo=[mm(e.x0),mm(e.y0),mm(e.x1),mm(e.y1)]}
+  else if(fd.tipo==='gradiente'){var e=PLCOLAGEM.eixoGrad(p.w,p.h,fd.ang);o.cor=fd.cor;o.cor2=fd.cor2;if(fd.cor3)o.cor3=fd.cor3;o.eixo=[mm(e.x0),mm(e.y0),mm(e.x1),mm(e.y1)]}
   else{o.src=fd.src;o.px=fd.px;o.py=fd.py;o.suave=fd.suave}
   return o
 }
@@ -598,6 +611,7 @@ function desenharFundo(ctx,it){
   if(it.tipo==='cor'){c=rgb(it.cor);ctx.page.pushOperators(PDF.pushGraphicsState(),PDF.setFillingRgbColor(c[0],c[1],c[2]),PDF.rectangle(0,0,W,H),PDF.fill(),PDF.popGraphicsState());return}
   if(it.tipo==='gradiente'){   /* sombreamento axial nativo: vetorial, sem faixas (D-152) */
     var cx=ctx.doc.context,a=rgb(it.cor),b=rgb(it.cor2),fn=cx.obj({FunctionType:2,Domain:[0,1],C0:a,C1:b,N:1});
+    if(it.cor3){var m=rgb(it.cor3);fn=cx.obj({FunctionType:3,Domain:[0,1],Functions:[cx.obj({FunctionType:2,Domain:[0,1],C0:a,C1:m,N:1}),cx.obj({FunctionType:2,Domain:[0,1],C0:m,C1:b,N:1})],Bounds:[.5],Encode:[0,1,0,1]})}   /* D-208: 3 cores, a do meio em 50% */
     var sh=cx.obj({ShadingType:2,ColorSpace:PDF.PDFName.of('DeviceRGB'),Coords:it.eixo,Function:fn,Extend:[true,true]});
     var R=ctx.page.node.normalizedEntries().Resources,tab=R.lookupMaybe(PDF.PDFName.of('Shading'),PDF.PDFDict);
     if(!tab){tab=cx.obj({});R.set(PDF.PDFName.of('Shading'),tab)}
@@ -662,7 +676,8 @@ function construirDoc(paginas,p,jpegs,a,b,avisos,sinal,escala){
     fontesUsadas(paginas,a,b).forEach(function(f){
       var arq=arquivoFonte(f.fam,f.peso,f.it),url=BASE+'assets/fonts/pdf/'+arq,bytes=cacheBytes[url];
       if(!bytes)return;
-      var nome=f.fam.replace(/[^A-Za-z0-9]/g,'')+'-'+f.peso+(f.it?'-Italico':''),h=0,k=nome;
+      var nome=f.fam.replace(/[^A-Za-z0-9]/g,'')+'-'+f.peso+(f.it?'-Italico':''),h=0,k=nome,loc=window.PLFONTESLOCAIS&&PLFONTESLOCAIS.porArq(arq);
+      if(loc)nome=(fonteReserva[arq]===2?loc.reserva:loc.n).replace(/[^A-Za-z0-9]/g,'')+(fonteReserva[arq]===2?'-400':'-Italic');   /* D-208: o nome diz qual letra foi embutida */
       for(var i=0;i<k.length;i++)h=(h*33+k.charCodeAt(i))>>>0;
       var tag='';for(var j=0;j<6;j++){tag+=String.fromCharCode(65+h%26);h=Math.floor(h/26)}
       jobs.push(doc.embedFont(bytes,{subset:true,customName:tag+'+'+nome}).then(function(font){ctx.fontCache[f.fam+'|'+f.peso+'|'+(f.it?1:0)]={font:font,key:f.fam+'|'+f.peso+'|'+(f.it?1:0)}}))
@@ -792,7 +807,7 @@ function itensImg(g,itens,ctx){
     if(it.t==='grupo'){g.save();g.transform(it.m[0],it.m[1],it.m[2],it.m[3],it.m[4],it.m[5]);itensImg(g,it.itens,ctx);g.restore();return}
     if(it.t==='fundo'){
       if(it.tipo==='cor'){g.fillStyle=it.cor;g.fillRect(0,0,it.W,it.H);return}
-      if(it.tipo==='gradiente'){var gr=g.createLinearGradient(it.eixo[0],it.eixo[1],it.eixo[2],it.eixo[3]);gr.addColorStop(0,it.cor);gr.addColorStop(1,it.cor2);g.fillStyle=gr;g.fillRect(0,0,it.W,it.H);return}
+      if(it.tipo==='gradiente'){var gr=g.createLinearGradient(it.eixo[0],it.eixo[1],it.eixo[2],it.eixo[3]);gr.addColorStop(0,it.cor);if(it.cor3)gr.addColorStop(.5,it.cor3);gr.addColorStop(1,it.cor2);g.fillStyle=gr;g.fillRect(0,0,it.W,it.H);return}
       if(ctx.fundo)g.drawImage(ctx.fundo,0,0,it.W,it.H);return}
     if(it.t==='cheio'){g.fillStyle=it.cor;if(it.rx>0){retImg(g,it.x,it.y,it.w,it.h,it.rx);g.fill()}else g.fillRect(it.x,it.y,it.w,it.h);return}
     if(it.t==='sombra'){g.save();g.fillStyle='#000000';camadasSombra(it).forEach(function(q){g.globalAlpha=q.alfa;retImg(g,q.x,q.y,q.w,q.h,q.rx);g.fill()});g.restore();return}   /* D-207: igual ao PDF */

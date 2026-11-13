@@ -23,8 +23,8 @@ var FMTD=[ /* 13 formatos de data (FN-07, DV-05), os mesmos da T-10 */
 ];
 var COR_LG={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 /* Catálogo EXC-2 (DOC-02 §4): 24 fontes, 5 categorias (Nanum Pen Script e Gaegu saíram: sem acentos, D-111). fb = fallback genérico da categoria. */
-var CAT={man:'Manuscrita',cal:'Caligráfica',dat:'Datilografada',edi:'Editorial',lim:'Limpa'};
-var FB={man:'cursive',cal:'cursive',dat:'monospace',edi:'serif',lim:'sans-serif'};
+var CAT={pc:'Do seu computador',man:'Manuscrita',cal:'Caligráfica',dat:'Datilografada',edi:'Editorial',lim:'Limpa'};
+var FB={pc:'cursive',man:'cursive',cal:'cursive',dat:'monospace',edi:'serif',lim:'sans-serif'};
 var FONTES=[
  ['Caveat','man'],['Reenie Beanie','man'],['Shadows Into Light','man'],['Kalam','man'],['Patrick Hand','man'],['Covered By Your Grace','man'],['Zeyada','man'],['Homemade Apple','man'],['Over the Rainbow','man'],['La Belle Aurore','man'],
  ['Dancing Script','cal'],['Satisfy','cal'],['Sacramento','cal'],['Allura','cal'],['Parisienne','cal'],
@@ -36,7 +36,9 @@ var FONTES=[
  /* D-186: com itálico e negrito reais (os dois botões ao lado da fonte funcionam nelas) */
  ['IBM Plex Mono','dat'],['Space Mono','dat'],['Playfair Display','edi'],['Merriweather','edi'],['Alegreya','edi'],['Cormorant Garamond','edi'],['Josefin Sans','lim'],
  ['Cormorant Garamond Itálico','edi','Cormorant Garamond',1],['Playfair Display Itálico','edi','Playfair Display',1],['EB Garamond','edi'],['Libre Baskerville','edi'],['Lora','edi'],['Crimson Pro','edi'],
- ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400],['Nunito','lim'],['DM Sans','lim']
+ ['Inter Light','lim','Inter',0,300],['Inter Regular','lim','Inter',0,400],['Nunito','lim'],['DM Sans','lim'],
+ /* D-208: Lucida Handwriting e variações — fontes pagas, usadas só quando estão no aparelho (PLFONTESLOCAIS); sem elas, a reserva livre */
+ ['Lucida Handwriting','pc','PL Lucida Handwriting',1],['Lucida Calligraphy','pc','PL Lucida Calligraphy',1],['Lucida Casual','pc','PL Lucida Casual',1]
 ].map(function(f){return{n:f[0],c:f[1],fam:f[2]||f[0],it:!!f[3],w:f[4]||400,css:"'"+(f[2]||f[0])+"',"+FB[f[1]]}});
 function fonte(n){return FONTES.filter(function(f){return f.n===n})[0]||FONTES[0]}
 var FONT_LG={};
@@ -47,6 +49,7 @@ FONT_LG['IBM Plex Mono']=["'IBM Plex Mono',ui-monospace,monospace",0,400];
 var VAR={'Inter':['300','400','500'],'Cormorant Garamond':['300','400','500','700','300i','400i','700i'],'Caveat':['400','500','700'],'Kalam':['400','700'],
  'Courier Prime':['400','700','400i','700i'],'EB Garamond':['400','700','400i','700i'],'Libre Baskerville':['400','700','400i'],'Playfair Display':['400','700','400i','700i'],
  'Amatic SC':['400','700'],'IBM Plex Mono':['400','700','400i','700i'],'Space Mono':['400','700','400i','700i'],'Josefin Sans':['400','700','400i','700i'],'Merriweather':['400','700','400i','700i'],'Alegreya':['400','700','400i','700i'],'Dancing Script':['400','700'],'Fondamento':['400','400i'],'Almendra':['400','700','400i','700i'],'Oregano':['400','400i'],'Merienda':['400','700'],'Lora':['400','700','400i','700i'],'Crimson Pro':['400','700','400i','700i'],'Nunito':['400','700','400i','700i'],'DM Sans':['400','700','400i','700i']};
+VAR['PL Lucida Handwriting']=VAR['PL Lucida Calligraphy']=VAR['PL Lucida Casual']=['400i'];   /* D-208: só a itálica (a única que existe) */
 function temVar(fam,w,i){return(VAR[fam]||['400']).indexOf(w+(i?'i':''))>=0}
 function variante(fam,w,i){                                    /* {w,i} existente mais próximo (mesmo itálico primeiro) */
   var l=(VAR[fam]||['400']).map(function(v){return{w:parseInt(v,10),i:/i$/.test(v)}}),r=null,d=1e9;
@@ -108,7 +111,7 @@ var LEG0={original:false,al:'esq',preset:'simples',dy:0,inc:0,
  data:{on:true,font:'IBM Plex Mono',pt:8,fmt:0,cor:'preto'},
  loc:{on:true,font:'IBM Plex Mono',pt:8,cor:'preto',uf:'sigla',pais:'oculto',ocBR:true,sep:', ',ordem:'cidade'}};
 function copia(o){return JSON.parse(JSON.stringify(o))}
-var POCKET_FONTE='Fondamento Itálico';   /* D-179: Lucida Calligraphy das fotos do Pocket → a livre mais parecida */
+var POCKET_FONTE='Lucida Handwriting';   /* D-208: pedido do dono; sem a fonte no aparelho entra a Courgette (PLFONTESLOCAIS), na tela e no arquivo */
 function legPocket(b){ /* D-113: padrão do Retro Pocket — duas linhas (local e data) ancoradas ao topo das maiúsculas */
   var l=copia(b||LEG0);
   l.txt.on=false;l.meta='linhas';l.ordem='loc-data';l.medida='letras';
@@ -204,8 +207,29 @@ function comAv(c){                                              /* D-148: espaç
   if(!c||!c.data||!c.loc)return c;
   var a=av(c);c.data.esp=a.esp;c.loc.esp=a.esp;c._cx=a.cx;return c
 }
+/* D-208: estilo próprio de uma foto (lgx, gravado na foto) por cima do estilo de todas: fonte, tamanho (%), alinhamento,
+   deslocamento, inclinação e espaçamento entre as legendas. Uma função só para o Quadro, as Folhas e o PDF (MT-02). */
+var LGX_K=['font','esc','al','dy','inc','lsp'];
+function estiloFoto(leg,f){
+  var x=f&&f.lgx;if(!x||!leg||!leg.data)return{leg:leg,f:f};
+  var l=copia(leg),k=x.esc?x.esc/100:1;
+  function fo(o){if(!o)return;if(x.font&&FONT_LG[x.font]){o.font=x.font;var e=estilosDe(x.font,o);if(o.b&&!e.b.ok)delete o.b;if(o.it&&!e.it.ok&&!e.it.natural)delete o.it}if(k!==1&&o.pt)o.pt=Math.round(o.pt*k*100)/100}
+  fo(l.txt);fo(l.data);fo(l.loc);if(l.pad&&l.pad.l)l.pad.l.forEach(fo);
+  if(x.al)l.al=x.al;if(x.dy!=null)l.dy=x.dy;if(x.inc!=null)l.inc=x.inc;if(x.lsp!=null)l.lsp=x.lsp;
+  var f2=f;if(f.pad&&f.pad.l){f2=Object.assign({},f,{pad:copia(f.pad)});f2.pad.l.forEach(fo)}
+  return{leg:l,f:f2}
+}
+function normLgx(x){
+  if(!x||typeof x!=='object')return null;var o={};
+  if(x.font&&FONT_LG[x.font])o.font=x.font;
+  if(x.esc!=null&&isFinite(x.esc)&&+x.esc!==100)o.esc=Math.max(60,Math.min(160,Math.round(+x.esc)));
+  if(x.al==='esq'||x.al==='centro'||x.al==='dir')o.al=x.al;
+  ['dy','inc','lsp'].forEach(function(k){if(x[k]!=null&&isFinite(x[k]))o[k]=Math.round(+x[k]*10)/10});
+  return Object.keys(o).length?o:null
+}
 function comPadrao(leg,f){
   if(!leg||!leg.data||!leg.loc)return leg;
+  if(f&&f.lgx){var ef=estiloFoto(leg,f);leg=ef.leg;f=ef.f}
   if(ehReal()&&!(leg.pad&&leg.pad.on))leg=migrarPad(copia(leg),f&&[f.leg!=null?f.leg:f.txt]);   /* projeto real: sempre 2 linhas */
   var a0=av(leg),padrao=a0.esp===AV0.esp&&a0.cx===AV0.cx;
   if(!leg.pad||!leg.pad.on)return padrao&&leg.data.esp==null?leg:comAv(copia(leg));
@@ -292,15 +316,15 @@ function linhas(leg,fr,medir,opts){
   }
   if(medida==='letras'||leg._pad){                /* D-192 · MT-02: 1ª maiúscula a 3 mm da foto (fixo); a 2ª, 2 mm abaixo da base da 1ª */
     var b=wb+LEG_TOPO+L[0].capMax;
-    L.forEach(function(ln,i){if(i)b+=2+ln.capMax;
+    L.forEach(function(ln,i){if(i)b+=2+(+leg.lsp||0)+ln.capMax;   /* D-208: espaçamento extra entre as legendas */
       ln.lh=ln.asc+ln.desc;ln.base=b;ln.top=b-ln.asc*ln.corpo;ln.letrasTop=b-ln.capMax})
   }else{                                          /* caixa: linha de 1,2 corpo (mesma conta do PDF) */
     var y=wb+2.2+1.2+(opts.capTxt&&opts.capBoxH?opts.capBoxH:0);
     L.forEach(function(ln){
       ln.lh=1.2;ln.top=y;ln.base=y+((1.2-(ln.asc+ln.desc))/2+ln.asc)*ln.corpo;ln.letrasTop=ln.base-ln.capMax;
-      y+=1.2*ln.corpo})
+      y+=1.2*ln.corpo+(+leg.lsp||0)})
   }
   return L
 }
-window.PLTEXTO={ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,lugarTxt:lugarTxt,cxMeta:cxMeta,caixaLG:caixaLG,ajustarCorpo:ajustarCorpo,larguraTela:larguraTela,LEG_TOPO:3,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
+window.PLTEXTO={estiloFoto:estiloFoto,normLgx:normLgx,LGX_K:LGX_K,ehReal:ehReal,LEG:LEG,MESX:MESX,SEMX:SEMX,FMTD:FMTD,COR_LG:COR_LG,CAT:CAT,FB:FB,FONTES:FONTES,FONT_LG:FONT_LG,z2:z2,famLG:famLG,VAR:VAR,temVar:temVar,variante:variante,estilosDe:estilosDe,AV0:AV0,DATA_AV:DATA_AV,LOC_AV:LOC_AV,UF_NOME:UF_NOME,av:av,fmtLocal:fmtLocal,lugarTxt:lugarTxt,cxMeta:cxMeta,caixaLG:caixaLG,ajustarCorpo:ajustarCorpo,larguraTela:larguraTela,LEG_TOPO:3,estLG:estLG,fonte:fonte,LOC0:LOC0,dadosFoto:dadosFoto,localLG:localLG,LEG0:LEG0,legPocket:legPocket,alinharX:alinharX,assinaturaPos:assinaturaPos,assinaturaDir:assinaturaDir,migrar:migrar,padNovo:padNovo,legInicial:legInicial,migrarPad:migrarPad,sepMeta:sepMeta,padLinha:padLinha,PAD_PT:PAD_PT,PAD_TIPOS:PAD_TIPOS,comPadrao:comPadrao,medTela:medTela,limparMedTela:limparMedTela,linhas:linhas};
 })();

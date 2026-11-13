@@ -85,7 +85,7 @@ try {
   /* 6) a central de conexões mostra o Google Fotos disponível */
   await p.goto(srv.url + 'app/conexoes/', { waitUntil: 'networkidle' });
   const card = await p.evaluate(() => { const n = document.getElementById('n-google'); const a = n && n.closest('article'); return a ? a.textContent : ''; });
-  /Pronto para usar/.test(card) && !/Em breve/.test(card) ? ok('Conexões: Google Fotos «Pronto para usar»') : ruim('cartão: ' + card);
+  /Escolher fotos/.test(card) && !/Pronto para usar|Em breve/.test(card) ? ok('Conexões: Google Fotos disponível, com «Escolher fotos» e sem o selo «Pronto para usar» (D-208)') : ruim('cartão: ' + card);
   await ctx.close();
 } catch (e) { ruim('exceção: ' + e.message); }
 await nav.close(); srv.close?.();

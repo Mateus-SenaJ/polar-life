@@ -58,6 +58,7 @@ function prepara(a){
   var ok=false;try{ok=!!(window.isSecureContext&&navigator.canShare&&navigator.canShare({files:arquivos}))}catch(e){}
   if(estado==='sem-suporte'||estado==='erro'||estado==='baixado')ok=false;
   falhou=estado==='erro';modo=ok?'compartilhar':'baixar';pinta();
+  if(window.PLENVIAR)PLENVIAR.montar($('enviar'),{arquivos:function(){return arquivos},toast:toast,semImagem:'../exportar/'});   /* D-208: Instagram e WhatsApp */
   if(estado==='baixado')mostraBaixado()
 }
 /* A tela de revisao preserva seus estados sem inventar um arquivo fora da geracao real. */

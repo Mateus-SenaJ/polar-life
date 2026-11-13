@@ -15,10 +15,12 @@ var LAYOUTS=[
   {id:'capa',n:'Capa e destaques',d:'Uma polaroid grande e as outras menores embaixo.',esc:true,min:3},
   {id:'tempo',n:'Linha do tempo',d:'Uma polaroid de cada lado de um traço, na ordem das datas.',esc:true,min:3},
   {id:'varal',n:'Varal',d:'Polaroids penduradas num fio, presas com pregadores.',esc:true,min:3},
-  {id:'cabine',n:'Tira vertical',d:'Polaroids empilhadas numa coluna, como na cabine de fotos.',esc:true,min:3}
+  {id:'cabine',n:'Tira vertical',d:'Polaroids empilhadas numa coluna, como na cabine de fotos.',esc:true,min:3},
+  /* D-208: arrastar, incluir ou tirar uma polaroid na folha passa a colagem para a Personalizada (posições guardadas em «livre») */
+  {id:'livre',n:'Personalizada',d:'Você arrasta, gira e muda o tamanho de cada polaroid; dá para incluir e tirar polaroids em cada folha.',min:1,livre:true}
 ];
-var PADRAO={ativo:false,layout:'espalhadas',fundo:{tipo:'foto',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40},peca:'A4',orient:'retrato',margem:3,fotos:null,
-  sombra:true,cantos:'retos',legendas:'auto',texto:''};   /* D-207: nunca contorno preto; sombra suave, cantos e onde vai a legenda */
+var PADRAO={ativo:false,layout:'espalhadas',fundo:{tipo:'foto',cor:'#FFFFFF',cor2:'#F8F9FA',cor3:null,ang:135,foto:null,px:50,py:50,suave:40},peca:'A4',orient:'retrato',margem:3,fotos:null,
+  sombra:true,cantos:'retos',legendas:'auto',texto:'',livre:null};   /* D-208: cor3 = cor do meio do degradê (null = 2 cores) · livre = folhas da Personalizada */   /* D-207: nunca contorno preto; sombra suave, cantos e onde vai a legenda */
 var LEGENDAS=[['auto','Automático'],['todas','Em todas'],['uma','Só em uma'],['caixa','Caixa de texto']];
 /* D-176: a Colagem tem tamanho próprio, separado do papel das Folhas de polaroids.
    D-195: tamanhos para as redes (DOC-06 §3): a imagem sai com os pixels de «rede», 4,5 px por mm (240 mm = 1080 px), sempre em pé */
@@ -33,7 +35,7 @@ function norm(c){
   d.ativo=!!o.ativo;
   d.layout=LAYOUTS.some(function(l){return l.id===o.layout})?o.layout:d.layout;
   d.fundo.tipo=f.tipo==='cor'||f.tipo==='gradiente'||f.tipo==='foto'?f.tipo:d.fundo.tipo;
-  d.fundo.cor=hex(f.cor,d.fundo.cor);d.fundo.cor2=hex(f.cor2,d.fundo.cor2);
+  d.fundo.cor=hex(f.cor,d.fundo.cor);d.fundo.cor2=hex(f.cor2,d.fundo.cor2);d.fundo.cor3=f.cor3?hex(f.cor3,null):null;
   d.fundo.ang=Math.round(num(f.ang,0,360,d.fundo.ang))%360;
   d.fundo.foto=f.foto!=null&&f.foto%1===0&&f.foto>=1?+f.foto:null;
   d.fundo.px=num(f.px,0,100,50);d.fundo.py=num(f.py,0,100,50);d.fundo.suave=Math.round(num(f.suave,0,100,d.fundo.suave));
@@ -42,7 +44,16 @@ function norm(c){
   d.sombra=o.sombra!==false;d.cantos=o.cantos==='redondos'?'redondos':'retos';                                   /* D-207 */
   d.legendas=LEGENDAS.some(function(x){return x[0]===o.legendas})?o.legendas:'auto';
   d.texto=typeof o.texto==='string'?o.texto.replace(/\s+/g,' ').trim().slice(0,60):'';
+  d.livre=normLivre(o.livre);
+  if(d.layout==='livre'&&!d.livre)d.layout=PADRAO.layout;   /* Personalizada sem posições: volta ao padrão */
   return d
+}
+/* D-208 · Personalizada: [[{src,cx,cy,giro,rot,s}]] por folha, em mm a partir do canto da folha */
+function normLivre(L){
+  if(!Array.isArray(L))return null;
+  var o=L.map(function(f){return Array.isArray(f)?f.filter(function(q){return q&&q.src%1===0&&q.src>=1&&isFinite(q.cx)&&isFinite(q.cy)}).slice(0,KMAX).map(function(q){
+    return{src:+q.src,cx:Math.round(+q.cx*100)/100,cy:Math.round(+q.cy*100)/100,giro:!!q.giro,rot:Math.round(num(q.rot,-180,180,0)*10)/10,s:Math.round(num(q.s,SMIN,2,1)*100)/100}}):[]}).filter(function(f){return f.length}).slice(0,60);
+  return o.length?o:null
 }
 /* foto do fundo: a escolhida, se ainda estiver no projeto; senão a primeira (D-151) */
 function fotoDeFundo(c,fotos){
@@ -279,17 +290,42 @@ function caixaDe(A,p,m,txt){var b=banda(p,m),aw=A.x1-A.x0,w=Math.min(aw*.8,170),
   return{x:A.x0+(aw-w)/2,y:A.y1+(b-h)/2,w:w,h:h,rot:-2,txt:txt,pt:Math.round(mmTxt*72/25.4*100)/100}}
 /* D-207: fotos que faltam para o tipo de colagem (0 = pode seguir) */
 function minimo(c){c=norm(c);var L=LAYOUTS.filter(function(l){return l.id===c.layout})[0];return L&&L.min||1}
-function faltam(c,total){c=norm(c);var n=c.fotos?Math.min(total,c.fotos.length):total;return Math.max(0,minimo(c)-n)}
+function faltam(c,total){c=norm(c);if(c.layout==='livre')return total?0:1;var n=c.fotos?Math.min(total,c.fotos.length):total;return Math.max(0,minimo(c)-n)}
 function papel(s){return window.PLFOLHAS.papel(s)}
 /* capacidade = maior k tal que todos os k' ≤ k têm posição válida (dentro da margem e com a regra de sobreposição) */
 function capDe(id,A,fw,fh){
   var key=[id,fw,fh,A.x0,A.y0,A.x1,A.y1,A.smax||1].join('|');if(MEMO[key]!=null)return MEMO[key];
   var k=0,n,mx=Math.min(KMAX,GR[id].max||KMAX);for(n=1;n<=mx;n++){var c=GR[id].pos(n,A,fw,fh);if(valido(c,n,fw,fh,A))k=n;else break}
   return MEMO[key]=k}
-function capacidade(s,fr){var c=norm(s.colagem),p=papel(s);return capDe(c.layout,area(s,p),fr.w,fr.h)}
-function contar(s,fr,total){var c0=norm(s.colagem);if(c0.fotos)total=Math.min(total,c0.fotos.length);var cap=capacidade(s,fr);return cap<1?{folhas:0,porFolha:0,naoCabe:true}:{folhas:total>0?Math.ceil(total/cap):0,porFolha:cap,naoCabe:false}}
+function capacidade(s,fr){var c=norm(s.colagem),p=papel(s);if(c.layout==='livre')return c.livre.reduce(function(m,f){return Math.max(m,f.length)},0);return capDe(c.layout,area(s,p),fr.w,fr.h)}
+function contar(s,fr,total){var c0=norm(s.colagem);
+  if(c0.layout==='livre'){var nf=c0.livre.length;return{folhas:total>0?nf:0,porFolha:capacidade(s,fr),naoCabe:false}}   /* D-208 */if(c0.fotos)total=Math.min(total,c0.fotos.length);var cap=capacidade(s,fr);return cap<1?{folhas:0,porFolha:0,naoCabe:true}:{folhas:total>0?Math.ceil(total/cap):0,porFolha:cap,naoCabe:false}}
+/* D-208: a polaroid da Personalizada nunca sai da área impressa (a caixa girada e reduzida fica dentro da margem) */
+function prender(q,A,fw,fh){var g=(q.giro?90:0)+(q.rot||0),k=q.s||1,r=limita(q.cx,q.cy,(q.giro?fh:fw)*k,(q.giro?fw:fh)*k,g-(q.giro?90:0),A);
+  if(A.x1-A.x0<meia(fw*k,fh*k,g).x*2)r.cx=(A.x0+A.x1)/2;if(A.y1-A.y0<meia(fw*k,fh*k,g).y*2)r.cy=(A.y0+A.y1)/2;return r}
+function paginarLivre(s,c,fr,fotos,p,A){
+  var porSrc={},sheets=[];(fotos||[]).forEach(function(f){var k=f&&typeof f==='object'?f.src:f;if(porSrc[k]==null)porSrc[k]=f});
+  c.livre.forEach(function(F,si){
+    var cells=[];F.forEach(function(q,ci){var f=porSrc[q.src];if(!f)return;var r=prender(q,A,fr.w,fr.h);
+      var W=q.giro?fr.h:fr.w,H=q.giro?fr.w:fr.h;cells.push({x:r.cx-W/2,y:r.cy-H/2,w:W,h:H,giro:q.giro,rot:q.rot,s:q.s,f:f,li:[si,ci]})});
+    if(!cells.length)return;
+    var sh={cells:cells,grupo:'',per:cells.length,parcial:false,livre:si},ml=modoLegenda(c,cells,fr.w,fr.h);sh.legendas=ml;
+    if(ml==='uma')cells.forEach(function(q,i){if(i<cells.length-1)q.semLeg=true});
+    else if(ml==='caixa'){cells.forEach(function(q){q.semLeg=true});sh.caixa=caixaDe(A,p,s.margem,textoCaixa(c,cells))}
+    sheets.push(sh)});
+  var maior=sheets.reduce(function(t,x){return Math.max(t,x.cells.length)},0);
+  return{p:p,sheets:sheets,erro:false,g:{n:maior,c:maior,r:1,fw:fr.w,fh:fr.h,giro:false,cap:maior},colagem:true,livre:true}
+}
+/* D-208: a colagem automática de agora vira a Personalizada (mesmas posições), para a pessoa mexer a partir dela */
+function paraLivre(s,fr,fotos){
+  var c=norm(s.colagem);if(c.layout==='livre')return c.livre;
+  var R=paginar(s,fr,fotos);
+  return normLivre(R.sheets.map(function(sh){return sh.cells.map(function(q){var k=q.s||1;return{src:q.f&&typeof q.f==='object'?q.f.src:q.f,cx:q.x+q.w/2,cy:q.y+q.h/2,giro:!!q.giro,rot:q.rot||0,s:k}})}))
+}
 function paginar(s,fr,fotos){
-  var c=norm(s.colagem);fotos=escolhidas(c,fotos||[]);
+  var c=norm(s.colagem);
+  if(c.layout==='livre'){var pL=papel(s);return paginarLivre(s,c,fr,fotos,pL,area(s,pL))}
+  fotos=escolhidas(c,fotos||[]);
   var p=papel(s),A=area(s,p),L=GR[c.layout],cap=capDe(c.layout,A,fr.w,fr.h);
   if(cap<1)return{p:p,sheets:[],erro:true,g:{n:0,c:0,r:0,fw:fr.w,fh:fr.h,giro:false,cap:0},colagem:true};
   if(L.data)fotos=porData(fotos);
@@ -333,5 +369,5 @@ function comModelo(atual,id){
 }
 window.PLCOLAGEM={PECAS:PECAS,config:config,escolhidas:escolhidas,LAYOUTS:LAYOUTS,PADRAO:PADRAO,norm:norm,fotoDeFundo:fotoDeFundo,fundo:fundo,eixoGrad:eixoGrad,blurMm:blurMm,clareia:clareia,
   capacidade:capacidade,contar:contar,paginar:paginar,dentro:dentro,cobertura:cobertura,JAN:JAN,LIM:LIM,ativa:function(s){return!!(s&&s.colagem&&s.colagem.ativo)},
-  rede:rede,MODELOS:MODELOS,comModelo:comModelo,LEGENDAS:LEGENDAS,minimo:minimo,faltam:faltam};
+  rede:rede,MODELOS:MODELOS,comModelo:comModelo,LEGENDAS:LEGENDAS,minimo:minimo,faltam:faltam,paraLivre:paraLivre,prender:prender,area:function(s){var p=papel(s);return area(s,p)},normLivre:normLivre};
 })();

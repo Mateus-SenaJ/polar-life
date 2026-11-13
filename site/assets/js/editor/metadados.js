@@ -31,6 +31,39 @@ Q.meta=function(n){var m=M(n),p=pd(m.iso);return{iso:m.iso,data:p?new Date(p.y,p
 /* D-178: cidade lida do GPS (no formato de Avançado), para o campo mostrar de onde vem a linha de local */
 function daFoto(m){return m&&m.lugar&&window.PLTEXTO?PLTEXTO.lugarTxt(m.lugar,Q.ST()[0].leg):''}
 
+/* ---------- D-208: cidade escolhida na lista → pergunta se vale para as outras fotos do mesmo dia ---------- */
+function dia(n){return(M(n).iso||'').slice(0,10)}
+function mesmoDia(n){var d=dia(n),r=[],i;if(!d)return r;for(i=1;i<=Q.N;i++)if(i!==n&&dia(i)===d)r.push(i);return r}
+Q.cidadesUsadas=function(){var r=[],i,c;for(i=1;i<=Q.N;i++){c=M(i).c;if(c&&M(i).cs!=='sem'&&r.indexOf(c)<0)r.push(c)}return r};
+Q.porDia=function(){var g={},i,d;for(i=1;i<=Q.N;i++){d=dia(i)||'';(g[d]=g[d]||[]).push(i)}return g};
+/* aplica a cidade nas fotos ns (sem pergunta); as linhas de Localização digitadas à mão voltam a seguir a cidade */
+Q.cidadeEm=function(ns,rot,k){ns.forEach(function(i){var m=cp(i);m.c=rot;m.cs=rot?'manual':'none';Q.ST()[i].meta=m;if(window.PLLEG&&PLLEG.soltarLoc)PLLEG.soltarLoc(i)});Q.commit(k||'md:c-dia');refaz(ns)};
+var dlgC=null,dlgV=null;
+function dialogoCidade(){
+  if(dlgC)return dlgC;
+  var sc=document.createElement('div');sc.className='scrim led-scrim';sc.id='cid-scrim';sc.hidden=true;
+  var d=document.createElement('div');d.className='dialog led-dialog led-box led-box--3';d.id='cid-dlg';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');
+  d.setAttribute('aria-labelledby','cid-t');d.setAttribute('aria-describedby','cid-d');d.hidden=true;
+  d.innerHTML='<h2 class="led-dialog__title" id="cid-t"></h2><p id="cid-d"></p><div class="dialog__act led-dialog__actions">'
+    +'<button type="button" class="btn2 btn2--lg" id="cid-nao">Só nesta foto</button>'
+    +'<button type="button" class="led-btn led-btn--light" id="cid-sim"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content"><span id="cid-sim-t"></span></span></button></div>';
+  document.body.appendChild(sc);document.body.appendChild(d);
+  function fecha(){sc.hidden=d.hidden=true;if(dlgV&&dlgV.focus)dlgV.focus()}
+  $('cid-nao').onclick=fecha;sc.onclick=fecha;
+  d.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();fecha();return}
+    if(e.key!=='Tab')return;var a=$('cid-nao'),z=$('cid-sim');
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
+  dlgC={sc:sc,d:d,fecha:fecha};return dlgC}
+function perguntaDia(n,rot){
+  var L=mesmoDia(n);if(!L.length||!rot)return;
+  var o=dialogoCidade(),dif=L.filter(function(i){var c=M(i).c;return c&&c!==rot}).length,p=pd(M(n).iso),dt=p?z(p.d)+'/'+z(p.m)+'/'+p.y:'';
+  $('cid-t').textContent='Usar «'+rot+'» nas outras fotos de '+dt+'?';
+  $('cid-d').textContent=(L.length===1?'Há mais 1 foto desse dia.':'Há mais '+L.length+' fotos desse dia.')+(dif?(dif===1?' 1 delas tem outra cidade e também muda.':' '+dif+' delas têm outra cidade e também mudam.'):'')+' Dá para desfazer com Ctrl+Z.';
+  $('cid-sim-t').textContent=L.length===1?'Aplicar em 1 foto':'Aplicar em '+L.length+' fotos';
+  $('cid-sim').onclick=function(){o.fecha();Q.cidadeEm(L,rot);Q.toast('«'+rot+'» aplicada em '+(L.length===1?'1 foto':L.length+' fotos')+' de '+dt+' · Desfazer',true)};
+  dlgV=document.activeElement;o.sc.hidden=o.d.hidden=false;$('cid-sim').focus()}
+/* escolheu na lista: grava nesta foto e pergunta pelas do mesmo dia */
+Q.escolherCidade=function(n,rot){Q.cidadeEm([n],rot,'md:c');perguntaDia(n,rot)};
 function refaz(ns){if(window.PLLEG&&PLLEG.refazer)PLLEG.refazer(ns)}   /* D-148: as linhas sugeridas seguem a data e a cidade */
 function grava(n,m,k){Q.ST()[n].meta=m;Q.commit(k)}
 /* D-182: fotos (fora a aberta) sem cidade digitada e sem local lido do GPS, e que não foram marcadas «Sem local» */
@@ -40,7 +73,7 @@ function html(){
   var h='<div class="f md-sec" data-md="1"><div class="f__top"><span class="f__l">Data e cidade desta foto</span></div>'
    +'<p class="f__h" id="md-info" role="status"></p></div>';
   h+='<div class="f" data-k="d"><div class="f__top"><label class="f__l" for="md-d">Data</label><button type="button" class="lk" data-clr="d">Sem data</button></div><div class="num num--l"><input id="md-d" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
-  h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off" list="md-c-l"><datalist id="md-c-l"></datalist></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
+  h+='<div class="f" data-k="c"><div class="f__top"><label class="f__l" for="md-c">Cidade</label><button type="button" class="lk" data-clr="c">Sem local</button></div><div class="num num--l"><input id="md-c" maxlength="60" autocomplete="off" placeholder="Buscar cidade"></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
   h+='<button type="button" class="btn2 btn2--sm mod__apl" id="md-c-todas" hidden><svg class="ico sm"><use href="#i-copy"/></svg><span></span></button>';   /* D-182 */
   h+='<p class="f__h"><svg class="ico sm"><use href="#i-info"/></svg><span>Vale só para esta foto. Em branco, vale o local lido da foto; «Sem local» tira a cidade e o ponto. Coordenadas nunca aparecem e o arquivo gerado não leva os metadados originais.</span></p>';
   h+='<div class="f" data-k="h"><div class="f__top"><label class="f__l" for="md-h">Somar ou subtrair horas às datas</label></div><div class="num"><input id="md-h" inputmode="numeric" autocomplete="off" value="0"><span class="num__u mono">h</span></div><p class="f__h" hidden><svg class="ico sm"><use href="#i-cancel"/></svg><span></span></p></div>';
@@ -58,6 +91,7 @@ function prev(){
   b.disabled=!ok;b.textContent=q?'Aplicar em '+q+(q===1?' foto com data':' fotos com data'):'Nenhuma foto com data'}
 function render(){
   if(!$('md-d'))return;                      /* a seção só existe com Legendas › Avançado aberto */
+  if(window.PLCIDADE)PLCIDADE.ligar($('md-c'),{usadas:Q.cidadesUsadas,escolher:function(rot){Q.escolherCidade(Q.cur(),rot)}});   /* D-208: lista com busca */
   if(Q.cur()!==ult){ult=Q.cur();err=null}
   var n=Q.cur(),m=M(n),P=$('p-legendas');
   $('md-info').textContent=(m.iso?lido(m.iso)+' · '+(m.ds==='exif'?'data lida da foto':m.ds==='manual'?'digitada por você':'sem data na foto'):'Sem data')+(m.dh?' · corrigida '+(m.dh>0?'+':'−')+Math.abs(m.dh)+' h':'')+(m.cs==='sem'?' · sem local':!m.c&&daFoto(m)?' · local lido da foto':m.c&&m.cs==='gps'?' · cidade aproximada':'');
@@ -82,8 +116,6 @@ P0.addEventListener('change',function(e){var t=e.target,n=Q.cur(),m;
   if(t.id==='md-c'){m=cp(n);m.c=t.value.trim();m.cs=m.c?'manual':'none';err=null;grava(n,m,'md:c');refaz([n]);return}
   if(t.id==='md-h'){var v=t.value.trim().replace('−','-');if(!/^[+-]?\d+$/.test(v)||Math.abs(+v)>48){err={k:'h',m:'Use um número inteiro entre −48 e 48.'};hv=0}else{err=null;hv=+v}render()}});
 P0.addEventListener('input',function(e){
-  if(e.target.id==='md-c'&&window.PLLOCAIS){var s0=Q.ST()[0].leg,dl=$('md-c-l');   /* D-139: «Cidade - UF» enquanto digita; desligado em «Sugestões de legendas» */
-    if(!(s0&&(s0.sug===false||s0.original)))PLLOCAIS.buscar(e.target.value,8).then(function(r){dl.innerHTML=r.map(function(x){return'<option value="'+PLLOCAIS.rotulo(x)+'"></option>'}).join('')});else dl.innerHTML=''}
   if(e.target.id==='md-h'){var v=e.target.value.trim().replace('−','-');if(/^[+-]?\d+$/.test(v)&&Math.abs(+v)<=48){hv=+v;err=null}prev()}});
 P0.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var n=Q.cur(),m;
   if(b.getAttribute('data-clr')==='d'){m=cp(n);m.iso='';m.ds='none';m.dh=0;err=null;grava(n,m,'md:d');refaz([n])}

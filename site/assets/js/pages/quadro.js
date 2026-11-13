@@ -658,8 +658,8 @@ var ABA='tab-ajustes',tabs=[].slice.call(document.querySelectorAll('.tab'));
 function aba(t){
   tabs.forEach(function(x){var on=x===t;x.classList.toggle('is-on',on);x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1});
   var id=t.id,esc=$('scope');ABA=id;
-  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';   /* D-183: Papel e Fotos saíram do Quadro (eram só um aviso; o papel fica nas Folhas) */
-  esc.hidden=id!=='tab-ajustes'&&id!=='tab-legendas';lote();if(window.PLLEG)PLLEG.render();if(window.PLMOL)PLMOL.render()
+  $('p-ajustes').hidden=id!=='tab-ajustes';$('p-legendas').hidden=id!=='tab-legendas';$('p-molduras').hidden=id!=='tab-molduras';$('p-lote').hidden=id!=='tab-lote';   /* D-183: Papel e Fotos saíram do Quadro (eram só um aviso; o papel fica nas Folhas) */
+  esc.hidden=id!=='tab-ajustes'&&id!=='tab-legendas';lote();if(window.PLLEG)PLLEG.render();if(window.PLMOL)PLMOL.render();if(id==='tab-lote'&&window.PLLOTEABA)PLLOTEABA.render()   /* D-208 */
 }
 tabs.forEach(function(t,i){t.onclick=function(){aba(t)};t.onkeydown=function(e){var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;var j=(i+d+tabs.length)%tabs.length;tabs[j].focus();aba(tabs[j]);e.preventDefault()}   /* D-183: ← na primeira aba volta para a última */});
 

@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='1cb48a7e1cd3';
+self.PL_VERSAO='551555a873a0';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -59,6 +59,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/editor/controles.js",
 "../assets/js/editor/filtros.js",
 "../assets/js/editor/legendas.js",
+"../assets/js/editor/lote-aba.js",
 "../assets/js/editor/lote.js",
 "../assets/js/editor/metadados.js",
 "../assets/js/editor/molduras.js",
@@ -66,6 +67,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/nucleo/colagem.js",
 "../assets/js/nucleo/conta.js",
 "../assets/js/nucleo/exif.js",
+"../assets/js/nucleo/fontes-locais.js",
 "../assets/js/nucleo/fotos-locais.js",
 "../assets/js/nucleo/gerador.js",
 "../assets/js/nucleo/google-fotos.js",
@@ -96,7 +98,9 @@ self.PL_ARQUIVOS=[
 "../assets/js/pages/quadro.js",
 "../assets/js/pages/resumo.js",
 "../assets/js/ui/banners.js",
+"../assets/js/ui/cidade.js",
 "../assets/js/ui/deslizar.js",
+"../assets/js/ui/enviar-apps.js",
 "../assets/js/ui/esqueleto.js",
 "../assets/js/ui/foto-tela.js",
 "../assets/js/ui/guarda.js",

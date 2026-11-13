@@ -147,8 +147,9 @@ try {
 
   titulo('Autocomplete «Cidade - UF»:');
   await p.fill('#pl-in-0', 'bom jes');
-  await p.waitForFunction(() => document.querySelectorAll('#pl-dl-0 option').length > 0);
-  const ops = await p.evaluate(() => [].map.call(document.querySelectorAll('#pl-dl-0 option'), o => o.value));
+  await p.waitForFunction(() => document.querySelectorAll('.cbx__lista:not([hidden]) .cbx__o').length > 1);   /* D-208: lista com busca no lugar do datalist */
+  const ops = await p.evaluate(() => [].map.call(document.querySelectorAll('.cbx__lista:not([hidden]) .cbx__o'), o => o.textContent).filter(o => !/^Usar «/.test(o)));
+  await p.keyboard.press('Escape');
   ok(ops.includes('Bom Jesus - RS') && ops.every(o => /^.+ - [A-Z]{2}$/.test(o)), 'sugere «Bom Jesus - RS» etc. (' + ops.slice(0, 3) + ')');
   await p.selectOption('#pad-t-0', 'loc'); await p.fill('#pl-in-0', ''); await p.waitForTimeout(200); await p.click('[data-restaurar="0"]'); await esperaPl(p, 1, 0, 'Salvador - BA');
 

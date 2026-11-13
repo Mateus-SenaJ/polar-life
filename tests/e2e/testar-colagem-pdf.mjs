@@ -117,7 +117,7 @@ try {
   /* =============== 2) layouts da Colagem: a tela e o PDF usam as mesmas posições =============== */
   console.log('Colagem · layouts (tela = PDF, MT-02):');
   await abrirEditor(p, null);
-  const layouts = await p.evaluate(() => PLCOLAGEM.LAYOUTS.map(l => l.id));
+  const layouts = await p.evaluate(() => PLCOLAGEM.LAYOUTS.filter(l => !l.livre).map(l => l.id));   /* D-208: a Personalizada não tem posição automática (testar-colagem-livre) */
   ok(layouts.length === 10, 'o editor oferece ' + layouts.length + ' layouts: ' + layouts.join(', '));
   for (const lay of layouts) {
     await abrirEditor(p, colagem(lay, { tipo: 'cor', cor: '#336699' }));

@@ -57,7 +57,9 @@ const VENDOR = join(SITE, 'assets', 'vendor');
 // D-147: endereços de NAVEGAÇÃO (a pessoa vai ao Google e volta), não recursos carregados pela página (T6)
 const NAVEGACAO = { 'assets/js/nucleo/google.js': ['https://accounts.google.com/o/oauth2/v2/auth', 'https://accounts.google.com', 'https://www.googleapis.com/auth/photospicker.mediaitems.readonly'],
   // D-168: API REST do seletor do Google Fotos (chamada só quando a pessoa escolhe fotos do Google; CSP connect-src)
-  'assets/js/nucleo/google-fotos.js': ['https://photospicker.googleapis.com/v1/'] };
+  'assets/js/nucleo/google-fotos.js': ['https://photospicker.googleapis.com/v1/'],
+  // D-208: abrir o Instagram ou o WhatsApp para anexar o arquivo baixado (navegação, sem nada carregado pela página)
+  'assets/js/ui/enviar-apps.js': ['https://www.instagram.com/', 'https://web.whatsapp.com/', 'https://wa.me/'] };
 for (const f of arquivos.filter(f => /\.(js|css)$/.test(f) && !f.startsWith(VENDOR))) {  // vendor: URLs só em comentários internos, sem requisição (T6)
   const s = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   const nav = NAVEGACAO[rel(f).split('\\').join('/')] || [];

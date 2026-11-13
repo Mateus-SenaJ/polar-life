@@ -1,7 +1,9 @@
 /* D-179: a letra das fotos do Retro Pocket. As polaroids do dono usam Lucida Calligraphy (proprietária, sem licença para embutir);
    o Pocket nasce com Fondamento Itálico, a livre mais parecida, e o catálogo ganha 10 caligráficas da mesma família (só legendas).
    Confere: padrão do Pocket na tela, nas Folhas e no PDF; «Voltar ao padrão» no Pocket; as 11 no seletor e embutidas no PDF sem
-   fonte reserva; e as linhas do Pocket no Quadro nas mesmas medidas do PDF (antes ficavam 3 mm acima e à esquerda). */
+   fonte reserva; e as linhas do Pocket no Quadro nas mesmas medidas do PDF (antes ficavam 3 mm acima e à esquerda).
+   D-208: o padrão do Pocket passou a ser a Lucida Handwriting (pedido do dono). Ela é paga: vem do computador da pessoa
+   (PLFONTESLOCAIS) e, sem ela, entra a Courgette — a mesma letra na tela, nas Folhas e no PDF, sem aviso de fonte reserva. */
 import { chromium } from 'playwright';
 import { readFile } from 'node:fs/promises';
 import { servir } from '../helpers/servidor.mjs';
@@ -46,11 +48,13 @@ try {
     await projetoPocket(p);
     await abrirQuadro(p);
     const leg = await p.evaluate(() => { const l = PLQ.ST()[0].leg; return [l.data.font, l.loc.font]; });
-    ok(leg[0] === 'Fondamento Itálico' && leg[1] === 'Fondamento Itálico', 'o Pocket nasce com Fondamento Itálico nas duas linhas (' + leg + ')');
+    ok(leg[0] === 'Lucida Handwriting' && leg[1] === 'Lucida Handwriting', 'o Pocket nasce com a Lucida Handwriting nas duas linhas (' + leg + ')');
+    const face = await p.evaluate(async () => { await document.fonts.load('italic 400 20px "PL Lucida Handwriting"'); return [...document.fonts].filter((f) => f.family.replace(/"/g, '') === 'PL Lucida Handwriting').map((f) => f.status + ':' + f.style); });
+    ok(face.length === 1 && face[0] === 'loaded:italic', 'a Lucida tem uma face só, carregada (a do computador ou a reserva livre), sem itálico sintético (' + face + ')');
     await p.fill('#pl-in-0', 'Taipú de Fora - BA'); await p.fill('#pl-in-1', 'Farol de Taipú de Fora'); await p.waitForTimeout(500);
     const L = await linhasQ(p);
     ok(L.length === 2 && L[0].txt === 'Taipú de Fora - BA' && L[1].txt === 'Farol de Taipú de Fora', 'Quadro: as duas linhas digitadas');
-    ok(L.every((x) => /Fondamento/.test(x.fam) && x.it === 'italic'), 'Quadro: as linhas saem em Fondamento itálico de verdade (' + L.map((x) => x.fam.split(',')[0] + ' ' + x.it).join(' · ') + ')');
+    ok(L.every((x) => /PL Lucida Handwriting/.test(x.fam) && x.it === 'italic'), 'Quadro: as linhas saem na Lucida Handwriting (' + L.map((x) => x.fam.split(',')[0] + ' ' + x.it).join(' · ') + ')');
     ok(L.every((x) => x.dTop <= 0.3 && x.dLeft <= 0.3), 'Quadro = PDF: topo e lateral de cada linha batem com PLTEXTO.linhas (Δ ≤ 0,3 mm: ' + L.map((x) => x.dTop.toFixed(2) + '/' + x.dLeft.toFixed(2)).join(', ') + ')');
     if (w === 1440) {
       /* seletor: a categoria Caligráfica tem as 11 */
@@ -62,7 +66,7 @@ try {
       /* Folhas */
       await p.goto(srv.url + 'app/editor/'); await p.waitForFunction(() => document.querySelectorAll('#sheet .pol .pol__ml').length >= 2);
       const fl = await p.evaluate(() => [...document.querySelectorAll('#sheet .pol')[0].querySelectorAll('.pol__ml')].map((e) => { const cs = getComputedStyle(e.firstElementChild || e); return e.textContent.trim() + '|' + cs.fontFamily.split(',')[0] + '|' + cs.fontStyle; }));
-      ok(fl.length === 2 && fl.every((x) => /Fondamento/.test(x) && /italic$/.test(x)) && /Taipú de Fora - BA/.test(fl[0]), 'Folhas: as mesmas linhas em Fondamento itálico (' + fl.join(' · ') + ')');
+      ok(fl.length === 2 && fl.every((x) => /PL Lucida Handwriting/.test(x) && /italic$/.test(x)) && /Taipú de Fora - BA/.test(fl[0]), 'Folhas: as mesmas linhas na Lucida Handwriting (' + fl.join(' · ') + ')');
       /* PDF com cada uma das 11 fontes: embutida de verdade, sem fonte reserva */
       for (const s of SCRIPTS) await p.addScriptTag({ url: srv.url + s });
       const pdfs = await p.evaluate(async (nomes) => {
@@ -75,7 +79,9 @@ try {
           out.push({ n, ok: r.arquivos.length === 1 && !reserva.length, fams: [...new Set(txt)].join(',') });
         }
         return out;
-      }, NOVAS);
+      }, ['Lucida Handwriting'].concat(NOVAS));
+      const luc = pdfs.shift();
+      ok(luc.ok && /PL Lucida Handwriting i/.test(luc.fams), 'PDF: a Lucida Handwriting (ou a reserva, sem aviso) vai embutida e na mesma posição da tela (' + luc.fams + ')');
       const ruins = pdfs.filter((x) => !x.ok);
       ok(!ruins.length, 'PDF: as 12 opções novas (Fondamento, Fondamento Itálico e as 10 parecidas) embutidas no arquivo, sem fonte reserva' + (ruins.length ? ' · ' + JSON.stringify(ruins) : ''));
       const f0 = pdfs[0].fams;
@@ -86,7 +92,7 @@ try {
       await p.evaluate(() => { const b = document.getElementById('lg-rtudo'); b.hidden = false; b.click(); });
       await p.waitForTimeout(300);
       const rt = await p.evaluate(() => { const l = PLQ.ST()[0].leg; return [l.data.font, l.loc.font, l.meta]; });
-      ok(rt[0] === 'Fondamento Itálico' && rt[1] === 'Fondamento Itálico', '«Voltar ao padrão» num projeto Pocket volta ao Fondamento Itálico (' + rt + ')');
+      ok(rt[0] === 'Lucida Handwriting' && rt[1] === 'Lucida Handwriting', '«Voltar ao padrão» num projeto Pocket volta à Lucida Handwriting (' + rt + ')');
     }
     ok(erros.length === 0, 'nenhum erro de página' + (erros.length ? ': ' + erros.join(' | ') : ''));
     await ctx.close();

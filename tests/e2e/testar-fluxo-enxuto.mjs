@@ -41,9 +41,9 @@ try {
     console.log('Quadro:');
     await p.goto(srv.url + 'app/editor/quadro/'); await p.waitForFunction(() => !!window.PLQ);
     const abas = await p.evaluate(() => [...document.querySelectorAll('[role=tab]')].map((t) => t.textContent.trim()));
-    ok(abas.join() === 'Ajustes,Legendas,Molduras', 'abas do Quadro: ' + abas.join(', ') + ' (Papel e Fotos eram só avisos)');
+    ok(abas.join() === 'Ajustes,Legendas,Molduras,Lote', 'abas do Quadro (D-208: + Lote): ' + abas.join(', ') + ' (Papel e Fotos eram só avisos)');
     await p.focus('#tab-ajustes'); await p.keyboard.press('ArrowLeft');
-    ok(await p.evaluate(() => document.activeElement.id === 'tab-molduras' && !document.getElementById('p-molduras').hidden), 'setas do teclado andam entre as 3 abas');
+    ok(await p.evaluate(() => document.activeElement.id === 'tab-lote' && !document.getElementById('p-lote').hidden), 'setas do teclado andam entre as 4 abas (← na primeira vai para Lote)');
     ok(erros.length === 0, 'nenhum erro de página' + (erros.length ? ': ' + erros.join(' | ') : ''));
     await ctx.close();
   }

@@ -82,7 +82,7 @@ try {
   await p.setViewportSize({ width: 1440, height: 1000 });
   await p.waitForTimeout(300);
   const alt = await p.evaluate(() => document.getElementById('p-legendas').scrollHeight);
-  ok(alt <= 1550, 'D-149: o painel Legendas recolhido cabe em ~1,5 tela de 1000 px (' + alt + ' px)');
+  ok(alt <= 1650, 'D-149: o painel Legendas recolhido cabe em ~1,6 tela de 1000 px (' + alt + ' px; D-208 somou o espaçamento entre as legendas e a linha «Só nesta foto»)');
   const rep = await p.evaluate(() => ({ fsel: document.querySelectorAll('.fsel').length, tam: document.querySelectorAll('[data-lk="ln.pt"]').length, cor: document.querySelectorAll('[name="cor-ln"]').length, fmt: document.querySelectorAll('input[name=fmt]').length, lg: !!document.getElementById('lg-in'), secoes: ['lm1', 'lm2', 'lm3', 'lm4'].filter(i => document.getElementById(i)).length, padon: !!document.querySelector('[data-sw=padon]'), alvo: (document.querySelector('input[name=alvo]:checked') || {}).value, linhas: document.querySelectorAll('select[data-padt]').length }));
   ok(rep.fsel === 1 && rep.tam === 1 && rep.cor === 3 && rep.fmt === 0, 'Fonte, Tamanho e Cor aparecem uma vez só e o formato de data não tem 19 botões (' + JSON.stringify(rep) + ')');
   ok(!rep.lg && rep.secoes === 0 && !rep.padon && rep.linhas === 2, 'sem Texto livre, Data e Local separados nem «Padrão de 2 linhas»; há Linha 1 e Linha 2');
@@ -150,11 +150,14 @@ try {
   const arquivos = await p.evaluate(async srvUrl => {
     const falta = [], slug = f => f.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     for (const [fam, vs] of Object.entries(PLTEXTO.VAR)) for (const v of vs) {
+      if (/^PL /.test(fam)) continue;   /* D-208: Lucida vem do computador da pessoa (paga, o site não distribui); a reserva livre é conferida abaixo */
       const w = parseInt(v, 10), it = /i$/.test(v), n = slug(fam) + '-' + w + (it ? '-italico' : '');
       for (const u of ['assets/fonts/' + n + '.woff2', 'assets/fonts/pdf/' + n + '.ttf']) if (n.indexOf('inter-4') !== 0 && n !== 'inter-500' && !(await fetch(srvUrl + u)).ok) falta.push(u);
     }
     return falta;
   }, srv.url);
+  const reservas = await p.evaluate(async (u) => { const r = []; for (const it of PLFONTESLOCAIS.LISTA) { if (!(await fetch(u + 'assets/fonts/' + it.woff)).ok) r.push(it.woff); } return r; }, srv.url).catch(() => ['sem PLFONTESLOCAIS']);
+  ok(!reservas.length, 'a reserva livre de cada fonte do computador existe (' + (reservas.join(', ') || 'Courgette, Fondamento, Merienda') + ')');
   ok(arquivos.length === 0, 'toda variante declarada existe como WOFF2 (tela) e TTF (PDF)' + (arquivos.length ? ': faltam ' + arquivos.join(', ') : ''));
   await p.click('[data-fsel=ln]');
   await p.fill('#fbusca', 'Lora'); await p.click('[data-pick="Lora"]'); await aguardarCommit(p);

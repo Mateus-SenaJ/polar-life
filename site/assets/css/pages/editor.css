@@ -360,3 +360,28 @@ figcaption[data-preset=calendario] .pol__meta time{display:inline-block;padding:
   .acts{margin-top:10px}
   .acts__cota{display:none}   /* as medidas seguem no inspetor (Papel e Molduras): a mesa fica para a foto */
 }
+/* D-208 · bolinhas de cor e de degradê (o fundo é conteúdo, DS-13); a escolhida tem o anel azul e o ✓ (T3) */
+.bolas{display:flex;flex-wrap:wrap;gap:4px}
+.bola{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+.bola__c{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgb(0 0 0/.12);color:var(--white)}
+.bola--clara .bola__c,.bola--mais .bola__c{color:var(--black)}
+.bola[aria-checked=true] .bola__c,.bola--mais:has(.bola__ok) .bola__c{box-shadow:0 0 0 2px var(--white),0 0 0 4px var(--blue)}
+.bola__ok{filter:drop-shadow(0 0 1px rgb(0 0 0/.6))}
+.bola--clara .bola__ok{filter:none}
+.bola:focus-visible,.bola--mais:focus-within{outline:2px solid var(--blue);outline-offset:1px}
+.bola--mais .bola__c{background:var(--white);box-shadow:inset 0 0 0 1px var(--outline-subtle)}
+.bola--mais input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.col-grad-prev{height:44px;margin:0 0 16px;border-radius:12px;box-shadow:inset 0 0 0 1px rgb(0 0 0/.08)}
+.dirs{display:flex;flex-wrap:wrap;gap:4px}
+.dir{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--outline-subtle);border-radius:50%;background:var(--white);color:var(--black);cursor:pointer}
+.dir[aria-checked=true]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue)}
+.dir:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#col-inv{margin:0 0 16px}
+/* D-208 · Colagem Personalizada: arrastar na folha e a polaroid selecionada (anel fora da foto, só na tela, T4) */
+.pol--col[data-ci]{cursor:grab;touch-action:none}
+.pol--col.is-arrasto{cursor:grabbing;z-index:5;transition:none}
+.pol--col.is-sel .pol__in{outline:2px solid var(--blue);outline-offset:3px}
+.col-selec__b{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.col-selec__b .btn2{min-height:44px}
+.col-dica{margin:0 0 8px}
+#col-incluir{margin:0 0 16px}

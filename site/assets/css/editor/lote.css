@@ -12,3 +12,12 @@
 .mix[hidden]{display:none}
 .f.is-mix .f__top{flex-wrap:wrap;row-gap:0}
 @media(max-width:480px){.mix{font-size:16px}}
+/* D-208 · aba Lote do Quadro */
+.lt-intro{display:flex;gap:8px;align-items:flex-start;margin:0 0 16px}
+.lt-intro .ico{flex:none;margin-top:2px}
+.lt-dias{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.lt-dia{padding:12px;border:1px solid var(--outline-subtle);border-radius:var(--r-box);background:var(--white)}
+.lt-dia__top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.lt-dia__c{margin:4px 0 8px}
+#p-lote [data-lt="dy"],#p-lote [data-lt="lsp"]{width:100%}
+#lt-limpar{margin-top:8px}

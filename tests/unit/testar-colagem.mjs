@@ -23,7 +23,7 @@ const velho = FL.paginar(Object.assign({}, FL.PADRAO, { margem: 10, gap: 4 }), F
 ok(velho.g.n === 4 && velho.sheets.length === 6 && Math.abs(velho.sheets[0].cells[1].x - velho.sheets[0].cells[0].x - 92) < 1e-9, 'projeto salvo com 10/4 segue com 10 mm e 4 mm (92 mm de passo)');
 
 console.log('Layouts da Colagem (D-150):');
-ok(C.LAYOUTS.map(l => l.id).join() === 'grade,mosaico,espalhadas,tira,coracao,mural,capa,tempo,varal,cabine', '10 layouts (5 + os 5 das redes, D-195): ' + C.LAYOUTS.map(l => l.id).join(', '));
+ok(C.LAYOUTS.map(l => l.id).join() === 'grade,mosaico,espalhadas,tira,coracao,mural,capa,tempo,varal,cabine,livre', '11 layouts (5 + os 5 das redes, D-195, + a Personalizada, D-208): ' + C.LAYOUTS.map(l => l.id).join(', '));
 let combos = 0, fora = 0, nao = 0, difer = 0, cob = 0, pior = 0;
 for (const papel of ['A4', 'A3', 'A5', '13x18'])
   for (const orient of ['retrato', 'paisagem'])

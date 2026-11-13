@@ -25,3 +25,11 @@
 .fl .ico{margin-top:2px;color:var(--black);stroke-width:2}
 @media(max-width:600px){.page{padding-top:20px}.card{padding:16px}.act .btn2,.act .led-btn,.dialog__act .btn2,.dialog__act .led-btn{flex:1 1 100%;width:100%}.act,.dialog__act{flex-direction:column-reverse}.act--ok{flex-direction:column}.act--ok .led-btn{order:-1}}
 @media(prefers-reduced-motion:reduce){.prog__fill,.prog__glow{transition:none}.led-btn__bar::after{animation:none}}
+/* D-208 · «Enviar para» Instagram e WhatsApp (gerar e compartilhar) */
+.enviar{margin:20px 0 4px;padding:16px;border:1px solid var(--outline-subtle);border-radius:var(--r-box);background:var(--surface-subtle)}
+.enviar__t{margin:0 0 12px}
+.enviar__b{display:flex;flex-wrap:wrap;gap:12px}
+.enviar__app{flex:1 1 180px;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;text-decoration:none}
+.enviar__app .ico{width:22px;height:22px}
+.enviar__h{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0}
+.enviar__h .ico{flex:none;margin-top:2px}

@@ -211,7 +211,7 @@ try {
     const p = PLGERADOR.projeto();
     await PLGERADOR.preparar(p);
     const L = PLGERADOR.lista(p);
-    const m = PLGERADOR.metricas({ fam: 'Fondamento', peso: 400, it: true, pt: 8, esp: .02 });   /* D-179: padrão do Pocket = Fondamento Itálico */
+    const m = PLGERADOR.metricas({ fam: 'PL Lucida Handwriting', peso: 400, it: true, pt: 8, esp: .02 });   /* D-208: padrão do Pocket = Lucida Handwriting (do aparelho ou a reserva livre) */
     const capU = m.cap * 8 * .3528 * 1000;  /* altura de versal da linha de 8 pt, em µm */
     const out = { fr: { w: p.fr.w, h: p.fr.h, jw: p.fr.jw, jh: p.fr.jh, lado: p.fr.lado, topo: p.fr.topo },
       paginas: L.paginas.length, loc: null, data: null, nLoc: 0, nData: 0, mono: true };
@@ -219,7 +219,7 @@ try {
       for (const it of items) {
         if (it.t === 'grupo') walk(it.itens);
         else if (it.t === 'texto') {
-          if (it.fonte.fam !== 'Fondamento' || !it.fonte.it) out.mono = false;
+          if (it.fonte.fam !== 'PL Lucida Handwriting' || !it.fonte.it) out.mono = false;
           if (it.txt === 'Campos do Jordão - SP') { out.nLoc++; if (!out.loc) out.loc = it; }
           if (it.txt === '14/07/26') { out.nData++; if (!out.data) out.data = it; }
         }
@@ -232,7 +232,7 @@ try {
   });
   ok(re.fr.w === 66 && re.fr.h === 99 && re.fr.jw === 60 && re.fr.jh === 79 && re.fr.lado === 3 && re.fr.topo === 3,
     'PDF: moldura Pocket no projeto (66 × 99, janela 60 × 79)');
-  ok(re.nLoc === 24 && re.nData === 24 && re.mono, 'PDF: 24 linhas de local e 24 de data, só em Fondamento Itálico, a letra das fotos do Pocket (texto livre ausente)');
+  ok(re.nLoc === 24 && re.nData === 24 && re.mono, 'PDF: 24 linhas de local e 24 de data, só na Lucida Handwriting, o padrão do Pocket (texto livre ausente)');
   ok(re.locY !== null && re.dataY !== null && Math.abs((re.locY - re.capU) / 1000 - 85) <= 0.1,
     'PDF: topo das maiúsculas da 1ª linha a 3 mm da borda inferior da janela, D-192 (' + ((re.locY - re.capU) / 1000).toFixed(3) + ' mm ≈ 85)');
   ok(re.dataY !== null && Math.abs((re.dataY - re.locY) / 1000 - (2 + re.capU / 1000)) <= 0.1,
@@ -420,8 +420,8 @@ try {
     const mls = document.querySelector('#sheet .pol').querySelectorAll('.pol__ml');
     return { n: mls.length, f1: mls[0] ? mls[0].style.fontFamily : '', f2: mls[1] ? mls[1].style.fontFamily : '' };
   });
-  ok(rh3.n === 2 && /Special Elite/.test(rh3.f1) && /Fondamento/.test(rh3.f2),
-    'T-07: o local sai em Special Elite e a data segue em Fondamento Itálico');
+  ok(rh3.n === 2 && /Special Elite/.test(rh3.f1) && /PL Lucida Handwriting/.test(rh3.f2),
+    'T-07: o local sai em Special Elite e a data segue na Lucida Handwriting');
 
   console.log('Clássico continua como era:');
   await guardarQuadro({ fmt: 'classico', w: 88, h: 107, jh: 76, lado: 6, topo: 6, rad: 0.4, man: false, lock: true, ori: 'v' }, LEG0, 24);

@@ -31,7 +31,7 @@ var PRESETS={ /* 8 estilos prontos (DV-03); cada um muda o look, não o texto */
   manuscrito:{t:'Manuscrito',p:{'txt.font':'Caveat','txt.caixa':'normal','txt.esp':0}}
 };
 var PADRAO=LT.LEG0; /* mesmo conteúdo do padrão antigo, na mesma ordem de chaves: projetos salvos comparam por JSON */
-var DEFL={meta:'junto',ordem:'data-loc',medida:'caixa'}; /* chaves novas (D-113): ausentes no projeto = padrão */
+var DEFL={meta:'junto',ordem:'data-loc',medida:'caixa',lsp:0};   /* D-208: lsp = espaçamento extra entre as legendas (mm) */ /* chaves novas (D-113): ausentes no projeto = padrão */
 var UI={sel:null,cat:'todas',busca:'',aberto:{},conf:false,err:null};
 var COR={preto:'#000',azul:'#006194',laranja:'#FD761A'};
 function copia(o){return JSON.parse(JSON.stringify(o))}
@@ -93,7 +93,7 @@ function pintar(){
   var lcH=lc?'<span class="lg-lc" style="font-family:'+fam(l.loc.font)+stF(l.loc)+';--pt:'+l.loc.pt+';color:'+cor('loc')+espM(l.loc)+'">'+(l.preset==='pin'?'<svg class="ico lg-pin"><use href="#i-pin"/></svg>':'')+'</span>':'';
   var sepH=(dt&&lc)?'<span class="lg-sep" aria-hidden="true">'+LT.sepMeta(l)+'</span>':'';
   var metaHTML=junto?(ordem==='loc-data'?lcH+sepH+dtH:dtH+sepH+lcH)
-   :'<span class="lg-ms">'+(ordem==='loc-data'?[lcH,dtH]:[dtH,lcH]).filter(Boolean).map(function(r){return'<span class="lg-m">'+r+'</span>'}).join('')+'</span>';
+   :'<span class="lg-ms">'+(ordem==='loc-data'?[lcH,dtH]:[dtH,lcH]).filter(Boolean).map(function(r,ix){return'<span class="lg-m"'+(ix&&l.lsp?' style="margin-top:calc(var(--pmm)*'+l.lsp+')"':'')+'>'+r+'</span>'}).join('')+'</span>';
   /* D-136: o texto é sempre abaixo da foto; a faixa de cima fica vazia */
   top.innerHTML='';
   cap.outerHTML='<span class="pq__cap" id="cap">'+capHTML+'</span>';
@@ -169,15 +169,22 @@ function fontePor(n){return FONTES.filter(function(x){return x.n===n})[0]||null}
 function varDe(x){var v=LT.VAR[x.fam]||['400'];return{it:x.it||v.some(function(y){return/i$/.test(y)}),b:v.indexOf('700')>=0||v.indexOf('700i')>=0}}
 function ambos(x){var v=varDe(x);return v.it&&v.b}
 var FCATS=[['todas','Todas'],['fav','Favoritas'],['rec','Recentes'],['in','Itálico e negrito']];
+/* D-208: fontes do computador (Lucida) — dizem se estão em uso, se falta permitir ou qual reserva entra */
+var FL=window.PLFONTESLOCAIS;
+var EST_PC={ok:'Do seu computador',pedir:'No seu computador · falta permitir',bloqueada:'Acesso bloqueado · entra a reserva','sem-acesso':'Este navegador não deixa usar · entra a reserva',ausente:'Não está neste aparelho · entra a reserva'};
+function estPC(x){return x.c==='pc'&&FL?FL.estado(x.n):''}
+function visivel(x){var it=x.c==='pc'&&FL&&FL.porNome(x.n);return!(it&&it.opc&&estPC(x)!=='ok'&&estPC(x)!=='pedir')}   /* Lucida Casual só aparece se estiver instalada */
+function notaPC(n){var x=fontePor(n);if(!x||x.c!=='pc'||!FL)return'';var e=FL.estado(n);
+  return'<p class="f__h" id="lg-pc-h"><svg class="ico sm"><use href="#i-info"/></svg><span>'+escH(FL.texto(n))+'</span></p>'+(e==='pedir'?'<button type="button" class="btn2 btn2--sm" data-flocal="1">Usar a fonte do computador</button>':'')}
 function itemFonte(x,atual,amo){
-  var on=x.n===atual,fv=PREF.fav.indexOf(x.n)>=0,v=varDe(x);
+  var on=x.n===atual,fv=PREF.fav.indexOf(x.n)>=0,v=varDe(x),pc=estPC(x);
   return'<li class="fitem'+(on?' is-on':'')+'"><button type="button" class="fitem__b" data-pick="'+x.n+'" aria-pressed="'+on+'"><span class="fitem__s" style="font-family:'+x.css+';font-style:'+(x.it?'italic':'normal')+';font-weight:'+x.w+'">'+escH(amo)+'</span>'
-   +'<span class="fitem__n"><span class="rotulo">'+x.n+'</span>'+(v.it?'<span class="fvar fvar--i" title="Tem itálico">I</span>':'')+(v.b?'<span class="fvar fvar--b" title="Tem negrito">N</span>':'')+'</span></button>'
+   +'<span class="fitem__n"><span class="rotulo">'+x.n+'</span>'+(v.it?'<span class="fvar fvar--i" title="Tem itálico">I</span>':'')+(v.b?'<span class="fvar fvar--b" title="Tem negrito">N</span>':'')+'</span>'+(pc?'<span class="fitem__pc">'+EST_PC[pc]+'</span>':'')+'</button>'
    +'<button type="button" class="ib" data-fav="'+x.n+'" aria-pressed="'+fv+'" aria-label="'+(fv?'Tirar de':'Pôr em')+' favoritas: '+x.n+'"><svg class="ico sm"><use href="#i-heart"/></svg></button></li>'
 }
 function listaFontes(atual,amo){
   var q=UI.busca.toLowerCase(),cat=UI.cat,gr=[],vistas=[];
-  function passa(x){return!!x&&x.n.toLowerCase().indexOf(q)>=0}
+  function passa(x){return!!x&&visivel(x)&&x.n.toLowerCase().indexOf(q)>=0}
   if(cat==='fav')gr.push(['Favoritas',PREF.fav.map(fontePor).filter(passa)]);
   else if(cat==='rec')gr.push(['Recentes',PREF.rec.map(fontePor).filter(passa)]);
   else if(cat==='in')gr.push(['Com itálico e negrito',FONTES.filter(function(x){return ambos(x)&&passa(x)})]);
@@ -204,7 +211,7 @@ function campoFonte(k,atual,o,amo,extra){
   return'<div class="f fdd"><div class="f__top"><span class="f__l" id="l-f-'+k+'">Fonte'+(x?' e estilo':'')+'</span>'+(extra||'')+'</div>'
    +'<div class="fdd__row"><button type="button" class="fsel" data-fsel="'+k+'" aria-haspopup="true" aria-expanded="'+abre+'" aria-labelledby="l-f-'+k+' fv-'+k+'"><span id="fv-'+k+'" class="fsel__s" style="font-family:'+fam(atual)+';font-style:'+(fe.i?'italic':'normal')+';font-weight:'+fe.w+'">'+escH(amo)+'</span><span class="rotulo fsel__n">'+atual+'</span><svg class="ico sm"><use href="#i-down"/></svg></button>'
    +(x?botoesEst(x):'')+'</div>'
-   +(x?'<p class="f__h" id="lg-est-h">'+msgEst(x,fm)+'</p>':'')
+   +(x?'<p class="f__h" id="lg-est-h">'+msgEst(x,fm)+'</p>':'')+notaPC(atual)
    +(abre?listaFontes(atual,amo):'')+'</div>'
 }
 function seletor(k){var l=L()[k];return campoFonte(k,l.font,k==='txt'?l:null,amostra(k),rst(k+'.font'))}
@@ -240,7 +247,7 @@ function avancado(l,dis){
       h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Legenda '+(i+1)+'</label></div>'
        +'<div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
        +'<div class="seg" role="radiogroup" aria-label="Tamanho da legenda '+(i+1)+'">'+TAMS.map(function(t){return'<label class="seg__o"><input type="radio" name="pad-p-'+i+'" value="'+t[0]+'" data-padp="'+i+'"'+(t[0]===ln.pt?' checked':'')+'><span>'+t[1]+'</span></label>'}).join('')+'</div>'
-       +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div>'
+       +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"></div>'
        +'<button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
     }
     h+='<label class="chk"><input type="checkbox" id="pad-own"'+(Q.S().pad?' checked':'')+'><span class="chk__b" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></span><span><strong>Padrão próprio para esta foto</strong><span class="f__h">As outras fotos não mudam.</span></span></label>'
@@ -322,7 +329,7 @@ function secLinhas(l,dis){
     var ln=LT.padLinha(pd.l[i]);
     h+='<div class="f pad-l" data-pl="'+i+'"><div class="f__top"><label class="f__l" for="pad-t-'+i+'">Legenda '+(i+1)+'</label><button type="button" class="lk" data-restaurar="'+i+'" hidden>Restaurar sugestão</button></div>'
      +'<div class="lg-ln"><div class="num num--l"><select id="pad-t-'+i+'" data-padt="'+i+'" aria-label="Tipo da legenda '+(i+1)+'">'+TIPOS.map(function(t){return'<option value="'+t[0]+'"'+(t[0]===ln.t?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></div>'
-     +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" list="pl-dl-'+i+'" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"><datalist id="pl-dl-'+i+'"></datalist></div></div></div>'
+     +'<div class="num lg-num"><input id="pl-in-'+i+'" maxlength="60" autocomplete="off" aria-label="Texto da legenda '+(i+1)+' desta foto" style="text-align:left;padding-left:12px"></div></div></div>'
   }
   return h+'</div></section>'
 }
@@ -339,7 +346,29 @@ function secEstilo(l,dis){
 function secPosicao(l,dis){
   return'<section class="mod" aria-labelledby="lm5"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm5">Posição</h3>'
    +seg('al','Alinhamento',[['esq','Esquerda'],['centro','Centro'],['dir','Direita']],l.al||'esq','al')
-   +sld('dy','Deslocar para baixo','mm',0,5,0.1,1,'A legenda começa 3 mm abaixo da foto; daqui ela só desce.')+'</section>'
+   +sld('dy','Deslocar para baixo','mm',0,5,0.1,1,'A legenda começa 3 mm abaixo da foto; daqui ela só desce.')
+   +sld('lsp','Espaçamento entre as legendas','mm',0,6,0.5,1,'')+'</section>'+secFoto()
+}
+/* D-208: «Só nesta foto» — estilo próprio por cima do de todas (fonte, tamanho, alinhamento, posição e espaçamento).
+   Fica na foto (ST[n].lgx) e vale no Quadro, nas Folhas e no PDF (PLTEXTO.estiloFoto). A aba Lote muda todas de uma vez. */
+var LGX_ON={};
+function opcFontes(v){return'<option value="">A mesma de todas</option>'+Object.keys(CAT).map(function(c){var L0=FONTES.filter(function(x){return x.c===c&&visivel(x)});
+  return L0.length?'<optgroup label="'+CAT[c]+'">'+L0.map(function(x){return'<option value="'+escH(x.n)+'"'+(x.n===v?' selected':'')+'>'+escH(x.n)+'</option>'}).join('')+'</optgroup>':''}).join('')}
+function faixaX(k,rot,v,min,max,step,u,h){return'<div class="f"><div class="f__top"><label class="f__l" for="lgx-'+k+'">'+rot+'</label><span class="mono" id="lgx-'+k+'-v">'+String(v).replace('.',',')+u+'</span></div><input type="range" id="lgx-'+k+'" data-lgx="'+k+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+v+'">'+(h?'<p class="f__h">'+h+'</p>':'')+'</div>'}
+function secFoto(){
+  var s=Q.S(),x=s.lgx||{},n=Q.cur(),on=!!s.lgx||!!LGX_ON[n],l=L();
+  var h='<section class="mod lgx'+(on?'':' lgx--off')+'" aria-label="Só nesta foto" data-n="'+n+'">'+(on?'<h3 class="mod__h rotulo rotulo--m">Só nesta foto</h3>':'')   /* desligado: uma linha só (D-149: painel curto) */
+   +'<div class="sw-row"><div><span class="f__l" id="s-lgx">Estilo próprio na Foto '+Q.p2(n)+'</span><p class="f__h">'+(on?'As outras fotos seguem o estilo de todas.':'Fonte, tamanho e posição só desta foto.')+'</p></div>'
+   +'<button type="button" class="sw" data-lgx-on role="switch" aria-checked="'+on+'" aria-labelledby="s-lgx"><span></span></button></div>';
+  if(on){
+    h+='<div class="f"><label class="f__l" for="lgx-font">Fonte</label><div class="sel"><select id="lgx-font" data-lgx="font">'+opcFontes(x.font||'')+'</select><svg class="ico sm" aria-hidden="true"><use href="#i-down"/></svg></div></div>'
+     +faixaX('esc','Tamanho',x.esc||100,60,160,5,'%','100% = o tamanho de todas.')
+     +'<div class="f"><span class="f__l" id="lgx-al-l">Alinhamento</span><div class="seg" role="radiogroup" aria-labelledby="lgx-al-l">'+[['','Como todas'],['esq','Esquerda'],['centro','Centro'],['dir','Direita']].map(function(o){return'<label class="seg__o"><input type="radio" name="lgx-al" value="'+o[0]+'" data-lgx="al"'+((x.al||'')===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>'
+     +faixaX('dy','Deslocar para baixo',x.dy!=null?x.dy:(l.dy||0),0,5,.1,' mm','')
+     +faixaX('lsp','Espaçamento entre as legendas',x.lsp!=null?x.lsp:(l.lsp||0),0,6,.5,' mm','')
+     +'<button type="button" class="btn2 btn2--sm" data-lgx-limpar>Voltar ao estilo de todas</button>'
+  }
+  return h+'</section>'
 }
 function secPresets(l,dis){
   return'<section class="mod" aria-labelledby="lm6"'+dis+'><h3 class="mod__h rotulo rotulo--m" id="lm6">Estilos prontos</h3><div class="presets" role="radiogroup" aria-label="Estilos prontos">'
@@ -369,7 +398,7 @@ function montarReal(){
   h+='<div id="lg-fora" class="msg msg--warn" hidden><svg class="ico"><use href="#i-warn"/></svg><div class="msg__body"><p>A legenda passa da área segura e bloqueia a impressão. Reduza o tamanho ou encurte o texto.</p></div></div>';
   h+='<div class="pe"><button type="button" class="btn2 btn2--lg pe__b" id="lg-rtudo">Resetar legendas</button><button type="button" class="btn2 btn2--lg pe__b" id="lg-apply">Aplicar legendas</button></div>';
   $('p-legendas').innerHTML=h;
-  sincronizar()
+  sincronizar();ligaCidades()
 }
 /* migração (projeto real): a legenda antiga vira as 2 linhas equivalentes; o texto livre de cada foto vai para a linha de texto livre */
 function iniciarReal(){
@@ -466,7 +495,8 @@ function sincronizar(){
 }
 function render(){
   L();pintar();
-  if(!$('p-legendas').hidden){if(!$(real()?'lg-lin':'lg-in'))montar();else{sincronizar();['txt','data','loc'].forEach(function(k){var e=$('fv-'+k);if(e)e.textContent=amostra(k)})}}
+  var lf=document.querySelector('#p-legendas .lgx');   /* D-208: o «Só nesta foto» é da foto aberta */
+  if(!$('p-legendas').hidden){if(!$(real()?'lg-lin':'lg-in')||(lf&&+lf.getAttribute('data-n')!==Q.cur()))montar();else{sincronizar();['txt','data','loc'].forEach(function(k){var e=$('fv-'+k);if(e)e.textContent=amostra(k)})}}
 }
 function mudar(k,v,chave){setp(L(),k,v);Q.commit(chave||('lg:'+k))}
 function preset(k){
@@ -489,6 +519,7 @@ function padraoPocket(){
 var P=$('p-legendas');
 /* D-186: a lista suspensa de fontes fecha com Esc ou com um toque fora; as setas ↑ e ↓ andam pelas fontes */
 document.addEventListener('click',function(e){if(UI.sel&&!(e.target.closest&&e.target.closest('.fdd'))){UI.sel=null;UI.busca='';montar()}});
+document.addEventListener('pl-fontes-locais',function(){if($('p-legendas'))montar();render()});   /* D-208: a fonte do computador chegou (ou a permissão mudou) */
 document.addEventListener('keydown',function(e){
   if(!UI.sel)return;
   if(e.key==='Escape'){var k=UI.sel;UI.sel=null;UI.busca='';montar();var bt=document.querySelector('[data-fsel="'+k+'"]');if(bt)bt.focus();e.preventDefault();return}
@@ -512,7 +543,7 @@ P.addEventListener('input',function(e){
     if(isNaN(v2)||v2<+r.min||v2>+r.max){f2.classList.add('is-err');$('h-'+k).textContent='✕ Use um valor de '+r.min.replace('.',',')+' a '+r.max.replace('.',',')+'.';return}
     f2.classList.remove('is-err');mudar(k,v2);return}
   if(t.id==='pl-in-0'||t.id==='pl-in-1'){var ii=+t.id.slice(-1),e2=Q.S();e2.pl=e2.pl||[{v:'',m:false},{v:'',m:false}];e2.pl[ii]={v:t.value,m:true};Q.commit('lg:pl');  /* digitou: vira manual */
-    var dl=$('pl-dl-'+ii);if(dl&&sugOn()&&window.PLLOCAIS&&LT.padLinha(padAlvo().l[ii]).t==='loc')PLLOCAIS.buscar(t.value,8).then(function(r){dl.innerHTML=r.map(function(x){return'<option value="'+PLLOCAIS.rotulo(x)+'"></option>'}).join('')});
+
     var rb=document.querySelector('[data-restaurar="'+ii+'"]');if(rb)rb.hidden=!sugOn()||LT.padLinha(padAlvo().l[ii]).t==='txt';return}
   if(t.id==='fbusca'){UI.busca=t.value;if(t.value)UI.cat='todas';   /* D-186: a busca procura em todas */
     var pos=t.selectionStart;montar();var n=$('fbusca');n.focus();n.setSelectionRange(pos,pos);return}
@@ -543,6 +574,9 @@ P.addEventListener('click',function(e){
     if(real()){setLn(ch,!estLn()[ch]);Q.commit('lg:est');montar();return}
     var tx=L().txt;if(tx[ch])delete tx[ch];else tx[ch]=true;Q.commit('lg:est');montar();return}   /* D-148 */
   if(b.hasAttribute('data-fsel')){var kk=b.getAttribute('data-fsel');UI.sel=UI.sel===kk?null:kk;UI.busca='';UI.cat='todas';montar();var c0=UI.sel&&document.querySelector('#fpick .fitem.is-on');if(c0){var fl0=c0.parentNode,y0=c0.offsetTop-fl0.offsetTop;if(y0+c0.offsetHeight>fl0.clientHeight)fl0.scrollTop=y0-fl0.clientHeight/3}return}   /* abre mostrando a fonte atual, sem esconder os primeiros grupos à toa */
+  if(b.hasAttribute('data-lgx-on')){var sN=Q.S(),nN=Q.cur();if(sN.lgx||LGX_ON[nN]){delete sN.lgx;delete LGX_ON[nN];Q.commit('lg:lgx')}else LGX_ON[nN]=true;montar();var nb=document.querySelector('[data-lgx-on]');if(nb)nb.focus();return}   /* D-208 */
+  if(b.hasAttribute('data-lgx-limpar')){delete Q.S().lgx;delete LGX_ON[Q.cur()];Q.commit('lg:lgx');montar();Q.toast('A Foto '+Q.p2(Q.cur())+' voltou ao estilo de todas',true);return}
+  if(b.hasAttribute('data-flocal')){if(FL)FL.pedir().then(function(ok){montar();Q.toast(ok?'Fonte do computador em uso na tela, no PDF e na imagem':'O navegador não liberou a fonte. Entra a reserva livre.')});return}   /* D-208: o pedido sai do toque */
   if(b.hasAttribute('data-fcat')){var fc=b.getAttribute('data-fcat');UI.cat=fc;montar();var nb=document.querySelector('[data-fcat="'+fc+'"]');if(nb)nb.focus();return}
   if(b.hasAttribute('data-pick')){var n=b.getAttribute('data-pick');PREF.rec=[n].concat(PREF.rec.filter(function(x){return x!==n})).slice(0,6);guardaPref();UI.busca='';var s=UI.sel;UI.sel=null;var Lf=L();
     if(s==='ln'){setLn('font',n);alvosLn().forEach(function(i){var ln=Lf.pad.l[i],ee=LT.estilosDe(n,ln);if(ln.b&&!ee.b.ok)delete ln.b;ee=LT.estilosDe(n,ln);if(ln.it&&!ee.it.ok)delete ln.it});Q.commit('lg:font');montar();return}
@@ -563,7 +597,20 @@ P.addEventListener('click',function(e){
 });
 function iniciar(){if(!real()||!Q.meta)return Promise.resolve();return preencher(todasFotos()).then(function(){if(Q.rebase)Q.rebase();sincPad()})}
 iniciarReal();
-window.PLLEG={iniciar:iniciar,render:render,padraoPocket:padraoPocket,refazer:function(ns){depois(preencher(ns||[Q.cur()]),'lg:md')}};   /* D-148: a cidade ou a data da foto mudou: refaz as linhas não digitadas */
+/* D-208: a linha de Localização volta a seguir a cidade da foto (tira o texto digitado à mão) */
+function soltarLoc(n){var e=Q.ST()[n],pd=e&&(e.pad||(L().pad));if(!e||!pd||!pd.l||!e.pl)return;[0,1].forEach(function(i){if(LT.padLinha(pd.l[i]).t==='loc'&&e.pl[i]&&e.pl[i].m)e.pl[i]={v:'',m:false}})}
+/* D-208: a linha de Localização tem a lista de cidades com busca; escolher grava a cidade da foto e pergunta pelas do mesmo dia */
+function ligaCidades(){if(!window.PLCIDADE||!real())return;var pd=padAlvo();if(!pd||!pd.l)return;
+  [0,1].forEach(function(i){var inp=$('pl-in-'+i);if(inp&&LT.padLinha(pd.l[i]).t==='loc')PLCIDADE.ligar(inp,{usadas:Q.cidadesUsadas,escolher:function(rot){if(Q.escolherCidade)Q.escolherCidade(Q.cur(),rot)}})})}
+window.PLLEG={L:L,refazerTodas:function(){depois(preencher(todasFotos()),'lg:lote')},soltarLoc:soltarLoc,ligaCidades:ligaCidades,iniciar:iniciar,render:render,padraoPocket:padraoPocket,refazer:function(ns){depois(preencher(ns||[Q.cur()]),'lg:md')}};   /* D-148: a cidade ou a data da foto mudou: refaz as linhas não digitadas */
 document.fonts&&document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',function(){LT.limparMedTela();render()}); /* métricas mudaram: recalcula as linhas (D-113) */
 render();iniciar()
+})();
+
+/* D-208 · eventos do «Só nesta foto» (o painel é remontado; os eventos ficam no contêiner) */
+(function(){var P=document.getElementById('p-legendas');if(!P||!window.PLQ)return;var Q=window.PLQ,LT=window.PLTEXTO;
+  function set(fn){var s=Q.S(),x=Object.assign({},s.lgx||{});fn(x);var v=LT.normLgx(x);if(v)s.lgx=v;else delete s.lgx;Q.commit('lg:lgx')}
+  P.addEventListener('input',function(e){var t=e.target,k=t.getAttribute&&t.getAttribute('data-lgx');if(!k||t.type!=='range')return;var v=+t.value;
+    set(function(x){x[k]=v});var o=document.getElementById('lgx-'+k+'-v');if(o)o.textContent=String(v).replace('.',',')+(k==='esc'?'%':' mm')});
+  P.addEventListener('change',function(e){var t=e.target,k=t.getAttribute&&t.getAttribute('data-lgx');if(!k||t.type==='range')return;set(function(x){if(t.value)x[k]=t.value;else delete x[k]})});
 })();
