@@ -13,6 +13,9 @@
 .pl-qualidade:focus-visible .pl-qualidade__p{outline:2px solid #006194;outline-offset:3px}
 /* nas folhas as polaroids são pequenas e vizinhas: alvo de 24 px (WCAG 2.2 · 2.5.8) e só desenho (a folha é role="img") */
 .pl-qualidade--folha{top:-6px;right:-6px;width:24px;height:24px}
+.pl-qualidade--folha .pl-qualidade__p{width:var(--pq,8px);height:var(--pq,8px)}   /* D-204: o tamanho vem da borda da moldura */
+.pl-qualidade--folha.pl-qualidade--boa .pl-qualidade__p{border-width:max(1px,calc(var(--pq,8px) / 4))}
+.pl-qualidade--folha.pl-qualidade--borrada .pl-qualidade__p::after{left:12.5%;top:calc(50% - .5px);width:75%}
 .pl-qualidade--folha .pl-qualidade__bal{top:22px;right:4px;width:180px}
 @media (forced-colors:active){.pl-qualidade__p{forced-color-adjust:none}}
 @media print{.pl-qualidade{display:none}}

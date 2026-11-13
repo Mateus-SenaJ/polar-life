@@ -167,7 +167,8 @@ try {
     tela: readFileSync(JS + 'ui/foto-tela.js', 'utf8')
   };
   const criaUrl = [codigo.quadro, codigo.editor, codigo.filtros].map(t => (t.match(/createObjectURL/g) || []).length);
-  ok(criaUrl.every(n => n <= 1), 'só o backup «Salvar .polarlife» cria object URL no editor (' + criaUrl.join(', ') + ')');
+  const revoga = [codigo.quadro, codigo.editor, codigo.filtros].map(t => (t.match(/revokeObjectURL/g) || []).length);
+  ok(criaUrl[0] <= 2 && criaUrl[1] <= 1 && criaUrl[2] === 0 && revoga.every((r, i) => r >= criaUrl[i]), 'só os arquivos baixados criam object URL no editor (backup .polarlife e «Baixar polaroid», D-197), sempre revogados (' + criaUrl.join(', ') + ' · ' + revoga.join(', ') + ')');
   ok(codigo.quadro.indexOf('translate(-50%,-50%)') < 0 && codigo.editor.indexOf('translate(-50%,-50%)') < 0, 'a expressão do recorte da foto só existe em PLFOTOTELA.estilo');
   ok(codigo.tela.indexOf("transform:translate(-50%,-50%)") >= 0, 'PLFOTOTELA.estilo tem a conta do recorte');
   ok(codigo.quadro.indexOf('PLFOTOTELA.estilo') >= 0 && codigo.editor.indexOf('PLFOTOTELA.estilo') >= 0, 'quadro.js e editor.js chamam PLFOTOTELA.estilo');

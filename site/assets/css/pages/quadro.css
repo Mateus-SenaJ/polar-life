@@ -24,6 +24,7 @@
 .pq{--k:1;--pw:420px;position:relative;flex:none;width:var(--pqw,var(--pw));aspect-ratio:var(--ar,88/107);margin:0;padding:var(--pt,calc(var(--k)*20px)) var(--pr,var(--pl,calc(var(--k)*20px))) 0 var(--pl,calc(var(--k)*20px));background:var(--white);border-radius:var(--rd,2px);box-shadow:var(--shadow-polaroid)}
 .win{position:relative;width:100%;aspect-ratio:var(--wa,1);background:var(--surface-subtle);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .win.is-drag{cursor:grabbing}
+.win.is-cobre:not(.is-drag),.win.is-cobre:not(.is-drag) .win__cmp{background:transparent}   /* Preencher, foto parada: nenhuma emenda de arredondamento (posição fracionária) mostra o fundo vazio; aparece a moldura */
 .win.is-drag .ph{will-change:transform}   /* D-149: o arrasto só muda o transform */
 .win:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .win__clip{position:absolute;inset:0;overflow:hidden}
@@ -49,6 +50,8 @@
 .qmsg{position:relative;z-index:1;width:100%;max-width:560px;margin-top:24px}
 .msg--warn>.ico{color:var(--orange);stroke-width:2}
 .qmsg__act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+/* D-204: na mesa fixa (≥1024 px) o aviso fica no topo do inspetor e acompanha a rolagem dele; o palco não muda de altura */
+@media (min-width:1024px) and (min-height:560px){.insp .qmsg{position:sticky;top:0;z-index:3;max-width:none;margin:0;background:var(--white);box-shadow:0 0 0 8px var(--white)}}
 .qmsg .msg,.msg .qmsg__act{text-align:left}
 
 /* faixa do lote · DOC-01: inativa 48×56, ativa 56×64 com anel azul 2 */

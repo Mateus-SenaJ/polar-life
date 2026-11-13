@@ -101,7 +101,7 @@ try {
     await page.evaluate(() => document.fonts ? document.fonts.ready.then(() => true) : true);
     await page.waitForFunction(() => document.querySelectorAll('#sheet .pol').length > 0);
     /* folha com ~4 px/mm: a borda de 0,26 mm da legenda não é arredondada pelo navegador (MT-02) */
-    await page.addStyleTag({ content: '.stage{height:1200px !important;width:1200px !important}' });
+    await page.addStyleTag({ content: '.stage{height:1200px !important;width:1200px !important;flex:none !important}' });   /* D-204: o palco fixo do teste não encolhe com a mesa */
     await page.waitForTimeout(200);
     for (const src of SCRIPTS) await page.addScriptTag({ url: srv.url + src });
   }

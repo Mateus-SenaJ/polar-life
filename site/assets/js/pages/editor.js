@@ -149,7 +149,9 @@ function polaroid(c,s,px,det){
   }
   if(det&&D.assin){var dirSig=PLTEXTO.assinaturaPos(LG||PLTEXTO.LEG0,FR)==='dir'; /* D-129/D-136: canto oposto ao texto */
     html+='<img class="pol__sig" src="../../assets/img/logos/Logo_tipografia_lateral.png" alt="" style="'+(dirSig?'right':'left')+':'+FR.lado*px+'px;bottom:'+3*px+'px;width:'+3.9*2.9*px+'px">'}
-  if(det&&window.PLQUALIDADE){var qp=ppiDe(c.f);if(qp)html+=PLQUALIDADE.ponto(qp,{decorativo:true}).outerHTML}   /* D-130: ponto na moldura (a folha é role=img) */
+  if(det&&window.PLQUALIDADE){var qp=ppiDe(c.f);if(qp){   /* D-130: ponto na moldura (a folha é role=img) · D-204: do tamanho da borda, no meio dela, em qualquer escala (T4) */
+    var qe=PLQUALIDADE.ponto(qp,{decorativo:true}),bt=FR.topo*px,bl=FR.lado*px,qd=Math.max(3,Math.min(8,Math.min(bt,bl)*.7)),qs=Math.max(qd,Math.min(24,bt,bl));
+    qe.style.top=(bt-qs)/2+'px';qe.style.right=(bl-qs)/2+'px';qe.style.width=qe.style.height=qs+'px';qe.style.setProperty('--pq',qd+'px');html+=qe.outerHTML}}
   return html+'</div></figure>'
 }
 function linhas(sh,p,px){                                          /* guias de corte · FN-02 · MT-04 */

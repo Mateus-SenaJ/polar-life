@@ -384,8 +384,12 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.locator('text=Seu arquivo está pronto').waitFor({ timeout: 90000 });
   (await p.evaluate(() => PLCONTA.plano().usadasMes)) === 1 ? ok('geração concluída consome a folha grátis (BR-10)') : ruim('folha grátis não foi consumida');
   await p.goto(srv.url + 'app/editor/exportar/');
+  /já foi exportado nas últimas 24 horas/.test(await p.locator('#info-conta').textContent())
+    ? ok('2ª exportação do mesmo arquivo em 24 h: não pede outra folha (DOC-03 §3)') : ruim('linha da 2ª exportação do mesmo arquivo');
+  await p.evaluate(() => { const f = JSON.parse(sessionStorage.getItem('pl-folhas') || '{}'); f.margem = (f.margem || 3) + 1; sessionStorage.setItem('pl-folhas', JSON.stringify(f)); });
+  await p.goto(srv.url + 'app/editor/exportar/');
   /precisa de 1 folha/.test(await p.locator('#info-conta').textContent())
-    ? ok('2ª exportação: linha avisa que precisa de folha') : ruim('linha da 2ª exportação');
+    ? ok('outro arquivo depois da folha grátis: linha avisa que precisa de folha') : ruim('linha da 2ª exportação');
 
   /* pop-up «Sua folha grátis foi usada» */
   await p.locator('#go').click();

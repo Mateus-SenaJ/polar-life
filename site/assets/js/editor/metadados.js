@@ -9,7 +9,8 @@ var err=null,hv=0,ult=0;
 function z(n){return(n<10?'0':'')+n}
 /* dados de exemplo: 14.07.26 em Campos do Jordão (DOC-04 §6); horas 08:00 + 30 min por foto [HIPÓTESE] */
 var HEIC={5:1,7:1,12:1,13:1,18:1,22:1};   /* mesmas fotos «convertidas» da T-04 (processando.js) */
-function def(n){if(sessionStorage.getItem('pl-fotos'))return{iso:'',ds:'',dh:0,c:'',cs:'',o:'Do aparelho',conv:false};n=Q.src(n);var m=480+30*(n-1);return{iso:'2026-07-14T'+z(Math.floor(m/60))+':'+z(m%60),ds:'exif',dh:0,c:'Campos do Jordão',cs:'gps',o:'Do aparelho',conv:!!HEIC[n]}}
+function real(){try{return window.PLTEXTO&&PLTEXTO.ehReal?PLTEXTO.ehReal():!!sessionStorage.getItem('pl-fotos')}catch(e){return false}}   /* o exemplo também grava pl-fotos no 1º ajuste: a lista sozinha não diz que o projeto é real */
+function def(n){if(real())return{iso:'',ds:'',dh:0,c:'',cs:'',o:'Do aparelho',conv:false};n=Q.src(n);var m=480+30*(n-1);return{iso:'2026-07-14T'+z(Math.floor(m/60))+':'+z(m%60),ds:'exif',dh:0,c:'Campos do Jordão',cs:'gps',o:'Do aparelho',conv:!!HEIC[n]}}
 function M(n){return Q.ST()[n].meta||def(n)}
 function cp(n){return JSON.parse(JSON.stringify(M(n)))}
 function pd(iso){var a=(iso||'').match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+)(?::\d+)?$/);return a?{y:+a[1],m:+a[2],d:+a[3],h:+a[4],i:+a[5]}:null}   /* o EXIF pode vir com segundos */

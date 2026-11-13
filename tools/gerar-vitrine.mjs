@@ -243,5 +243,5 @@ if (quer('banner')) {
   await compor('banner-colagem.jpg', 1200, 500, '#000', [{ png: b3, x: 760, y: 20, w: 330, r: 3, s: 20, so: .6 }], 82);
   await compor('banner-colagem-cel.jpg', 760, 560, '#000', [{ png: b3, x: 200, y: 22, w: 360, r: 3, s: 20, so: .6 }], 82);   /* D-199: celular */
 }
-await nav.close(); srv.close?.();
+await nav.close(); srv.fechar();   /* o servidor de teste devolve fechar(), não close(): sem isso o processo não terminava */
 console.log('\n✔ vitrine pronta em site/assets/img/vitrine/');

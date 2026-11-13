@@ -208,7 +208,7 @@ function sincronizar(){
   $('modo-h').textContent=s.modo==='preencher'?'A foto cobre toda a janela. Nunca é esticada.':'A foto inteira cabe na janela; o que sobrar fica branco.';
   [].forEach.call(document.querySelectorAll('[data-act=espelhar]'),function(b){b.setAttribute('aria-pressed',s.flip)});
   [].forEach.call(document.querySelectorAll('[data-act=inteira]'),function(b){b.setAttribute(b.getAttribute('role')==='switch'?'aria-checked':'aria-pressed',UI.inteira)});
-  $('win').classList.toggle('is-all',UI.inteira)
+  $('win').classList.toggle('is-all',UI.inteira);$('win').classList.toggle('is-cobre',s.modo==='preencher')   /* Preencher: a foto cobre a janela; o fundo vazio só aparece no arrasto */
 }
 
 /* ---------- desenho ---------- */
@@ -682,6 +682,14 @@ window.PLQ={rebase:rebase,sinc:sincronizar,lote:lote,thumb:thumb,ajustou:ajustou
 Object.defineProperty(window.PLQ,'N',{get:function(){return N}});
 /* ---------- partida ---------- */
 construir();faixa();
+/* D-204: com a mesa fixa ao lado do inspetor (≥1024 px), o aviso de qualidade vai para o topo do inspetor. Embaixo do palco ele
+   tirava altura da mesa e a polaroid encolhia no meio do zoom (o ponto sob o cursor escapava). Celular e tablet: embaixo da foto. */
+(function(){
+  var mq=window.matchMedia&&window.matchMedia('(min-width:1024px) and (min-height:560px)'),m=$('qmsg'),mesa=m&&m.parentNode,sc=$('scope');
+  if(!mq||!m||!sc)return;
+  function lugar(){if(mq.matches){if(m.previousElementSibling!==sc)sc.parentNode.insertBefore(m,sc.nextSibling)}else if(m.parentNode!==mesa)mesa.appendChild(m)}
+  lugar();if(mq.addEventListener)mq.addEventListener('change',lugar);else if(mq.addListener)mq.addListener(lugar);
+})();
 if(window.ResizeObserver){new ResizeObserver(dimensionar).observe($('stage'))}else window.addEventListener('resize',dimensionar);
 dimensionar();render();
 var c0=document.querySelector('.th[aria-current]');if(c0&&c0.scrollIntoView)c0.scrollIntoView({block:'nearest',inline:'center'});
