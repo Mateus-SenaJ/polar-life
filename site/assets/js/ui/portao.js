@@ -67,12 +67,12 @@ function acoes(lista){ /* [{led, txt, ic, cb, cls, terc}] */
 function raizApp(){var g=window.PLGUARDA;return g&&g.raiz?g.raiz():null}
 
 /* ---------- portão: pedir ---------- */
-function pedir(nFolhas,classe){
+function pedir(nFolhas,classe,chave){
   return new Promise(function(res){
     var C=window.PLCONTA;
     if(!C){res({ok:false,motivo:'semConta'});return}
-    var g=C.direito(nFolhas,classe);
-    if(g.ok){res({ok:true,usaGratis:!!g.usaGratis,codigo:!!g.codigo});return} /* linha na T-19, sem pop-up */
+    var g=C.direito(nFolhas,classe,chave);   /* chave do projeto: a mesma folha em 24 h passa sem pedir outra (DOC-03 §3) */
+    if(g.ok){res({ok:true,usaGratis:!!g.usaGratis,codigo:!!g.codigo,jaContado:!!g.jaContado});return} /* linha na T-19, sem pop-up */
     PEND={nFolhas:nFolhas,classe:classe||'padrao',resolve:res};
     abrir();
     if(g.motivo==='semConta')semConta();

@@ -265,6 +265,7 @@ function observar(){
   [].forEach.call(ol.children,function(li){var b=li.firstChild;if(b)OBS.observe(b)})
 }
 function faixa(){
+  if(typeof rotuloGo==='function')rotuloGo();   /* D-197: o LED acompanha o número de fotos */
   var ol=$('faixa');ol.innerHTML='';
   for(var i=1;i<=N;i++){
     var li=document.createElement('li'),b=document.createElement('button');
@@ -433,7 +434,39 @@ document.addEventListener('click',function(e){
 $('rtudo').onclick=function(){if(!ajustou(S()))return;S().adj=copia(ADJ0);S().flt={id:'original',int:100};commit('rtudo');toast('Ajustes e filtro da foto zerados',true)};
 $('fprev').onclick=function(){ir(cur-1)};$('fnext').onclick=function(){ir(cur+1)};
 $('save').onclick=function(){if(!window.PLPROJETOS||!PLPROJETOS.atual()){toast('Abra um projeto para salvar o backup.');return}PLPROJETOS.exportar(PLPROJETOS.atual()).then(function(o){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=o.projeto.nome+'.polarlife';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},0)})};
-$('go').onclick=$('go2').onclick=function(){location.href='../#revisar'};   /* o pré-voo (T-18) abre nas Folhas, onde a medida da folha existe */
+$('go').onclick=$('go2').onclick=function(){if(umaSo()){baixarUma();return}location.href='../#revisar'};   /* o pré-voo (T-18) abre nas Folhas, onde a medida da folha existe */
+/* D-197 · «Fazer uma polaroid» (DOC-04: foto → legenda → baixar). No atalho e com uma foto só, o LED baixa a polaroid em PNG a
+   300 DPI, da mesma lista de desenho do PDF (MT-02). Passa pelo portão: polaroid avulsa conta 1 folha a cada 4 (DOC-03 §3).
+   O gerador e o portão só carregam no primeiro clique, para o Quadro continuar leve. */
+function umaSo(){try{return sessionStorage.getItem('pl-uma')==='1'&&N===1}catch(e){return false}}
+var GERA=false;
+function rotuloGo(){var u=umaSo();['go','go2'].forEach(function(i){var b=$(i);if(!b)return;var t=b.querySelector('.btn-content > span'),ic=b.querySelector('use');if(t)t.textContent=GERA?'Gerando…':u?'Baixar polaroid':'Revisar impressão';if(ic)ic.setAttribute('href',u?'#i-download':'#i-print');b.disabled=GERA;b.setAttribute('aria-busy',String(GERA))})}
+function carregar(src,css){return new Promise(function(ok,no){var e=document.createElement(css?'link':'script');if(css){e.rel='stylesheet';e.href=src}else e.src=src;e.onload=ok;e.onerror=no;document.head.appendChild(e)})}
+var EXTRAS=null,RAIZ='../../../assets/';
+function extras(){
+  if(EXTRAS)return EXTRAS;
+  var a=window.PLPORTAO?Promise.resolve():Promise.all([carregar(RAIZ+'css/ui/portao.css',true),carregar(RAIZ+'js/ui/portao.js')]);
+  var b=window.fontkit?Promise.resolve():carregar(RAIZ+'vendor/fontkit.umd.min.js');
+  return EXTRAS=Promise.all([a,b]).then(function(){return window.PLGERADOR?null:carregar(RAIZ+'js/nucleo/gerador.js')}).catch(function(e){EXTRAS=null;throw e})   /* o gerador lê o fontkit ao carregar */
+}
+function chaveProj(){var t='';try{t=(sessionStorage.getItem('pl-quadro')||'')+'|'+(sessionStorage.getItem('pl-folhas')||'')+'|'+(sessionStorage.getItem('pl-colagem')||'')}catch(e){}for(var h=5381,i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)}   /* a mesma chave da exportação: a mesma polaroid em 24 h conta uma vez */
+function baixarUma(){
+  if(GERA)return;GERA=true;rotuloGo();
+  var fim=function(m){GERA=false;rotuloGo();if(m)toast(m)},gratis=false;
+  var jaFoi=false;
+  extras().then(function(){return window.PLPORTAO?PLPORTAO.pedir(1,'padrao',chaveProj()):{ok:true}}).then(function(r){
+    if(!r||!r.ok){fim();return}                                   /* sem conta: o portão leva para entrar; sem folhas: fica aqui */
+    gratis=!!r.usaGratis;jaFoi=!!r.jaContado;
+    return PLGERADOR.imagens(PLGERADOR.projeto(),{f:'polaroids',tipo:'png',ppi:300}).then(function(o){
+      if(o.falhas.length||!o.arquivos.length){fim('Não foi possível ler a foto. Troque a foto e tente de novo.');return}
+      var d=new Date(),nome='polarlife-'+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'-polaroid.png';   /* BR-11: nome neutro */
+      try{if(window.PLCONTA)PLCONTA.consumir(1,'padrao',chaveProj())}catch(e){}
+      var u=URL.createObjectURL(new Blob([o.arquivos[0].bytes],{type:'image/png'})),a=document.createElement('a');a.href=u;a.download=nome;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);
+      fim(jaFoi?'Polaroid baixada de novo, sem gastar outra folha.':gratis?'Polaroid baixada. Ela usou a sua folha grátis do mês.':'Polaroid baixada: está na sua pasta de downloads.')
+    })
+  }).catch(function(){fim('Não foi possível gerar a polaroid. Tente de novo.')})
+}
+rotuloGo();
 
 /* ---------- posicionar a foto: arrastar 1:1, pinça, roda e teclado (FN-04, FN-12) ---------- */
 var win=$('win'),pts={},gst=null,dbl=null,ultTap=0,ultX=0,ultY=0,rafE=null;

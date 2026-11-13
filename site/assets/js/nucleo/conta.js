@@ -131,8 +131,9 @@ function plano(){
   return o}
 
 /* ---------- direito de uso e consumo (DOC-03 §4 · BR-10) ---------- */
-function direito(nFolhas,classe){
+function direito(nFolhas,classe,chaveProj){
   if(!temSessao())return {ok:false,motivo:'semConta'};
+  if(chaveProj){var g0=ler('pl-gerado24h',null);if(g0&&g0.k===chaveProj&&agora()-g0.t<DIA)return {ok:true,usaGratis:false,jaContado:true}}   /* DOC-03 §3: a mesma folha em 24 h já foi contada: não pede outra */
   var sc=sessaoCodigo();
   if(sc){ /* código de impressão: uso único do pacote (D-124) */
     if(sc.usadoEm)return {ok:false,motivo:'semFolhas',codigoUsado:true};

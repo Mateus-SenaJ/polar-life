@@ -303,7 +303,7 @@ function aplicarColagem(id){
   var CH=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'],ir=function(){location.href='../editor/'};
   function novo(){
     var c=JSON.stringify(PLCOLAGEM.comModelo({},id));
-    try{CH.concat(['pl-prevoo','pl-exportar','pl-volta']).forEach(function(k){sessionStorage.removeItem(k)});sessionStorage.setItem('pl-fotos','[]');sessionStorage.setItem('pl-colagem',c)}catch(e){}
+    try{CH.concat(['pl-prevoo','pl-exportar','pl-volta','pl-uma']).forEach(function(k){sessionStorage.removeItem(k)});sessionStorage.setItem('pl-fotos','[]');sessionStorage.setItem('pl-colagem',c)}catch(e){}
     if(!P){ir();return}
     P.criar(m.nome).then(ir,ir)
   }

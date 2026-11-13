@@ -27,9 +27,17 @@ P.aoMudar(mostrar);mostrar();P.espaco().then(function(e){$('aviso-espaco').hidde
 var BRANCO={tipo:'cor',cor:'#FFFFFF',cor2:'#F8F9FA',ang:135,foto:null,px:50,py:50,suave:40};
 var SUG={viagem:{nome:'Viagem com a turma',fmt:'classico'},cidade:{nome:'Rolê na cidade',fmt:'imini'},casal:{nome:'Nós dois',fmt:'pocket'},
   coracao:{nome:'Coração de verão',col:{layout:'coracao',orient:'paisagem',fundo:BRANCO}},varal:{nome:'Varal de memórias',col:{layout:'tira',orient:'paisagem',fundo:BRANCO}},
-  mesa:{nome:'Mesa de recordações',col:{layout:'espalhadas',orient:'paisagem',fundo:{tipo:'foto'}}}};
+  mesa:{nome:'Mesa de recordações',col:{layout:'espalhadas',orient:'paisagem',fundo:{tipo:'foto'}}},
+  /* D-198: mais formatos para imprimir e colagens em pé (9:16, 1080 × 1920) prontas para status e reels; a imagem não gasta folha */
+  praia:{nome:'Dias de praia',fmt:'mini'},familia:{nome:'Família reunida',fmt:'iwide'},quadradas:{nome:'Quadradinhas',fmt:'isq'},
+  'status-tira':{nome:'Tira para o status',col:{peca:'r916',layout:'cabine',margem:14,fundo:{tipo:'cor',cor:'#000000'}}},
+  'status-varal':{nome:'Varal no stories',col:{peca:'r916',layout:'varal',margem:10,fundo:{tipo:'gradiente',cor:'#FFFFFF',cor2:'#F8F9FA',ang:180}}},
+  'status-tempo':{nome:'Linha do tempo vertical',col:{peca:'r916',layout:'tempo',margem:10,fundo:BRANCO}},
+  'status-capa':{nome:'Capa do status',col:{peca:'r916',layout:'capa',margem:10,fundo:{tipo:'cor',cor:'#F8F9FA'}}},
+  'status-mural':{nome:'Mural do fim de semana',col:{peca:'r916',layout:'mural',margem:10,fundo:BRANCO}},
+  'status-mesa':{nome:'Mesa no status',col:{peca:'r916',layout:'espalhadas',margem:8,fundo:{tipo:'foto',suave:45}}}};
 function comecar(o){
-  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-prevoo','pl-exportar','pl-volta'].forEach(function(k){sessionStorage.removeItem(k)});
+  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-prevoo','pl-exportar','pl-volta','pl-uma'].forEach(function(k){sessionStorage.removeItem(k)});
     if(o.fmt)sessionStorage.setItem('pl-fmt',o.fmt);
     if(o.col)sessionStorage.setItem('pl-colagem',JSON.stringify(Object.assign({ativo:true,fundo:{tipo:'foto'}},o.col)))}catch(e){}
   /* D-188: colagem começa pelo modelo (as molduras vazias na tela) e as fotos entram depois; polaroids seguem para escolher as fotos */
@@ -38,5 +46,29 @@ function comecar(o){
   PLPROJETOS.criar(o.nome).then(ir,ir)
 }
 $('sugs').addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-sug]');if(!b)return;var o=SUG[b.getAttribute('data-sug')];if(o)comecar(o)});
+/* D-198: as sugestões passam sozinhas para o lado (um cartão a cada 3,5 s; no fim, volta ao começo). Param com o cursor em cima,
+   com o foco dentro, enquanto o dedo está na faixa (voltam 4 s depois), fora da tela e com movimento reduzido; «Pausar» ao lado
+   do título (WCAG 2.2.2). Deslizar com o dedo continua funcionando. */
+(function(){
+  var box=document.querySelector('.sugs'),ul=$('sugs'),bt=$('sugs-pausa');if(!box||!ul)return;
+  var calmo=false;try{calmo=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+  var ligado=!calmo,parado=false,visivel=true,tm=null,volta=null;
+  if(calmo&&bt)bt.hidden=true;
+  function passo(){var a=ul.children[0],b=ul.children[1];return a&&b?b.getBoundingClientRect().left-a.getBoundingClientRect().left:0}
+  function anda(){var max=box.scrollWidth-box.clientWidth;if(max<=4)return;var x=box.scrollLeft+passo();box.scrollTo({left:x>max-4?0:x,behavior:'smooth'})}
+  function agenda(){clearTimeout(tm);tm=null;if(ligado&&!parado&&visivel&&!document.hidden)tm=setTimeout(function(){anda();agenda()},3500)}
+  function suspende(s){parado=s;agenda()}
+  box.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')suspende(true)});
+  box.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')suspende(false)});
+  box.addEventListener('focusin',function(){suspende(true)});
+  box.addEventListener('focusout',function(){setTimeout(function(){if(!box.contains(document.activeElement))suspende(false)},0)});
+  box.addEventListener('touchstart',function(){clearTimeout(volta);suspende(true)},{passive:true});
+  box.addEventListener('touchend',function(){clearTimeout(volta);volta=setTimeout(function(){suspende(false)},4000)},{passive:true});
+  document.addEventListener('visibilitychange',agenda);
+  if(window.IntersectionObserver)new IntersectionObserver(function(es){visivel=es[0].isIntersecting;agenda()}).observe(box);
+  if(bt)bt.addEventListener('click',function(){ligado=!ligado;bt.querySelector('span').textContent=ligado?'Pausar':'Retomar';bt.setAttribute('aria-label',ligado?'Pausar a passagem das sugestões':'Retomar a passagem das sugestões');bt.querySelector('svg').innerHTML=ligado?'<path d="M9 6v12M15 6v12"/>':'<path d="M8 5l11 7-11 7z"/>';agenda()});
+  window.PLSUGS={passar:anda,ligado:function(){return ligado&&!parado&&visivel}};   /* para os testes */
+  agenda();
+})();
 $('criar-colagem').onclick=function(){comecar({nome:'Colagem de '+new Date().toLocaleDateString('pt-BR'),col:{layout:'espalhadas'}})};
 })();

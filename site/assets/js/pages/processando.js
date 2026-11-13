@@ -147,7 +147,7 @@ $('swap').addEventListener('change',function(){
   say('Foto '+(i+1)+' trocada por '+file.name+'.');paint();
   var nb=$('fail').querySelector('button');(nb||$('go')).focus();
 });
-$('go').addEventListener('click',function(){if(this.disabled)return;location.href='../resumo/'});
+$('go').addEventListener('click',function(){if(this.disabled)return;var u=false;try{u=sessionStorage.getItem('pl-uma')==='1'}catch(e){}location.href=u?'../editor/quadro/#foto-1':'../resumo/'});   /* D-197: «Fazer uma polaroid» vai direto ao Quadro */
 $('cancel').addEventListener('click',function(){clearInterval(timer)});
 window.addEventListener('hashchange',function(){location.reload()});
 })();

@@ -4,7 +4,8 @@
    Com movimento reduzido: sem rotação automática (troca instantânea pelos pontos) e sem botão de pausa. */
 (function(){
 'use strict';
-var ROTA=5000,PLBANNERS;   /* D-190: passa mais rápido (antes 8 s) */
+var ROTA=5000,ROTA_CEL=4000,PLBANNERS;   /* D-190: passa mais rápido (antes 8 s) · D-199: 4 s em telas menores que 1024 px */
+function intervalo(){try{return window.matchMedia&&window.matchMedia('(max-width:1023px)').matches?ROTA_CEL:ROTA}catch(e){return ROTA}}
 
 function semMovimento(){try{return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){return false}}
 
@@ -45,7 +46,7 @@ Banners.prototype.rotar=function(){
   var self=this;
   this.parar();
   if(!this.auto||this.mq)return;
-  this.tmr=setTimeout(function(){self.mostrar((self.i+1)%self.slides.length,false);self.rotar()},ROTA);
+  this.tmr=setTimeout(function(){self.mostrar((self.i+1)%self.slides.length,false);self.rotar()},intervalo());
 };
 Banners.prototype.parar=function(){if(this.tmr){clearTimeout(this.tmr);this.tmr=null}};
 Banners.prototype.suspender=function(ligado){        /* hover, foco, toque e aba escondida */
@@ -88,11 +89,20 @@ Banners.prototype.ligar=function(){
     self.rotuloBotao(self.auto?'Pausar':'Retomar');
     if(self.auto)self.rotar();else self.parar();
   });
-  this.el.addEventListener('mouseenter',function(){self.suspender(true)});
-  this.el.addEventListener('mouseleave',function(){self.suspender(false)});
+  /* D-199: só o cursor de verdade pausa (no celular o toque gerava um «mouseenter» que nunca saía e a rotação parava) */
+  this.el.addEventListener('pointerenter',function(ev){if(ev.pointerType==='mouse')self.suspender(true)});
+  this.el.addEventListener('pointerleave',function(ev){if(ev.pointerType==='mouse')self.suspender(false)});
   this.el.addEventListener('focusin',function(){self.suspender(true)});
   this.el.addEventListener('focusout',function(){setTimeout(function(){if(!self.el.contains(document.activeElement))self.suspender(false)},0)});
-  this.el.addEventListener('touchstart',function(){self.suspender(true)},{passive:true});
+  /* D-199: o toque pausa só enquanto o dedo está na faixa e volta 2,5 s depois; deslizar para o lado troca o banner e a rotação segue */
+  var t0=null,volta=null;
+  this.el.addEventListener('touchstart',function(ev){clearTimeout(volta);var t=ev.touches&&ev.touches[0];t0=t?{x:t.clientX,y:t.clientY}:null;self.suspender(true)},{passive:true});
+  var solta=function(ev){
+    var t=ev.changedTouches&&ev.changedTouches[0];
+    if(t0&&t){var dx=t.clientX-t0.x,dy=t.clientY-t0.y;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.3)self.mostrar((self.i+(dx<0?1:-1)+self.slides.length)%self.slides.length,false)}
+    t0=null;clearTimeout(volta);volta=setTimeout(function(){if(!self.el.contains(document.activeElement))self.suspender(false)},2500)
+  };
+  this.el.addEventListener('touchend',solta,{passive:true});this.el.addEventListener('touchcancel',solta,{passive:true});
   document.addEventListener('visibilitychange',function(){self.suspender(document.hidden)});
   if(window.matchMedia){
     var mq=window.matchMedia('(prefers-reduced-motion: reduce)');

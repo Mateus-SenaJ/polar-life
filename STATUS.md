@@ -1,6 +1,6 @@
 # Status do projeto
 
-Atualizado em 2026-11-12 (D-194 e D-195). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
+Atualizado em 2026-11-12 (D-194 a D-205). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
 
 ## No ar
 - https://polar-life.vercel.app e https://mateus-senaj.github.io/polar-life/ (o mesmo `site/`, publicado a partir de `main`).
@@ -9,6 +9,7 @@ Atualizado em 2026-11-12 (D-194 e D-195). O histórico das etapas antigas está 
   (recorte, ajustes, filtros, legendas, molduras) → Folhas ou Colagem → revisão → PDF, PDF profissional, PDF leve,
   imagens das folhas, polaroids avulsas ou imagem para as redes (1080 × 1080, 1080 × 1350, 1080 × 1920) → baixar, imprimir ou compartilhar.
 - Contas de teste (admin, gratis, folha e pro @polarlife.test): botões na tela Entrar só no aparelho que abrir `/app/entrar/?contas-de-teste`; também entram com e-mail e senha (senhas com o dono, em `.local/contas-de-teste.txt`, D-196).
+- Atalho «Fazer uma polaroid» (D-197): uma foto, legenda e «Baixar polaroid» em PNG a 300 DPI. Guias de corte tracejadas e suaves também no PDF (D-205).
 - Compras de planos: **demonstração** (liberam créditos sem cobrar, com o aviso na tela), por decisão do dono. Entrar com Google é de verdade onde está configurado.
 
 ## Como mexer

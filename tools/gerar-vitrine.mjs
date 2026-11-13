@@ -95,30 +95,71 @@ async function compor(nome, w, h, fundo, itens, q, extra) {
 }
 const MESA = 'url(' + srv.url + 'assets/img/fotos/mesa.jpg) center/cover';
 
-/* ===================== 1 · sugestões do topo (tela de Projetos) · 400 × 240 ===================== */
+/* ---------- D-198: uma colagem para as redes (imagem de verdade, 1080 px), reduzida para a prévia ---------- */
+async function imagemRede(cfg, lista, altura) {
+  const leg = await legenda({ fonte: 'Caveat', pt: [12, 10] });
+  const q = [{ leg, fr: frDe('classico'), nome: 'Vitrine' }].concat(lista.map(([f, t, l1, l2]) => { const e = Object.assign({}, ENTRADAS[ID[f] - 1]); e.flt = { id: t, int: 100 }; e.pl = [{ v: l1 || '', m: true }, { v: l2 || '', m: true }]; return e; }));
+  if (!p.url().includes('/app/editor/gerar/')) { await p.goto(srv.url + 'app/editor/gerar/'); await p.waitForFunction(() => !!window.PLGERADOR && !!window.PLCOLAGEM); }
+  return p.evaluate(async ({ q, cfg, altura }) => {
+    sessionStorage.setItem('pl-quadro', JSON.stringify(q)); sessionStorage.setItem('pl-fotos', JSON.stringify(q.slice(1).map((e) => e.src)));
+    sessionStorage.setItem('pl-colagem', JSON.stringify(PLCOLAGEM.norm(Object.assign({ ativo: true }, cfg))));
+    const r = await PLGERADOR.imagens(PLGERADOR.projeto(), { f: 'rede', tipo: 'png' }), a = r.arquivos[0];
+    const im = await createImageBitmap(new Blob([a.bytes], { type: 'image/png' })), W = Math.round(altura * a.wpx / a.hpx), c = document.createElement('canvas');
+    c.width = W; c.height = altura; const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, W, altura);
+    const b = await new Promise((ok) => c.toBlob(ok, 'image/png')), u = new Uint8Array(await b.arrayBuffer()); let s = '';
+    for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192));
+    sessionStorage.removeItem('pl-colagem'); return btoa(s);
+  }, { q, cfg, altura });
+}
+
+/* ===================== 1 · sugestões do topo (tela de Projetos) · 400 × 300 (D-198) ===================== */
 if (quer('sug')) {
   console.log('Sugestões (Projetos):');
   const viagem = [
     await polaroid({ foto: 'amigos-viagem', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['Sydney com a turma', '03/2025'], flt: 'cinema' }),
     await polaroid({ foto: 'paisagem-lago', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['O lago mais azul', '04/2025'], flt: 'original' }),
     await polaroid({ foto: 'amigos-estrada', fmt: 'classico', fonte: 'Caveat', pt: [12, 10], linhas: ['Pé na estrada', '03/2025'], flt: 'retro' })];
-  await compor('sug-viagem.jpg', 400, 240, MESA, [{ png: viagem[1], x: 16, y: 20, w: 150, r: -7 }, { png: viagem[2], x: 236, y: 26, w: 150, r: 6 }, { png: viagem[0], x: 122, y: 14, w: 156, r: -1 }]);
+  await compor('sug-viagem.jpg', 400, 300, MESA, [{ png: viagem[1], x: 16, y: 50, w: 150, r: -7 }, { png: viagem[2], x: 236, y: 56, w: 150, r: 6 }, { png: viagem[0], x: 122, y: 44, w: 156, r: -1 }]);
   const cidade = [
     await polaroid({ foto: 'cidade-rua', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Centro, 18h', '22/08/25'], flt: 'pb' }),
     await polaroid({ foto: 'cidade-grafite', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Beco das cores', '23/08/25'], flt: 'original' }),
     await polaroid({ foto: 'cidade-luzes', fmt: 'imini', fonte: 'Special Elite', pt: [10, 8], linhas: ['Noite na cidade', '23/08/25'], flt: 'cinema' })];
-  await compor('sug-cidade.jpg', 400, 240, MESA, [{ png: cidade[0], x: 40, y: 18, w: 106, r: -8 }, { png: cidade[2], x: 254, y: 22, w: 106, r: 7 }, { png: cidade[1], x: 147, y: 12, w: 106, r: 1 }]);
+  await compor('sug-cidade.jpg', 400, 300, MESA, [{ png: cidade[0], x: 40, y: 48, w: 106, r: -8 }, { png: cidade[2], x: 254, y: 52, w: 106, r: 7 }, { png: cidade[1], x: 147, y: 42, w: 106, r: 1 }]);
   const casal = [
     await polaroid({ foto: 'casal-por-do-sol', fmt: 'pocket', pocket: true, linhas: ['Pipa - RN', '20/04/23'], flt: 'polaroid' }),
     await polaroid({ foto: 'casal-cidade', fmt: 'pocket', pocket: true, linhas: ['Salvador - BA', 'Pelourinho'], flt: 'desbotado' }),
     await polaroid({ foto: 'casal-serra', fmt: 'pocket', pocket: true, linhas: ['Itacaré - BA', '15/06/19'], flt: 'verao' })];
-  await compor('sug-casal.jpg', 400, 240, MESA, [{ png: casal[1], x: 40, y: 16, w: 110, r: -9 }, { png: casal[2], x: 250, y: 20, w: 110, r: 8 }, { png: casal[0], x: 145, y: 10, w: 112, r: -1 }]);
+  await compor('sug-casal.jpg', 400, 300, MESA, [{ png: casal[1], x: 40, y: 46, w: 110, r: -9 }, { png: casal[2], x: 250, y: 50, w: 110, r: 8 }, { png: casal[0], x: 145, y: 40, w: 112, r: -1 }]);
   const coracao = await colagem({ layout: 'coracao', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['amigas-praia', 'casal-por-do-sol', 'amigos-praia', 'paisagem-mar', 'casal-bicicletas', 'familia-por-do-sol', 'amigos-abraco', 'casal-praia', 'paisagem-rochas', 'casal-campo', 'amigos-skate', 'casal-noite'], flts: ['verao', 'polaroid', 'original', 'praia', 'retro', 'original', 'verao', 'pb', 'cinema', 'pastel', 'noir', 'original'] });
-  await compor('sug-coracao.jpg', 400, 240, MESA, [{ png: coracao, x: 52, y: 14, w: 296, r: -2, s: 8 }]);
+  await compor('sug-coracao.jpg', 400, 300, MESA, [{ png: coracao, x: 52, y: 44, w: 296, r: -2, s: 8 }]);
   const varal = await colagem({ layout: 'tira', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['amigos-trilha', 'amigos-acampamento', 'paisagem-estrelas', 'amigos-viagem', 'casal-ponte', 'cidade-porto', 'amigos-cidade', 'casal-noite'], flts: ['retro', 'cinema', 'original', 'pastel', 'antiga', 'noir', 'instantanea', 'original'], linhas: ['Trilha', 'Fogueira', 'Céu', 'Sydney', 'Florença', 'Porto', 'Picnic', 'Noite'] });
-  await compor('sug-varal.jpg', 400, 240, MESA, [{ png: varal, x: 52, y: 14, w: 296, r: 2, s: 8 }]);
+  await compor('sug-varal.jpg', 400, 300, MESA, [{ png: varal, x: 52, y: 44, w: 296, r: 2, s: 8 }]);
   const mesa = await colagem({ layout: 'espalhadas', orient: 'paisagem', margem: 8, fmt: 'classico', fotos: ['casal-ponte', 'amigos-cidade', 'cidade-multidao', 'paisagem-lago', 'amigos-skate', 'casal-campo', 'cidade-mochila'], flts: ['polaroid', 'original', 'retro', 'verao', 'noir', 'pastel', 'desbotado'], fundo: { tipo: 'foto', cor: '#FFFFFF', cor2: '#F8F9FA', ang: 135, foto: null, px: 50, py: 50, suave: 40 }, fundoFoto: 'paisagem-mar', linhas: ['Florença', 'Picnic', 'Centro', 'Lago', 'Skate', 'Campo', 'Rolê'] });
-  await compor('sug-mesa.jpg', 400, 240, MESA, [{ png: mesa, x: 52, y: 14, w: 296, r: -1, s: 8 }]);
+  await compor('sug-mesa.jpg', 400, 300, MESA, [{ png: mesa, x: 52, y: 44, w: 296, r: -1, s: 8 }]);
+  /* D-198: mais 3 de design e 6 colagens em pé (9:16) para status e reels, feitas pelo gerador de verdade */
+  const praia = [
+    await polaroid({ foto: 'paisagem-mar', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Mar azul', ''], flt: 'praia' }),
+    await polaroid({ foto: 'praia', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Fim de tarde', ''], flt: 'verao' }),
+    await polaroid({ foto: 'amigas-praia', fmt: 'mini', fonte: 'Caveat', pt: [12, 10], linhas: ['Dias de praia', '01/2026'], flt: 'verao' })];
+  await compor('sug-praia.jpg', 400, 300, MESA, [{ png: praia[0], x: 36, y: 84, w: 120, r: -8 }, { png: praia[1], x: 252, y: 88, w: 120, r: 7 }, { png: praia[2], x: 142, y: 70, w: 122, r: -1 }]);
+  const familia = [
+    await polaroid({ foto: 'amigos-abraco', fmt: 'iwide', fonte: 'Patrick Hand', pt: [12, 10], linhas: ['Todo mundo junto', ''], flt: 'instantanea' }),
+    await polaroid({ foto: 'familia-por-do-sol', fmt: 'iwide', fonte: 'Patrick Hand', pt: [12, 10], linhas: ['Família reunida', 'Natal 2025'], flt: 'verao' })];
+  await compor('sug-familia.jpg', 400, 300, MESA, [{ png: familia[0], x: 22, y: 96, w: 176, r: -5 }, { png: familia[1], x: 200, y: 70, w: 176, r: 5 }]);
+  const quadradas = [
+    await polaroid({ foto: 'cidade-grafite', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Beco das cores', ''], flt: 'original' }),
+    await polaroid({ foto: 'paisagem-pier', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Pôr do sol no píer', ''], flt: 'polaroid' }),
+    await polaroid({ foto: 'casal-bicicletas', fmt: 'isq', fonte: 'Special Elite', pt: [10, 8], linhas: ['Pedalando', ''], flt: 'pastel' })];
+  await compor('sug-quadradas.jpg', 400, 300, MESA, [{ png: quadradas[0], x: 40, y: 88, w: 116, r: -7 }, { png: quadradas[1], x: 246, y: 92, w: 116, r: 8 }, { png: quadradas[2], x: 142, y: 76, w: 118, r: 1 }]);
+  const STATUS = [
+    ['status-tira', { peca: 'r916', layout: 'cabine', margem: 14, fundo: { tipo: 'cor', cor: '#000000' } }, [['amigas-praia', 'verao'], ['amigos-praia', 'praia'], ['casal-praia', 'polaroid'], ['paisagem-mar', 'original']]],
+    ['status-varal', { peca: 'r916', layout: 'varal', margem: 10, fundo: { tipo: 'gradiente', cor: '#FFFFFF', cor2: '#F8F9FA', ang: 180 } }, [['familia-por-do-sol', 'verao'], ['casal-bicicletas', 'polaroid'], ['amigos-abraco', 'instantanea'], ['paisagem-pier', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro']]],
+    ['status-tempo', { peca: 'r916', layout: 'tempo', margem: 10, fundo: { tipo: 'cor', cor: '#FFFFFF' } }, [['casal-serra', 'original', '02/07'], ['casal-campo', 'pastel', '09/07'], ['casal-ponte', 'antiga', '16/07'], ['casal-noite', 'cinema', '23/07'], ['casal-praia', 'verao', '30/07']]],
+    ['status-capa', { peca: 'r916', layout: 'capa', margem: 10, fundo: { tipo: 'cor', cor: '#F8F9FA' } }, [['amigos-viagem', 'cinema', 'Sydney com a turma', '03/2025'], ['amigos-estrada', 'retro'], ['paisagem-lago', 'original'], ['amigos-cidade', 'instantanea'], ['amigos-acampamento', 'cinema']]],
+    ['status-mural', { peca: 'r916', layout: 'mural', margem: 10, fundo: { tipo: 'cor', cor: '#FFFFFF' } }, [['paisagem-mar', 'praia'], ['amigas-praia', 'verao'], ['cidade-grafite', 'original'], ['casal-campo', 'pastel'], ['amigos-trilha', 'retro'], ['paisagem-estrelas', 'original'], ['amigos-cidade', 'instantanea'], ['casal-noite', 'cinema'], ['paisagem-rochas', 'desbotado'], ['casal-bicicletas', 'polaroid'], ['amigos-skate', 'noir'], ['cidade-porto', 'cinema']]],
+    ['status-mesa', { peca: 'r916', layout: 'espalhadas', margem: 8, fundo: { tipo: 'foto', suave: 45 } }, [['casal-ponte', 'polaroid'], ['amigos-cidade', 'original'], ['cidade-multidao', 'retro'], ['paisagem-lago', 'verao']]],
+  ];
+  for (const [nome, cfg, lista] of STATUS) { const png = await imagemRede(cfg, lista, 544); await compor('sug-' + nome + '.jpg', 400, 300, MESA, [{ png, x: 123, y: 14, w: 153, r: -2, s: 10, so: .35 }]); }
 }
 
 /* ===================== 2 · modelos do Início (cada um como o «Usar este modelo» aplica) ===================== */
@@ -182,13 +223,25 @@ if (quer('banner')) {
     await cp.waitForTimeout(500); const buf = await cp.screenshot({ type: 'jpeg', quality: 82 }); writeFileSync(OUT + 'banner-imprimir.jpg', buf); await cp.close();
     console.log('  ✔ vitrine/banner-imprimir.jpg (' + Math.round(buf.length / 1024) + ' KB)');
   }
+  {   /* D-199: celular (760 × 560): câmera e polaroids maiores, no centro */
+    const cp = await ctx.newPage(); await cp.setViewportSize({ width: 760, height: 560 });
+    await cp.setContent('<html><body style="margin:0;width:760px;height:560px;overflow:hidden;background:#000;position:relative">'
+      + '<div style="position:absolute;left:34px;top:250px;width:290px;height:228px;background:' + camera + ' center/contain no-repeat"></div>'
+      + '<img src="data:image/png;base64,' + b1[1] + '" style="position:absolute;left:230px;top:120px;width:270px;transform:rotate(-8deg);filter:drop-shadow(0 18px 30px rgba(0,0,0,.6))">'
+      + '<img src="data:image/png;base64,' + b1[0] + '" style="position:absolute;left:440px;top:36px;width:290px;transform:rotate(6deg);filter:drop-shadow(0 18px 30px rgba(0,0,0,.6))">'
+      + '</body></html>');
+    await cp.waitForTimeout(500); const buf = await cp.screenshot({ type: 'jpeg', quality: 82 }); writeFileSync(OUT + 'banner-imprimir-cel.jpg', buf); await cp.close();
+    console.log('  ✔ vitrine/banner-imprimir-cel.jpg (' + Math.round(buf.length / 1024) + ' KB)');
+  }
   const b2 = [await polaroid({ foto: 'casal-por-do-sol', fmt: 'pocket', pocket: true, linhas: ['Pipa - RN', '20/04/23'], flt: 'polaroid' }),
     await polaroid({ foto: 'amigas-praia', fmt: 'classico', fonte: 'Shadows Into Light', pt: [12, 10], cor: 'azul', linhas: ['Dias de sol', 'jul/26'], flt: 'praia' }),
     await polaroid({ foto: 'cidade-luzes', fmt: 'imini', fonte: 'Courier Prime', pt: [10, 8], linhas: ['Noite na cidade', ''], flt: 'cinema' }),
     await polaroid({ foto: 'familia-por-do-sol', fmt: 'iwide', fonte: 'Sacramento', pt: [14, 10], cor: 'laranja', linhas: ['Fim de tarde', ''], flt: 'verao' })];
   await compor('banner-design.jpg', 1200, 500, '#000', [{ png: b2[3], x: 470, y: 236, w: 262, r: -6, s: 18, so: .6 }, { png: b2[2], x: 640, y: 50, w: 150, r: -5, s: 18, so: .6 }, { png: b2[1], x: 820, y: 40, w: 220, r: 4, s: 18, so: .6 }, { png: b2[0], x: 1040, y: 150, w: 150, r: 9, s: 18, so: .6 }], 82);
+  await compor('banner-design-cel.jpg', 760, 560, '#000', [{ png: b2[3], x: 24, y: 280, w: 330, r: -6, s: 18, so: .6 }, { png: b2[2], x: 52, y: 26, w: 190, r: -5, s: 18, so: .6 }, { png: b2[1], x: 262, y: 54, w: 262, r: 4, s: 18, so: .6 }, { png: b2[0], x: 534, y: 196, w: 172, r: 9, s: 18, so: .6 }], 82);   /* D-199: celular */
   const b3 = await colagem({ layout: 'grade', orient: 'retrato', margem: 10, fmt: 'mini', fotos: ['paisagem-mar', 'amigas-praia', 'cidade-grafite', 'casal-campo', 'amigos-trilha', 'cidade-porto', 'amigos-cidade', 'casal-noite', 'paisagem-rochas'], flts: ['praia', 'verao', 'original', 'pastel', 'retro', 'noir', 'polaroid', 'cinema', 'desbotado'] });
   await compor('banner-colagem.jpg', 1200, 500, '#000', [{ png: b3, x: 760, y: 20, w: 330, r: 3, s: 20, so: .6 }], 82);
+  await compor('banner-colagem-cel.jpg', 760, 560, '#000', [{ png: b3, x: 200, y: 22, w: 360, r: 3, s: 20, so: .6 }], 82);   /* D-199: celular */
 }
 await nav.close(); srv.close?.();
 console.log('\n✔ vitrine pronta em site/assets/img/vitrine/');

@@ -65,8 +65,9 @@ function atualizaInfo(){
   var o=lerOpc(),box=$('info-conta'),N=folhasDe(o),cl=o.f==='polaroids'?'padrao':classeFolha();
   if(o.f==='rede'){$('info-conta-t').textContent='Imagem para compartilhar: não gasta folha.';box.hidden=false;return}
   if(window.PLCONTA&&N&&PLCONTA.temSessao()){
-    var g=PLCONTA.direito(N,cl),t='';
-    if(g.ok){
+    var g=PLCONTA.direito(N,cl,chave()),t='';
+    if(g.ok&&g.jaContado)t='Este arquivo já foi exportado nas últimas 24 horas: não gasta outra folha.';
+    else if(g.ok){
       var pl=PLCONTA.plano()||{},MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
       if(pl.id==='gratis')t=g.usaGratis?'Esta exportação usa sua folha grátis de '+MESES[new Date().getMonth()]+'.':'Esta exportação usa '+N+' folha'+(N>1?'s':'')+' comprada'+(N>1?'s':'')+'.';
       else if(pl.id==='avulsa')t='Esta exportação usa '+N+' das suas '+(cl==='grande'?pl.folhasCompradas.grande:pl.folhasCompradas.padrao)+(cl==='grande'?' folhas grandes':' folhas compradas')+'.';
@@ -89,7 +90,7 @@ $('go').onclick=function(){
   var N=folhasDe(o);
   if(N&&window.PLPORTAO){                                                  /* D-195: imagens de folhas e polaroids também passam pelo portão; a imagem para as redes, não */
     var classe=o.f==='polaroids'?'padrao':classeFolha();
-    PLPORTAO.pedir(N,classe).then(function(r){
+    PLPORTAO.pedir(N,classe,chave()).then(function(r){
       if(r.ok)seguir();
       else if(r.motivo==='semConta'){/* o pop-up já encaminhou para a T-25 com ?voltar */}
       /* semFolhas/cancelado/pendente/recusado: fica na T-19 */

@@ -21,6 +21,7 @@
   transition:opacity 500ms var(--ease);
 }
 .faixa__slide.is-active{opacity:1;visibility:visible}
+.faixa__pic{display:contents}   /* D-199: <picture> não vira caixa: o <img> continua na grade */
 .faixa__txt{grid-column:1/6;grid-row:1;align-self:center;position:relative;z-index:1;padding:32px 0}
 .faixa__kick{
   display:flex;align-items:center;gap:12px;margin:0;
@@ -51,8 +52,10 @@
   max-height:500px;
   object-fit:cover;object-position:right center;
 }
-.faixa__slide.is-active .faixa__img{animation:faixa-entra 500ms var(--ease)}    /* a ilustração entra 16 px */
+.faixa__slide.is-active .faixa__img{animation:faixa-entra 500ms var(--ease),faixa-vivo 9s ease-in-out 500ms infinite alternate}    /* entra 16 px e segue viva (D-199) */
 @keyframes faixa-entra{from{transform:translateX(16px);opacity:.4}to{transform:translateX(0);opacity:1}}
+@keyframes faixa-vivo{from{transform:scale(1) translateX(0)}to{transform:scale(1.07) translateX(-2.5%)}}   /* D-199: aproxima e desliza de leve, sem parar */
+.faixa.is-pausa .faixa__img{animation-play-state:paused}
 
 /* controles na base da faixa: pontos (rótulo no aria-label) + pausar/retomar */
 .faixa__ctrl{
@@ -83,8 +86,8 @@
 /* celular 390: ilustração no topo (200 px) e texto abaixo */
 @media (max-width:767px){
   .faixa__slide{grid-template-columns:1fr;gap:0}
-  .faixa__img{grid-column:1;grid-row:1;height:200px;max-height:200px;object-position:70% center}
-  .faixa__txt{grid-column:1;grid-row:2;padding:40px 24px}
+  .faixa__img{grid-column:1;grid-row:1;height:clamp(240px,66vw,340px);max-height:none;object-position:center}   /* D-199: versão do celular, com as polaroids grandes no centro */
+  .faixa__txt{grid-column:1;grid-row:2;padding:28px 24px 32px}   /* D-199: o texto mais perto da ilustração */
   .faixa__tit{font-size:36px;line-height:1.05}
   .faixa__apoio{font-size:16px}
   .faixa__cta{width:100%}
@@ -127,7 +130,7 @@
    empilha como no celular (ilustração em cima, texto embaixo), com mais altura para a arte */
 @media (min-width:768px) and (max-width:1279px){
   .faixa__slide{grid-template-columns:1fr;gap:0}
-  .faixa__img{grid-column:1;grid-row:1;height:300px;max-height:300px;object-position:right center}
+  .faixa__img{grid-column:1;grid-row:1;height:clamp(320px,44vw,460px);max-height:none;object-position:right center}   /* D-199 */
   .faixa__txt{grid-column:1;grid-row:2;padding:40px 56px}
   .faixa__tit{max-width:none}
   .faixa__apoio{max-width:46ch}

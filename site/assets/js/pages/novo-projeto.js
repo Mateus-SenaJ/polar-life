@@ -248,9 +248,11 @@ $('paper').addEventListener('change',function(){
   update();
 });
 $('err-fix').addEventListener('click',function(){S.paper=this.dataset.paper;update();$('paper').focus()});
-$('continuar').addEventListener('click',function(){
-  if(this.disabled)return;
-  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'].forEach(function(k){sessionStorage.removeItem(k)})}catch(e){}   /* projeto novo começa limpo */
+/* D-197: «Fazer uma polaroid» segue o mesmo caminho com a marca pl-uma: uma foto só, direto para o Quadro, que baixa a polaroid */
+$('uma').addEventListener('click',function(){iniciar(true)});
+$('continuar').addEventListener('click',function(){if(this.disabled)return;iniciar(false)});
+function iniciar(uma){
+  try{['pl-quadro','pl-fotos','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-uma'].forEach(function(k){sessionStorage.removeItem(k)});if(uma)sessionStorage.setItem('pl-uma','1')}catch(e){}   /* projeto novo começa limpo */
   /* D-159: o que a pessoa escolheu aqui chega ao editor e ao PDF: formato (pl-fmt; D-113 no Pocket) e papel (pl-folhas) */
   var idf={mini:'mini',pocket:'pocket',imini:'imini',isquare:'isq',iwide:'iwide'}[S.fmt];
   var fo={papel:S.paper,orient:S.pori==='portrait'?'retrato':'paisagem'};
@@ -262,8 +264,8 @@ $('continuar').addEventListener('click',function(){
   /* D-158: voltar e continuar de novo reaproveita o projeto ainda sem fotos, em vez de criar outro */
   P.listar().then(function(l){var a=P.atual(),p=null;l.forEach(function(x){if(x.id===a)p=x});
     if(p&&!p.fotos&&!p.exemplo&&!(p.estado&&p.estado['pl-fotos'])&&P.sincronizado())return P.salvarEstado();
-    return P.criar('Projeto de '+new Date().toLocaleDateString('pt-BR'))}).then(ir,ir);
-});
+    return P.criar((uma?'Polaroid de ':'Projeto de ')+new Date().toLocaleDateString('pt-BR'))}).then(ir,ir);
+}
 
 /* Estados pelo endereço, para revisão: #personalizado, #nao-cabe */
 function init(){

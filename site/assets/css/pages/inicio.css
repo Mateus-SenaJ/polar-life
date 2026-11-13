@@ -88,6 +88,9 @@ a{color:inherit}
   align-self:stretch;justify-self:end;
   width:100%;height:100%;max-height:500px;
 }
+/* D-199: no celular e no tablet a simulação ocupa a largura toda, em cima do texto (antes ficava presa às colunas do desktop e encolhia) */
+@media (max-width:767px){.faixa__svg{grid-column:1;grid-row:1;justify-self:stretch;height:clamp(240px,66vw,340px);max-height:none}}
+@media (min-width:768px) and (max-width:1279px){.faixa__svg{grid-column:1;grid-row:1;justify-self:stretch;height:clamp(320px,44vw,460px);max-height:none}}
 .sim__mini{animation:sim-mini 6s var(--ease) infinite backwards}
 .sim__mini--1{animation-delay:0ms}
 .sim__mini--2{animation-delay:800ms}

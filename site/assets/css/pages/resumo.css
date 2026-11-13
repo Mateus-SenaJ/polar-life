@@ -47,7 +47,7 @@ strong{font-weight:500}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:20px 16px;margin:0}
 .stats div{min-width:0}
 .stats dt{margin:0 0 4px}
-.stats dd{margin:0;font-family:var(--font-serif);font-weight:400;font-size:22px;line-height:1.25;overflow-wrap:anywhere}
+.stats dd{margin:0;font-family:var(--font);font-weight:500;font-size:20px;line-height:1.25;letter-spacing:-.01em;font-variant-numeric:lining-nums tabular-nums;overflow-wrap:anywhere}   /* D-203: Inter, mais sóbria (os números em Cormorant pareciam letras) */
 .stats dd span{display:block;margin-top:2px;font:400 13px/1.4 'Inter',sans-serif}
 @media (min-width:720px){.stats{grid-template-columns:repeat(3,1fr)}}
 .rows{margin:16px 0 0;padding:0;list-style:none}
@@ -60,3 +60,32 @@ strong{font-weight:500}
 .sw[aria-checked=true] span{background:var(--blue);border-color:var(--blue)}
 .sw[aria-checked=true] span::after{transform:translateX(20px);background:var(--white)}
 @media (prefers-reduced-motion:reduce){.sw span,.sw span::after{transition:none}}
+
+/* D-203: telas grandes — tudo numa tela, sem rolagem: o resumo e os avisos à esquerda; ordenar, privacidade e «Continuar» à direita */
+@media (min-width:1024px){
+  .page{padding-top:clamp(12px,3vh,32px);padding-bottom:clamp(12px,3vh,32px)}
+  .head p{margin-top:6px}
+  .card{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);column-gap:32px;align-items:start;margin-top:clamp(12px,2.5vh,24px)}
+  .stats{grid-column:1;grid-row:1;gap:14px 16px}
+  #q-note{grid-column:1;grid-row:2}
+  #nd-note{grid-column:1;grid-row:3}
+  .rows{grid-column:2;grid-row:1;margin-top:0}
+  .rows .row:first-child{border-top:0;padding-top:0}
+  .row{padding:12px 0}
+  #lock{grid-column:2;grid-row:2}
+  .act{grid-column:2;grid-row:3;margin-top:16px}
+  .card .msg{margin-top:12px;padding:12px 14px}
+}
+@media (min-width:1024px) and (max-height:760px){   /* D-203: janelas baixas */
+  .head h1{font-size:24px}
+  .head p{font-size:15px}
+  .card{padding:16px}
+  .stats{gap:10px 16px}
+  .stats dt{margin-bottom:2px}
+  .stats dd{font-size:18px}
+  .stats dd span{font-size:12.5px;line-height:1.35}
+  .row{padding:8px 0}
+  .row p{font-size:13px;line-height:1.4}
+  .card .msg{margin-top:10px;padding:8px 12px;font-size:13px}
+  .act{margin-top:10px}
+}

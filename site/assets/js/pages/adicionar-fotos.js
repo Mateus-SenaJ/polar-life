@@ -10,6 +10,9 @@ var MAXJA=JA.reduce(function(m,x){return Math.max(m,+x||0)},0);
 var VOLTA=(function(){try{var c=JSON.parse(sessionStorage.getItem('pl-colagem')||'null');return sessionStorage.getItem('pl-volta')==='colagem'&&c&&c.ativo}catch(e){return false}})();
 function juntarColagem(){try{var c=JSON.parse(sessionStorage.getItem('pl-colagem')||'null');if(c&&Array.isArray(c.fotos)){for(var i=1;i<=picked.length;i++)if(c.fotos.indexOf(MAXJA+i)<0)c.fotos.push(MAXJA+i);sessionStorage.setItem('pl-colagem',JSON.stringify(c))}}catch(e){}}
 if(VOLTA){var vl=document.querySelector('.app-header a.btn2');if(vl)vl.href='../editor/#colagem';var hp=document.querySelector('.head p');if(hp)hp.textContent='As fotos escolhidas vão direto para a sua colagem. Elas continuam no seu aparelho.'}
+/* D-197: no atalho «Fazer uma polaroid», a primeira escolha é de uma foto só (escolher de novo troca a foto) */
+var UMA=(function(){try{return sessionStorage.getItem('pl-uma')==='1'&&!JA.length}catch(e){return false}})();
+if(UMA){var fd=document.getElementById('f-device');if(fd)fd.removeAttribute('multiple');var h1=document.querySelector('.head h1'),hp1=document.querySelector('.head p');if(h1)h1.textContent='Escolha a foto';if(hp1)hp1.textContent='Ela vira uma polaroid: depois é só escrever a legenda e baixar. A foto continua no seu aparelho.'}
 function toast(m){clearTimeout(tm);$('toast-t').textContent=m;$('toast').hidden=false;tm=setTimeout(function(){$('toast').hidden=true},Math.max(4000,m.length*60))}   /* aviso longo fica mais tempo para ler */
 
 /* D-181: «Outros lugares» saiu; toda forma nova de trazer fotos entra na caixa «Escolha suas fotos» (aparelho, câmera, Google Fotos). */
@@ -30,6 +33,7 @@ function receive(list){
     return}
   var all=[].slice.call(list||[]);if(!all.length)return;
   var ok=all.filter(accepted),bad=all.filter(function(f){return !accepted(f)}).map(function(f){return f.name});
+  if(UMA&&ok.length){if(ok.length>1||picked.length)toast(picked.length?'Foto trocada: neste atalho entra uma só.':'Neste atalho entra uma foto só: ficou a primeira.');ok=ok.slice(0,1);picked=[]}   /* D-197 */
   var max=limiteFotos(),cabem=Math.max(0,max-JA.length-picked.length),extra=ok.length-cabem;
   if(extra>0)ok=ok.slice(0,cabem); /* acima do plano: as primeiras entram, o resto avisa (DOC-03 §7) */
   var fresh=picked.length===0&&ok.length>0&&!JA.length; /* 44: primeira escolha de um projeto vazio (num projeto aberto, acrescenta) */
@@ -42,6 +46,7 @@ function receive(list){
     .then(function(){return fresh?PLFOTOS.limpar():null})
     .then(function(){return Promise.all(ok.map(function(f,i){var n=MAXJA+picked.length-ok.length+i+1;return PLFOTOS.salvar(n,f,window.PLPROJETOS?PLPROJETOS.atual():'')   /* uma leitura grava a foto aberta e a cópia do projeto */}))})
     .catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
+  acompanhar(salvando);   /* D-200 */
   render(bad,extra);
 }
 function render(bad,extra){
@@ -58,16 +63,27 @@ function render(bad,extra){
     h+='<div class="msg msg--err" role="alert"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><p><strong>'+(um?'Este arquivo não é uma foto':plural(bad.length,'arquivo não é uma foto','arquivos não são fotos'))+'.</strong> '+(um?'«'+nm+'» não pôde ser usado. ':'')+'Escolha uma foto, RAW com prévia JPEG ou uma pasta ZIP.</p></div>';
   }
   g.innerHTML=h;g.hidden=!h;
-  var led=$('btn-device'),t=$('btn-device-t');
+  botaoPrincipal();   /* D-200: «Continuar com N fotos» ou «Carregando…» */
   if(picked.length){
-    led.id='btn-device';
-    t.innerHTML='Continuar com '+plural(picked.length,'foto','fotos')+'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     $('btn-camera').innerHTML='<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Escolher mais fotos';
     $('btn-camera').dataset.mode='more';
     if(!$('btn-clear')){var c=document.createElement('button');c.type='button';c.className='link';c.id='btn-clear';c.textContent='Limpar escolha';$('drop').appendChild(c);c.onclick=function(){picked=[];if(window.PLFOTOS)salvando=PLFOTOS.limpar();$('btn-clear').remove();$('btn-camera').innerHTML='<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Usar a câmera';delete $('btn-camera').dataset.mode;render(0);$('btn-device').focus()}}
-  }else{
-    t.innerHTML='Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
   }
+}
+/* D-200: as fotos escolhidas vão para o armazenamento do aparelho antes de seguir. Se isso passar de 250 ms, o LED mostra
+   «Carregando…» com a barra de carregamento (o mesmo LED da tela Processando) e não aceita clique até terminar. */
+var CARREGANDO=false,tmCarr=null;
+function acompanhar(p){
+  clearTimeout(tmCarr);tmCarr=setTimeout(function(){if(salvando===p&&picked.length){CARREGANDO=true;botaoPrincipal()}},250);
+  var fim=function(){if(salvando!==p)return;clearTimeout(tmCarr);if(CARREGANDO){CARREGANDO=false;botaoPrincipal()}};
+  p.then(fim,fim)
+}
+function botaoPrincipal(){
+  var led=$('btn-device'),t=$('btn-device-t');if(!led||!t)return;
+  if(CARREGANDO&&picked.length){led.setAttribute('aria-busy','true');t.textContent='Carregando…';return}
+  led.setAttribute('aria-busy','false');
+  t.innerHTML=picked.length?'Continuar com '+plural(picked.length,'foto','fotos')+'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+    :'Escolher do aparelho<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
 }
 /* 44: a lista real de fotos escolhidas (ids = posições gravadas no IndexedDB) vira a
    fonte da verdade; o estado de folhas/quadro antigo é descartado para não carregar 24. */

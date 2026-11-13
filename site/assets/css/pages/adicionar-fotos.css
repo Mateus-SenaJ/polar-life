@@ -65,4 +65,23 @@ h2.sec{margin:0;font-size:22px;font-weight:300;line-height:1.2}
   .drop__act .btn2{min-width:200px}
 }
 .toast{position:fixed;z-index:950;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;max-width:calc(100vw - 32px);padding:12px 16px;font-size:14px;font-weight:500}
+/* D-202: em telas grandes a página cabe numa tela só: os espaços verticais acompanham a altura da janela */
+@media (min-width:1024px){
+  .page{padding-top:clamp(16px,3.5vh,40px);padding-bottom:clamp(16px,3vh,40px)}
+  .head p{margin-top:6px}
+  .pick{margin-top:clamp(12px,2.5vh,24px)}
+  .drop{padding:clamp(20px,5vh,56px) 24px;gap:clamp(8px,1.6vh,16px)}
+  .drop__ico{width:clamp(32px,5vh,48px);height:clamp(32px,5vh,48px)}
+  .got{margin-top:12px;gap:8px}
+  .pick__con{margin-top:8px}
+}
+@media (min-width:1024px) and (max-height:760px){   /* D-202: janelas baixas */
+  .head h1{font-size:26px}
+  .head p{font-size:15px}
+  .pick{padding:16px}
+  .drop{padding:clamp(12px,3vh,32px) 20px;gap:8px}
+  .drop p{line-height:1.45}
+  .drop .small{line-height:1.35}
+  .got .msg{margin-top:0;padding:10px 14px}
+}
 @media (prefers-reduced-motion:reduce){.drop{transition:none}}

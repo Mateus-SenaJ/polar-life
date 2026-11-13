@@ -139,3 +139,6 @@
 /* D-182: «… nas demais» no fim de cada parte dos Ajustes: copia só aquela parte para as outras fotos do escopo */
 .mod__apl{align-self:flex-start;min-height:44px;margin-top:12px;max-width:100%;white-space:normal;text-align:left}
 .prot__h{margin:0}
+
+/* D-204: janelas baixas em tablet e desktop — barra de recorte e faixa do lote mais justas, para a polaroid crescer */
+@media (min-width:768px) and (min-height:560px) and (max-height:820px){.cbar{margin-bottom:8px}.faixa--q{padding:8px 12px}.acts--q{margin-top:10px}.acts--q .acts__cota,.acts--q #nb{display:none}}   /* a medida do passe-partout segue na aba Molduras */

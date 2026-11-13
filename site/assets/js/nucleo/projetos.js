@@ -1,5 +1,5 @@
 /* Projetos e cópias de fotos locais; a chave de fotos aberta nunca muda (T5). */
-(function(){var ATUAL='pl-projeto-atual',SESS='pl-projeto-sessao',CH=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt','pl-colagem'];
+(function(){var ATUAL='pl-projeto-atual',SESS='pl-projeto-sessao',CH=['pl-fotos','pl-quadro','pl-folhas','pl-orientacao','pl-fmt','pl-colagem','pl-uma'];
 function db(){return PLFOTOS.abrirDB()}function req(r){return new Promise(function(ok,no){r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}})}function id(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}function atual(){return localStorage.getItem(ATUAL)||''}function definirAtual(x){if(x)localStorage.setItem(ATUAL,x);else localStorage.removeItem(ATUAL);marcar(x)}
 /* D-157: o estado do projeto vive na aba (sessionStorage) e o projeto atual no aparelho (localStorage). A marca diz de qual projeto é o estado desta aba:
    aba nova ou reaberta não tem a marca, então o projeto é recarregado do aparelho antes de qualquer gravação (nunca se salva o exemplo por cima do projeto). */
