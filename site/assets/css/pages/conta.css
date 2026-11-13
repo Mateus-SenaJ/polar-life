@@ -219,7 +219,7 @@ body{margin:0;background:var(--surface-subtle);min-height:100vh;color:var(--blac
   .cfg__fim .btn2{width:100%}
   .sec{display:none;background:none;border-radius:0;box-shadow:none}
   .sec.is-on{display:block}
-  .sec__cab{min-height:0;padding:0;pointer-events:none;cursor:default}
+  .sec__cab{min-height:44px;padding:0;pointer-events:none;cursor:default}   /* T3: mesmo como título, alvo de 44 px */
   .sec__cab>.ico,.sec__res{display:none}
   .sec__n{font-size:24px}
   .sec__c,.sec.is-on .sec__c{display:block;padding:0;margin-top:16px}

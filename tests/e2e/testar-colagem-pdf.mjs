@@ -145,7 +145,7 @@ try {
     ok(r.n === r.total && r.n > 0 && r.pior < 0.08 && r.ang < 0.05, `${lay}: ${r.n} polaroids, centro tela × PDF até ${r.pior.toFixed(3)} mm e ângulo até ${r.ang.toFixed(3)}°`);
     ok(r.cobr <= 0.21, `${lay}: com a janela real da foto, no máximo ${(r.cobr * 100).toFixed(1)}% de uma foto fica coberta por outra polaroid (limite de 20%)`);
     ok(r.cartao === `${r.maxCel} ${r.maxCel === 1 ? 'polaroid' : 'polaroids'} por folha · ${r.nFolhas} ${r.nFolhas === 1 ? 'folha' : 'folhas'}` && !/aproveitamento/.test(r.cartao), `${lay}: o cartão do Inspetor mostra a contagem real da Colagem («${r.cartao}»)`);
-    ok(r.fora === 0 && r.guias === 0 && r.fundo === 'fundo' && r.contornos === r.n, `${lay}: dentro da margem, sem guias de corte, fundo antes de tudo e contorno em cada polaroid (${r.folhas} folha(s) para 6 fotos)`);
+    ok(r.fora === 0 && r.guias === 0 && r.fundo === 'fundo' && r.contornos === 0, `${lay}: dentro da margem, sem guias de corte, fundo antes de tudo e nenhum contorno preto nas polaroids, D-207 (${r.folhas} folha(s) para 6 fotos)`);
   }
 
   console.log('Colagem · barra lateral e moldura branca:');

@@ -28,7 +28,7 @@ try {
     const p = await nav.newPage();
     await p.route('**/assets/js/nucleo/google.js', (r) => r.fulfill({ contentType: 'application/javascript', body: semId }));
     await p.goto(U);
-    await p.getByText('Continuar com Google').click();
+    await p.getByText('Continuar com o Google').click();
     await p.locator('#f-dados').waitFor({ timeout: 5000 });
     /Demonstração/.test(await p.locator('#caixa').textContent()) ? ok('sem ID: Google segue em demonstração, com aviso') : ruim('sem ID: aviso de demonstração ausente');
     await p.close();
@@ -43,7 +43,7 @@ try {
 
   /* 2) ida: URL de autorização correta */
   await p.goto(U);
-  await p.getByText('Continuar com Google').click();
+  await p.getByText('Continuar com o Google').click();
   await p.waitForURL('https://accounts.google.com/**', { timeout: 5000 });
   const q = new URL(pedidoUrl).searchParams;
   q.get('client_id') === ID && q.get('response_type') === 'id_token' && q.get('scope') === 'openid email profile' && q.get('redirect_uri') === U && q.get('state') && q.get('nonce')
@@ -68,7 +68,7 @@ try {
   /* 4) segunda vez: conta já aceita entra direto */
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(U);
-  await p.getByText('Continuar com Google').click();
+  await p.getByText('Continuar com o Google').click();
   await p.waitForURL('https://accounts.google.com/**', { timeout: 5000 });
   const q2 = new URL(pedidoUrl).searchParams;
   await p.goto(U + '#state=' + q2.get('state') + '&id_token=' + token({ ...claims, nonce: q2.get('nonce') }));
@@ -85,7 +85,7 @@ try {
   ]) {
     await p.evaluate(() => PLCONTA.sair());
     await p.goto(U);
-    await p.getByText('Continuar com Google').click();
+    await p.getByText('Continuar com o Google').click();
     await p.waitForURL('https://accounts.google.com/**', { timeout: 5000 });
     const qq = new URL(pedidoUrl).searchParams;
     await p.goto(U + hash(qq.get('state'), qq.get('nonce')));

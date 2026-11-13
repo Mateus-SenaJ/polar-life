@@ -83,6 +83,21 @@ calm and uncluttered (only the wooden table).
 Tradução curta: a mesma cena em pé; polaroids nos dois terços de baixo, celular perto da borda de cima, faixas de cima e de baixo calmas.
 Dica: se o Flow permitir, use o primeiro quadro do vídeo horizontal como imagem de referência para manter a mesma mesa e a mesma luz.
 
+**`mesa-polaroids-vertical.mp4` · versão 2 (D-207)**: o vídeo atual mostra só a mão segurando o celular; o dono quer ver também
+a pessoa pegando uma polaroid. Use este roteiro e salve com o mesmo nome (o site já faz o movimento de câmera do celular até a polaroid):
+
+```
+Photorealistic, cozy, slow cinematic shot, 8 seconds, vertical 4:5, 1080 px wide, 24 fps. Warm light-oak table by a window in
+golden-hour light, shallow depth of field. A woman's hands (knit sweater sleeves) scroll photos on a smartphone for two seconds,
+lock it and set it face down near the top edge, then pick up one white-bordered instant photo from the scattered pile in the
+lower half and lift it toward the camera, holding it fully inside the frame (all four borders visible) while the camera slowly
+pushes in and focuses on the photo, which shows friends laughing at the beach. Keep the held photo and both hands entirely inside
+the central 70% of the frame at all times. First and last frames nearly identical for a seamless loop. No text, no logos.
+```
+
+Tradução curta: as mãos mexem no celular, deixam o celular virado e pegam uma polaroid, que fica inteira no quadro, com a câmera
+aproximando devagar; tudo no centro do quadro; começo e fim iguais.
+
 ## Vídeo 2 · varal iluminado com polaroids
 
 Onde aparece: tela de entrar, abaixo da faixa preta «Não deixe para depois». O quadro é 16:10 no celular e mais alto no desktop

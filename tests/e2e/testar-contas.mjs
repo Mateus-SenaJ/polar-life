@@ -202,7 +202,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p.evaluate(() => PLCONTA.sair());
   await p.goto(srv.url + 'app/entrar/');
   const provs = await p.locator('[data-prov]').allTextContents();
-  provs.join('|') === 'Continuar com Google' ? ok('segundo bloco: só o Google (D-194: a Apple, que só simulava, saiu)') : ruim('provedores: ' + provs.join('|'));
+  provs.join('|') === 'Continuar com o Google'   /* D-207: texto da diretriz de marca do Google */ ? ok('segundo bloco: só o Google (D-194: a Apple, que só simulava, saiu)') : ruim('provedores: ' + provs.join('|'));
   const ordem = await p.evaluate(() => {
     const q = s => document.querySelector(s), antes = (a, b) => !!(a.compareDocumentPosition(b) & 4);
     const em = q('#email'), se = q('#senha'), esq = q('#b-esqueci'), led = q('#b-enviar'), criar = q('#b-criar'), prov = q('[data-prov]'), cod = q('#b-via-codigo');

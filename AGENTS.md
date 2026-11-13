@@ -6,7 +6,7 @@ A especificação está em `docs/` (o `docs/12_ORQUESTRADOR_AGENTES-2.md` §1.3 
 
 ## Travas (nunca quebrar)
 - T1 Tipografia: só as famílias e pesos do DOC-02; peso máximo 500.
-- T2 Cor: só `#FFFFFF`, `#000000`, `#006194`, `#FD761A` e `#F8F9FA`. Sem vermelho, verde ou outro cinza.
+- T2 Cor: só `#FFFFFF`, `#000000`, `#006194`, `#FD761A` e `#F8F9FA`. Sem vermelho, verde ou outro cinza. Exceção única: marca de terceiro exigida pela diretriz dele (o «G» oficial do Google, em `assets/img/marcas/`, D-207).
 - T3 Acessibilidade: nada só por cor (ícone + texto); alvos ≥ 44 px; foco visível.
 - T4 Nada sobre a foto: sem número, código, coordenada ou selo sobre a foto, na tela ou no arquivo.
 - T5 Privacidade: tudo roda no aparelho; nenhuma foto, legenda ou dado sai para servidor.

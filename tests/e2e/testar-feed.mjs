@@ -75,12 +75,13 @@ try {
   ok(mu.n === 1 && /9 polaroids por imagem · 1 imagem/.test(mu.res), 'resumo fala em imagem («' + mu.res + '»)');
   const gr0 = await p.evaluate(() => PLCONTA.direito(1, 'padrao'));
   const pv = await revisarEExportar(p);
-  ok(pv.t === 'Tudo pronto para compartilhar?' && /Gerar imagens \(1 imagem\)/.test(pv.g) && !/calibrad|impressora/i.test(pv.txt), 'pré-voo para as redes: sem avisos de impressora (' + pv.g + ')');
+  ok(pv.t === 'Tudo pronto para compartilhar?' && /Gerar imagem/.test(pv.g) && !/calibrad|impressora/i.test(pv.txt), 'pré-voo para as redes: sem avisos de impressora (' + pv.g + ')');
   const ex = await p.evaluate(() => ({ vis: [...document.querySelectorAll('.fmt')].filter((l) => !l.hidden).map((l) => l.querySelector('input').value), info: document.getElementById('info-conta-t').textContent, go: document.getElementById('go-t').textContent, ppi: document.getElementById('o-ppi').hidden }));
-  ok(ex.vis.join() === 'rede' && /não gasta folha/.test(ex.info) && ex.ppi, 'Exportar: só «Imagem para as redes», sem resolução e sem gastar folha');
+  const qual = await p.evaluate(() => ({ q: document.querySelector('input[name=qual]:checked').value, av: !!document.getElementById('avanc'), t: document.querySelector('#fmt-rede strong').textContent }));
+  ok(ex.vis.join() === 'rede' && /não gasta folha/.test(ex.info) && qual.q === 'alta' && qual.av && qual.t === 'Imagem para compartilhar', 'Exportar: só «Imagem para compartilhar», qualidade Alta por padrão, formato e qualidade em «Avançado», sem gastar folha (D-207)');
   await p.locator('#go').click(); await p.waitForURL('**/editor/gerar/');
   const a1 = await baixar(p, 'feed-mural.png'), i1 = png(a1.bytes);
-  ok(a1.nome === 'Colagem-01.png' && i1.w === 1080 && i1.h === 1080 && !i1.exif, 'PNG de 1080 × 1080, sem EXIF (' + a1.nome + ', ' + (a1.bytes.length / 1e6).toFixed(1) + ' MB)');
+  ok(a1.nome === 'Colagem-01.png' && i1.w === 2160 && i1.h === 2160 && !i1.exif, 'PNG de 2160 × 2160 (qualidade Alta), sem EXIF (' + a1.nome + ', ' + (a1.bytes.length / 1e6).toFixed(1) + ' MB)');
   const gr1 = await p.evaluate(() => PLCONTA.direito(1, 'padrao'));
   ok(gr0.usaGratis === true && gr1.usaGratis === true, 'a folha grátis do mês continua livre (imagem para as redes não gasta folha)');
   /* a imagem tem as fotos (não é um quadro branco): pixels variados no meio das polaroids */
@@ -95,7 +96,8 @@ try {
   const ti = await p.evaluate(() => ({ peca: PLEDITOR.ctx().C.peca, n: document.querySelectorAll('#sheet .pol').length, folhas: PLEDITOR.ctx().R.sheets.length }));
   ok(ti.peca === 'r916' && ti.n >= 3, 'as 9 fotos do projeto continuam e entram na Tira (' + ti.n + ' por imagem, ' + ti.folhas + ' imagens)');
   await revisarEExportar(p);
-  await p.click('label:has(> input[name=tipo][value=jpeg])'); if (await p.isChecked('#zip')) await p.click('#zip-l');
+  await p.click('#avanc > summary');   /* D-207: formato e qualidade ficam em «Avançado» */
+  await p.click('label:has(> input[name=tipo][value=jpeg])'); await p.click('label:has(> input[name=qual][value=normal])'); if (await p.isChecked('#zip')) await p.click('#zip-l');
   await p.locator('#go').click(); await p.waitForURL('**/editor/gerar/');
   await p.getByText('Seu arquivo está pronto').waitFor({ timeout: 90000 });
   const nArq = await p.locator('#arqs li').count();

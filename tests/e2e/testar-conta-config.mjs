@@ -208,6 +208,7 @@ try {
       ok(/Instalar é opcional/.test(t) && /Para desfazer/.test(t) && await p.locator('#app-sem').isVisible() && await p.locator('#b-instalar').count() === 0, 'aplicativo: explica que é opcional e como desfazer; sem botão quando o navegador não oferece');
       await p.evaluate(() => { const e = new Event('beforeinstallprompt'); e.prompt = () => Promise.resolve(); e.userChoice = Promise.resolve({ outcome: 'accepted' }); window.dispatchEvent(e); });
       ok(await p.locator('#b-instalar').isVisible(), 'aplicativo: «Instalar o PolarLife» aparece quando o navegador oferece (PLPWA)');
+      await p.waitForTimeout(300);   /* o interruptor termina a transição de cor antes de conferir a paleta */
       await travas(p, `${w} gratis · preferencias com instalar`); await foto(p, `${w}-gratis-preferencias-instalar`);
       await p.locator('#b-instalar').click();
       await p.locator('#toast:not([hidden])').waitFor({ timeout: 5000 });

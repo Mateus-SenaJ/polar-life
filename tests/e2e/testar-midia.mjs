@@ -30,7 +30,7 @@ const vigiar = p => {
   return v;
 };
 const TELAS = [
-  { rota: '', nome: 'apresentacao', video: 'mesa-polaroids' },
+  { rota: '', nome: 'apresentacao', video: 'mesa-polaroids', desc: true },   /* D-207: só o vídeo, com descrição; o poster é o primeiro quadro (<picture>) */
   { rota: 'app/entrar/', nome: 'entrar', video: 'varal-polaroids' }
 ];
 const quadro = p => p.evaluate(() => {
@@ -39,7 +39,7 @@ const quadro = p => p.evaluate(() => {
     x: Math.round(b.left), y: Math.round(b.top + scrollY), w: Math.round(b.width), h: Math.round(b.height),
     oculto: cx.getAttribute('aria-hidden'), estado: cx.getAttribute('data-midia-estado'), classes: cx.className,
     attrs: { muted: v.muted || v.hasAttribute('muted'), loop: v.loop, inline: v.playsInline, autoplay: v.autoplay, preload: v.getAttribute('preload'), controls: v.controls, tab: v.getAttribute('tabindex') },
-    poster: v.getAttribute('poster'), fontes: [...v.querySelectorAll('source')].map(s => s.getAttribute('src')), pausado: v.paused, src: v.currentSrc,
+    poster: v.getAttribute('poster') || (im => im ? im.currentSrc.replace(/^https?:\/\/[^/]+\//, '') : null)(cx.querySelector('.midia__poster')), rotulo: cx.getAttribute('aria-label'), papel: cx.getAttribute('role'), fontes: [...v.querySelectorAll('source')].map(s => s.getAttribute('src')), pausado: v.paused, src: v.currentSrc,
     ajuste: getComputedStyle(v).objectFit, mascara: (() => { const s1 = getComputedStyle(v); let m = s1.maskImage || s1.webkitMaskImage; if (!m || m === 'none') { const c = v.closest('.midia'), s2 = c && getComputedStyle(c); if (s2) m = s2.maskImage || s2.webkitMaskImage; } return m; })(),   /* D-189: no desktop a máscara fica no quadro (o vídeo é ampliado) */
     reserva: r ? { op: getComputedStyle(r).opacity, vis: getComputedStyle(r).visibility } : null
   };
@@ -61,8 +61,9 @@ try {
       const a = q.attrs;
       a.muted && a.loop && a.inline && a.autoplay && a.preload === 'none' && !a.controls && a.tab === '-1'
         ? ok(`${rot}: <video> mudo, em loop, playsinline, autoplay, preload="none", sem controles e fora da tabulação`) : ruim(`${rot}: atributos do vídeo ${JSON.stringify(a)}`);
-      q.oculto === 'true' ? ok(`${rot}: mídia decorativa (aria-hidden)`) : ruim(`${rot}: a mídia não está com aria-hidden`);
-      q.poster && !/^https?:/.test(q.poster) && v.pedidos.some(u => u.endsWith(q.poster.split('/').pop())) && q.ajuste === 'cover'
+      t.desc ? (q.papel === 'img' && /^Vídeo: numa mesa de madeira/.test(q.rotulo || '') && q.oculto !== 'true' ? ok(`${rot}: o vídeo tem descrição para leitor de tela (roteiro do vídeo)`) : ruim(`${rot}: sem descrição do vídeo (${q.papel} · ${q.rotulo})`))
+        : q.oculto === 'true' ? ok(`${rot}: mídia decorativa (aria-hidden)`) : ruim(`${rot}: a mídia não está com aria-hidden`);
+      q.poster && v.pedidos.some(u => u.endsWith(q.poster.split('/').pop())) && q.ajuste === 'cover'
         ? ok(`${rot}: poster local carregado (${q.poster.split('/').pop()}), com corte central`) : ruim(`${rot}: poster ${q.poster} (object-fit ${q.ajuste})`);
       q.w > 200 && q.h > 150 ? ok(`${rot}: o quadro tem tamanho reservado (${q.w}×${q.h})`) : ruim(`${rot}: quadro ${q.w}×${q.h}`);
       const indevidos = v.pedidos.filter(u => ESPERADOS.some(e => u.endsWith('/assets/' + e) && !presentes.includes(e)));
@@ -79,11 +80,13 @@ try {
         const r = await quadro(p), pre = t.rota ? '../../assets/' : 'assets/';
         tocou && !r.pausado && r.src.endsWith(`video/${nome}.webm`) && r.fontes.join('|') === `${pre}video/${nome}.webm|${pre}video/${nome}.mp4`
           ? ok(`${rot}: vídeo real tocando (${nome}.webm; fontes WebM → MP4)`) : ruim(`${rot}: vídeo real não tocou (${JSON.stringify({ estado: r.estado, src: r.src, fontes: r.fontes })})`);
-        r.poster === `${pre}video/${nome}-poster.jpg` && v.pedidos.some(u => u.endsWith(`/assets/video/${nome}-poster.jpg`)) && r.reserva.op === '0' && r.reserva.vis === 'hidden'
+        t.desc
+          ? (r.poster && r.poster.endsWith(`video/${nome}-poster.jpg`) && !r.reserva ? ok(`${rot}: antes de tocar, o primeiro quadro do próprio vídeo (${nome}-poster.jpg); nenhum desenho`) : ruim(`${rot}: poster ${r.poster} · reserva ${JSON.stringify(r.reserva)}`))
+          : r.poster === `${pre}video/${nome}-poster.jpg` && v.pedidos.some(u => u.endsWith(`/assets/video/${nome}-poster.jpg`)) && r.reserva.op === '0' && r.reserva.vis === 'hidden'
           ? ok(`${rot}: poster definitivo carregado e reserva desenhada fora de cena`) : ruim(`${rot}: poster ${r.poster} · reserva ${JSON.stringify(r.reserva)}`);
         r.w === q.w && r.h === q.h ? ok(`${rot}: o quadro não muda de tamanho com o vídeo (${r.w}×${r.h})`) : ruim(`${rot}: quadro mudou de ${q.w}×${q.h} para ${r.w}×${r.h}`);
       } else {
-        q.fontes.length === 0 && q.reserva.op === '1' && q.reserva.vis === 'visible'
+        q.fontes.length === 0 && (!q.reserva || q.reserva.op === '1') && (!q.reserva || q.reserva.vis === 'visible')
           ? ok(`${rot}: sem o vídeo definitivo, a reserva fica visível e o <video> não tem fonte`) : ruim(`${rot}: reserva ${JSON.stringify(q.reserva)} · fontes ${q.fontes.join(',')}`);
       }
       if (presentes.includes('img/fotos/camera-perfil.png')) {
@@ -124,7 +127,7 @@ try {
           rabiscos: document.querySelectorAll('svg.mesa [id^="mesa-p"] path, .faixa__img--svg > g[id^="bimp-p"] path').length,
           fonte: getComputedStyle(document.querySelector('svg.mesa text.pol-leg')).fontFamily
         }));
-        leg.hero.length === 2 && leg.hero.every(x => /\d{4}$/.test(x)) ? ok(`${rot}: polaroids do hero com legenda e data («${leg.hero[0]}»)`) : ruim(`${rot}: legendas do hero ${JSON.stringify(leg.hero)}`);
+        leg.hero.length === 0 ? ok(`${rot}: nenhuma polaroid desenhada sobre o vídeo do topo (D-207)`) : ruim(`${rot}: polaroids desenhadas no topo ${JSON.stringify(leg.hero)}`);
         leg.mesa.length === 7 && leg.banner.length === 2 && leg.datas.length >= 4 ? ok(`${rot}: mesa (7) e banner (2) com legendas; ${leg.datas.length} com data`) : ruim(`${rot}: legendas ${JSON.stringify(leg)}`);
         leg.rabiscos === 0 && /Caveat/.test(leg.fonte) ? ok(`${rot}: letra manuscrita (Caveat) e nenhum rabisco`) : ruim(`${rot}: rabiscos ${leg.rabiscos} · fonte ${leg.fonte}`);
       }
@@ -150,7 +153,7 @@ try {
           ? ok(`${rot}: o vídeo da câmera toca uma vez e para no último quadro (${est.d.toFixed(1)} s)`) : ruim(`${rot}: vídeo da câmera ${JSON.stringify({ estado: q.estado, ...est, loop: q.attrs.loop, src: q.src })}`);
         q.attrs.muted && q.attrs.inline && !q.attrs.controls && q.attrs.tab === '-1' && q.oculto === 'true' && q.poster === '../assets/video/camera-foto-poster.jpg' && q.fontes.join('|') === '../assets/video/camera-foto.webm|../assets/video/camera-foto.mp4'
           ? ok(`${rot}: vídeo da câmera decorativo, mudo, com poster e fontes WebM → MP4`) : ruim(`${rot}: ${JSON.stringify({ a: q.attrs, poster: q.poster, fontes: q.fontes })}`);
-        est.mistura === 'multiply' && /brightness/.test(est.filtro) && /gradient/.test(est.mascara) && q.reserva.op === '0' && q.w === q0.w && q.h === q0.h
+        est.mistura === 'multiply' && /brightness/.test(est.filtro) && /gradient/.test(est.mascara) && (!q.reserva || q.reserva.op === '0') && q.w === q0.w && q.h === q0.h
           ? ok(`${rot}: o fundo do vídeo funde com o branco da página (sem caixa) e o quadro não muda (${q.w}×${q.h})`) : ruim(`${rot}: fusão ${JSON.stringify(est)} · quadro ${q0.w}×${q0.h} → ${q.w}×${q.h}`);
         await p.evaluate(() => scrollTo(0, 400)); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
         (await p.evaluate(() => document.querySelector('[data-midia] video').ended)) ? ok(`${rot}: depois de terminar, o vídeo não recomeça`) : ruim(`${rot}: o vídeo recomeçou`);
@@ -180,7 +183,7 @@ try {
     await p.goto(srv.url + t.rota, { waitUntil: 'load' });
     await p.waitForTimeout(400);
     const q = await quadro(p);
-    q.poster && q.reserva.op === '1' && v.ruins.length === 0 ? ok(`${t.nome} sem JavaScript: poster e reserva visíveis, sem resposta de erro`) : ruim(`${t.nome} sem JavaScript: ${JSON.stringify(q.reserva)} ${v.ruins[0] || ''}`);
+    q.poster && (!q.reserva || q.reserva.op === '1') && v.ruins.length === 0 ? ok(`${t.nome} sem JavaScript: poster e reserva visíveis, sem resposta de erro`) : ruim(`${t.nome} sem JavaScript: ${JSON.stringify(q.reserva)} ${v.ruins[0] || ''}`);
     await c.close();
   }
 
@@ -229,7 +232,7 @@ try {
       q.fontes.join('|') === [`video/${nome}.webm`, `video/${nome}.mp4`].map(f => (t.rota ? '../../' : '') + 'assets/' + f).join('|')
         ? ok(`${rot}: fontes na ordem WebM → MP4 (${nome}${nome !== t.video ? ', versão em pé no celular' : ''})`) : ruim(`${rot}: fontes ${q.fontes.join(' | ')}`);
       q.poster.endsWith(`video/${nome}-poster.jpg`) ? ok(`${rot}: o poster passa a ser o definitivo`) : ruim(`${rot}: poster ${q.poster}`);
-      q.reserva.op === '0' && q.reserva.vis === 'hidden' ? ok(`${rot}: a reserva desenhada sai de cena`) : ruim(`${rot}: reserva ${JSON.stringify(q.reserva)}`);
+      (!q.reserva || q.reserva.op === '0') && (!q.reserva || q.reserva.vis === 'hidden') ? ok(`${rot}: a reserva desenhada sai de cena`) : ruim(`${rot}: reserva ${JSON.stringify(q.reserva)}`);
       q.w === antes.w && q.h === antes.h && q.x === antes.x && q.y === antes.y ? ok(`${rot}: o quadro não mudou de lugar nem de tamanho (${q.w}×${q.h})`) : ruim(`${rot}: quadro mudou de ${antes.w}×${antes.h}@${antes.x},${antes.y} para ${q.w}×${q.h}@${q.x},${q.y}`);
       const troca = await p.evaluate(() => {
         const cam = [...document.querySelectorAll('[data-midia-camera]')].map(el => {

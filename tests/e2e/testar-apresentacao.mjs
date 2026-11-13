@@ -21,7 +21,7 @@ const vigiar = p => {
   return v;
 };
 const TELAS = [
-  { rota: '', nome: 'apresentacao', cam: true, mesa: true, rolo: false },
+  { rota: '', nome: 'apresentacao', cam: false, video: true, mesa: true, rolo: false },   /* D-207: o topo é só o vídeo (sem câmera desenhada) */
   { rota: 'como-funciona/', nome: 'como-funciona', cam: true, mesa: false, rolo: true }
 ];
 
@@ -45,6 +45,7 @@ try {
         });
         const faixa = document.querySelector('.faixa');
         const cam = document.querySelector('.cam-svg');
+        const hv = document.querySelector('.midia--hero');
         const mesa = document.querySelector('.mesa');
         const rolo = document.querySelector('.intro__rolo img');
         return {
@@ -56,6 +57,7 @@ try {
           cam: !!cam, camLargura: cam ? Math.round(cam.getBoundingClientRect().width) : 0,
           mesa: !!mesa, mesaLargura: mesa ? Math.round(mesa.getBoundingClientRect().width) : 0,
           rolo: !!rolo,
+          heroVideo: !!hv && !!hv.querySelector('video') && /^Vídeo: /.test(hv.getAttribute('aria-label') || ''), reserva: !!document.querySelector('.midia__reserva'),
           fatos: document.querySelectorAll('.fato').length,
           passos: document.querySelectorAll('.step').length,
           passosComArte: document.querySelectorAll('.step__arte').length,
@@ -70,7 +72,8 @@ try {
       r.rolagem <= 0 ? ok(`${rot}: sem rolagem lateral`) : ruim(`${rot}: rolagem lateral de ${r.rolagem} px`);
       r.fundoFaixa === 'rgb(0, 0, 0)' ? ok(`${rot}: a faixa preta está na tela`) : ruim(`${rot}: a faixa preta não apareceu (${r.fundoFaixa})`);
       r.faixaTemLink ? ok(`${rot}: a faixa tem o link terciário`) : ruim(`${rot}: a faixa está sem link`);
-      r.cam ? ok(`${rot}: a câmera instantânea está na tela`) : ruim(`${rot}: a câmera não apareceu`);
+      t.cam ? (r.cam ? ok(`${rot}: a câmera instantânea está na tela`) : ruim(`${rot}: a câmera não apareceu`))
+        : (!r.cam && r.heroVideo && !r.reserva ? ok(`${rot}: o topo mostra só o vídeo, com a descrição para leitor de tela`) : ruim(`${rot}: topo com desenho de reserva ou sem vídeo`));
       t.mesa
         ? (r.mesa ? ok(`${rot}: a mesa de polaroids está na tela`) : ruim(`${rot}: a mesa não apareceu`))
         : (r.mesa ? ruim(`${rot}: a mesa não devia aparecer nesta tela`) : ok(`${rot}: a mesa fica só na apresentação`));
@@ -106,6 +109,7 @@ try {
         texto: (document.querySelector('.hero__lead') || document.querySelector('.page-lead') || {}).textContent || '',
         mesa: mesa.map(e => +getComputedStyle(e).opacity),
         cam: cam ? +getComputedStyle(cam).opacity : null,
+        poster: (p => !!p && p.complete && p.naturalWidth > 0)(document.querySelector('.midia__poster')),
         mov: document.documentElement.className
       };
     });
@@ -116,8 +120,9 @@ try {
     if (t.mesa) {
       r.mesa.length === 7 && r.mesa.every(o => o === 1)
         ? ok(`${t.nome} sem JavaScript: as sete polaroids da mesa já aparecem`) : ruim(`${t.nome} sem JavaScript: mesa com opacidade ${r.mesa.join(',')}`);
-      r.cam === 1 ? ok(`${t.nome} sem JavaScript: a foto da câmera aparece`) : ruim(`${t.nome} sem JavaScript: a foto da câmera está com opacidade ${r.cam}`);
     }
+    if (t.cam) r.cam === 1 ? ok(`${t.nome} sem JavaScript: a foto da câmera aparece`) : ruim(`${t.nome} sem JavaScript: a foto da câmera está com opacidade ${r.cam}`);
+    if (t.video) r.poster ? ok(`${t.nome} sem JavaScript: o primeiro quadro do vídeo aparece no topo`) : ruim(`${t.nome} sem JavaScript: sem o primeiro quadro do vídeo`);
     await p.screenshot({ path: join(saida, `${t.nome}-sem-javascript.png`), fullPage: true });
     await c.close();
   }
@@ -149,8 +154,8 @@ try {
     if (t.mesa) {
       r.mesa.length === 7 && r.mesa.every(o => o === 1)
         ? ok(`${t.nome} movimento reduzido: as sete polaroids da mesa na posição final`) : ruim(`${t.nome} movimento reduzido: mesa com opacidade ${r.mesa.join(',')}`);
-      r.cam === 1 ? ok(`${t.nome} movimento reduzido: a foto da câmera na posição final`) : ruim(`${t.nome} movimento reduzido: a foto da câmera está com opacidade ${r.cam}`);
     }
+    if (t.cam) r.cam === 1 ? ok(`${t.nome} movimento reduzido: a foto da câmera na posição final`) : ruim(`${t.nome} movimento reduzido: a foto da câmera está com opacidade ${r.cam}`);
     await p.screenshot({ path: join(saida, `${t.nome}-movimento-reduzido.png`), fullPage: true });
     await c.close();
   }
@@ -176,17 +181,17 @@ try {
     /* a câmera desenhada é a reserva do vídeo do hero (D-140): com os arquivos reais ela fica escondida; aqui vale o estado sem os arquivos */
     await c.route('**/assets/js/ui/midia-arquivos.js', r => r.fulfill({ contentType: 'text/javascript', body: 'window.PLMIDIA_ARQUIVOS=[];' }));
     const p = await c.newPage();
-    await p.goto(srv.url, { waitUntil: 'networkidle' });
+    await p.goto(srv.url + 'como-funciona/', { waitUntil: 'networkidle' });   /* D-207: a câmera desenhada ficou só em «Como funciona» */
     await p.waitForTimeout(400);
     const durante = await p.evaluate(() => {
       const f = document.getElementById('cam-foto');
-      return { classe: document.querySelector('.cam').className, translate: getComputedStyle(f).translate };
+      return { classe: document.querySelector('.mov-cam').className, translate: getComputedStyle(f).translate };
     });
     await p.waitForTimeout(2200);
     const depois = await p.evaluate(() => {
       const f = document.getElementById('cam-foto');
       return {
-        classe: document.querySelector('.cam').className,
+        classe: document.querySelector('.mov-cam').className,
         translate: getComputedStyle(f).translate,
         estados: f.getAnimations().map(a => a.playState)
       };

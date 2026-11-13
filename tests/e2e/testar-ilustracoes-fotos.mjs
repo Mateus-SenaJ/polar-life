@@ -132,9 +132,9 @@ try {
           src: f.querySelector('img') ? f.querySelector('img').getAttribute('src') : null,
           w: f.querySelector('img') ? f.querySelector('img').naturalWidth : 0
         })));
-        hero.length === 2 && hero.every(p => p.tag === 'FIGURE' && p.src && p.src.indexOf('assets/img/fotos/') >= 0)
-          ? ok(`${rot}: as duas polaroids pousadas são molduras com foto (${hero.map(p => p.src.split('/').pop()).join(', ')})`)
-          : ruim(`${rot}: as polaroids pousadas não viraram molduras com foto (${JSON.stringify(hero)})`);
+        hero.length === 0   /* D-207: o topo é só o vídeo; as polaroids pousadas saíram */
+          ? ok(`${rot}: o topo não tem polaroids desenhadas (só o vídeo)`)
+          : ruim(`${rot}: polaroids desenhadas no topo (${JSON.stringify(hero)})`);
         const banner = await page.evaluate(() => {
           const svg = document.querySelector('.faixa__img--svg');
           if (!svg) return { svg: false, cenas: [] };

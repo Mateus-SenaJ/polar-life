@@ -135,24 +135,30 @@ try {
   ok(!antigo.includes('polar-life-versao-nova-teste') && antigo.length === 1, 'Atualizar recarrega e o cache antigo polar-life-* é apagado');
   versaoFalsa = null;
 
-  // 7. instalar (Android/desktop): botão secundário, não LED (T8)
+  // 7. instalar (Android/desktop): opcional, só em Conta › Preferências (D-207); botão secundário, não LED (T8)
+  const proj = await ctx.newPage();
+  await proj.goto(URL0 + 'app/', { waitUntil: 'load' });
+  await proj.evaluate(() => { const e = new Event('beforeinstallprompt', { cancelable: true }); e.prompt = () => Promise.resolve(); e.userChoice = Promise.resolve({ outcome: 'dismissed' }); window.dispatchEvent(e); });
+  await proj.waitForTimeout(200);
+  ok(!(await proj.locator('#pwa-instalar').isVisible()) && !(await proj.locator('#pwa-barra').isVisible()), 'D-207: a tela de projetos não oferece instalar (fica opcional na Conta)');
+  await proj.close();
   const inst = await ctx.newPage();
-  await inst.goto(URL0 + 'app/', { waitUntil: 'load' });
-  ok(await inst.evaluate(() => document.getElementById('pwa-instalar').hidden), 'botão «Instalar» escondido sem o evento do navegador');
+  await inst.goto(URL0 + 'app/conta/#preferencias', { waitUntil: 'load' });
+  ok(!(await inst.locator('#b-instalar').count()), 'botão «Instalar» escondido sem o evento do navegador');
   const evento = r => { window.__prompts = window.__prompts || 0; const e = new Event('beforeinstallprompt', { cancelable: true }); e.prompt = () => { window.__prompts++; return Promise.resolve(); }; e.userChoice = Promise.resolve({ outcome: r }); window.dispatchEvent(e); };
   await inst.evaluate(evento, 'accepted');
-  const b = inst.locator('#pwa-instalar');
+  const b = inst.locator('#b-instalar');
   ok(await b.isVisible() && /Instalar o PolarLife/.test(await b.textContent()), 'botão «Instalar o PolarLife» aparece com o evento');
   ok(await b.evaluate(x => x.classList.contains('btn2') && !x.classList.contains('led-btn') && !x.closest('.led-btn')), 'botão Instalar é secundário (btn2), não LED (T8)');
   ok((await b.boundingBox()).height >= 44, 'alvo do botão Instalar ≥ 44 px (T3)');
-  ok(await inst.evaluate(() => document.querySelectorAll('.led-btn').length === 1   /* D-177: a tela central tem um só LED («Polaroids para imprimir») */ && !document.querySelector('#pwa-barra .led-btn')), 'T-01 não ganhou botão LED');
+  ok(await inst.evaluate(() => !document.querySelector('#app-bloco .led-btn')), 'a opção de instalar não ganhou botão LED');
   await b.click(); await inst.waitForTimeout(200);
-  ok(await inst.evaluate(() => window.__prompts === 1 && document.getElementById('pwa-instalar').hidden), 'clicar chama o prompt e o botão some');
+  ok(await inst.evaluate(() => window.__prompts === 1 && !document.getElementById('b-instalar')), 'clicar chama o prompt e o botão some');
   await inst.evaluate(evento, 'dismissed');
-  ok(await inst.locator('#pwa-instalar').isVisible(), 'botão volta com novo evento');
+  ok(await inst.locator('#b-instalar').isVisible(), 'botão volta com novo evento');
   await inst.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
-  ok(await inst.evaluate(() => document.getElementById('pwa-instalar').hidden), 'some depois de instalado (appinstalled)');
-  ok(await inst.evaluate(() => document.getElementById('pwa-dica-ios').hidden), 'dica do iPhone não aparece fora do iPhone');
+  ok(await inst.evaluate(() => !document.getElementById('b-instalar')), 'some depois de instalado (appinstalled)');
+  ok(!/No iPhone ou iPad/.test(await inst.locator('#app-bloco').textContent()), 'dica do iPhone não aparece fora do iPhone');
 
   // 8. armazenamento: persist uma vez e aviso acima de 80%
   const arm = await ctx.newPage();
@@ -180,14 +186,9 @@ try {
   await ic.addInitScript(CONTA);
   const ip = await ic.newPage(); vigiar(ip);
   await ip.goto(URL0 + 'app/', { waitUntil: 'load' });
-  const dica = ip.locator('#pwa-dica-ios');
-  ok(await dica.isVisible() && /No iPhone: Compartilhar → Adicionar à Tela de Início/.test(await dica.textContent()) && (await dica.locator('svg').count()) >= 1, 'iPhone: dica com ícone de compartilhar');
-  ok(!(await ip.locator('#pwa-instalar').isVisible()), 'iPhone: sem botão de prompt');
-  ok((await ip.locator('#pwa-dica-fechar').boundingBox()).height >= 44, 'dica fechável com alvo ≥ 44 px');
-  await ip.click('#pwa-dica-fechar');
-  ok(!(await dica.isVisible()), 'dica fecha');
-  await ip.reload({ waitUntil: 'load' }); await ip.waitForTimeout(300);
-  ok(!(await dica.isVisible()), 'dica não volta depois de fechada (localStorage)');
+  ok(!(await ip.locator('#pwa-dica-ios').isVisible()), 'iPhone: a tela de projetos não empurra a instalação (D-207)');
+  await ip.goto(URL0 + 'app/conta/#preferencias', { waitUntil: 'load' }); await ip.waitForTimeout(300);
+  ok(/No iPhone ou iPad, abra o PolarLife no Safari, toque em Compartilhar/.test(await ip.locator('#app-bloco').textContent()) && !(await ip.locator('#b-instalar').count()), 'iPhone: na Conta, o passo a passo do Safari, sem botão de prompt');
   await ic.close();
 
   // 10. CSP do vercel.json (aplicado a tudo pelo proxy, inclusive ao sw.js) sem violações
