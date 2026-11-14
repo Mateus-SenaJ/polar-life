@@ -1,6 +1,6 @@
 # Status do projeto
 
-Atualizado em 2026-11-13 (D-194 a D-207). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
+Atualizado em 2026-11-13 (D-194 a D-208). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
 
 ## No ar
 - https://polar-life.vercel.app e https://mateus-senaj.github.io/polar-life/ (o mesmo `site/`, publicado a partir de `main`).
@@ -12,6 +12,8 @@ Atualizado em 2026-11-13 (D-194 a D-207). O histórico das etapas antigas está 
 - Atalho «Fazer uma polaroid» (D-197): uma foto, legenda e «Baixar polaroid» em PNG a 300 DPI. Guias de corte tracejadas e suaves também no PDF (D-205).
 - Conta com configurações de SaaS (perfil, plano e uso, códigos, pagamentos, segurança, preferências, privacidade); instalar como app é opcional, só na Conta (D-207).
 - Colagem sem contorno preto (sombra e cantos opcionais), imagem para compartilhar em PNG Alta como padrão e revisor com miniaturas, interruptores e avisos (D-207).
+- Editor (D-208): Lucida Handwriting do computador (ou a reserva livre) como padrão do Pocket; colagem Personalizada (arrastar, incluir e tirar polaroids); fundos em bolinhas com degradê de 3 cores; cidade em lista com busca; aba Lote; estilo próprio por foto; «Enviar para» Instagram e WhatsApp.
+- Notificações discretas com colagem das fotos da pessoa, prazos e campanhas do admin (DOC-16); cupons e código de folhas em Folhas e planos (D-208).
 - Compras de planos: **demonstração** (liberam créditos sem cobrar, com o aviso na tela), por decisão do dono. Entrar com Google é de verdade onde está configurado.
 
 ## Preparado, fora do ar
