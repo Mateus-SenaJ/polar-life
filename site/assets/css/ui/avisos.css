@@ -1,0 +1,36 @@
+/* Avisos (D-208, DOC-16): sino discreto no cabeçalho e painel de avisos (gaveta à direita no desktop, folha de baixo no celular).
+   Nada pisca nem interrompe: o ponto do sino é parado e não é LED (T8). Só a paleta (T2), peso até 500 (T1), alvos de 44 px (T3). */
+.sino{position:relative;flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:none;color:var(--black);cursor:pointer}
+.sino:hover{background:var(--surface-subtle)}
+.sino:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.sino svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.sino__p{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 2px var(--white)}
+
+.avs-veu{position:fixed;inset:0;z-index:800;background:rgb(255 255 255/.72)}
+.avs{position:fixed;z-index:801;top:0;right:0;bottom:0;width:min(400px,100vw);display:flex;flex-direction:column;background:var(--white);border-left:1px solid var(--outline-subtle);box-shadow:var(--shadow-lifted);font-family:var(--font);color:var(--black)}
+.avs__top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 20px;border-bottom:1px solid var(--outline-subtle)}
+.avs__t{margin:0;font:400 22px/1.3 var(--font-serif)}
+.avs__x{flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:none;color:var(--black);cursor:pointer}
+.avs__x:hover{background:var(--surface-subtle)}
+.avs__x svg,.av__tipo svg,.avs__aj svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.avs__x svg{width:20px;height:20px}
+.avs__l{flex:1 1 auto;min-height:0;overflow:auto;list-style:none;margin:0;padding:12px;display:flex;flex-direction:column;gap:12px}
+.av{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface-subtle)}
+.av__img{display:block;width:100%;height:auto;aspect-ratio:2/1;border-radius:10px;object-fit:cover;background:var(--white)}   /* D-208: a colagem das suas fotos em destaque */
+.av__img[hidden]{display:none}
+.av__q{min-width:0}
+.av__tipo{display:flex;align-items:center;gap:6px;margin:0;font:500 12px/1.3 var(--font);color:var(--blue)}
+.av__n{margin:4px 0 0;font:500 15px/1.35 var(--font);overflow-wrap:anywhere}
+.av__x{margin:4px 0 0;font:400 14px/1.5 var(--font);overflow-wrap:anywhere}
+.av__act{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:8px}
+.av__ir{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-right:4px;padding:0 14px;background:var(--white);border:1px solid var(--outline-subtle);border-radius:12px;box-shadow:var(--shadow-subtle);font:500 14px/1.2 var(--font);color:var(--black);text-decoration:none;cursor:pointer}
+.av__b{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 8px;border:0;border-radius:12px;background:none;font:500 13px/1.2 var(--font);color:var(--black);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.av__ir:focus-visible,.av__b:focus-visible,.avs__x:focus-visible,.avs__aj:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.avs__vazio{margin:0;padding:24px 20px;font:400 14px/1.6 var(--font)}
+.avs__pe{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px)) 20px;border-top:1px solid var(--outline-subtle)}
+.avs__aj{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:500 14px/1.2 var(--font);color:var(--black);text-decoration:underline;text-underline-offset:4px}
+.avs__vivo{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:767px){
+  .avs{top:auto;left:0;width:auto;max-height:84vh;border-left:0;border-top:1px solid var(--outline-subtle);border-radius:16px 16px 0 0}
+  .avs__top,.avs__pe{padding-left:16px}
+}

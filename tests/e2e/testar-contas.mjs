@@ -105,7 +105,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   };
   (await led1(null, 'entrar/')) === 1 ? ok('entrar/: um LED («Entrar»)') : ruim('entrar/: LEDs divergem do T8');
   (await led1('gratis@polarlife.test', 'conta/')) === 1 ? ok('conta/ (Grátis): um LED («Ver folhas e planos»)') : ruim('conta/: LEDs divergem do T8');
-  (await led1('pro@polarlife.test', 'conta/planos/')) === 1 ? ok('planos/: um LED («Continuar»)') : ruim('planos/: LEDs divergem do T8');
+  (await led1('gratis@polarlife.test', 'conta/planos/')) === 1 ? ok('planos/: um LED («Assinar o Pro», no cartão preto, D-208)') : ruim('planos/: LEDs divergem do T8');
   (await led1('admin@polarlife.test', 'admin/')) === 1 ? ok('admin/: um LED («Salvar alterações»)') : ruim('admin/: LEDs divergem do T8');
 }
 
@@ -451,13 +451,12 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   cards === 3 ? ok('planos: 3 cartões') : ruim('planos: ' + cards + ' cartões');
   /Seu plano/.test(await p.locator('#cartoes').textContent()) ? ok('planos: chip «Seu plano»') : ruim('chip «Seu plano» ausente');
 
-  /* compra avulsa simulada */
-  await p.locator('.pln input[value=avulsa]').check();
+  /* compra avulsa simulada (D-208: cada cartão tem a sua ação) */
   await p.locator('#qtd').fill('5');
   await p.waitForTimeout(150);
   /5 folhas padrão · R\$ 14,50/.test(await p.locator('#tot').textContent())
     ? ok('planos: total 5 × R$ 2,90') : ruim('total errado');
-  await p.locator('#b-continuar').click();
+  await p.locator('#b-avulsa').click();
   await p.locator('.plportao:not([hidden])').waitFor({ timeout: 5000 });
   await p.locator('.plportao').getByRole('button', { name: 'Simular pagamento aprovado' }).click();
   await p.locator('.plportao').getByRole('button', { name: /Pagar R\$ 14,50/ }).click();
@@ -466,8 +465,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   (await p.evaluate(() => PLCONTA.plano().folhasCompradas.padrao)) === 5 ? ok('planos: compra credita 5 folhas') : ruim('compra no planos não creditou');
 
   /* assinar o Pro pela página de planos */
-  await p.locator('.pln input[value=pro]').check();
-  await p.locator('#b-continuar').click();
+  await p.locator('#b-pro').click();
   await p.locator('.plportao:not([hidden])').waitFor({ timeout: 5000 });
   await p.locator('.plportao').getByRole('button', { name: 'Simular pagamento aprovado' }).click();
   await p.locator('.plportao').getByRole('button', { name: /Pagar R\$ 14,90/ }).click();
@@ -488,7 +486,7 @@ for (let i = 1; i <= 11; i++) { const f = join(dirFotos, `f${i}.jpg`); await wri
   await p2.locator('#d-nome').fill('Cliente Dois'); await p2.locator('#d-aceite').check(); await p2.locator('#b-dados').click();
   await p2.waitForURL('**/app/inicio/', { timeout: 5000 });
   await p2.goto(srv.url + 'app/conta/planos/');
-  await p2.locator('#b-continuar').click(); /* avulsa já vem marcada para sessão de código */
+  await p2.locator('#b-avulsa').click(); /* sessão de código: comprar pede entrar com a conta */
   await p2.locator('#dialog:not([hidden])').waitFor({ timeout: 5000 });
   /Entrar para comprar/.test(await p2.locator('#dlg-t').textContent())
     ? ok('sessão de código em planos: «Entrar para comprar»') : ruim('planos com código: pop-up errado');

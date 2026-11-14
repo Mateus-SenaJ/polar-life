@@ -18,7 +18,7 @@ Fundação do banco para quando o PolarLife tiver servidor (API). **Hoje o site 
 
 | Pasta | O que tem |
 | --- | --- |
-| `migracoes/` | Esquema em ordem: `0001_fundacao` … `0008_manutencao`. Nunca se edita uma migração aplicada: muda-se com um arquivo novo. |
+| `migracoes/` | Esquema em ordem: `0001_fundacao` … `0009_avisos_cupons`. Nunca se edita uma migração aplicada: muda-se com um arquivo novo. |
 | `sementes/` | Dados de partida idempotentes (planos, limites, preços, parâmetros, chaves). Pode rodar de novo. |
 
 | Migração | Conteúdo |
@@ -31,6 +31,7 @@ Fundação do banco para quando o PolarLife tiver servidor (API). **Hoje o site 
 | 0006 regras | Funções de negócio (`SECURITY DEFINER`, `search_path` fixo) e erros com código próprio (`PL001`…`PL005`) |
 | 0007 acesso | RLS em toda tabela com dado de pessoa, permissões por coluna, `EXECUTE` só no que cada papel usa, visões de análise sem dado pessoal |
 | 0008 manutenção | Partições do mês, retenção por prazo e limpeza de itens vencidos |
+| 0009 avisos e cupons | Notificações (campanhas do admin, textos automáticos, preferências, inscrições de Web Push, entregas e contadores sem dado pessoal) e cupons promocionais (só o HMAC; usos por conta). Nada de foto chega aqui: a colagem dos avisos é feita no aparelho (DOC-16) |
 
 ## Aplicar
 
@@ -92,7 +93,8 @@ COMMIT;
 
 - Leitura das próprias linhas: RLS. Escrita: quase sempre por função, que confere o dono (`PL004` se não for).
 - Erros que a API traduz para a tela: `PL001` sem folhas · `PL002` código não encontrado · `PL003` código usado, revogado
-  ou vencido · `PL004` acesso negado · `PL005` conta já existe.
+  ou vencido · `PL004` acesso negado · `PL005` conta já existe · `PL006` muitos pedidos de código · `PL007` cupom não
+  encontrado · `PL008` cupom vencido, esgotado, pausado, revogado ou já usado · `PL009` cupom não vale para o produto.
 - Segredos que **nunca** entram no banco: a senha (a API faz o hash Argon2id), o token de sessão (só o SHA-256), o
   código de impressão e o código por e-mail (só o HMAC-SHA-256), e as chaves desses HMACs (ficam no cofre de segredos).
 

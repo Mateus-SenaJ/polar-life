@@ -28,6 +28,7 @@ publico: [IA de design, IA de código, humanos]
 | 09 | `09_LEGAL_PRIVACIDADE.md` | Privacidade, termos, cookies (texto-base) | Páginas legais |
 | 10 | `10_LOG_DECISOES.md` | Decisões, conflitos resolvidos, pendências | Auditar ou contestar |
 | 15 | `15_DADOS_E_POSTGRESQL.md` | Dados no servidor: inventário, LGPD, segurança, esquema do banco e mapa para a API | Quando houver servidor ou dado novo |
+| 16 | `16_NOTIFICACOES.md` | Notificações (lembranças com colagem, prazos, campanhas do admin), cupons e códigos em Folhas e planos | Ao mexer em avisos, cupons ou no envio por push |
 
 **Referências visuais canônicas (HTML):** `polar_life_biblioteca_can_nica_de_componentes_do_editor_e1_definitivo.html` (componentes) e `polar_life_inspetor_legendas_fotogr_ficas_e4b.html` (layout do editor). Em conflito de **layout**, o HTML vence. Em conflito de **tipografia**, o DOC-02 vence (os HTMLs ainda usam Inter 700; veja DOC-01 §9).
 

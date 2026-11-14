@@ -33,6 +33,7 @@ function donoSessao(){var c=ler('pl-conta',null),s=ler('pl-codigo-sessao',null);
 function fecharProjeto(){
   try{localStorage.removeItem('pl-projeto-atual')}catch(e){}
   try{for(var i=sessionStorage.length-1;i>=0;i--){var k=sessionStorage.key(i);if(/^pl-/.test(k))sessionStorage.removeItem(k)}}catch(e){}
+  try{indexedDB.deleteDatabase('polar-life-avisos')}catch(e){}   /* D-208: a agenda de avisos do aparelho é da conta que saiu */
   try{var r=indexedDB.open('polar-life');r.onsuccess=function(){var d=r.result;if(!d.objectStoreNames.contains('fotos')){d.close();return}var t=d.transaction('fotos','readwrite');t.objectStore('fotos').clear();t.oncomplete=t.onerror=function(){d.close()}}}catch(e){}
 }
 function gravar(k,v){var antes=SESSAO_K[k]?donoSessao():null;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){return false}if(antes!==null&&antes!==donoSessao())fecharProjeto();return true}
@@ -311,7 +312,7 @@ function definirSenha(senha){ /* depois de confirmar o código por e-mail («Esq
 
 /* ---------- compra simulada (brief §3.6: sem campo de cartão; botões «Simular…») ---------- */
 function novoRecibo(c,desc,valor){var r={id:'R'+String(agora()).slice(-6),data:fmtDataCurta(agora()),desc:desc,valor:valor};c.recibos=c.recibos||[];c.recibos.unshift(r);return r}
-function comprar(n,classe,metodo){
+function comprar(n,classe,metodo,op){   /* op.valor: o que foi pago com cupom (D-208) */
   return new Promise(function(res){
     var s=sessao();
     if(!s){res({estado:'semConta'});return}
@@ -319,20 +320,20 @@ function comprar(n,classe,metodo){
     if(metodo==='aprovado'){
       var un=classe==='grande'?'folhas grandes':'folhas padrão';
       if(classe==='grande')c.folhasGrande=(c.folhasGrande||0)+n;else c.folhasPadrao=(c.folhasPadrao||0)+n;
-      var rec=novoRecibo(c,n+' '+un,moeda(n*(classe==='grande'?L.precoGrande:L.precoPadrao)));
+      var rec=novoRecibo(c,n+' '+un+(op&&op.cupom?' · cupom '+op.cupom:''),moeda(op&&op.valor!=null?op.valor:n*(classe==='grande'?L.precoGrande:L.precoPadrao)));
       salvarConta(s.email,c);
       res({estado:'confirmado',recibo:rec})
     }else if(metodo==='pendente')res({estado:'pendente'});
     else res({estado:'recusado'})
   })}
-function assinarPro(metodo){
+function assinarPro(metodo,op){
   return new Promise(function(res){
     var s=sessao();
     if(!s){res({estado:'semConta'});return}
     var c=contaDe(s.email),L=limites().planos.pro;
     if(metodo==='aprovado'){
       c.perfil='pro';c.proDesde=agora();c.proAte=agora()+30*DIA;delete c.canceladoEm;
-      var rec=novoRecibo(c,'Assinatura Pro · 1 mês',moeda(L.precoMes));
+      var rec=novoRecibo(c,'Assinatura Pro · 1 mês'+(op&&op.cupom?' · cupom '+op.cupom:''),moeda(op&&op.valor!=null?op.valor:L.precoMes));
       salvarConta(s.email,c);
       res({estado:'confirmado',recibo:rec})
     }else if(metodo==='pendente')res({estado:'pendente'});
@@ -566,6 +567,54 @@ function gerarCodigoLegivel(){
   var corpo='',i;
   for(i=0;i<7;i++)corpo+=ALFABETO.charAt(Math.floor(Math.random()*31));
   return 'PL'+corpo+dvsCodigo(corpo)[0]}                    /* DV na leitura 0-based */
+/* ---------- D-208 · cupons promocionais (comercial.cupons · conferir_cupom/usar_cupom, DOC-15 §8) ----------
+   Só o hash do cupom fica guardado (como os códigos); o admin vê o rótulo e o final. Erros na língua da tela:
+   formato · invalido (PL007) · vencido, esgotado, pausado, revogado, usado (PL008) · produto (PL009). Demonstração: valem neste navegador. */
+var PRODUTOS={folha_padrao:'Folha padrão',folha_grande:'Folha grande',pro_mensal:'Pro mensal'};
+function dbCupons(){return ler('pl-cupons',{})}
+function normalizaCupom(t){return String(t||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+function hashCupom(t){return sha256hex(SAL+'|cupom|'+t)}
+function descontoDe(cp,valor){var v=Math.round(valor*100),d=cp.tipo==='percentual'?Math.round(v*cp.percentual/100):Math.min(Math.round(cp.valor*100),v);return d/100}
+function situacaoCupom(cp,email){
+  if(cp.situacao==='revogado')return'revogado';if(cp.situacao==='pausado')return'pausado';
+  if(cp.validoAte&&agora()>cp.validoAte)return'vencido';
+  if(cp.usosMax&&cp.usos>=cp.usosMax)return'esgotado';
+  if(cp.umPorConta&&email&&cp.usadoPor&&cp.usadoPor[soma32(email)])return'usado';
+  return'livre'}
+function soma32(s){var h=2166136261,i;s=String(s).toLowerCase();for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(16)}
+function conferirCupom(texto,produto,valor){
+  var t=normalizaCupom(texto),s=sessao();
+  if(t.length<4||t.length>20)return Promise.reject({tipo:'formato'});
+  return hashCupom(t).then(function(h){
+    var cp=dbCupons()[h];if(!cp)return Promise.reject({tipo:'invalido'});
+    var sit=situacaoCupom(cp,s&&s.email);if(sit!=='livre')return Promise.reject({tipo:sit});
+    if(produto&&cp.produtos.indexOf(produto)<0)return Promise.reject({tipo:'produto',produtos:cp.produtos.map(function(p){return PRODUTOS[p]})});
+    var d=valor!=null?descontoDe(cp,valor):null;
+    return{ok:true,texto:t,rotulo:cp.rotulo,tipo:cp.tipo,percentual:cp.percentual||null,valor:cp.valor||null,produtos:cp.produtos.slice(),validoAte:cp.validoAte?iso(cp.validoAte):null,
+      desconto:d,total:valor!=null?Math.round((valor-d)*100)/100:null}
+  })}
+function usarCupom(texto,produto,valor){
+  var s=sessao();if(!s)return Promise.reject({tipo:'semConta'});
+  return conferirCupom(texto,produto,valor).then(function(r){
+    return hashCupom(r.texto).then(function(h){var db=dbCupons(),cp=db[h];cp.usos=(cp.usos||0)+1;cp.usadoPor=cp.usadoPor||{};cp.usadoPor[soma32(s.email)]=agora();gravar('pl-cupons',db);return r})})}
+function criarCupom(d){
+  var t=normalizaCupom(d&&d.texto),erros={};
+  if(t.length<4||t.length>20)erros.texto='Use de 4 a 20 letras e números.';
+  var rot=String(d&&d.rotulo||'').trim().slice(0,60);if(!rot)erros.rotulo='Dê um nome para reconhecer o cupom.';
+  var tipo=d&&d.tipo==='valor'?'valor':'percentual',pc=Math.round(+(d&&d.percentual)),vl=Math.round(+(d&&d.valor)*100)/100;
+  if(tipo==='percentual'&&!(pc>=1&&pc<=90))erros.percentual='De 1% a 90%.';
+  if(tipo==='valor'&&!(vl>0))erros.valor='Informe um valor maior que zero.';
+  var prods=(d&&d.produtos||[]).filter(function(p){return PRODUTOS[p]});if(!prods.length)erros.produtos='Escolha ao menos um produto.';
+  var ate=d&&d.validoAte?+new Date(d.validoAte):null;if(ate&&ate<=agora())erros.validoAte='A validade precisa ser no futuro.';
+  var mx=d&&d.usosMax?Math.round(+d.usosMax):null;if(mx!=null&&!(mx>=1))erros.usosMax='Ao menos 1 uso.';
+  if(Object.keys(erros).length)return Promise.resolve({erros:erros});
+  return hashCupom(t).then(function(h){var db=dbCupons();if(db[h])return{erros:{texto:'Esse cupom já existe.'}};
+    db[h]={final:t.slice(-4),rotulo:rot,tipo:tipo,percentual:tipo==='percentual'?pc:null,valor:tipo==='valor'?vl:null,produtos:prods,validoAte:ate,usosMax:mx,usos:0,umPorConta:d.umPorConta!==false,situacao:'ativo',criadoEm:agora(),usadoPor:{}};
+    gravar('pl-cupons',db);return{ok:true,id:h.slice(0,16),final:t.slice(-4)}})}
+function listarCupons(){var db=dbCupons();return Object.keys(db).map(function(h){var c=db[h];return{id:h.slice(0,16),final:c.final,rotulo:c.rotulo,tipo:c.tipo,percentual:c.percentual,valor:c.valor,
+  produtos:c.produtos.map(function(p){return PRODUTOS[p]}),validoAte:c.validoAte?iso(c.validoAte):null,usosMax:c.usosMax,usos:c.usos||0,umPorConta:!!c.umPorConta,situacao:situacaoCupom(c,null)==='livre'?'ativo':situacaoCupom(c,null),criadoEm:iso(c.criadoEm)}}).sort(function(a,b){return a.criadoEm<b.criadoEm?1:-1})}
+function mudarCupom(id,sit){var db=dbCupons(),h=Object.keys(db).filter(function(k){return k.slice(0,16)===id})[0];
+  if(!h||db[h].situacao==='revogado'||['ativo','pausado','revogado'].indexOf(sit)<0)return{erro:'cupom'};db[h].situacao=sit;gravar('pl-cupons',db);return{ok:true}}
 function gerarCodigos(pacoteId,qtd,validaDias){
   qtd=Math.max(1,Math.min(100,Math.round(qtd)||1));
   validaDias=Math.max(1,Math.round(validaDias)||30);
@@ -603,14 +652,14 @@ PLCONTA={
   /* Conta como página de configurações: mesmas formas do DOC-15 §7, prontas para virar rota (DOC-15 §8) */
   perfil:perfil,atualizarPerfil:atualizarPerfil,aceites:aceites,temSenha:temSenha,trocarSenha:trocarSenha,sessoes:sessoes,encerrarSessoes:encerrarSessoes,
   preferencias:preferencias,salvarPreferencias:salvarPreferencias,formasPagamento:formasPagamento,recibos:recibos,assinatura:assinatura,
-  direitoDeUso:direitoDeUso,codigos:codigos,resgatarCodigo:resgatarCodigo,
+  direitoDeUso:direitoDeUso,codigos:codigos,resgatarCodigo:resgatarCodigo,conferirCupom:conferirCupom,usarCupom:usarCupom,descontoCupom:function(c,v){return descontoDe(c,v)},PRODUTOS:PRODUTOS,
   /* códigos de impressão (D-123/D-124) */
   pacotes:function(){return JSON.parse(JSON.stringify(PACOTES))},
   verificarCodigo:verificarCodigo,tentativasCodigo:tentativasCodigo,sairCodigo:sairCodigo,
   dvOk:dvOk,
   admin:{
     salvarLimites:salvarLimites,restaurarPadroes:restaurarPadroes,salvarContas:adminSalvarContas,
-    gerarCodigos:gerarCodigos,revogarCodigo:revogarCodigo,listarCodigos:listarCodigos
+    gerarCodigos:gerarCodigos,revogarCodigo:revogarCodigo,listarCodigos:listarCodigos,criarCupom:criarCupom,listarCupons:listarCupons,mudarCupom:mudarCupom
   }
 };
 window.PLCONTA=PLCONTA;

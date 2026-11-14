@@ -80,4 +80,15 @@ $('sugs').addEventListener('click',function(e){var b=e.target.closest&&e.target.
   agenda();
 })();
 $('criar-colagem').onclick=function(){comecar({nome:'Colagem de '+new Date().toLocaleDateString('pt-BR'),col:{layout:'espalhadas'}})};
+/* D-208: ação de um aviso. «?criar=<aviso>» monta um projeto novo com as fotos da lembrança ou da sugestão (cópias, no aparelho)
+   e abre na Colagem; «?abrir=<projeto>» abre o projeto que faz aniversário. O endereço é limpo para não repetir ao recarregar. */
+(function(){
+  var m=/[?&](criar|abrir)=([^&#]+)/.exec(location.search);if(!m)return;
+  var id=decodeURIComponent(m[2]);
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+  if(m[1]==='abrir'){abrir(id);return}
+  if(!window.PLAVISOS)return;
+  toast('Montando a colagem com as suas fotos…');
+  PLAVISOS.criarProjeto(id).then(function(p){return PLPROJETOS.abrir(p.id)}).then(function(){location.href='editor/#colagem'},function(){atualizar();toast('As fotos deste aviso não estão mais neste aparelho.')})
+})();
 })();

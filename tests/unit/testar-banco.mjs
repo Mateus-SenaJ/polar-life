@@ -80,7 +80,7 @@ try {
 
   console.log('Governança do esquema:');
   const proibidas = um(`SELECT coalesce(string_agg(table_schema || '.' || table_name || '.' || column_name, ', '), '') FROM information_schema.columns
-    WHERE table_schema IN ('util','identidade','privacidade','comercial','config','auditoria','analise')
+    WHERE table_schema IN ('util','identidade','privacidade','comercial','config','auditoria','analise','avisos')
     AND column_name ~* '(foto|miniatura|imagem|legenda|exif|gps|latitude|longitude|coordenada|thumb|caption)'
     AND data_type NOT IN ('integer', 'smallint', 'bigint', 'boolean')`);   /* contagem de fotos por projeto não é foto */
   ok(proibidas === '', 'regra de ouro (BR-01): nenhuma coluna para foto, miniatura, legenda, EXIF ou coordenada' + (proibidas ? ': ' + proibidas : ''));
@@ -88,13 +88,13 @@ try {
     WHERE table_schema IN ('identidade','privacidade','comercial','config') AND column_name ~* '^(senha|password|token|segredo|secret|codigo)$' AND table_name <> 'planos'`);
   ok(segredos === '', 'nenhum segredo em texto: senha, token e código só como hash/HMAC' + (segredos ? ': ' + segredos : ''));
   const semRls = um(`SELECT coalesce(string_agg(c.relnamespace::regnamespace || '.' || c.relname, ', '), '') FROM pg_class c
-    WHERE c.relkind = 'r' AND c.relnamespace::regnamespace::text IN ('identidade','privacidade','comercial') AND NOT c.relrowsecurity
+    WHERE c.relkind = 'r' AND c.relnamespace::regnamespace::text IN ('identidade','privacidade','comercial','avisos') AND NOT c.relrowsecurity
     AND EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid AND a.attname = 'usuario_id' AND NOT a.attisdropped)`);
   ok(semRls === '', 'toda tabela com dado de pessoa tem RLS ligada' + (semRls ? ': ' + semRls : ''));
   const semPath = um(`SELECT coalesce(string_agg(p.oid::regprocedure::text, ', '), '') FROM pg_proc p WHERE p.prosecdef
-    AND p.pronamespace::regnamespace::text IN ('util','identidade','privacidade','comercial','auditoria') AND NOT coalesce(p.proconfig::text ~ 'search_path=', false)`);
+    AND p.pronamespace::regnamespace::text IN ('util','identidade','privacidade','comercial','auditoria','avisos') AND NOT coalesce(p.proconfig::text ~ 'search_path=', false)`);
   ok(semPath === '', 'toda função SECURITY DEFINER tem search_path fixo' + (semPath ? ': ' + semPath : ''));
-  const publico = um(`SELECT count(*) FROM pg_proc p WHERE p.pronamespace::regnamespace::text IN ('util','identidade','privacidade','comercial','auditoria') AND has_function_privilege('public', p.oid, 'EXECUTE')`);
+  const publico = um(`SELECT count(*) FROM pg_proc p WHERE p.pronamespace::regnamespace::text IN ('util','identidade','privacidade','comercial','auditoria','avisos') AND has_function_privilege('public', p.oid, 'EXECUTE')`);
   ok(publico === '0', 'nenhuma função executável por qualquer papel (PUBLIC)');
   ok(!psql(`INSERT INTO identidade.usuarios (email, nome) VALUES ('Maiuscula@Exemplo.com', 'Ana')`).ok, 'e-mail fora do padrão (maiúsculas) é recusado pelo tipo util.email');
 
@@ -216,6 +216,55 @@ try {
   const an = comoApp(null, `SELECT count(*) FROM analise.vendas_por_mes; SELECT count(*) FROM analise.folhas_por_mes;`, 'pl_analitica');
   ok(an.ok && /permission denied|permissão negada/i.test(comoApp(null, `SELECT email FROM identidade.usuarios;`, 'pl_analitica').err), 'análise vê só agregados (vendas e folhas por mês), nunca a tabela de contas');
   ok(/"sessoes":/.test(um(`SELECT auditoria.limpar_expirados()`)), 'limpeza de itens vencidos (sessões, códigos de e-mail, tentativas, exportações, checkouts)');
+
+  console.log('Notificações (D-208):');
+  const semFoto = um(`SELECT coalesce(string_agg(table_name || '.' || column_name, ', '), '') FROM information_schema.columns WHERE table_schema = 'avisos'
+    AND column_name ~* '(foto|miniatura|imagem|legenda|exif|gps|latitude|longitude|coordenada|thumb|caption)'`);
+  ok(semFoto === '', 'avisos sem coluna de foto, miniatura ou legenda: a colagem da lembrança é feita no aparelho (BR-01)' + (semFoto ? ': ' + semFoto : ''));
+  ok(um(`SELECT count(*) FROM avisos.modelos`) === '3', 'os 3 textos automáticos (lembrança, sugestão, prazo) já vêm prontos');
+  const pr = js(comoApp(B, `SELECT avisos.salvar_preferencias('${B}', true, '{"lembranca": false}', 'sistema', 23::smallint, 7::smallint);`));
+  ok(pr.tipos.lembranca === false && pr.canal === 'sistema' && pr.silencio.ini === 23, 'a conta salva as próprias preferências (tipos, canal e horário silencioso)');
+  ok(/PL004/.test(comoApp(B, `SELECT avisos.salvar_preferencias('${C}', false, NULL, NULL, NULL, NULL);`).err), 'ninguém muda as preferências de outra conta (PL004)');
+  ok(!comoApp(B, `SELECT avisos.salvar_preferencias('${B}', true, '{"foto": true}', NULL, NULL, NULL);`).ok, 'tipo de aviso desconhecido é recusado');
+  const ins = comoApp(B, `SELECT avisos.inscrever_push('${B}', 'https://push.exemplo.net/abc', '${'B'.repeat(87)}', 'segredoAuth1234567890', 'Android · Chrome');`);
+  ok(ins.ok && comoApp(B, `SELECT count(*) FROM avisos.inscricoes_push;`).out === '1' && /permission denied|permissão negada/i.test(comoApp(B, `SELECT chave_auth FROM avisos.inscricoes_push;`).err),
+    'inscrição de push gravada; a própria API não lê as chaves de volta');
+  const PB = um(`SELECT comercial.plano_de('${B}')`), PUB = PB === 'pro' ? 'assinantes' : PB;
+  const camp = comoApp(C, `SELECT avisos.salvar_campanha(NULL, 'promocao', 'Folhas em dobro', 'Na compra de 5, mais 5.', 'conta/planos/', 'Ver oferta', '${PUB}', 'app', NULL, NULL);`, 'pl_admin');
+  const K = camp.out;
+  ok(camp.ok && /PL004/.test(comoApp(B, `SELECT avisos.salvar_campanha(NULL, 'anuncio', 'x', 'y', NULL, NULL, 'todos', 'app', NULL, NULL);`, 'pl_admin').err), 'só a conta admin cria campanha (PL004 para as outras)');
+  ok(!comoApp(C, `SELECT avisos.salvar_campanha(NULL, 'anuncio', 'Novo', 'Texto', 'https://golpe.example', NULL, 'todos', 'app', NULL, NULL);`, 'pl_admin').ok, 'o botão da campanha só leva para dentro do app (endereço de fora é recusado)');
+  ok(comoApp(B, `SELECT count(*) FROM avisos.caixa('${B}');`).out === '0', 'rascunho não aparece para ninguém');
+  ok(comoApp(C, `SELECT avisos.mudar_campanha('${K}', 'lancar');`, 'pl_admin').out === 'ativa', 'lançar põe a campanha no ar');
+  ok(comoApp(B, `SELECT count(*) FROM avisos.caixa('${B}');`).out === '1', 'a conta vê a promoção feita para o plano dela (' + PB + ')');
+  ok(comoApp(C, `SELECT count(*) FROM avisos.caixa('${C}');`).out === '0', 'e outra conta, de outro público, não vê');
+  ok(/22023/.test(comoApp(C, `SELECT avisos.salvar_campanha('${K}', 'promocao', 'Mudou', 'z', NULL, NULL, 'todos', 'app', NULL, NULL);`, 'pl_admin').err) || !comoApp(C, `SELECT avisos.salvar_campanha('${K}', 'promocao', 'Mudou', 'z', NULL, NULL, 'todos', 'app', NULL, NULL);`, 'pl_admin').ok,
+    'campanha no ar não se edita (pausa ou duplica)');
+  comoApp(B, `SELECT avisos.marcar('${B}', 'promocao', 'app', 'campanha:${K}', '${K}', 'aberta'); SELECT avisos.marcar('${B}', 'promocao', 'app', 'campanha:${K}', '${K}', 'dispensada');`);
+  ok(comoApp(B, `SELECT count(*) FROM avisos.caixa('${B}');`).out === '0' && um(`SELECT entregues || '|' || abertas || '|' || dispensadas FROM avisos.resumo_campanhas WHERE campanha_id = '${K}'`) === '1|0|1',
+    'dispensada some da caixa; o resumo do admin conta sem dado pessoal (marcar de novo não duplica)');
+  ok(comoApp(C, `SELECT avisos.mudar_campanha('${K}', 'pausar');`, 'pl_admin').out === 'pausada' && /22023/.test(comoApp(C, `SELECT avisos.mudar_campanha('${K}', 'agendar');`, 'pl_admin').err),
+    'pausar vale; agendar sem início no futuro é recusado');
+  ok(+um(`SELECT count(*) FROM auditoria.eventos WHERE tabela = 'avisos.campanhas'`) >= 3, 'criar, lançar e pausar campanhas ficam na trilha de auditoria');
+
+  console.log('Cupons (D-208):');
+  const hc = (s) => h32('cupom:' + s);
+  const cp = comoApp(C, `SELECT comercial.novo_cupom('${hc('VERAO10')}', 'AO10', 'Verão 2026', 'percentual', 10::smallint, NULL, ARRAY['folha_padrao','pro_mensal'], now() + interval '30 days', 2, true);`, 'pl_admin');
+  ok(cp.ok && /PL004/.test(comoApp(B, `SELECT comercial.novo_cupom('${hc('X')}', 'X1', 'x', 'valor', NULL, 100, NULL, NULL, NULL, true);`, 'pl_admin').err), 'só a conta admin cria cupom; o banco guarda só o HMAC');
+  ok(/permission denied|permissão negada/i.test(comoApp(C, `SELECT codigo_hmac FROM comercial.cupons;`, 'pl_admin').err) && comoApp(C, `SELECT rotulo || '|' || final FROM comercial.cupons;`, 'pl_admin').out === 'Verão 2026|AO10',
+    'o admin vê o rótulo e o final do cupom, nunca o HMAC');
+  const cf = js(comoApp(B, `SELECT comercial.conferir_cupom('${hc('VERAO10')}', '${B}', 'pro_mensal', 1490);`));
+  ok(cf.desconto === 149 && cf.valor === 1341, 'conferir: 10% de R$ 14,90 = R$ 1,49 de desconto (R$ 13,41), sem gastar o cupom');
+  ok(/PL007/.test(comoApp(B, `SELECT comercial.conferir_cupom('${hc('NAOEXISTE')}', '${B}', 'pro_mensal', 1490);`).err), 'cupom que não existe: PL007');
+  ok(/PL009/.test(comoApp(B, `SELECT comercial.conferir_cupom('${hc('VERAO10')}', '${B}', 'folha_grande', 550);`).err), 'cupom que não vale para o produto: PL009');
+  ok(comoApp(B, `SELECT comercial.usar_cupom('${hc('VERAO10')}', '${B}', 'folha_padrao', 290, NULL);`).ok && /PL008/.test(comoApp(B, `SELECT comercial.usar_cupom('${hc('VERAO10')}', '${B}', 'folha_padrao', 290, NULL);`).err),
+    'usar uma vez vale; de novo na mesma conta: PL008 (um por conta)');
+  const D2 = um(`SELECT identidade.criar_conta('duda@exemplo.com', 'Duda')`), E2 = um(`SELECT identidade.criar_conta('edu@exemplo.com', 'Edu')`);
+  comoApp(D2, `SELECT comercial.usar_cupom('${hc('VERAO10')}', '${D2}', 'folha_padrao', 290, NULL);`);
+  ok(/PL008/.test(comoApp(E2, `SELECT comercial.usar_cupom('${hc('VERAO10')}', '${E2}', 'folha_padrao', 290, NULL);`).err) && um(`SELECT usos FROM comercial.cupons`) === '2', 'limite de 2 usos: o 3º é recusado (PL008)');
+  const cid = um(`SELECT id FROM comercial.cupons`);
+  ok(comoApp(C, `SELECT comercial.mudar_cupom('${cid}', 'revogado');`, 'pl_admin').ok && !comoApp(C, `SELECT comercial.mudar_cupom('${cid}', 'ativo');`, 'pl_admin').ok, 'cupom revogado não volta');
+  ok(comoApp(B, `SELECT count(*) FROM comercial.usos_cupons;`).out === '1', 'cada conta vê só os próprios usos de cupom (RLS)');
 } catch (e) { ok(false, 'exceção: ' + e.message); }
 finally {
   if (ligado) roda('pg_ctl', ['-D', DADOS, '-m', 'fast', '-w', 'stop'], { stdio: 'ignore', timeout: 60000 });

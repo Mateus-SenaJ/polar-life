@@ -24,9 +24,10 @@
 <link rel="stylesheet" href="../../../assets/css/ui/portao.css">
 <script src="../../../assets/js/ui/portao.js"></script>
 <link rel="stylesheet" href="../../../assets/css/pages/conta.css">
+<link rel="stylesheet" href="../../../assets/css/ui/voltar.css">
 <link rel="stylesheet" href="../../../assets/css/pages/planos.css">
 </head>
-<body>
+<body class="pg-planos">
 
 <header class="app-header"><div class="in">
 <a class="logo" href="../../" aria-label="PolarLife, seus projetos"><img class="logo-h" src="../../../assets/img/logos/Logo_tipografia_lateral.png" width="93" height="32" alt="PolarLife"></a>
@@ -37,18 +38,19 @@
 </div></header>
 
 <main class="wrap page">
+<a class="voltar" href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Voltar para a Conta</a>
 <div class="top">
 <h1>Folhas e planos</h1>
 <p class="apoio">Editar e ver o preview são sempre livres. O que se compra são as folhas exportadas.</p>
 </div>
 
-<form id="f-planos" class="plns" novalidate>
-<div id="cartoes" role="radiogroup" aria-label="Escolher plano"></div>
-<div class="plns__act">
-<button type="submit" class="led-btn led-btn--block" id="b-continuar"><span class="smoke-layer" aria-hidden="true"></span><span class="btn-content">Continuar</span></button>
-<p class="help" id="ajuda-continuar" aria-live="polite"></p>
-</div>
-</form>
+<div id="cartoes" class="plns__grid"></div>
+<p class="help plns__help" id="ajuda-continuar" aria-live="polite"></p>
+
+<section class="codigos" aria-labelledby="t-codigos">
+<h2 class="codigos__t" id="t-codigos">Tem um código?</h2>
+<div class="codigos__grade" id="codigos-grade"></div>
+</section>
 
 <ul class="legal">
 <li><a href="../../../legal/#privacidade">Privacidade</a></li>
@@ -65,6 +67,7 @@
 <div class="toast led-box led-box--1" id="toast" role="status" aria-live="polite" hidden><span id="toast-t"></span></div>
 
 <script src="../../../assets/js/pages/planos.js" defer></script>
+<script src="../../../assets/js/ui/voltar.js" defer></script>
 <script src="../../../assets/js/ui/pwa.js" defer></script>
 </body>
 </html>

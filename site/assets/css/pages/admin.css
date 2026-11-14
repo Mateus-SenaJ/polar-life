@@ -104,3 +104,66 @@
   .adm-cod__form{grid-template-columns:1.2fr 1fr 1fr auto;align-items:end}
 }
 @media (prefers-reduced-motion:reduce){.sw span,.sw span::after{transition:none}}
+
+/* Notificações (D-208): campanhas, prévia e textos automáticos */
+.adm-nt__h{margin:24px 0 0;font:500 14px/1.4 'Inter',system-ui,sans-serif}
+.adm-nt__grade{display:grid;gap:16px;margin-top:16px}
+.adm-nt__form,.adm-nt__previa,.adm-nt__auto,.adm-nt__c{display:flex;flex-direction:column;gap:12px;min-width:0;padding:16px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card)}
+.adm-nt__form .adm-nt__h,.adm-nt__previa .adm-nt__h{margin:0}
+.adm-nt__area{height:auto;min-height:44px;padding:10px 14px;line-height:1.5;resize:vertical}
+.adm-nt__par{display:grid;gap:12px}
+.adm-nt__dica{font-size:12px;line-height:1.5;margin:0}
+.adm-nt__act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.adm-nt__form .adm-nt__act{margin-top:4px}
+.adm-nt input[type=datetime-local]{min-width:0;font-size:14px}
+.adm-nt__pv .av{background:var(--surface-subtle)}
+.adm-nt__pv .av__ir,.adm-nt__pv .av__b{cursor:default}
+.adm-nt__sis{display:flex;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--outline-subtle);border-radius:12px}
+.adm-nt__sis img{flex:none;border-radius:8px}
+.adm-nt__sis div{min-width:0}
+.adm-nt__sn,.adm-nt__sx,.adm-nt__so{margin:0;overflow-wrap:anywhere}
+.adm-nt__sn{font:500 14px/1.4 'Inter',system-ui,sans-serif}
+.adm-nt__sx{font-size:13px;line-height:1.5}
+.adm-nt__so{margin-top:4px;font-size:12px;line-height:1.4}
+.adm-nt__lista{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px}
+.adm-nt__vazio{padding:16px;border:1px dashed rgb(0 0 0/.3);border-radius:12px;font-size:14px;line-height:1.6}
+.adm-nt__ct{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.adm-nt__n{display:flex;align-items:center;gap:8px;min-width:0;margin:0;font:500 15px/1.4 'Inter',system-ui,sans-serif;overflow-wrap:anywhere}
+.adm-nt__n .ico{flex:none;color:var(--blue)}
+.adm-nt__d,.adm-nt__m,.adm-nt__ex{margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.adm-nt__m,.adm-nt__ex{font-size:13px}
+.adm-nt__k{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0;font-size:13px;line-height:1.5}
+.adm-nt__k .mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:13px}
+.adm-nt__ca{display:flex;flex-wrap:wrap;gap:0 4px;margin:0 -8px -8px}
+.adm-nt__b{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 8px;border:0;border-radius:12px;background:none;font:500 13px 'Inter',system-ui,sans-serif;color:var(--black);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.adm-nt__b:focus-visible,.adm-nt .sw:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.adm-nt__autos{display:grid;gap:12px;margin-top:12px}
+.adm-nt__pausa{flex:none;display:flex;align-items:center;gap:8px}
+.adm-nt__pausa .sw{margin:0}
+.adm-nt .adm-err{margin:0}
+@media (min-width:600px){.adm-nt__par{grid-template-columns:1fr 1fr}}
+@media (min-width:1024px){
+  .adm-nt__grade{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start}
+  .adm-nt__lista{grid-template-columns:1fr 1fr}
+  .adm-nt__autos{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+}
+/* D-208 · cupons promocionais */
+.adm-cup__form{display:grid;gap:16px;margin-top:16px;padding:20px;background:var(--white);border-radius:14px;box-shadow:var(--shadow-card)}
+.adm-cup__d{display:flex;gap:8px;align-items:center}
+.adm-cup__d .sel{flex:1 1 auto;min-width:0}
+.adm-cup__d .txt{flex:0 0 96px;width:96px}
+.adm-cup__u{flex:none;min-width:24px;font:500 14px var(--font)}
+.adm-cup__ps{display:flex;flex-wrap:wrap;gap:8px 16px;margin:0;padding:0;border:0}
+.adm-cup__ps legend{padding:0;margin-bottom:6px}
+.adm-cup__p,.adm-cup__um{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:14px;cursor:pointer}
+.adm-cup__p input,.adm-cup__um input{width:20px;height:20px;accent-color:var(--blue)}
+.adm-cup__tab{margin-top:16px;overflow:auto}
+.adm-cup__acts{display:flex;gap:4px;flex-wrap:wrap}
+@media (min-width:1024px){
+  .adm-cup__form{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+  .adm-cup__ps{grid-column:span 2}
+  .adm-cup__form>.btn2{justify-self:start}
+}
+/* D-208 · varredura: o campo numérico não passa por baixo dos botões − e + */
+.num__v input{box-sizing:border-box}
+.txt{box-sizing:border-box}   /* D-208 · varredura: o campo não invade a coluna ao lado */
