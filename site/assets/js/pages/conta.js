@@ -1,10 +1,10 @@
-/* T-27 · Conta como página de configurações: Perfil, Plano e uso, Códigos, Pagamentos, Segurança, Preferências, Privacidade.
+/* T-27 · Conta como página de configurações: Perfil, Plano e uso, Códigos, Pagamentos, Segurança, Preferências, Notificações, Privacidade.
    Navegação lateral no desktop (≥ 900 px) e lista que abre e fecha no celular. Tudo vem de PLCONTA, com a forma dos dados do
    DOC-15 §8. Um LED só por tela (T8): «Ver folhas e planos». Pop-ups nível 3 com LED na opção segura (D-082).
    Sessão por código de impressão (D-124) tem menos seções: não há conta, pagamento nem senha. */
 (function(){
 var $=function(i){return document.getElementById(i)};
-var C=window.PLCONTA,G=window.PLGUARDA;
+var C=window.PLCONTA,G=window.PLGUARDA,AV=window.PLAVISOS;
 var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 var MQ=window.matchMedia?window.matchMedia('(min-width:900px)'):null;
 var tmToast=null,abridor=null;
@@ -35,6 +35,7 @@ var I={pessoa:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   aparelho:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
   seta:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   abre:'<path d="M6 9l6 6 6-6"/>',
+  sino:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   mais:'<path d="M12 5v14M5 12h14"/>',
   x:'<path d="M6 6l12 12M18 6L6 18"/>'};
 
@@ -297,7 +298,46 @@ function renderApp(){ /* instalar é opcional (DOC-08 §7): só oferece quando o
   })
 }
 
-/* ---------- 7 · Privacidade e dados ---------- */
+/* ---------- 7 · Notificações (D-208, DOC-16) ----------
+   Preferências dos avisos (PLAVISOS): liga/desliga geral e por tipo, onde avisar, horário silencioso, permissão do aparelho
+   (pedida só pelo botão daqui), aviso de teste e os avisos recentes. Com servidor: GET/PUT /conta/avisos/preferencias (DOC-15 §8). */
+function horas(id,rot,val){
+  var h='<label class="nt-sel" for="'+id+'"><span class="cmp__r">'+rot+'</span><select id="'+id+'">',i;
+  for(i=0;i<24;i++)h+='<option value="'+i+'"'+(i===val?' selected':'')+'>'+i+'h</option>';
+  return h+'</select></label>'
+}
+function secNotificacoes(){
+  var p=AV.prefs(),s=AV.suporte(),T=AV.TIPOS,k,g,o,t,hs,h,i,perm;
+  g='<div class="sw-row"><div><p class="cc__meta" id="nt-geral-l">Receber avisos do PolarLife</p><p class="help">Lembranças, sugestões, prazos e novidades ficam no sino do cabeçalho, sem interromper o que você está fazendo.</p></div>'+
+    '<button type="button" class="sw" id="nt-geral" role="switch" aria-checked="'+(p.ligado?'true':'false')+'" aria-labelledby="nt-geral-l"><span></span></button></div>'+
+    '<ul class="nt-tipos" id="nt-tipos">';
+  for(k in T)g+='<li class="sw-row"><div><p class="cc__meta" id="nt-t-'+k+'-l">'+esc(T[k].nome)+'</p><p class="help">'+esc(T[k].desc)+'</p></div>'+
+    '<button type="button" class="sw" id="nt-t-'+k+'" data-nt-tipo="'+k+'" role="switch" aria-checked="'+(p.tipos[k]?'true':'false')+'" aria-labelledby="nt-t-'+k+'-l"'+(p.ligado?'':' disabled')+'><span></span></button></li>';
+  g+='</ul>';
+  o='<fieldset class="opc" id="nt-canal"><legend class="so-leitor">Onde avisar</legend>'+
+    '<label class="opc__o"><input type="radio" name="nt-canal" value="app"'+(p.canal==='app'?' checked':'')+'><span>'+ico(I.check)+'Só dentro do PolarLife</span></label>'+
+    '<label class="opc__o"><input type="radio" name="nt-canal" value="sistema"'+(p.canal==='sistema'?' checked':'')+'><span>'+ico(I.check)+'Também nas notificações do aparelho</span></label></fieldset>';
+  if(!s.suportado)perm='<div class="cc__row"><p class="cc__meta">Este navegador não mostra notificações do aparelho. Os avisos continuam no sino.</p>'+estado(I.info,'Não disponível')+'</div>';
+  else if(s.permissao==='granted')perm='<div class="cc__row"><p class="cc__meta">O PolarLife pode mostrar notificações neste aparelho.</p>'+estado(I.check,'Permitido')+'</div>';
+  else if(s.permissao==='denied')perm='<div class="cc__row"><p class="cc__meta">As notificações do PolarLife estão bloqueadas neste navegador.</p>'+estado(I.aten,'Bloqueado')+'</div>'+
+    '<p class="help" id="nt-desbloquear">Para desbloquear: toque no cadeado (ou no ícone ao lado do endereço), abra «Notificações», escolha «Permitir» e recarregue esta página. No app instalado: Configurações do aparelho › Apps › PolarLife › Notificações.</p>';
+  else perm='<div class="cc__row"><p class="cc__meta">O navegador ainda vai perguntar se você permite.</p>'+estado(I.info,'Ainda não permitido')+'</div>'+
+    '<div class="cc__act"><button type="button" class="btn2" id="b-nt-permitir">'+ico(I.sino)+'Permitir notificações do aparelho</button></div>';
+  o+='<div id="nt-perm" data-estado="'+esc(s.suportado?s.permissao:'unsupported')+'">'+perm+'</div>'+
+    '<p class="help">No aparelho, o PolarLife manda no máximo 1 notificação por dia, sempre sem som. A colagem que aparece nela é montada aqui, com as suas fotos.</p>';
+  hs='<div class="nt-hora">'+horas('nt-sil-ini','Começa às',p.silencio.ini)+horas('nt-sil-fim','Termina às',p.silencio.fim)+'</div>'+
+    '<p class="help" id="nt-sil-res">'+(p.silencio.ini===p.silencio.fim?'Sem horário silencioso.':'Das '+p.silencio.ini+'h às '+p.silencio.fim+'h o aparelho não recebe notificação do PolarLife.')+'</p>';
+  t='<p class="cc__meta">Veja como um aviso aparece no sino'+(p.canal==='sistema'&&s.permissao==='granted'?' e nas notificações do aparelho.':'.')+'</p>'+recado('nt')+
+    '<div class="cc__act"><button type="button" class="btn2" id="b-nt-teste">'+ico(I.sino)+'Enviar um aviso de teste</button></div>';
+  var hi=AV.historico(8),SIT={novo:['Novo',I.info],lido:['Visto',I.check],dispensado:['Dispensado',I.x],adiado:['Volta amanhã',I.info],encerrado:['Encerrado',I.x]};
+  if(!hi.length)h='<p class="vazio" id="nt-vazio">Nenhum aviso ainda.</p>';
+  else{h='<ul class="nt-hist" id="nt-hist">';for(i=0;i<hi.length;i++)h+='<li class="cod"><div class="cod__q"><p class="cod__n">'+esc(hi[i].titulo)+'</p><p class="cod__d">'+esc(hi[i].tipoNome)+' · '+dataCurta(hi[i].criadoEm)+'</p></div>'+estado(SIT[hi[i].situacao][1],SIT[hi[i].situacao][0])+'</li>';h+='</ul>'}
+  h+=info('As lembranças e sugestões são montadas neste aparelho, com as fotos dos seus projetos: nenhuma foto é enviada. Nesta versão os avisos são conferidos quando você abre o PolarLife; ainda não há envio pelo servidor.');
+  return {id:'notificacoes',nome:'Notificações',ic:I.sino,resumo:p.ligado?'Avisos ligados · '+(p.canal==='sistema'?'no app e no aparelho':'só dentro do app'):'Avisos desligados',
+    html:cartao('cc-nt-geral','Avisos',g)+cartao('cc-nt-onde','Onde avisar',o)+cartao('cc-nt-silencio','Horário silencioso',hs)+cartao('cc-nt-teste','Testar',t)+cartao('cc-nt-hist','Avisos recentes',h)}
+}
+
+/* ---------- 8 · Privacidade e dados ---------- */
 function secPrivacidade(ac,cod){
   var d,t,x='';
   if(cod)d='<p class="cc__meta">Você entrou com um código de impressão, sem conta. O que você informou fica só neste navegador e sai dele quando você sair. Suas fotos e projetos ficam no seu aparelho.</p>';
@@ -322,6 +362,7 @@ function render(){
   secs.push(secCodigos(C.codigos(),cod));
   if(!cod){secs.push(secPagamentos(pl,as,C.recibos(),C.formasPagamento()));secs.push(secSeguranca(C.sessoes()))}
   secs.push(secPreferencias(C.preferencias(),cod));
+  if(AV)secs.push(secNotificacoes());
   secs.push(secPrivacidade(C.aceites(),cod));
   IDS=[];for(i=0;i<secs.length;i++)IDS.push(secs[i].id);
   if(IDS.indexOf(ativa)<0)ativa='';
@@ -478,6 +519,42 @@ function ligar(){
     $('nov-e').textContent=on?'Ligado':'Desligado';
     C.salvarPreferencias({emails:{novidades:on}});
     toast(on?'Preferência guardada: novidades ligadas.':'Preferência guardada: novidades desligadas.')
+  });
+
+  /* notificações (D-208) */
+  function ntSalvar(d,msg,foco){var r=AV.salvarPrefs(d);if(r&&r.ok){AV.atualizar();if(msg)toast(msg);render();if(foco&&$(foco))focar($(foco))}}
+  if(b=$('nt-geral'))b.addEventListener('click',function(){var on=this.getAttribute('aria-checked')!=='true';ntSalvar({ligado:on},on?'Avisos ligados.':'Avisos desligados.','nt-geral')});
+  els=document.querySelectorAll('[data-nt-tipo]');
+  for(i=0;i<els.length;i++)els[i].addEventListener('click',function(){
+    var k=this.getAttribute('data-nt-tipo'),on=this.getAttribute('aria-checked')!=='true',t={};t[k]=on;
+    ntSalvar({tipos:t},AV.TIPOS[k].nome+': '+(on?'ligado':'desligado')+'.',this.id)
+  });
+  els=document.querySelectorAll('input[name="nt-canal"]');
+  for(i=0;i<els.length;i++)els[i].addEventListener('change',function(){
+    if(!this.checked)return;
+    var v=this.value,s=AV.suporte();
+    ntSalvar({canal:v},v==='app'?'Avisos só dentro do PolarLife.':s.permissao==='granted'?'Avisos também nas notificações do aparelho.':'Falta permitir as notificações neste aparelho.',s.permissao==='default'&&v==='sistema'?'b-nt-permitir':null);
+    if(!$('b-nt-permitir')||v!=='sistema'){var r=document.querySelector('input[name="nt-canal"]:checked');if(r)focar(r)}
+  });
+  if(b=$('b-nt-permitir'))b.addEventListener('click',function(){
+    this.disabled=true;
+    AV.pedirPermissao().then(function(v){
+      if(v==='granted'){AV.salvarPrefs({canal:'sistema'});AV.atualizar();toast('Notificações permitidas neste aparelho.')}
+      else toast(v==='denied'?'As notificações ficaram bloqueadas neste navegador.':'Permissão não concedida.');
+      render();var x=document.querySelector('input[name="nt-canal"]:checked');if(x)focar(x)
+    })
+  });
+  if((b=$('nt-sil-ini'))&&$('nt-sil-fim')){
+    var sil=function(){ntSalvar({silencio:{ini:+$('nt-sil-ini').value,fim:+$('nt-sil-fim').value}},'Horário silencioso guardado.',this.id)};
+    b.addEventListener('change',sil);$('nt-sil-fim').addEventListener('change',sil)
+  }
+  if(b=$('b-nt-teste'))b.addEventListener('click',function(){
+    this.disabled=true;
+    AV.testar().then(function(r){
+      aviso.nt=!r.painel?{erro:true,txt:'Os avisos estão desligados. Ligue «Receber avisos» e «Avisos do PolarLife» para testar.'}:
+        {txt:r.sistema?'Aviso de teste enviado: veja o sino e as notificações do aparelho.':'Aviso de teste enviado: veja o sino no alto da tela.'};
+      toast(r.painel?'Aviso de teste enviado':'Avisos desligados');render();focar($('b-nt-teste'))
+    })
   });
 
   /* privacidade e dados */

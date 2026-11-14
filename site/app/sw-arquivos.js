@@ -1,5 +1,5 @@
 /* Gerado por tools/gerar-sw.mjs (npm run sw). Não edite à mão. */
-self.PL_VERSAO='1cb48a7e1cd3';
+self.PL_VERSAO='3db3ca57516f';
 self.PL_ARQUIVOS=[
 "../assets/css/base/fonts.css",
 "../assets/css/base/led.css",
@@ -29,6 +29,7 @@ self.PL_ARQUIVOS=[
 "../assets/css/pages/quadro.css",
 "../assets/css/pages/resumo.css",
 "../assets/css/ui/app-header.css",
+"../assets/css/ui/avisos.css",
 "../assets/css/ui/esqueleto.css",
 "../assets/css/ui/faixa-escura.css",
 "../assets/css/ui/midia.css",
@@ -36,6 +37,7 @@ self.PL_ARQUIVOS=[
 "../assets/css/ui/portao.css",
 "../assets/css/ui/pwa.css",
 "../assets/css/ui/qualidade.css",
+"../assets/css/ui/voltar.css",
 "../assets/fonts/cormorant-garamond-300-italico.woff2",
 "../assets/fonts/cormorant-garamond-300.woff2",
 "../assets/fonts/cormorant-garamond-400-italico.woff2",
@@ -63,6 +65,8 @@ self.PL_ARQUIVOS=[
 "../assets/js/editor/metadados.js",
 "../assets/js/editor/molduras.js",
 "../assets/js/editor/prevoo.js",
+"../assets/js/nucleo/avisos-arte.js",
+"../assets/js/nucleo/avisos.js",
 "../assets/js/nucleo/colagem.js",
 "../assets/js/nucleo/conta.js",
 "../assets/js/nucleo/exif.js",
@@ -95,6 +99,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/pages/processando.js",
 "../assets/js/pages/quadro.js",
 "../assets/js/pages/resumo.js",
+"../assets/js/ui/avisos-painel.js",
 "../assets/js/ui/banners.js",
 "../assets/js/ui/deslizar.js",
 "../assets/js/ui/esqueleto.js",
@@ -107,6 +112,7 @@ self.PL_ARQUIVOS=[
 "../assets/js/ui/portao.js",
 "../assets/js/ui/pwa.js",
 "../assets/js/ui/qualidade.js",
+"../assets/js/ui/voltar.js",
 "../assets/vendor/fontkit.umd.min.js",
 "../assets/vendor/pdf-lib.min.js",
 "./",

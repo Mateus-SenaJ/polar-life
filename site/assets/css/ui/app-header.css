@@ -42,3 +42,13 @@
   .app-barra__i .ico{flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
   .app-barra__i[aria-current="page"]{color:var(--blue);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
 }
+
+/* D-208 · varredura de layout: no tablet a navegação do meio entra no fluxo (não fica por baixo do sino e dos botões);
+   no celular estreito, «Conexões» vira só o ícone (o nome continua para o leitor de tela) */
+@media (min-width:768px) and (max-width:1099.98px){
+  .app-nav{position:static;transform:none;margin:0 8px 0 auto}
+}
+@media (max-width:400px){
+  .hnav a.btn2[href$="conexoes/"]{font-size:0;gap:0;min-width:44px;padding:0;justify-content:center}
+  .hnav a.btn2[href$="conexoes/"] .ico{margin:0}
+}

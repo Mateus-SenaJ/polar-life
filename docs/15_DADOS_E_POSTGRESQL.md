@@ -57,6 +57,9 @@ guarda fiscal), **Técnico** (sem pessoa ou só com chave interna), **Público**
 | Códigos de impressão (HMAC e 4 últimos) | `comercial.codigos_impressao` | Segredo | Uso único do código vendido | Contrato | 5 anos | Admin (sem o HMAC) |
 | Registros de acesso (IP, porta, data, rota) | `auditoria.registros_acesso` | Pessoal | Marco Civil, art. 15 | Obrigação legal (art. 7º II) | **6 meses**, sob sigilo | Só a auditoria |
 | Trilha de auditoria | `auditoria.eventos` | Técnico (sem e-mail, nome nem segredo) | Quem mudou o quê | Legítimo interesse: segurança e prova | 5 anos | Só a auditoria |
+| Preferências de aviso e inscrições de push | `avisos.preferencias`, `inscricoes_push` | Pessoal | Avisar no canal e na hora que a pessoa escolheu | Consentimento (art. 7º I) para o aparelho; contrato para o painel | Até a pessoa mudar, sair do aparelho ou excluir a conta | A pessoa (sem as chaves do push) |
+| Entregas de avisos | `avisos.entregas` | Pessoal | Não repetir aviso; contar aberturas | Legítimo interesse | 1 ano | A pessoa; admin só em contagem |
+| Cupons (HMAC, final, rótulo) e usos | `comercial.cupons`, `usos_cupons` | Segredo e financeiro | Desconto, uso único por conta | Contrato | 5 anos (fiscal) | Admin (sem o HMAC); a pessoa vê os próprios usos |
 | Planos, limites, preços, chaves | `comercial.planos`, `limites_plano`, `precos`, `config.*` | Público e técnico | Regras do produto | — | Histórico completo | API e admin |
 
 **Fora do banco, sempre:** foto, miniatura, legenda, ajuste, projeto, coordenada, EXIF, endereço temporário do Google Fotos,
@@ -194,6 +197,10 @@ chamada vira uma rota da API (nomes `[RECOMENDADO]`), e a API chama a função d
 | `exportarDados` | `GET /conta/dados` | `exportar_dados` |
 | `excluirConta` | `DELETE /conta` | `excluir_conta` |
 | Painel Admin | `/admin/*` | `novo_limite`, `novo_preco`, `criar_lote_codigos`, `revogar_codigo`, `ajustar_folhas` |
+| `conferirCupom`, `usarCupom` (D-208) | `POST /cupons/conferir` · no `POST /checkout` | `conferir_cupom` · `usar_cupom` (`PL007`, `PL008`, `PL009`) |
+| `PLAVISOS.salvarPrefs`, permitir notificações | `PUT /conta/avisos/preferencias` · `POST /conta/avisos/push` | `avisos.salvar_preferencias` · `inscrever_push` · `cancelar_push` |
+| Painel de avisos (campanhas, abrir, dispensar) | `GET /conta/avisos` · `POST /conta/avisos/{id}` | `avisos.caixa` · `avisos.marcar` |
+| Admin › Notificações e Cupons | `/admin/avisos/*`, `/admin/cupons/*` | `salvar_campanha`, `mudar_campanha`, `salvar_modelo`, `novo_cupom`, `mudar_cupom` |
 
 ## 9. Gestão
 

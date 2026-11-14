@@ -131,8 +131,11 @@ function pagamento(qtd,pro){
   var C=window.PLCONTA,L=C.limites().planos;
   var classe=PEND?PEND.classe:'padrao';
   var valor=pro?(L.pro.precoMes!==undefined?L.pro.precoMes:14.9):qtd*(classe==='grande'?L.avulsa.precoGrande:L.avulsa.precoPadrao);
+  /* D-208: cupom promocional aplicado na página de planos — desconto no valor; o cupom só é gasto com o pagamento aprovado */
+  var prod=pro?'pro_mensal':classe==='grande'?'folha_grande':'folha_padrao',cp=PEND&&PEND.cupom&&PEND.cupom.produtos.indexOf(prod)>=0?PEND.cupom:null,cheio=valor,desconto=0;
+  if(cp){desconto=C.descontoCupom(cp,valor);valor=Math.round((valor-desconto)*100)/100}
   var desc=pro?'Assinatura Pro · 1 mês':qtd+' folha'+(qtd>1?'s':'')+' '+(classe==='grande'?'grandes':'padrão');
-  PEND.pg={qtd:qtd,pro:!!pro,desc:desc,valor:valor,classe:classe};
+  PEND.pg={qtd:qtd,pro:!!pro,desc:desc,valor:valor,classe:classe,cupom:cp};
   titulo(pro?'Assinar o Pro':'Comprar '+qtd+' folha'+(qtd>1?'s':''));
   corpo(
     '<fieldset class="pp-pg"><legend class="pp-pg__t">Como pagar</legend>'+
@@ -140,6 +143,7 @@ function pagamento(qtd,pro){
     '<label class="pp-pg__o"><input type="radio" name="pp-pg" value="pix"><span>Pix</span></label>'+
     '<label class="pp-pg__o"><input type="radio" name="pp-pg" value="boleto"><span>Boleto</span></label>'+
     '</fieldset>'+
+    (cp?'<p class="pp-cupom">Cupom '+esc(cp.texto)+' · '+esc(cp.rotulo)+': de '+C.moeda(cheio)+' por <strong>'+C.moeda(valor)+'</strong> (−'+C.moeda(desconto)+')</p>':'')+
     '<div class="pp-sim">'+ico(I.info)+'<p><strong>Demonstração:</strong> nenhum dado de pagamento é pedido e nada é cobrado. Escolha abaixo o que simular.</p></div>'+
     '<div class="pp-sim-b"><button type="button" class="btn2 btn2--lg pp-sim__b" data-m="aprovado">Simular pagamento aprovado</button>'+
     '<button type="button" class="btn2 btn2--lg pp-sim__b" data-m="pendente">Simular Pix pendente</button>'+
@@ -157,8 +161,10 @@ function pagamento(qtd,pro){
   acoes([
     {led:true,txt:'Pagar '+C.moeda(valor)+' (teste)',cb:function(){
       if(!sim)return; /* tracejado até escolher a simulação (brief §3.6) */
-      if(pro)C.assinarPro(sim).then(depois);
-      else C.comprar(qtd,classe,sim).then(depois)
+      var op=cp?{cupom:cp.texto,valor:valor}:null;
+      function segue(){if(pro)C.assinarPro(sim,op).then(depois);else C.comprar(qtd,classe,sim,op).then(depois)}
+      if(cp&&sim==='aprovado')C.usarCupom(cp.texto,prod,cheio).then(segue,function(){op=null;valor=cheio;segue()});   /* cupom que deixou de valer: cobra o preço cheio */
+      else segue()
     }},
     {txt:'Voltar',cb:function(){fechar({ok:false,motivo:'cancelado'})}}
   ]);
@@ -200,8 +206,8 @@ function depois(r){
 PLPORTAO={
   pedir:pedir,
   /* página /app/conta/planos/: abre a etapa de pagamento direto (brief §3.7) */
-  pagamento:function(qtd,classe,pro,cb){
-    PEND={nFolhas:qtd,classe:classe||'padrao',externo:true,cb:cb||function(){}};
+  pagamento:function(qtd,classe,pro,cb,op){
+    PEND={nFolhas:qtd,classe:classe||'padrao',externo:true,cb:cb||function(){},cupom:op&&op.cupom||null};
     abrir();
     pagamento(qtd,!!pro)
   },

@@ -1,0 +1,5 @@
+/* D-208 · seta de voltar das telas da Conta (ícone + texto, 44 px, foco visível) */
+.voltar{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0 0 4px -10px;padding:0 12px 0 10px;border-radius:12px;color:var(--black);text-decoration:none;font:500 15px/1.2 var(--font)}
+.voltar:hover{background:var(--surface-subtle)}
+.voltar:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.voltar svg{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}

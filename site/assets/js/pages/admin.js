@@ -144,6 +144,8 @@ function render(){
   cx.appendChild(grid);
   cx.appendChild(contas());
   cx.appendChild(codigos());
+  if(C.admin.criarCupom)cx.appendChild(cupons());
+  if(window.PLAVISOS)cx.appendChild(notificacoes());
   antes=null;pendencias(false);
   function confere(){ /* atenção Pro < Grátis em fotos (não bloqueia) */
     var fg=document.getElementById('f-p-fotos');
@@ -346,6 +348,211 @@ function codigos(){
       })
     })
   }
+  return sec
+}
+
+/* ---------- cupons promocionais (D-208 · comercial.cupons) ----------
+   Criar (o texto do cupom é mostrado só agora; fica o hash), listar com usos e validade, pausar, reativar e revogar. */
+function cupons(){
+  var sec=document.createElement('section');sec.className='adm-sec adm-cup';sec.id='sec-cupons';sec.setAttribute('aria-labelledby','t-cup');
+  var P=C.PRODUTOS,prods='';for(var k in P)prods+='<label class="adm-cup__p"><input type="checkbox" name="cup-prod" value="'+k+'" checked><span>'+esc(P[k])+'</span></label>';
+  sec.innerHTML='<h2 class="adm-sec__t" id="t-cup">Cupons promocionais</h2>'+
+    '<p class="adm-sec__p">Desconto na compra de folhas ou na assinatura do Pro. Quem tem o cupom digita em Folhas e planos. Só o hash do cupom fica guardado.</p>'+
+    '<form class="adm-cup__form" id="cup-form" novalidate>'+
+    '<div class="adm-f"><label class="adm-f__l" for="cup-texto">Cupom</label><input class="txt" id="cup-texto" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="VERAO10"></div>'+
+    '<div class="adm-f"><label class="adm-f__l" for="cup-rot">Nome para reconhecer</label><input class="txt" id="cup-rot" maxlength="60" autocomplete="off" placeholder="Verão 2026"></div>'+
+    '<div class="adm-f"><span class="adm-f__l" id="cup-tipo-l">Desconto</span><div class="adm-cup__d"><span class="sel"><select id="cup-tipo" aria-labelledby="cup-tipo-l"><option value="percentual">Porcentagem</option><option value="valor">Valor fixo</option></select></span>'+
+    '<input class="txt" id="cup-val" inputmode="decimal" value="10" aria-label="Quanto de desconto"><span class="adm-cup__u" id="cup-u">%</span></div></div>'+
+    '<fieldset class="adm-f adm-cup__ps"><legend class="adm-f__l">Vale para</legend>'+prods+'</fieldset>'+
+    '<div class="adm-f"><label class="adm-f__l" for="cup-ate">Validade</label><input class="txt" id="cup-ate" type="date"><span class="adm-nt__dica">Vazio: sem prazo</span></div>'+
+    '<div class="adm-f"><label class="adm-f__l" for="cup-max">Limite de usos</label><input class="txt" id="cup-max" inputmode="numeric" placeholder="Sem limite"></div>'+
+    '<label class="adm-cup__um"><input type="checkbox" id="cup-um" checked><span>Uma vez por conta</span></label>'+
+    '<p class="adm-err" id="cup-erro" role="alert" hidden></p>'+
+    '<button type="submit" class="btn2 btn2--lg" id="cup-criar">Criar cupom</button></form>'+
+    '<div class="adm-cod__aviso">'+ico(I.atn)+'<span>Demonstração · sem servidor: os cupons valem neste navegador.</span></div>'+
+    '<div id="cup-tabela"></div>';
+  var q=function(s){return sec.querySelector(s)};
+  q('#cup-tipo').addEventListener('change',function(){q('#cup-u').textContent=this.value==='valor'?'R$':'%'});
+  q('#cup-form').addEventListener('submit',function(e){e.preventDefault();
+    var tipo=q('#cup-tipo').value,v=parseFloat(String(q('#cup-val').value).replace(',','.')),d={texto:q('#cup-texto').value,rotulo:q('#cup-rot').value,tipo:tipo,
+      percentual:tipo==='percentual'?v:null,valor:tipo==='valor'?v:null,produtos:[].map.call(sec.querySelectorAll('[name=cup-prod]:checked'),function(x){return x.value}),
+      validoAte:q('#cup-ate').value?q('#cup-ate').value+'T23:59:59':null,usosMax:q('#cup-max').value?parseInt(q('#cup-max').value,10):null,umPorConta:q('#cup-um').checked};
+    C.admin.criarCupom(d).then(function(r){var er=q('#cup-erro');
+      if(r.erros){var k=Object.keys(r.erros);er.textContent=k.map(function(x){return r.erros[x]}).join(' ');er.hidden=false;return}
+      er.hidden=true;toast('Cupom '+String(d.texto).toUpperCase().replace(/[^A-Z0-9]/g,'')+' criado');q('#cup-texto').value='';q('#cup-rot').value='';tabela()})});
+  function tabela(){
+    var ls=C.admin.listarCupons();
+    if(!ls.length){q('#cup-tabela').innerHTML='<p class="adm-sec__p">Nenhum cupom ainda.</p>';return}
+    q('#cup-tabela').innerHTML='<div class="adm-cup__tab"><table class="tbl"><thead><tr><th>Cupom</th><th>Nome</th><th>Desconto</th><th>Vale para</th><th>Validade</th><th>Usos</th><th>Situação</th><th></th></tr></thead><tbody>'+
+      ls.map(function(x){return '<tr><td class="mono">…'+esc(x.final)+'</td><td>'+esc(x.rotulo)+'</td><td>'+(x.tipo==='percentual'?x.percentual+'%':C.moeda(x.valor))+'</td><td>'+esc(x.produtos.join(', '))+'</td>'+
+        '<td class="mono">'+(x.validoAte?dataCurta(+new Date(x.validoAte)):'—')+'</td><td class="mono">'+x.usos+(x.usosMax?' de '+x.usosMax:'')+'</td><td><span class="sit">'+esc(x.situacao)+'</span></td><td class="adm-cup__acts">'+
+        (x.situacao==='ativo'?'<button type="button" class="b44" data-cup="'+esc(x.id)+'" data-sit="pausado">Pausar</button>':x.situacao==='pausado'?'<button type="button" class="b44" data-cup="'+esc(x.id)+'" data-sit="ativo">Reativar</button>':'')+
+        (x.situacao!=='revogado'?'<button type="button" class="b44" data-cup="'+esc(x.id)+'" data-sit="revogado">Revogar</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div>';
+    [].forEach.call(sec.querySelectorAll('[data-cup]'),function(b){b.addEventListener('click',function(){var s=b.getAttribute('data-sit');C.admin.mudarCupom(b.getAttribute('data-cup'),s);toast(s==='revogado'?'Cupom revogado':s==='pausado'?'Cupom pausado':'Cupom reativado');tabela()})})
+  }
+  tabela();return sec
+}
+
+/* ---------- notificações (D-208, DOC-16 §6) ----------
+   Campanhas (promoção, anúncio, aviso do sistema): criar, editar, prévia, rascunho, agendar, lançar, pausar, encerrar, duplicar e
+   excluir; textos dos avisos automáticos e pausa de cada um; exportar o feed. Sem servidor: tudo vale neste navegador (T7).
+   Cada botão daqui grava na hora (não depende de «Salvar alterações», que é dos limites dos planos). */
+function notificacoes(){
+  var A=window.PLAVISOS,AD=A.admin,sec=document.createElement('section'),editando='';
+  var TIPO={promocao:'Promoção',anuncio:'Anúncio',sistema:'Aviso do sistema'},SIT={rascunho:'Rascunho',agendada:'Agendada','no-ar':'No ar',pausada:'Pausada',encerrada:'Encerrada'};
+  var CANAL={app:'Só no painel do app',sistema:'Painel e notificação do aparelho'};
+  var IT={promocao:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="8" r="1.5"/>',anuncio:'<path d="M4 10v4h3l7 4V6l-7 4z"/><path d="M17 9a4 4 0 0 1 0 6"/>',sistema:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    lembranca:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><rect x="7.5" y="5.5" width="9" height="9"/>',sugestao:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',codigo:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'};
+  var q=function(s){return sec.querySelector(s)};
+  function ops(o,sel){var h='',k;for(k in o)h+='<option value="'+esc(k)+'"'+(k===sel?' selected':'')+'>'+esc(o[k])+'</option>';return h}
+  function d2(n){return ('0'+n).slice(-2)}
+  function paraCampo(ms){if(!ms)return '';var d=new Date(ms);return d.getFullYear()+'-'+d2(d.getMonth()+1)+'-'+d2(d.getDate())+'T'+d2(d.getHours())+':'+d2(d.getMinutes())}
+  function doCampo(v){if(!v)return null;var t=new Date(v).getTime();return isNaN(t)?null:t}
+  function dataHora(ms){var d=new Date(ms);return dataCurta(ms)+' '+d2(d.getHours())+':'+d2(d.getMinutes())}
+  function campo(id,rot,html,dica){return '<div class="adm-f" id="f-'+id+'"><label class="adm-f__l" for="'+id+'" id="'+id+'-l">'+rot+'</label>'+html+(dica?'<span class="adm-nt__dica" id="'+id+'-d">'+dica+'</span>':'')+'</div>'}
+
+  sec.className='adm-sec adm-nt';sec.id='sec-notificacoes';sec.setAttribute('aria-labelledby','t-nt');
+  var dest='<option value="">Sem botão</option>'+A.DESTINOS.map(function(d){return '<option value="'+esc(d.url||'./')+'">'+esc(d.nome)+'</option>'}).join('');
+  sec.innerHTML='<h2 class="adm-sec__t" id="t-nt">Notificações</h2>'+
+    '<p class="adm-sec__p">Promoções, anúncios e avisos do PolarLife para quem usa o app, e os textos dos avisos automáticos (lembranças, sugestões e prazos).</p>'+
+    '<div class="adm-cod__aviso" id="nt-demo">'+ico(I.atn)+'<span>Demonstração · sem servidor. As campanhas ficam neste navegador e aparecem para as contas que abrirem o PolarLife nele; nada é enviado a outros aparelhos.</span></div>'+
+    '<div class="adm-nt__grade">'+
+    '<form class="adm-nt__form" id="nt-form" novalidate aria-labelledby="nt-form-t"><h3 class="adm-nt__h" id="nt-form-t">Nova campanha</h3>'+
+    campo('nt-tipo','Tipo','<span class="sel"><select id="nt-tipo">'+ops(TIPO,'promocao')+'</select></span>')+
+    campo('nt-titulo','Título','<input class="txt" id="nt-titulo" maxlength="60" autocomplete="off">','<span id="nt-titulo-n">0</span> de 60')+
+    campo('nt-texto','Texto','<textarea class="txt adm-nt__area" id="nt-texto" maxlength="160" rows="3"></textarea>','<span id="nt-texto-n">0</span> de 160')+
+    '<div class="adm-nt__par">'+campo('nt-url','Botão leva para','<span class="sel"><select id="nt-url">'+dest+'</select></span>')+
+    campo('nt-botao','Texto do botão','<input class="txt" id="nt-botao" maxlength="24" autocomplete="off" placeholder="Ver oferta">')+'</div>'+
+    campo('nt-publico','Público','<span class="sel"><select id="nt-publico">'+ops(A.PUBLICOS,'todos')+'</select></span>')+
+    '<div class="adm-nt__par">'+campo('nt-inicio','Início','<input class="txt" id="nt-inicio" type="datetime-local">','Vazio: ao lançar')+
+    campo('nt-fim','Fim','<input class="txt" id="nt-fim" type="datetime-local">','Vazio: até encerrar')+'</div>'+
+    campo('nt-canal','Onde aparece','<span class="sel"><select id="nt-canal">'+ops(CANAL,'app')+'</select></span>','No aparelho, só para quem permitiu; no máximo 1 por dia, sem som.')+
+    '<p class="adm-err" id="nt-erro" role="alert" hidden></p>'+
+    '<div class="adm-nt__act"><button type="submit" class="btn2" id="nt-salvar">Salvar rascunho</button><button type="button" class="btn2" id="nt-agendar">Agendar</button>'+
+    '<button type="button" class="btn2" id="nt-lancar">Lançar agora</button><button type="button" class="btn2" id="nt-limpar">Limpar</button></div></form>'+
+    '<div class="adm-nt__previa" aria-labelledby="nt-pv-t"><h3 class="adm-nt__h" id="nt-pv-t">Prévia</h3>'+
+    '<p class="adm-f__l">No painel de avisos</p><div class="adm-nt__pv" id="nt-pv-painel"></div>'+
+    '<p class="adm-f__l">Na notificação do aparelho</p><div class="adm-nt__sis" id="nt-pv-sis"></div>'+
+    '<p class="adm-nt__dica">Promoções e anúncios vão sem imagem. A colagem só aparece nas lembranças e sugestões, montada no aparelho de cada pessoa com as fotos dela.</p></div>'+
+    '</div>'+
+    '<h3 class="adm-nt__h" id="nt-lista-t">Campanhas</h3><ul class="adm-nt__lista" id="nt-lista" aria-labelledby="nt-lista-t"></ul>'+
+    '<div class="adm-nt__act"><button type="button" class="btn2" id="nt-exportar">'+ico('<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>')+'Exportar JSON</button></div>'+
+    '<p class="adm-nt__dica">O arquivo traz as campanhas lançadas e os textos automáticos, no formato que o servidor vai ler quando existir.</p>'+
+    '<h3 class="adm-nt__h" id="nt-auto-t">Avisos automáticos</h3>'+
+    '<p class="adm-sec__p">Gerados no aparelho de cada pessoa. Você escolhe o texto e pode pausar cada um.</p><div class="adm-nt__autos" id="nt-autos"></div>'+
+    '<p class="adm-err" id="nt-auto-erro" role="alert" hidden></p>'+
+    '<div class="adm-nt__act"><button type="button" class="btn2" id="nt-auto-salvar">Salvar textos</button><button type="button" class="btn2" id="nt-auto-padrao">Restaurar textos padrão</button></div>';
+
+  function ler(){
+    var u=q('#nt-url').value;
+    return {id:editando||undefined,tipo:q('#nt-tipo').value,titulo:q('#nt-titulo').value,texto:q('#nt-texto').value,botao:u?q('#nt-botao').value:'',url:u==='./'?'':u,
+      publico:q('#nt-publico').value,canal:q('#nt-canal').value,inicio:doCampo(q('#nt-inicio').value),fim:doCampo(q('#nt-fim').value)}
+  }
+  function preencher(c){
+    editando=c?c.id:'';
+    q('#nt-form-t').textContent=c?'Editando campanha':'Nova campanha';
+    q('#nt-tipo').value=c?c.tipo:'promocao';q('#nt-titulo').value=c?c.titulo:'';q('#nt-texto').value=c?c.texto:'';
+    q('#nt-botao').value=c?c.botao||'':'';q('#nt-url').value=c&&c.botao?(c.url||'./'):'';
+    q('#nt-publico').value=c?c.publico:'todos';q('#nt-canal').value=c?c.canal:'app';
+    q('#nt-inicio').value=c?paraCampo(c.inicio):'';q('#nt-fim').value=c?paraCampo(c.fim):'';
+    q('#nt-limpar').textContent=c?'Cancelar edição':'Limpar';
+    erro('');previa()
+  }
+  function erro(msg){var e=q('#nt-erro');e.hidden=!msg;e.innerHTML=msg?ico(I.x)+'<span>'+esc(msg)+'</span>':''}
+  function previa(){
+    var d=ler(),t=d.titulo.trim()||'Título da campanha',x=d.texto.trim()||'O texto aparece aqui, em até 160 caracteres.';
+    q('#nt-titulo-n').textContent=d.titulo.length;q('#nt-texto-n').textContent=d.texto.length;
+    q('#f-nt-botao').hidden=!q('#nt-url').value;
+    q('#nt-pv-painel').innerHTML='<div class="av av--semimg"><div class="av__q"><p class="av__tipo"><svg viewBox="0 0 24 24" aria-hidden="true">'+IT[d.tipo]+'</svg>'+esc(A.TIPOS[d.tipo].um)+'</p><p class="av__n">'+esc(t)+'</p><p class="av__x">'+esc(x)+'</p></div>'+
+      '<div class="av__act">'+(d.botao.trim()?'<span class="av__ir">'+esc(d.botao.trim())+'</span>':'')+'<span class="av__b">Lembrar amanhã</span><span class="av__b">Dispensar</span></div></div>';
+    q('#nt-pv-sis').innerHTML=d.canal==='sistema'?'<img src="../../assets/img/icones/icone-192.png" width="40" height="40" alt=""><div><p class="adm-nt__sn">'+esc(t)+'</p><p class="adm-nt__sx">'+esc(x)+'</p><p class="adm-nt__so">PolarLife · sem som</p></div>':
+      '<p class="adm-nt__sx">Esta campanha aparece só no painel do app.</p>'
+  }
+  function salvar(depois){ /* depois: 'lancar' | 'agendar' | undefined (rascunho) */
+    var d=ler(),r,k;
+    if(depois==='agendar'&&(!d.inicio||d.inicio<=Date.now())){erro('Para agendar, escolha um início no futuro.');focar(q('#nt-inicio'));return}
+    r=AD.salvar(d);
+    if(r.erros){for(k in r.erros){erro(r.erros[k]);var c=q('#nt-'+k);if(c)focar(c);return}}
+    if(!r.ok){erro('Só a conta Admin grava campanhas.');return}
+    if(depois){var r2=AD[depois](r.campanha.id);if(!r2.ok){erro(r2.erro==='fim'?'O fim já passou: ajuste a data para lançar.':'Não foi possível '+(depois==='lancar'?'lançar':'agendar')+' esta campanha.');editando=r.campanha.id;lista();return}}
+    toast(depois==='lancar'?'Campanha lançada neste navegador':depois==='agendar'?'Campanha agendada':'Rascunho salvo');
+    preencher(null);lista()
+  }
+  function lista(){
+    var cs=AD.campanhas(),ul=q('#nt-lista');
+    if(!cs.length){ul.innerHTML='<li class="adm-nt__vazio" id="nt-vazio">Nenhuma campanha ainda. Crie a primeira no formulário acima.</li>';return}
+    ul.innerHTML=cs.map(function(c){
+      var s=c.situacao,b=function(a,t){return '<button type="button" class="adm-nt__b" data-nt="'+a+'" data-id="'+esc(c.id)+'">'+t+'</button>'},h='';
+      if(s!=='encerrada')h+=b('editar','Editar');
+      if(s==='rascunho'||s==='agendada')h+=b('lancar','Lançar agora');
+      if(s==='no-ar'||s==='agendada')h+=b('pausar','Pausar');
+      if(s==='pausada')h+=b('retomar','Retomar');
+      if(s!=='rascunho'&&s!=='encerrada')h+=b('encerrar','Encerrar');
+      h+=b('duplicar','Duplicar')+b('excluir','Excluir');
+      return '<li class="adm-nt__c" data-id="'+esc(c.id)+'" data-sit="'+s+'"><div class="adm-nt__ct"><p class="adm-nt__n">'+esc(c.titulo)+'</p><span class="sit">'+SIT[s]+'</span></div>'+
+        '<p class="adm-nt__d">'+esc(c.texto)+'</p>'+
+        '<p class="adm-nt__m">'+esc(TIPO[c.tipo])+' · '+esc(A.PUBLICOS[c.publico])+' · '+esc(CANAL[c.canal])+(c.botao?' · botão «'+esc(c.botao)+'»':'')+'</p>'+
+        '<p class="adm-nt__m">'+(c.inicio?'Início '+dataHora(c.inicio):'Início ao lançar')+' · '+(c.fim?'fim '+dataHora(c.fim):'sem data de fim')+'</p>'+
+        '<p class="adm-nt__k" aria-label="Contadores deste navegador"><span>Entregues <span class="mono" data-k="entregues">'+(c.cont.entregues||0)+'</span></span><span>Abertas <span class="mono" data-k="abertas">'+(c.cont.abertas||0)+'</span></span><span>Dispensadas <span class="mono" data-k="dispensadas">'+(c.cont.dispensadas||0)+'</span></span></p>'+
+        '<div class="adm-nt__ca">'+h+'</div></li>'
+    }).join('')
+  }
+  function autos(){
+    var M=AD.modelos(),P=AD.pausados(),NOME={lembranca:'Lembrança «neste dia»',sugestao:'Sugestão do mês',codigo:'Prazo de código'},k,h='';
+    for(k in M)h+='<div class="adm-nt__auto" data-auto="'+k+'"><div class="adm-nt__ct"><p class="adm-nt__n"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+IT[k]+'</svg>'+NOME[k]+'</p>'+
+      '<div class="adm-nt__pausa"><span class="adm-f__l" id="nt-p-'+k+'-l">Pausado</span><button type="button" class="sw" id="nt-p-'+k+'" data-pausa="'+k+'" role="switch" aria-checked="'+(P[k]?'true':'false')+'" aria-labelledby="nt-p-'+k+'-l"><span></span></button></div></div>'+
+      campo('nt-m-'+k+'-t','Título','<input class="txt" id="nt-m-'+k+'-t" maxlength="60" value="'+esc(M[k].titulo)+'" autocomplete="off">')+
+      campo('nt-m-'+k+'-x','Texto','<textarea class="txt adm-nt__area" id="nt-m-'+k+'-x" maxlength="160" rows="2">'+esc(M[k].texto)+'</textarea>','Variáveis: '+A.VARS[k].map(function(v){return '{'+v+'}'}).join(' '))+
+      '<p class="adm-nt__ex" id="nt-m-'+k+'-ex"></p></div>';
+    q('#nt-autos').innerHTML=h;
+    for(k in M)exemploDe(k)
+  }
+  function exemploDe(k){var v=AD.exemplo(k);q('#nt-m-'+k+'-ex').textContent='Exemplo: '+A.formatar(q('#nt-m-'+k+'-t').value,v)+' — '+A.formatar(q('#nt-m-'+k+'-x').value,v)}
+  function erroAuto(msg){var e=q('#nt-auto-erro');e.hidden=!msg;e.innerHTML=msg?ico(I.x)+'<span>'+esc(msg)+'</span>':''}
+
+  q('#nt-form').addEventListener('submit',function(e){e.preventDefault();salvar()});
+  q('#nt-form').addEventListener('input',previa);q('#nt-form').addEventListener('change',previa);
+  q('#nt-agendar').addEventListener('click',function(){salvar('agendar')});
+  q('#nt-lancar').addEventListener('click',function(){salvar('lancar')});
+  q('#nt-limpar').addEventListener('click',function(){preencher(null);focar(q('#nt-titulo'))});
+  q('#nt-lista').addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-nt]');if(!b)return;
+    var a=b.getAttribute('data-nt'),id=b.getAttribute('data-id'),c=null,r;
+    AD.campanhas().forEach(function(x){if(x.id===id)c=x});
+    if(!c)return;
+    if(a==='editar'){preencher(c);focar(q('#nt-titulo'));q('#nt-form').scrollIntoView({block:'start'});return}
+    if(a==='excluir'){
+      pop('Excluir esta campanha?','<p>«'+esc(c.titulo)+'» sai da lista e do painel de quem já recebeu. Os contadores dela se perdem.</p>',
+        [{led:true,txt:'Manter campanha',cb:fecharDlg},{txt:'Excluir campanha',ic:ico(I.lixo),cb:function(){AD.excluir(id);fecharDlg();if(editando===id)preencher(null);toast('Campanha excluída');lista();focar(q('#nt-titulo'))}}]);
+      return
+    }
+    r=AD[a](id);
+    if(!r.ok){toast(a==='lancar'&&r.erro==='fim'?'O fim já passou: edite a data para lançar.':'Não foi possível concluir.');return}
+    toast({lancar:'Campanha lançada neste navegador',pausar:'Campanha pausada',retomar:'Campanha retomada',encerrar:'Campanha encerrada',duplicar:'Cópia criada como rascunho'}[a]);
+    lista();
+    var n=q('.adm-nt__c[data-id="'+(a==='duplicar'?r.campanha.id:id)+'"] .adm-nt__b');if(n)focar(n)
+  });
+  q('#nt-exportar').addEventListener('click',function(){
+    var d=new Date(),n='polarlife-avisos-'+d.getFullYear()+d2(d.getMonth()+1)+d2(d.getDate())+'.json';
+    var u=URL.createObjectURL(new Blob([JSON.stringify(AD.feed(),null,2)],{type:'application/json'})),a=document.createElement('a');
+    a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},2000);
+    toast('Feed exportado ('+n+')')
+  });
+  q('#nt-autos').addEventListener('input',function(e){var d=e.target.closest('[data-auto]');if(d)exemploDe(d.getAttribute('data-auto'))});
+  q('#nt-autos').addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-pausa]');if(!b)return;
+    var on=b.getAttribute('aria-checked')!=='true',k=b.getAttribute('data-pausa');
+    if(AD.pausarTipo(k,on).ok){b.setAttribute('aria-checked',on?'true':'false');toast(on?'Aviso automático pausado':'Aviso automático retomado')}
+  });
+  q('#nt-auto-salvar').addEventListener('click',function(){
+    var m={},k,r;
+    for(k in AD.modelos())m[k]={titulo:q('#nt-m-'+k+'-t').value,texto:q('#nt-m-'+k+'-x').value};
+    r=AD.salvarModelos(m);
+    if(r.erros){for(k in r.erros){erroAuto(r.erros[k]);focar(q('#nt-m-'+k+'-t'));return}}
+    erroAuto('');toast(r.ok?'Textos salvos neste navegador':'Só a conta Admin grava os textos.')
+  });
+  q('#nt-auto-padrao').addEventListener('click',function(){AD.restaurarModelos();erroAuto('');autos();toast('Textos padrão restaurados')});
+  preencher(null);lista();autos();
   return sec
 }
 
