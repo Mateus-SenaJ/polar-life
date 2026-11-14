@@ -43,9 +43,15 @@ function receive(list){
      antigas por posição se misturam com as novas (bug «sempre aparecem 24 fotos»). */
   if(window.PLFOTOS)salvando=salvando
     .then(function(){return window.PLPROJETOS&&!PLPROJETOS.atual()?PLPROJETOS.criar('Projeto de '+new Date().toLocaleDateString('pt-BR')):null})
-    .then(function(){return fresh?PLFOTOS.limpar():null})
-    .then(function(){return Promise.all(ok.map(function(f,i){var n=MAXJA+picked.length-ok.length+i+1;return PLFOTOS.salvar(n,f,window.PLPROJETOS?PLPROJETOS.atual():'')   /* uma leitura grava a foto aberta e a cópia do projeto */}))})
-    .catch(function(){toast('Não foi possível preparar uma foto neste navegador.')});
+    .then(function(){if(fresh)try{sessionStorage.removeItem('pl-falhas')}catch(e){}return fresh?PLFOTOS.limpar():null})
+    .then(function(){   /* D-210: uma foto por vez (no celular, várias ao mesmo tempo estouravam a memória); a que falha não para as outras */
+      var base=MAXJA+picked.length-ok.length,falhas=[],pid=window.PLPROJETOS?PLPROJETOS.atual():'';
+      return ok.reduce(function(ant,f,i){return ant.then(function(){return PLFOTOS.salvar(base+i+1,f,pid).catch(function(){falhas.push({n:base+i+1,nome:f.name||'',tipo:f.type||''})})})},Promise.resolve())
+        .then(function(){if(!falhas.length)return;
+          try{var g=JSON.parse(sessionStorage.getItem('pl-falhas')||'{}');falhas.forEach(function(x){g[x.n]=x});sessionStorage.setItem('pl-falhas',JSON.stringify(g))}catch(e){}
+          toast(falhas.length===1?'«'+falhas[0].nome+'» não abriu neste navegador. As outras fotos seguem.':falhas.length+' fotos não abriram neste navegador. '+(falhas.length<ok.length?'As outras seguem.':'Confira se são HEIC e converta para JPEG, ou tente outro navegador.'))})
+    })
+    .catch(function(){toast('Não foi possível preparar as fotos neste navegador.')});
   acompanhar(salvando);   /* D-200 */
   render(bad,extra);
 }

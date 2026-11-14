@@ -63,7 +63,7 @@ function zip(f){return f.arrayBuffer().then(function(b){
 
 /* HEIC e TIFF só abrem onde o navegador decodifica (Safari); nos outros, aviso claro em vez de falha muda */
 function decodifica(f){
-  var x=ext(f.name);if(!/^(heic|heif|tiff?)$/.test(x))return Promise.resolve(true);
+  var x=ext(f.name);if(!/^(heic|heif|tiff?)$/.test(x)&&!/^image\/(heic|heif|tiff)$/i.test(f.type||''))return Promise.resolve(true);   /* D-210: o HEIC também pelo tipo (no Android o nome pode vir sem extensão) */
   if(!window.createImageBitmap)return Promise.resolve(false);
   return createImageBitmap(f).then(function(b){b.close();return true},function(){return false})}
 
@@ -74,7 +74,7 @@ function expandir(arqs){
     var nome=f.name||'';
     if(/\.zip$/i.test(nome))return zip(f).then(function(r){out=out.concat(r.arquivos);erros=erros.concat(r.erros)});
     if(RAW.test(nome))return raw(f).then(function(j){out.push(j)});
-    return decodifica(f).then(function(ok){if(ok)out.push(f);else erros.push('«'+nome+'»: este navegador não abre '+ext(nome).toUpperCase()+'. Converta para JPEG no aparelho ou use o Safari.')})
+    return decodifica(f).then(function(ok){if(ok)out.push(f);else erros.push('«'+nome+'»: este navegador não abre '+(ext(nome)||String(f.type||'').replace('image/','')).toUpperCase()+'. Converta para JPEG no aparelho ou use o Safari.')})
   }).catch(function(e){erros.push(e&&e.message||('«'+(f.name||'arquivo')+'» não pôde ser lido.'))})},Promise.resolve())
   .then(function(){return {arquivos:out,erros:erros}})}
 

@@ -1,6 +1,6 @@
 # Status do projeto
 
-Atualizado em 2026-11-13 (D-194 a D-209). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
+Atualizado em 2026-11-13 (D-194 a D-210). O histórico das etapas antigas está em `docs/historico/` e no git; as decisões, em `docs/10_LOG_DECISOES.md`.
 
 ## No ar
 - https://polar-life.vercel.app e https://mateus-senaj.github.io/polar-life/ (o mesmo `site/`, publicado a partir de `main`).

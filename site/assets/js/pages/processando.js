@@ -120,7 +120,8 @@ function verificarReal(){
     if(i>=N){finish();return}
     cur=i;FILES[i].st='work';paint();
     var p=window.PLFOTOS?PLFOTOS.ler(REAL[i]).catch(function(){return null}):Promise.resolve({w:1,h:1});
-    p.then(function(r){var f=FILES[i];if(r&&r.w&&r.h)f.st='ok';else{f.st='fail';f.why='A foto não está mais neste aparelho. Volte e escolha de novo.'}i++;setTimeout(prox,30)})
+    p.then(function(r){var f=FILES[i];if(r&&r.w&&r.h)f.st='ok';else{f.st='fail';var fl=null;try{fl=JSON.parse(sessionStorage.getItem('pl-falhas')||'{}')[REAL[i]]}catch(e){}   /* D-210: o motivo de verdade */
+      f.why=fl?(/heic|heif/i.test(fl.tipo+fl.nome)?'Este navegador não abre HEIC. Converta para JPEG no aparelho ou use o Safari.':'Este navegador não conseguiu abrir a foto. Tente de novo ou troque a foto.'):'A foto não está mais neste aparelho. Volte e escolha de novo.'}i++;setTimeout(prox,30)})
   }
   prox()
 }

@@ -4,9 +4,35 @@ var DB='polar-life',VERS=3;
 function abrirDB(){return new Promise(function(ok,no){var r=indexedDB.open(DB,VERS);r.onupgradeneeded=function(){var d=r.result;if(!d.objectStoreNames.contains('fotos'))d.createObjectStore('fotos');if(!d.objectStoreNames.contains('arquivos'))d.createObjectStore('arquivos');if(!d.objectStoreNames.contains('fotosProjeto'))d.createObjectStore('fotosProjeto');if(!d.objectStoreNames.contains('projetos'))d.createObjectStore('projetos',{keyPath:'id'})};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}})}
 function tx(loja,modo,fn){return abrirDB().then(function(db){return new Promise(function(ok,no){var t=db.transaction(loja,modo),s=t.objectStore(loja),v;try{v=fn(s,t)}catch(e){db.close();no(e);return}t.oncomplete=function(){db.close();ok(v)};t.onerror=function(){db.close();no(t.error)}})})}
 function pedido(r){return new Promise(function(ok,no){r.onsuccess=function(){ok(r.result||null)};r.onerror=function(){no(r.error)}})}
-function dimensoes(file){if(!window.createImageBitmap)return Promise.reject(new Error('Imagem não suportada'));return createImageBitmap(file,{imageOrientation:'from-image'}).then(function(b){var r={w:b.width,h:b.height};b.close();return r})}
+/* D-210: no celular, decodificar a foto inteira (50 MP ou mais) para saber o tamanho estourava a memória e todas falhavam.
+   Agora o tamanho vem do cabeçalho (JPEG, PNG, WebP), sem decodificar; a orientação do EXIF troca largura e altura (5 a 8).
+   Só os outros formatos (HEIC no Safari, AVIF, TIFF) ainda passam pelo createImageBitmap. */
+function cabecalho(file){return new Promise(function(ok){
+  if(!file||!file.slice){ok(null);return}
+  var r=new FileReader();r.onerror=function(){ok(null)};
+  r.onload=function(){try{ok(medir(new Uint8Array(r.result)))}catch(e){ok(null)}};
+  r.readAsArrayBuffer(file.slice(0,1024*1024))})}
+function medir(a){
+  if(a[0]===255&&a[1]===216){var p=2;
+    while(p+9<a.length){if(a[p]!==255){p++;continue}var m=a[p+1];
+      if(m===255){p++;continue}
+      if(m===216||m===1||(m>=208&&m<=215)){p+=2;continue}
+      var n=a[p+2]<<8|a[p+3];
+      if(m>=192&&m<=207&&m!==196&&m!==200&&m!==204){var h=a[p+5]<<8|a[p+6],w=a[p+7]<<8|a[p+8];return w&&h?{w:w,h:h}:null}
+      if(m===218||n<2)return null;p+=2+n}
+    return null}
+  if(a[0]===137&&a[1]===80&&a[2]===78&&a[3]===71){var dv=new DataView(a.buffer,a.byteOffset);return{w:dv.getUint32(16),h:dv.getUint32(20)}}
+  if(a[0]===82&&a[1]===73&&a[2]===70&&a[3]===70&&a[8]===87&&a[9]===69&&a[10]===66&&a[11]===80){var t=String.fromCharCode(a[12],a[13],a[14],a[15]);
+    if(t==='VP8 ')return{w:(a[26]|a[27]<<8)&16383,h:(a[28]|a[29]<<8)&16383};
+    if(t==='VP8L'){var b=a[21]|a[22]<<8|a[23]<<16|a[24]<<24;return{w:(b&16383)+1,h:((b>>>14)&16383)+1}}
+    if(t==='VP8X')return{w:1+(a[24]|a[25]<<8|a[26]<<16),h:1+(a[27]|a[28]<<8|a[29]<<16)}}
+  return null}
+function dimensoes(file,orient){return cabecalho(file).then(function(d){
+  if(d){if(orient>=5&&orient<=8)d={w:d.h,h:d.w};return d}
+  if(!window.createImageBitmap)return Promise.reject(new Error('Imagem não suportada'));
+  return createImageBitmap(file,{imageOrientation:'from-image'}).then(function(b){var r={w:b.width,h:b.height};b.close();return r})})}
 function meta(file){return /^image\/jpe?g$/i.test(file.type||'')&&window.PLEXIF?PLEXIF.ler(file):Promise.resolve({})}
-function registro(file){return Promise.all([dimensoes(file),meta(file)]).then(function(r){return{blob:file,w:r[0].w,h:r[0].h,nome:file.name||'',meta:r[1]||{}}})}
+function registro(file){return meta(file).then(function(mt){mt=mt||{};return dimensoes(file,mt.orientacao).then(function(d){return{blob:file,w:d.w,h:d.h,nome:file.name||'',meta:mt}})})}
 function salvar(src,file,pid){delete LUGAR[Number(src)];return registro(file).then(function(v){return abrirDB().then(function(db){return new Promise(function(ok,no){ /* 44: decodifica uma vez; com projeto, grava também a cópia (mesma transação) */
   var t=db.transaction(pid?['fotos','fotosProjeto']:['fotos'],'readwrite');t.objectStore('fotos').put(v,Number(src));if(pid)t.objectStore('fotosProjeto').put(v,String(pid)+':'+Number(src));
   t.oncomplete=function(){db.close();if(window.PLPWA)PLPWA.persistir();ok({w:v.w,h:v.h,meta:v.meta})};t.onerror=function(){db.close();no(t.error)}})})})}
@@ -53,5 +79,5 @@ function lugar(src){
   return p
 }
 function esquecerLugar(src){if(src==null)LUGAR={};else delete LUGAR[Number(src)]}
-window.PLFOTOS={lugar:lugar,esquecerLugar:esquecerLugar,removerFoto:removerFoto,restaurarFoto:restaurarFoto,abrirDB:abrirDB,salvar:salvar,salvarProjeto:salvarProjeto,ler:ler,limpar:limpar,todos:todos,limparArquivos:limparArquivos,guardarArquivos:guardarArquivos,lerArquivos:lerArquivos};
+window.PLFOTOS={medir:medir,lugar:lugar,esquecerLugar:esquecerLugar,removerFoto:removerFoto,restaurarFoto:restaurarFoto,abrirDB:abrirDB,salvar:salvar,salvarProjeto:salvarProjeto,ler:ler,limpar:limpar,todos:todos,limparArquivos:limparArquivos,guardarArquivos:guardarArquivos,lerArquivos:lerArquivos};
 })();
