@@ -33,3 +33,5 @@
 .enviar__app .ico{width:22px;height:22px}
 .enviar__h{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0}
 .enviar__h .ico{flex:none;margin-top:2px}
+/* D-208: no celular a coluna de botões não espreme a altura (flex-basis 100% em coluna virava altura); 48 px cada */
+@media(max-width:600px){.act .btn2,.act .led-btn,.dialog__act .btn2,.dialog__act .led-btn{flex:0 0 auto;min-height:48px}}
