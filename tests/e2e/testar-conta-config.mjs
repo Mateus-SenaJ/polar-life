@@ -16,8 +16,8 @@ const srv = await servir(), nav = await chromium.launch();
 const saida = fileURLToPath(new URL('../saida/conta/', import.meta.url));
 await rm(saida, { recursive: true, force: true }); await mkdir(saida, { recursive: true });
 const erros = [];
-const TODAS = ['perfil', 'plano', 'codigos', 'pagamentos', 'seguranca', 'preferencias', 'privacidade'];
-const DO_CODIGO = ['perfil', 'plano', 'codigos', 'preferencias', 'privacidade'];
+const TODAS = ['perfil', 'plano', 'codigos', 'pagamentos', 'seguranca', 'preferencias', 'notificacoes', 'privacidade'];   /* D-208: + Notificações */
+const DO_CODIGO = ['perfil', 'plano', 'codigos', 'preferencias', 'notificacoes', 'privacidade'];
 const mascara = cod => cod.slice(0, 2) + '-' + cod.slice(2, 6) + '-' + cod.slice(6); /* PL-XXXX-XXXX */
 
 async function novo(w, h) {
@@ -107,17 +107,17 @@ try {
       const { c, p } = await novo(w, h);
       await entrar(p, 'gratis'); await conta(p);
       const ids = await p.evaluate(() => [...document.querySelectorAll('.sec')].map(s => s.dataset.sec));
-      ok(ids.join() === TODAS.join(), 'sete seções, nesta ordem: ' + ids.join(', '));
+      ok(ids.join() === TODAS.join(), 'oito seções, nesta ordem: ' + ids.join(', '));
       if (desk) {
         const lay = await p.evaluate(() => ({ nav: document.querySelector('.cfg__nav').offsetWidth > 0, links: document.querySelectorAll('.cfg__l').length,
           abertas: [...document.querySelectorAll('.sec')].filter(s => s.offsetHeight > 0).map(s => s.dataset.sec), atual: document.querySelector('.cfg__l[aria-current]')?.dataset.ir,
           lado: document.querySelector('.cfg__lado').getBoundingClientRect().right <= document.querySelector('.cfg__secs').getBoundingClientRect().left }));
-        ok(lay.nav && lay.links === 7 && lay.lado, 'desktop: navegação lateral com as sete seções, ao lado do painel');
+        ok(lay.nav && lay.links === 8 && lay.lado, 'desktop: navegação lateral com as oito seções, ao lado do painel');
         ok(lay.abertas.join() === 'perfil' && lay.atual === 'perfil', 'desktop: um painel por vez, começando por Perfil e cadastro (marcado na navegação)');
       } else {
         const lay = await p.evaluate(() => ({ nav: document.querySelector('.cfg__nav').offsetWidth > 0, abertas: document.querySelectorAll('.sec.is-on').length,
           cab: [...document.querySelectorAll('.sec__cab')].map(b => b.getAttribute('aria-expanded') + ':' + (b.offsetHeight >= 44)).join(), res: [...document.querySelectorAll('.sec__res')].every(e => e.textContent.trim().length > 3) }));
-        ok(!lay.nav && lay.abertas === 0 && lay.cab === Array(7).fill('false:true').join() && lay.res, 'celular: lista de sete seções fechadas, cada uma com resumo, sem navegação lateral');
+        ok(!lay.nav && lay.abertas === 0 && lay.cab === Array(8).fill('false:true').join() && lay.res, 'celular: lista de oito seções fechadas, cada uma com resumo, sem navegação lateral');
         await travas(p, `${w} gratis · lista`); await foto(p, `${w}-gratis-lista`);
         await abrir(p, 'plano');
         ok(await p.locator('.sec__cab[data-abre=plano]').getAttribute('aria-expanded') === 'true' && await p.locator('.sec.is-on').count() === 1, 'celular: tocar abre a seção (só uma aberta)');
@@ -314,7 +314,7 @@ try {
       });
       await conta(p);
       const ids = await p.evaluate(() => [...document.querySelectorAll('.sec')].map(s => s.dataset.sec));
-      ok(ids.join() === DO_CODIGO.join() && await p.locator('#quem-plano').innerText() === 'Pacote Avulso básico', 'código: cinco seções (sem Pagamentos nem Segurança) e o pacote no cartão');
+      ok(ids.join() === DO_CODIGO.join() && await p.locator('#quem-plano').innerText() === 'Pacote Avulso básico', 'código: seis seções (sem Pagamentos nem Segurança) e o pacote no cartão (' + ids.join(', ') + ')');
       await abrir(p, 'perfil');
       let t = await texto(p, 'perfil');
       ok(/Ana do Código/.test(t) && /ana@exemplo\.test/.test(t) && /Código de impressão/.test(t), 'código · perfil: nome, e-mail e forma de entrada');
