@@ -70,10 +70,12 @@
 
     <!-- vídeo realista ao lado do título (D-140). D-207: só o vídeo, sem desenho de reserva: antes de tocar aparece o
          primeiro quadro do próprio vídeo (em pé no celular). A descrição vem do roteiro do vídeo (docs/prompts-flow.md).
-         No celular, um movimento de câmera acompanha o vídeo: do celular na mão até as polaroids da mesa (PLMIDIA). -->
+         Um movimento de câmera leve acompanha a ação (PLMIDIA): o celular na mão, as polaroids da mesa e a polaroid
+         erguida nas mãos, sempre inteiros no quadro. Cada passo é [fração do tempo, x %, y %, escala]. -->
     <div class="hero__arte">
      <div class="midia midia--hero" data-midia="mesa-polaroids" data-midia-base="assets/"
-          data-midia-percurso-vertical="[[0,50,26,1],[0.18,50,26,1],[0.52,60,80,1.24],[0.8,60,80,1.24],[1,50,26,1]]"
+          data-midia-percurso="[[0,68,70,1],[0.5,68,70,1],[0.6,68,62,1.06],[0.8,68,62,1.06],[0.93,68,70,1],[1,68,70,1]]"
+          data-midia-percurso-vertical="[[0,50,34,1],[0.13,50,34,1],[0.27,58,70,1.05],[0.43,58,70,1.05],[0.56,46,20,1.05],[0.8,46,20,1.05],[0.93,50,34,1],[1,50,34,1]]"
           role="img" aria-label="Vídeo: numa mesa de madeira, no fim da tarde, uma pessoa segura o celular e passa pelas fotos da galeria. Ao lado, polaroids espalhadas com fotos de amigos rindo, de uma praia, de uma montanha e de uma cidade ao pôr do sol.">
       <picture class="midia__pic"><source media="(max-width:599px)" srcset="assets/video/mesa-polaroids-vertical-poster.jpg"><img class="midia__poster" src="assets/video/mesa-polaroids-poster.jpg" alt="" fetchpriority="high" decoding="async"></picture>
       <video class="midia__video" muted autoplay loop playsinline preload="none" tabindex="-1" disablepictureinpicture aria-hidden="true"></video>
